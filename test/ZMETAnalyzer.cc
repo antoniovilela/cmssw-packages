@@ -10,6 +10,7 @@
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TH3F.h"
 
 class ZMETAnalyzer: public edm::EDAnalyzer {
 public:
@@ -39,6 +40,16 @@ private:
   unsigned int theNbinsPtNu;
   double thePtNuMin;
   double thePtNuMax;
+
+  unsigned int theNbinsCaloMET;
+  double theCaloMETMin;
+  double theCaloMETMax;
+  unsigned int theNbinsVBPt;
+  double theVBPtMin;
+  double theVBPtMax;
+  unsigned int theNbinsVBEta;
+  double theVBEtaMin;
+  double theVBEtaMax; 
   std::string theRootFileName;
 
   // The output Root file
@@ -54,6 +65,15 @@ private:
   TH2F* hMTvsEtaNu;
   TH2F* hMETvsEtaNu;
 
+  TH1F* hCaloMET;
+  TH1F* hVBPt;
+  TH1F* hVBEta;
+  TH2F* hMETvsVBPt;
+  TH2F* hMETvsVBEta;
+  TH3F* hMETvsVBPtvsVBEta;
+  TH2F* hCaloMETvsVBPt;
+  TH2F* hCaloMETvsVBEta;
+  TH3F* hCaloMETvsVBPtvsVBEta;
 };
 
 ////////// Source code ////////////////////////////////////////////////
@@ -92,6 +112,16 @@ ZMETAnalyzer::ZMETAnalyzer(const ParameterSet& pset)
   theNbinsPtNu = pset.getUntrackedParameter<unsigned int>("NbinsPtNu");
   thePtNuMin = pset.getUntrackedParameter<double>("PtNuMin");
   thePtNuMax = pset.getUntrackedParameter<double>("PtNuMax");
+  
+  theNbinsCaloMET = pset.getUntrackedParameter<unsigned int>("NbinsCaloMET");
+  theCaloMETMin = pset.getUntrackedParameter<double>("CaloMETMin");
+  theCaloMETMax = pset.getUntrackedParameter<double>("CaloMETMax");
+  theNbinsVBPt = pset.getUntrackedParameter<unsigned int>("NbinsVBPt");
+  theVBPtMin = pset.getUntrackedParameter<double>("VBPtMin");
+  theVBPtMax = pset.getUntrackedParameter<double>("VBPtMax");
+  theNbinsVBEta = pset.getUntrackedParameter<unsigned int>("NbinsVBEta");
+  theVBEtaMin = pset.getUntrackedParameter<double>("VBEtaMin");
+  theVBEtaMax = pset.getUntrackedParameter<double>("VBEtaMax");
 
   theRootFileName = pset.getUntrackedParameter<string>("RootFileName");
 }
@@ -143,6 +173,50 @@ void ZMETAnalyzer::beginJob(const EventSetup& eventSetup){
   snprintf(chtitle, 255, "MET (GeV) vs #eta?#nu (GeV) in Z events");
   hMETvsEtaNu = new TH2F(chname, chtitle, theNbinsPtNu, 0.0, 2.0
                                       , theNbinsMET, theMETMin, theMETMax);
+
+  snprintf(chname, 255, "hCaloMET");
+  snprintf(chtitle, 255, "Calo MET (GeV) in Z events");
+  hCaloMET = new TH1F(chname, chtitle, theNbinsCaloMET, theCaloMETMin, theCaloMETMax);
+
+  snprintf(chname, 255, "hVBPt");
+  snprintf(chtitle, 255, "VB PT (GeV) in Z events");
+  hVBPt = new TH1F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax);
+
+  snprintf(chname, 255, "hVBEta");
+  snprintf(chtitle, 255, "VB Eta in Z events");
+  hVBEta = new TH1F(chname, chtitle, theNbinsVBEta, theVBEtaMin, theVBEtaMax);
+
+  snprintf(chname, 255, "hMETvsVBPt");
+  snprintf(chtitle, 255, "MET (GeV) vs VB PT (GeV) in Z events");
+  hMETvsVBPt = new TH2F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
+                                      , theNbinsMET, theMETMin, theMETMax);
+
+  snprintf(chname, 255, "hMETvsVBEta");
+  snprintf(chtitle, 255, "MET (GeV) vs VB Eta in Z events");
+  hMETvsVBEta = new TH2F(chname, chtitle, theNbinsVBEta, theVBEtaMin, theVBEtaMax
+                                      , theNbinsMET, theMETMin, theMETMax);
+
+  snprintf(chname, 255, "hMETvsVBPtvsVBEta");
+  snprintf(chtitle, 255, "MET (GeV) vs VB PT (GeV) vs VB Eta in Z events");
+  hMETvsVBPtvsVBEta = new TH3F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
+                                      , theNbinsVBEta, theVBEtaMin, theVBEtaMax
+                                      , theNbinsMET, theMETMin, theMETMax);
+
+  snprintf(chname, 255, "hCaloMETvsVBPt");
+  snprintf(chtitle, 255, "Calo MET (GeV) vs VB PT (GeV) in Z events");
+  hCaloMETvsVBPt = new TH2F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
+                                      , theNbinsCaloMET, theCaloMETMin, theCaloMETMax);
+
+  snprintf(chname, 255, "hCaloMETvsVBEta");
+  snprintf(chtitle, 255, "Calo MET (GeV) vs VB Eta in Z events");
+  hCaloMETvsVBEta = new TH2F(chname, chtitle, theNbinsVBEta, theVBEtaMin, theVBEtaMax
+                                      , theNbinsCaloMET, theCaloMETMin, theCaloMETMax);
+  
+  snprintf(chname, 255, "hCaloMETvsVBPtvsVBEta");
+  snprintf(chtitle, 255, "Calo MET (GeV) vs VB PT (GeV) vs VB Eta in Z events");
+  hCaloMETvsVBPtvsVBEta = new TH3F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
+                                      , theNbinsVBEta, theVBEtaMin, theVBEtaMax
+                                      , theNbinsCaloMET, theCaloMETMin, theCaloMETMax);
 }
 
 void ZMETAnalyzer::endJob(){
@@ -159,6 +233,16 @@ void ZMETAnalyzer::endJob(){
   hMTvsEtaNu->Write();
   hMETvsEtaNu->Write();
 
+  hCaloMET->Write();
+  hVBPt->Write();
+  hVBEta->Write();
+  hMETvsVBPt->Write();
+  hMETvsVBEta->Write();
+  hMETvsVBPtvsVBEta->Write();
+  hCaloMETvsVBPt->Write();
+  hCaloMETvsVBEta->Write();
+  hCaloMETvsVBPtvsVBEta->Write();
+  
   theFile->Close();
 }
 
@@ -218,11 +302,21 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   hMT->Fill(fromZtoW*massT);
   hMET->Fill(fromZtoW*met_et);
   hPtNu->Fill(fromZtoW*ptnu);
-  hEtaNu->Fill(etanu);
+  hEtaNu->Fill(fabs(etanu));
   hMTvsPtNu->Fill(fromZtoW*ptnu, fromZtoW*massT);
   hMETvsPtNu->Fill(fromZtoW*ptnu, fromZtoW*met_et);
-  hMTvsEtaNu->Fill(etanu, fromZtoW*massT);
-  hMETvsEtaNu->Fill(etanu, fromZtoW*met_et);
+  hMTvsEtaNu->Fill(fabs(etanu), fromZtoW*massT);
+  hMETvsEtaNu->Fill(fabs(etanu), fromZtoW*met_et);
+
+  hCaloMET->Fill(fromZtoW*caloMET->et());
+  hVBPt->Fill(fromZtoW*myZ.pt());
+  hVBEta->Fill(fabs(myZ.eta()));
+  hMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*met_et);
+  hMETvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*met_et);
+  hMETvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*met_et);
+  hCaloMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*caloMET->pt());
+  hCaloMETvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*caloMET->pt());
+  hCaloMETvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*caloMET->pt());
 
 }
 
