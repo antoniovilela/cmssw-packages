@@ -6,10 +6,13 @@
 ////////// Header section /////////////////////////////////////////////
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
+#include "CLHEP/Random/JamesRandom.h"
+#include "CLHEP/Random/RandGauss.h"
 
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TProfile.h"
 
 class WMETAnalyzer: public edm::EDAnalyzer {
 public:
@@ -77,7 +80,14 @@ private:
   TH1F* hMETCorr3;
   TH2F* hCaloMETvsVBPtCorr;
   TH2F* hMETvsVBPtCorr;
-  
+
+  TH1F* hMETfromZmumu;
+  TH1F* hMTfromZmumu;
+  TH2F* hMETfromZvsVBPt;
+
+  //Random number engine/generator
+  CLHEP::HepRandomEngine* fRandomEngine;
+  CLHEP::RandGauss*       fRandomGenerator;  
 };
 
 ////////// Source code ////////////////////////////////////////////////
@@ -95,6 +105,8 @@ private:
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Utilities/interface/RandomNumberGenerator.h"
 
 using namespace std;
 using namespace edm;
@@ -192,9 +204,24 @@ void WMETAnalyzer::beginJob(const EventSetup& eventSetup){
   hCaloMETvsVBPtCorr->Reset();
   hMETvsVBPtCorr->Reset();
 
+  hMTfromZmumu = (TH1F*)hMTInput->Clone("hMTfromZmumu");
+  hMETfromZmumu = (TH1F*)hMETInput->Clone("hMETfromZmumu");
+  hMETfromZvsVBPt = (TH2F*)hMETvsVBPtInput->Clone("hMETfromZvsVBPt");
+  hMTfromZmumu->Reset();
+  hMETfromZmumu->Reset();
+  hMETfromZvsVBPt->Reset();
+
   theOutputFile = new TFile(theOutputRootFileName.c_str(), "RECREATE");
   theOutputFile->cd();
 
+  //Initialize random generator
+  Service<RandomNumberGenerator> rng;
+  long seed = (long)(rng->mySeed());
+  LogTrace("") << " seed= " << seed;
+  fRandomEngine = new CLHEP::HepJamesRandom(seed);
+  fRandomGenerator = new CLHEP::RandGauss(fRandomEngine);
+  LogTrace("") << "Random Generator Initialized";
+  
 }
 
 void WMETAnalyzer::endJob(){
@@ -222,6 +249,10 @@ void WMETAnalyzer::endJob(){
   hVBPt->Write();
   hCaloMETvsVBPt->Write();
   hMETvsVBPt->Write();
+
+  hMTfromZmumu->Write();
+  hMETfromZmumu->Write();
+  hMETfromZvsVBPt->Write();
 
   double contZ = hPtNuInput->Integral(0,hPtNuInput->GetNbinsX()+1);
   double contW = hPtNu->Integral(0,hPtNu->GetNbinsX()+1);
@@ -349,33 +380,58 @@ void WMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   
   // PT of neutrino
   double ptnu = -1.;
-  const Candidate* myW = 0;
-  const double Zmuonptcut_ = 20.;
-  const double Zmuonetacut_ = 2.; 
+  double pxnu,pynu;
+  //const Candidate* myW = 0;
+  /*const double Zmuonptcut_ = 20.;
+  const double Zmuonetacut_ = 2.;*/ 
   // Get the generator information from the event
+  int myMuindex = -1;
+  int myNuindex = -1;
+  Candidate::LorentzVector myMup4;
+  Candidate::LorentzVector myNup4;
   if (theGeneratorLabel.label()!="NONE") {
     Handle<CandidateCollection> genParticles;
     ev.getByLabel(theGeneratorLabel, genParticles);
-    for( unsigned int i = 0; i < genParticles->size(); ++ i ) {
-      const Candidate & genpart = (*genParticles)[i];
-      int id1 = genpart.pdgId();
-      if (abs(id1)!=14) continue;
-      const Candidate* mother = genpart.mother();
-      int idmother = mother->pdgId();
-      if (fabs(idmother)!=24 && idmother!=24) continue;
-      if (genpart.pt()<Zmuonptcut_) continue;
-      if (fabs(genpart.eta())>Zmuonetacut_) continue;	
-      ptnu = genpart.pt();
-      myW = mother;
-      break;
-    }
-    if (ptnu<0) return;
+    int pid_ids[2] = {13,14};
+    for(int j = 0; j < 2; j++){	
+    	for( unsigned int i = 0; i < genParticles->size(); ++ i ) {
+      		const Candidate & genpart = (*genParticles)[i];
+      		//LogTrace("") << ">>>>>>> pid,status,px,py,px,e= "  << genpart.pdgId() << " , " << genpart.status() << " , " << genpart.px() << " , " << genpart.py() << " , " << genpart.pz() << " , " << genpart.energy();	
+      		int id1 = genpart.pdgId();
+      		/*if (abs(id1)!=14) continue;
+      		const Candidate* mother = genpart.mother();
+      		int idmother = mother->pdgId();
+      		if (fabs(idmother)!=24 && idmother!=24) continue;*/
+
+      		//if (genpart.pt()<Zmuonptcut_) continue;
+      		//if (fabs(genpart.eta())>Zmuonetacut_) continue;	
+
+		if (abs(id1)!=pid_ids[j]) continue; 
+      		//ptnu = genpart.pt();
+      		//myW = mother;
+		if(pid_ids[j] == 13) myMuindex = i;
+		else if(pid_ids[j] == 14) myNuindex = i;
+
+      		break;
+    	}
+    }	
+    if (myNuindex<0) {LogTrace("") << ">>>>>>> No generated neutrino found...skipping event";return;}
+    if (myMuindex<0) {LogTrace("") << ">>>>>>> No generated muon found...skipping event";return;}
+    const Candidate & genmuon = (*genParticles)[myMuindex];
+    const Candidate & genneutrino = (*genParticles)[myNuindex];
+    myMup4 = genmuon.p4();
+    myNup4 = genneutrino.p4();
+    LogTrace("") << ">>>> Gen neutrino px,py,pz,e= " << myNup4.px() << " , " << myNup4.py() << " , " <<	myNup4.pz() << " , " << myNup4.energy();
+    LogTrace("") << ">>>> Gen muon px,py,pz,e= " << myMup4.px() << " , " << myMup4.py() << " , " << myMup4.pz() << " , " << myMup4.energy();	 
+    ptnu = genneutrino.pt();
+    pxnu = genneutrino.px();
+    pynu = genneutrino.py();	 
   // No generator information is used: assume PT(W) = 0
   } else {
       ptnu = mu->pt();
   }
-  assert(ptnu >= 0.);
-  if(theGeneratorLabel.label()!="NONE") assert(myW != 0); 
+  //assert(ptnu >= 0.);
+  //if(theGeneratorLabel.label()!="NONE") assert(myW != 0); 
 
   Handle<CaloMETCollection> metCollection;
   ev.getByLabel(theMETCollectionLabel, metCollection);
@@ -392,6 +448,7 @@ void WMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   massT = (massT>0) ? sqrt(massT) : 0;
   LogTrace("") << "\t... W_et, W_px, W_py= " << w_et << ", " << w_px << ", " << w_py << " GeV";
   LogTrace("") << "\t... Invariant transverse mass= " << massT << " GeV";
+
   hMT->Fill(massT);
   hMET->Fill(met_et);
   hPtNu->Fill(ptnu);
@@ -399,13 +456,58 @@ void WMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   hMETvsPtNu->Fill(ptnu, met_et);
 
   hCaloMET->Fill(caloMET->pt());
-  double ptW = -1.;
-  if(myW) ptW = myW->pt();
-  else ptW = 0.; 
-  hVBPt->Fill(ptW);
-  hCaloMETvsVBPt->Fill(ptW, caloMET->pt());
-  hMETvsVBPt->Fill(ptW, met_et);  
+  if (theGeneratorLabel.label()!="NONE") {
+	/*double pxW = myMup4.px() + myNup4.px();
+	double pyW = myMup4.py() + myNup4.py();
+	double ptW = sqrt(pxW*pxW + pyW*pyW);*/
+	double pxW = mu->px() + pxnu;
+	double pyW = mu->px() + pynu;
+	double ptW = sqrt(pxW*pxW + pyW*pyW);
 
+  	//Get MET from Z(data) sample
+  	/*int binWpt = (hMETvsVBPtInput->GetXaxis())->FindBin(ptW);
+  	double dataMET = (hMETvsVBPtInput->ProfileX())->GetBinContent(binWpt);
+
+	double scale = dataMET/met_et;
+	double w_et = mu->pt() + scale*met_et;
+	double w_px = mu->px() + scale*met_px;
+	double w_py = mu->py() + scale*met_py;*/
+
+	/*int binWpt = (hCaloMETvsVBPtInput->GetXaxis())->FindBin(ptW);
+        double dataMET = (hCaloMETvsVBPtInput->ProfileX())->GetBinContent(binWpt);*/
+
+	int binWpt = (hCaloMETvsVBPtInput->GetXaxis())->FindBin(ptW);
+	TH1D* histCaloMET_binWpt = hCaloMETvsVBPtInput->ProjectionY("_pbinWpt",binWpt,binWpt);
+	double proj_mean = histCaloMET_binWpt->GetMean();
+	double proj_sigma = histCaloMET_binWpt->GetRMS();
+	double dataMET = fRandomGenerator->fire(proj_mean,proj_sigma);
+	LogTrace("") << "\t... W pt, bin in CaloMET dist.= " << ptW << " , " << binWpt;
+	LogTrace("") << "\t... CaloMET from Z events= " << dataMET;
+
+	double scale = dataMET/caloMET->pt();
+	double dataMEx = scale*caloMET->px();
+	dataMEx -= mu->px();
+	double dataMEy = scale*caloMET->py();
+        dataMEy -= mu->py();
+	dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy);	
+	double w_et = mu->pt() + dataMET;
+        double w_px = mu->px() + dataMEx;
+        double w_py = mu->py() + dataMEy;
+
+	double massT = w_et*w_et - w_px*w_px - w_py*w_py;
+	massT = (massT>0) ? sqrt(massT) : 0;
+	LogTrace("") << "\t... W_et, W_px, W_py= " << w_et << ", " << w_px << ", " << w_py << " GeV";
+	LogTrace("") << "\t... Invariant transverse mass= " << massT << " GeV";
+
+	//ptW = sqrt(w_px*w_px + w_py*w_py);
+	hVBPt->Fill(ptW);
+        hCaloMETvsVBPt->Fill(ptW, caloMET->pt());
+        hMETvsVBPt->Fill(ptW, met_et);
+
+	hMTfromZmumu->Fill(massT);
+  	hMETfromZmumu->Fill(dataMET);
+  	hMETfromZvsVBPt->Fill(ptW, dataMET);
+  } 
 }
 
 DEFINE_FWK_MODULE(WMETAnalyzer);

@@ -7,6 +7,7 @@
 <library file=WToMuNuSelector.cc> </library>
 <library file=WMETAnalyzer.cc>
   <use name=DataFormats/Common>
+  <use name=SimDataFormats/HepMCProduct>
   <use name=hepmc>
-  <lib name=SimDataFormatsHepMCProduct>
+  <use name=clhep>
 </library>
