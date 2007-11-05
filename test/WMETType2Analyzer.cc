@@ -347,7 +347,7 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
   double pyW = myMup4.py() + myNup4.py();
   double ptW = sqrt(pxW*pxW + pyW*pyW);*/
   double pxW = mu->px() + pxnu;
-  double pyW = mu->px() + pynu;
+  double pyW = mu->py() + pynu;
   double ptW = sqrt(pxW*pxW + pyW*pyW);
 
   //Get MET from Z(data) sample
@@ -380,17 +380,17 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
   double W_px = mu->px() + dataMEx;
   double W_py = mu->py() + dataMEy;
 
-  double MassT = w_et*w_et - w_px*w_px - w_py*w_py;
-  massT = (massT>0) ? sqrt(massT) : 0;
-  LogTrace("") << "\t... W_et, W_px, W_py= " << w_et << ", " << w_px << ", " << w_py << " GeV";
-  LogTrace("") << "\t... Invariant transverse mass= " << massT << " GeV";
+  double MassT = W_et*W_et - W_px*W_px - W_py*W_py;
+  MassT = (MassT>0) ? sqrt(MassT) : 0;
+  LogTrace("") << "\t... W_et, W_px, W_py= " << W_et << ", " << W_px << ", " << W_py << " GeV";
+  LogTrace("") << "\t... Invariant transverse mass= " << MassT << " GeV";
 
   //ptW = sqrt(w_px*w_px + w_py*w_py);
   hVBPt->Fill(ptW);
   hCaloMETvsVBPt->Fill(ptW, caloMET->pt());
   hMETvsVBPt->Fill(ptW, met_et);
 
-  hMTfromZmumu->Fill(massT);
+  hMTfromZmumu->Fill(MassT);
   hMETfromZmumu->Fill(dataMET);
   hMETfromZvsVBPt->Fill(ptW, dataMET);
   //} 
