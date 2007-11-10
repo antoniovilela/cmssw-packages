@@ -83,7 +83,7 @@ private:
 
   TH1F* hMETfromZmumu;
   TH1F* hMTfromZmumu;
-  TH2F* hMETfromZvsVBPt;
+  TH2F* hMETfromZmumuvsVBPt;
 
   //Random number engine/generator
   CLHEP::HepRandomEngine* fRandomEngine;
@@ -206,10 +206,10 @@ void WMETAnalyzer::beginJob(const EventSetup& eventSetup){
 
   hMTfromZmumu = (TH1F*)hMTInput->Clone("hMTfromZmumu");
   hMETfromZmumu = (TH1F*)hMETInput->Clone("hMETfromZmumu");
-  hMETfromZvsVBPt = (TH2F*)hMETvsVBPtInput->Clone("hMETfromZvsVBPt");
+  hMETfromZmumuvsVBPt = (TH2F*)hMETvsVBPtInput->Clone("hMETfromZmumuvsVBPt");
   hMTfromZmumu->Reset();
   hMETfromZmumu->Reset();
-  hMETfromZvsVBPt->Reset();
+  hMETfromZmumuvsVBPt->Reset();
 
   theOutputFile = new TFile(theOutputRootFileName.c_str(), "RECREATE");
   theOutputFile->cd();
@@ -229,21 +229,21 @@ void WMETAnalyzer::endJob(){
   LogInfo("WMETAnalyzer") << " Number of events used= " << hMT->GetEntries();
 
   // Write the histos to file
-  hMTInput->Write();
+  /*hMTInput->Write();
   hMETInput->Write();
   hPtNuInput->Write();
   hMTvsPtNuInput->Write();
-  hMETvsPtNuInput->Write();
+  hMETvsPtNuInput->Write();*/
   hMT->Write();
   hMET->Write();
   hPtNu->Write();
   hMTvsPtNu->Write();
   hMETvsPtNu->Write();
 
-  hCaloMETInput->Write();
+  /*hCaloMETInput->Write();
   hVBPtInput->Write(); 
   hCaloMETvsVBPtInput->Write();
-  hMETvsVBPtInput->Write();
+  hMETvsVBPtInput->Write();*/
 
   hCaloMET->Write();
   hVBPt->Write();
@@ -252,7 +252,7 @@ void WMETAnalyzer::endJob(){
 
   hMTfromZmumu->Write();
   hMETfromZmumu->Write();
-  hMETfromZvsVBPt->Write();
+  hMETfromZmumuvsVBPt->Write();
 
   double contZ = hPtNuInput->Integral(0,hPtNuInput->GetNbinsX()+1);
   double contW = hPtNu->Integral(0,hPtNu->GetNbinsX()+1);
@@ -461,7 +461,7 @@ void WMETAnalyzer::analyze(const Event & ev, const EventSetup&){
 	double pyW = myMup4.py() + myNup4.py();
 	double ptW = sqrt(pxW*pxW + pyW*pyW);*/
 	double pxW = mu->px() + pxnu;
-	double pyW = mu->px() + pynu;
+	double pyW = mu->py() + pynu;
 	double ptW = sqrt(pxW*pxW + pyW*pyW);
 
   	//Get MET from Z(data) sample
@@ -506,7 +506,7 @@ void WMETAnalyzer::analyze(const Event & ev, const EventSetup&){
 
 	hMTfromZmumu->Fill(massT);
   	hMETfromZmumu->Fill(dataMET);
-  	hMETfromZvsVBPt->Fill(ptW, dataMET);
+  	hMETfromZmumuvsVBPt->Fill(ptW, dataMET);
   } 
 }
 

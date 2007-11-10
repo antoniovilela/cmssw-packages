@@ -33,7 +33,8 @@ private:
   // Input from cfg file
   edm::InputTag theGeneratorLabel;
   edm::InputTag theMuonCollectionLabel;
-  edm::InputTag theMETCollectionLabel;
+  edm::InputTag theGenMETCollectionLabel;
+  edm::InputTag theCaloMETCollectionLabel;
 
   std::string theInputRootFileName;
   std::string theOutputRootFileName;
@@ -60,6 +61,7 @@ private:
   TH2F* hMTvsPtNu;
   TH2F* hMETvsPtNu;
 
+  TH1F* hGenMET;
   TH1F* hCaloMET;
   TH1F* hVBPt;
   TH2F* hCaloMETvsVBPt;
@@ -69,7 +71,7 @@ private:
 
   TH1F* hMETfromZmumu;
   TH1F* hMTfromZmumu;
-  TH2F* hMETfromZvsVBPt;
+  TH2F* hMETfromZmumuvsVBPt;
 
   //Random number engine/generator
   CLHEP::HepRandomEngine* fRandomEngine;
@@ -88,6 +90,7 @@ private:
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
+#include "DataFormats/METReco/interface/GenMET.h"
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -104,7 +107,8 @@ WMETType2Analyzer::WMETType2Analyzer(const ParameterSet& pset)
   theGeneratorLabel = pset.getUntrackedParameter<InputTag>("GeneratorCollectionLabel");
   theMuonCollectionLabel = pset.getUntrackedParameter<InputTag>("MuonCollectionLabel");
   theMuonCollectionLabel = edm::InputTag(theMuonCollectionLabel.label(),"WMuons");
-  theMETCollectionLabel = pset.getUntrackedParameter<InputTag>("METCollectionLabel");
+  theGenMETCollectionLabel = pset.getUntrackedParameter<InputTag>("GenMETCollectionLabel");
+  theCaloMETCollectionLabel = pset.getUntrackedParameter<InputTag>("CaloMETCollectionLabel");
 
   theInputRootFileName = pset.getUntrackedParameter<string>("InputRootFileName");
   theOutputRootFileName = pset.getUntrackedParameter<string>("OutputRootFileName");
@@ -147,6 +151,7 @@ void WMETType2Analyzer::beginJob(const EventSetup& eventSetup){
   hMTvsPtNu = (TH2F*)hMTvsPtNuInput->Clone("hMTvsPtNu");
   hMETvsPtNu = (TH2F*)hMETvsPtNuInput->Clone("hMETvsPtNu"); 
 
+  hGenMET = (TH1F*)hCaloMETInput->Clone("hGenMET");
   hCaloMET = (TH1F*)hCaloMETInput->Clone("hCaloMET");
   hVBPt = (TH1F*)hVBPtInput->Clone("hVBPt");
   hCaloMETvsVBPt = (TH2F*)hCaloMETvsVBPtInput->Clone("hCaloMETvsVBPt");
@@ -156,7 +161,7 @@ void WMETType2Analyzer::beginJob(const EventSetup& eventSetup){
 
   hMTfromZmumu = (TH1F*)hMTInput->Clone("hMTfromZmumu");
   hMETfromZmumu = (TH1F*)hMETInput->Clone("hMETfromZmumu");
-  hMETfromZvsVBPt = (TH2F*)hMETvsVBPtInput->Clone("hMETfromZvsVBPt");
+  hMETfromZmumuvsVBPt = (TH2F*)hMETvsVBPtInput->Clone("hMETfromZmumuvsVBPt");
 
   hMT->Reset();
   hMET->Reset();
@@ -164,6 +169,7 @@ void WMETType2Analyzer::beginJob(const EventSetup& eventSetup){
   hMTvsPtNu->Reset();
   hMETvsPtNu->Reset();
 
+  hGenMET->Reset();
   hCaloMET->Reset();
   hVBPt->Reset();
   hCaloMETvsVBPt->Reset();
@@ -173,7 +179,7 @@ void WMETType2Analyzer::beginJob(const EventSetup& eventSetup){
 
   hMTfromZmumu->Reset();
   hMETfromZmumu->Reset();
-  hMETfromZvsVBPt->Reset();
+  hMETfromZmumuvsVBPt->Reset();
 
   theOutputFile = new TFile(theOutputRootFileName.c_str(), "RECREATE");
   theOutputFile->cd();
@@ -193,11 +199,11 @@ void WMETType2Analyzer::endJob(){
   LogInfo("WMETType2Analyzer") << " Number of events used= " << hMT->GetEntries();
 
   // Write the histos to file
-  hMTInput->Write();
+  /*hMTInput->Write();
   hMETInput->Write();
   hPtNuInput->Write();
   hMTvsPtNuInput->Write();
-  hMETvsPtNuInput->Write();
+  hMETvsPtNuInput->Write();*/
  
   hMT->Write();
   hMET->Write();
@@ -205,11 +211,12 @@ void WMETType2Analyzer::endJob(){
   hMTvsPtNu->Write();
   hMETvsPtNu->Write();
 
-  hCaloMETInput->Write();
+  /*hCaloMETInput->Write();
   hVBPtInput->Write(); 
   hCaloMETvsVBPtInput->Write();
-  hMETvsVBPtInput->Write();
+  hMETvsVBPtInput->Write();*/
 
+  hGenMET->Write();
   hCaloMET->Write();
   hVBPt->Write();
   hCaloMETvsVBPt->Write();
@@ -217,16 +224,16 @@ void WMETType2Analyzer::endJob(){
 
   hMTfromZmumu->Write();
   hMETfromZmumu->Write();
-  hMETfromZvsVBPt->Write();
+  hMETfromZmumuvsVBPt->Write();
 
-  double contZ = hVBPtInput->Integral(0,hVBPtInput->GetNbinsX()+1);
+  /*double contZ = hVBPtInput->Integral(0,hVBPtInput->GetNbinsX()+1);
   double contW = hVBPt->Integral(0,hVBPt->GetNbinsX()+1);
   if (contZ>0) hVBPtInput->Scale(1./contZ);
   if (contW>0) hVBPt->Scale(1./contW);
   hVBPtRew = (TH1F*)hVBPt->Clone("hVBPtRew");
-  hVBPtRew->Divide(hVBPtInput);
+  hVBPtRew->Divide(hVBPtInput);*/
 
-  hVBPtRew->Write();
+  //hVBPtRew->Write();
 
   theOutputFile->Close();
 }
@@ -319,10 +326,16 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
   //assert(ptnu >= 0.);
   //if(theGeneratorLabel.label()!="NONE") assert(myW != 0); 
 
-  Handle<CaloMETCollection> metCollection;
-  ev.getByLabel(theMETCollectionLabel, metCollection);
-  CaloMETCollection::const_iterator caloMET = metCollection->begin();
-  LogTrace("") << ">>> CaloMET_et, CaloMET_py, CaloMET_py= " << caloMET->et() << ", " << caloMET->px() << ", " << caloMET->py();;
+  Handle<GenMETCollection> genMETCollection;
+  ev.getByLabel(theGenMETCollectionLabel, genMETCollection);
+  GenMETCollection::const_iterator genMET = genMETCollection->begin();
+  LogTrace("") << ">>> GenMET_et, GenMET_py, GenMET_py= " << genMET->pt() << ", " << genMET->px() << ", " << genMET->py();
+
+  Handle<CaloMETCollection> caloMETCollection;
+  ev.getByLabel(theCaloMETCollectionLabel, caloMETCollection);
+  CaloMETCollection::const_iterator caloMET = caloMETCollection->begin();
+  LogTrace("") << ">>> CaloMET_et, CaloMET_py, CaloMET_py= " << caloMET->pt() << ", " << caloMET->px() << ", " << caloMET->py();
+
   met_px += caloMET->px();
   met_py += caloMET->py();
   double met_et = sqrt(met_px*met_px+met_py*met_py);
@@ -341,6 +354,7 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
   hMTvsPtNu->Fill(ptnu, massT);
   hMETvsPtNu->Fill(ptnu, met_et);
 
+  hGenMET->Fill(genMET->pt());
   hCaloMET->Fill(caloMET->pt());
   //if (theGeneratorLabel.label()!="NONE") {
   /*double pxW = myMup4.px() + myNup4.px();
@@ -392,7 +406,7 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
 
   hMTfromZmumu->Fill(MassT);
   hMETfromZmumu->Fill(dataMET);
-  hMETfromZvsVBPt->Fill(ptW, dataMET);
+  hMETfromZmumuvsVBPt->Fill(ptW, dataMET);
   //} 
 }
 

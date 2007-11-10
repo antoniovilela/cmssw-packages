@@ -68,12 +68,15 @@ private:
   TH1F* hCaloMET;
   TH1F* hVBPt;
   TH1F* hVBEta;
+  TH1F* hresVBPt; 	
   TH2F* hMETvsVBPt;
   TH2F* hMETvsVBEta;
   TH3F* hMETvsVBPtvsVBEta;
   TH2F* hCaloMETvsVBPt;
   TH2F* hCaloMETvsVBEta;
   TH3F* hCaloMETvsVBPtvsVBEta;
+  TH2F* hCaloMEToverVBPtvsVBPt;
+  TH2F* hCaloMEToverVBPtvsCaloMET;	
 };
 
 ////////// Source code ////////////////////////////////////////////////
@@ -186,6 +189,10 @@ void ZMETAnalyzer::beginJob(const EventSetup& eventSetup){
   snprintf(chtitle, 255, "VB Eta in Z events");
   hVBEta = new TH1F(chname, chtitle, theNbinsVBEta, theVBEtaMin, theVBEtaMax);
 
+  snprintf(chname, 255, "hresVBPt");
+  snprintf(chtitle, 255, "(VB Pt - CaloMET)/VBPt in Z events");	
+  hresVBPt = new TH1F(chname, chtitle, theNbinsVBPt, -1., 1.);
+	
   snprintf(chname, 255, "hMETvsVBPt");
   snprintf(chtitle, 255, "MET (GeV) vs VB PT (GeV) in Z events");
   hMETvsVBPt = new TH2F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
@@ -217,6 +224,16 @@ void ZMETAnalyzer::beginJob(const EventSetup& eventSetup){
   hCaloMETvsVBPtvsVBEta = new TH3F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
                                       , theNbinsVBEta, theVBEtaMin, theVBEtaMax
                                       , theNbinsCaloMET, theCaloMETMin, theCaloMETMax);
+
+  snprintf(chname, 255, "hCaloMEToverVBPtvsVBPt");
+  snprintf(chtitle, 255, "Calo MET/VB PT vs VB PT (GeV) in Z events");
+  hCaloMEToverVBPtvsVBPt = new TH2F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
+                                      , theNbinsVBPt, 0., 2.);
+
+  snprintf(chname, 255, "hCaloMEToverVBPtvsCaloMET");
+  snprintf(chtitle, 255, "Calo MET/VB PT vs CaloMET (GeV) in Z events");
+  hCaloMEToverVBPtvsCaloMET = new TH2F(chname, chtitle, theNbinsCaloMET, theCaloMETMin, theCaloMETMax
+                                      , theNbinsVBPt, 0., 2.);
 }
 
 void ZMETAnalyzer::endJob(){
@@ -236,13 +253,16 @@ void ZMETAnalyzer::endJob(){
   hCaloMET->Write();
   hVBPt->Write();
   hVBEta->Write();
+  hresVBPt->Write();
   hMETvsVBPt->Write();
   hMETvsVBEta->Write();
   hMETvsVBPtvsVBEta->Write();
   hCaloMETvsVBPt->Write();
   hCaloMETvsVBEta->Write();
   hCaloMETvsVBPtvsVBEta->Write();
-  
+  hCaloMEToverVBPtvsVBPt->Write();
+  hCaloMEToverVBPtvsCaloMET->Write();
+
   theFile->Close();
 }
 
@@ -298,6 +318,8 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   LogTrace("") << "\t... W_et, W_px, W_py= " << w_et << ", " << w_px << ", " << w_py << " GeV";
   LogTrace("") << "\t... Invariant transverse mass= " << massT << " GeV";
 
+  double resVBPt = (myZ.pt() - caloMET->pt())/myZ.pt();
+ 	
   double fromZtoW = 80.4/91.2;
   hMT->Fill(fromZtoW*massT);
   hMET->Fill(fromZtoW*met_et);
@@ -311,13 +333,15 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   hCaloMET->Fill(fromZtoW*caloMET->et());
   hVBPt->Fill(fromZtoW*myZ.pt());
   hVBEta->Fill(fabs(myZ.eta()));
+  hresVBPt->Fill(resVBPt);	
   hMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*met_et);
   hMETvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*met_et);
   hMETvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*met_et);
   hCaloMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*caloMET->pt());
   hCaloMETvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*caloMET->pt());
   hCaloMETvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*caloMET->pt());
-
+  hCaloMEToverVBPtvsVBPt->Fill(fromZtoW*myZ.pt(),caloMET->pt()/myZ.pt());
+  hCaloMEToverVBPtvsCaloMET->Fill(fromZtoW*caloMET->pt(),caloMET->pt()/myZ.pt());
 }
 
 DEFINE_FWK_MODULE(ZMETAnalyzer);
