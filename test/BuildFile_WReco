@@ -14,6 +14,8 @@
 <library file=WMETType2Analyzer.cc>
   <use name=DataFormats/Common>
   <use name=SimDataFormats/HepMCProduct>
+  <use name=FastSimulation/Utilities>
+  <use name=FastSimulation/ParamL3MuonProducer>
   <use name=hepmc>
   <use name=clhep>
 </library>

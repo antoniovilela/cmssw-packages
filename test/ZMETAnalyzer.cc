@@ -8,6 +8,7 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
 #include "TFile.h"
+#include "TTree.h" 
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
@@ -49,12 +50,36 @@ private:
   double theVBPtMax;
   unsigned int theNbinsVBEta;
   double theVBEtaMin;
-  double theVBEtaMax; 
+  double theVBEtaMax;
+
+  unsigned int theNbinsCaloMETPhi;
+  double theCaloMETPhiMin;
+  double theCaloMETPhiMax; 
+  unsigned int theNbinsVBPhi;
+  double theVBPhiMin;
+  double theVBPhiMax;
   std::string theRootFileName;
 
   // The output Root file
   TFile* theFile;
 
+  // Output TTree
+  TTree* mytree;
+  double tree_VBPt;
+  double tree_VBEta;
+  double tree_VBPhi;
+  double tree_NuPt;
+  double tree_NuEta;
+  double tree_NuPhi;
+  double tree_CaloMET;
+  double tree_CaloMET_Phi;
+  double tree_CaloMEx;
+  double tree_CaloMEy;
+  double tree_MET;
+  double tree_MEx;
+  double tree_MEy;
+  double tree_MT;
+	
   // Histograms
   TH1F* hMT;
   TH1F* hMET;
@@ -72,11 +97,16 @@ private:
   TH2F* hMETvsVBPt;
   TH2F* hMETvsVBEta;
   TH3F* hMETvsVBPtvsVBEta;
+  TH2F* hMTvsVBPt;
+  TH2F* hMTvsVBEta;
+  TH3F* hMTvsVBPtvsVBEta;
   TH2F* hCaloMETvsVBPt;
   TH2F* hCaloMETvsVBEta;
+  TH2F* hCaloMETvsVBPhi;
   TH3F* hCaloMETvsVBPtvsVBEta;
   TH2F* hCaloMEToverVBPtvsVBPt;
-  TH2F* hCaloMEToverVBPtvsCaloMET;	
+  TH2F* hCaloMEToverVBPtvsCaloMET;
+  TH2F* hCaloMETPhivsVBPhi;	
 };
 
 ////////// Source code ////////////////////////////////////////////////
@@ -126,6 +156,13 @@ ZMETAnalyzer::ZMETAnalyzer(const ParameterSet& pset)
   theVBEtaMin = pset.getUntrackedParameter<double>("VBEtaMin");
   theVBEtaMax = pset.getUntrackedParameter<double>("VBEtaMax");
 
+  theNbinsCaloMETPhi = pset.getUntrackedParameter<unsigned int>("NbinsCaloMETPhi");
+  theCaloMETPhiMin = pset.getUntrackedParameter<double>("CaloMETPhiMin");
+  theCaloMETPhiMax = pset.getUntrackedParameter<double>("CaloMETPhiMax");
+  theNbinsVBPhi = pset.getUntrackedParameter<unsigned int>("NbinsVBPhi");
+  theVBPhiMin = pset.getUntrackedParameter<double>("VBPhiMin");
+  theVBPhiMax = pset.getUntrackedParameter<double>("VBPhiMax");
+
   theRootFileName = pset.getUntrackedParameter<string>("RootFileName");
 }
 
@@ -137,6 +174,22 @@ void ZMETAnalyzer::beginJob(const EventSetup& eventSetup){
   // Create the root file
   theFile = new TFile(theRootFileName.c_str(), "RECREATE");
   theFile->cd();
+
+  mytree = new TTree("ZTTree","ZTTree");
+  mytree->Branch("VBPt",&tree_VBPt,"VBPt/D");
+  mytree->Branch("VBEta",&tree_VBEta,"VBEta/D");
+  mytree->Branch("VBPhi",&tree_VBPhi,"VBPhi/D");
+  mytree->Branch("NuPt",&tree_NuPt,"NuPt/D");
+  mytree->Branch("NuEta",&tree_NuEta,"NuEta/D");
+  mytree->Branch("NuPhi",&tree_NuPhi,"NuPhi/D");
+  mytree->Branch("CaloMET",&tree_CaloMET,"CaloMET/D");
+  mytree->Branch("CaloMET_Phi",&tree_CaloMET_Phi,"CaloMET_Phi/D");
+  mytree->Branch("CaloMEx",&tree_CaloMEx,"CaloMEx/D");	
+  mytree->Branch("CaloMEy",&tree_CaloMEy,"CaloMEy/D");
+  mytree->Branch("MET",&tree_MET,"MET/D");
+  mytree->Branch("MEx",&tree_MEx,"MEx/D");
+  mytree->Branch("MEy",&tree_MEy,"MEy/D");
+  mytree->Branch("MT",&tree_MT,"MT/D");
 
   char chname[256];
   char chtitle[256];
@@ -209,6 +262,22 @@ void ZMETAnalyzer::beginJob(const EventSetup& eventSetup){
                                       , theNbinsVBEta, theVBEtaMin, theVBEtaMax
                                       , theNbinsMET, theMETMin, theMETMax);
 
+  snprintf(chname, 255, "hMTvsVBPt");
+  snprintf(chtitle, 255, "MT (GeV) vs VB PT (GeV) in Z events");
+  hMTvsVBPt = new TH2F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
+                                      , theNbinsMT, theMTMin, theMTMax);
+
+  snprintf(chname, 255, "hMTvsVBEta");
+  snprintf(chtitle, 255, "MT (GeV) vs VB Eta in Z events");
+  hMTvsVBEta = new TH2F(chname, chtitle, theNbinsVBEta, theVBEtaMin, theVBEtaMax
+                                      , theNbinsMT, theMTMin, theMTMax);
+
+  snprintf(chname, 255, "hMTvsVBPtvsVBEta");
+  snprintf(chtitle, 255, "MT (GeV) vs VB PT (GeV) vs VB Eta in Z events");
+  hMTvsVBPtvsVBEta = new TH3F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
+                                      , theNbinsVBEta, theVBEtaMin, theVBEtaMax
+                                      , theNbinsMT, theMTMin, theMTMax);
+
   snprintf(chname, 255, "hCaloMETvsVBPt");
   snprintf(chtitle, 255, "Calo MET (GeV) vs VB PT (GeV) in Z events");
   hCaloMETvsVBPt = new TH2F(chname, chtitle, theNbinsVBPt, theVBPtMin, theVBPtMax
@@ -217,6 +286,11 @@ void ZMETAnalyzer::beginJob(const EventSetup& eventSetup){
   snprintf(chname, 255, "hCaloMETvsVBEta");
   snprintf(chtitle, 255, "Calo MET (GeV) vs VB Eta in Z events");
   hCaloMETvsVBEta = new TH2F(chname, chtitle, theNbinsVBEta, theVBEtaMin, theVBEtaMax
+                                      , theNbinsCaloMET, theCaloMETMin, theCaloMETMax);
+
+  snprintf(chname, 255, "hCaloMETvsVBPhi");
+  snprintf(chtitle, 255, "Calo MET (GeV) vs VB Phi in Z events");
+  hCaloMETvsVBPhi = new TH2F(chname, chtitle, theNbinsVBPhi, theVBPhiMin, theVBPhiMax
                                       , theNbinsCaloMET, theCaloMETMin, theCaloMETMax);
   
   snprintf(chname, 255, "hCaloMETvsVBPtvsVBEta");
@@ -234,11 +308,19 @@ void ZMETAnalyzer::beginJob(const EventSetup& eventSetup){
   snprintf(chtitle, 255, "Calo MET/VB PT vs CaloMET (GeV) in Z events");
   hCaloMEToverVBPtvsCaloMET = new TH2F(chname, chtitle, theNbinsCaloMET, theCaloMETMin, theCaloMETMax
                                       , theNbinsVBPt, 0., 2.);
+
+  snprintf(chname, 255, "hCaloMETPhivsVBPhi");
+  snprintf(chtitle, 255, "Calo MET Phi vs VB Phi in Z events");
+  hCaloMETPhivsVBPhi = new TH2F(chname, chtitle, theNbinsVBPhi, theVBPhiMin, theVBPhiMax
+                                      , theNbinsCaloMETPhi, theCaloMETPhiMin, theCaloMETPhiMax);
 }
 
 void ZMETAnalyzer::endJob(){
   theFile->cd();
   LogInfo("ZMETAnalyzer") << " Number of events used= " << hMT->GetEntries();
+
+  // Write TTree
+  mytree->Write();
 
   // Write the histos to file
   hMT->Write();
@@ -257,11 +339,16 @@ void ZMETAnalyzer::endJob(){
   hMETvsVBPt->Write();
   hMETvsVBEta->Write();
   hMETvsVBPtvsVBEta->Write();
+  hMTvsVBPt->Write();
+  hMTvsVBEta->Write();
+  hMTvsVBPtvsVBEta->Write();
   hCaloMETvsVBPt->Write();
   hCaloMETvsVBEta->Write();
+  hCaloMETvsVBPhi->Write();
   hCaloMETvsVBPtvsVBEta->Write();
   hCaloMEToverVBPtvsVBPt->Write();
   hCaloMEToverVBPtvsCaloMET->Write();
+  hCaloMETPhivsVBPhi->Write();
 
   theFile->Close();
 }
@@ -301,6 +388,7 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   const Candidate* nu = myZ.daughter(1);
   double ptnu = nu->pt();
   double etanu = nu->eta();
+  double phinu = nu->phi();
 
   Handle<CaloMETCollection> metCollection;
   ev.getByLabel(theMETCollectionLabel, metCollection);
@@ -321,6 +409,24 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   double resVBPt = (myZ.pt() - caloMET->pt())/myZ.pt();
  	
   double fromZtoW = 80.4/91.2;
+  // Fill TTree
+  tree_VBPt = fromZtoW*myZ.pt();
+  tree_VBEta = myZ.eta();
+  tree_VBPhi = myZ.phi();  
+  tree_NuPt = fromZtoW*ptnu;
+  tree_NuEta = etanu;
+  tree_NuPhi = phinu;
+  tree_CaloMET = fromZtoW*caloMET->pt();
+  tree_CaloMET_Phi = caloMET->phi();
+  tree_CaloMEx = fromZtoW*caloMET->px();
+  tree_CaloMEy = fromZtoW*caloMET->py();
+  tree_MET = fromZtoW*met_et;
+  tree_MEx = fromZtoW*met_px;
+  tree_MEy = fromZtoW*met_py;
+  tree_MT = fromZtoW*massT;
+  mytree->Fill();
+
+  // Fill histos
   hMT->Fill(fromZtoW*massT);
   hMET->Fill(fromZtoW*met_et);
   hPtNu->Fill(fromZtoW*ptnu);
@@ -330,18 +436,23 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   hMTvsEtaNu->Fill(fabs(etanu), fromZtoW*massT);
   hMETvsEtaNu->Fill(fabs(etanu), fromZtoW*met_et);
 
-  hCaloMET->Fill(fromZtoW*caloMET->et());
+  hCaloMET->Fill(fromZtoW*caloMET->pt());
   hVBPt->Fill(fromZtoW*myZ.pt());
   hVBEta->Fill(fabs(myZ.eta()));
   hresVBPt->Fill(resVBPt);	
   hMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*met_et);
   hMETvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*met_et);
   hMETvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*met_et);
+  hMTvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*massT);
+  hMTvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*massT);
+  hMTvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*massT);	
   hCaloMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*caloMET->pt());
   hCaloMETvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*caloMET->pt());
+  hCaloMETvsVBPhi->Fill(myZ.phi(), fromZtoW*caloMET->pt());
   hCaloMETvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*caloMET->pt());
   hCaloMEToverVBPtvsVBPt->Fill(fromZtoW*myZ.pt(),caloMET->pt()/myZ.pt());
   hCaloMEToverVBPtvsCaloMET->Fill(fromZtoW*caloMET->pt(),caloMET->pt()/myZ.pt());
+  hCaloMETPhivsVBPhi->Fill(myZ.phi(), caloMET->phi());
 }
 
 DEFINE_FWK_MODULE(ZMETAnalyzer);

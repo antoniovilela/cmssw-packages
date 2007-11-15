@@ -14,6 +14,9 @@
 #include "TH2F.h"
 #include "TProfile.h"
 
+class RandomEngine;
+class FML3PtSmearer;
+
 class WMETType2Analyzer: public edm::EDAnalyzer {
 public:
   /// Constructor
@@ -43,6 +46,11 @@ private:
   TFile* theInputFile;
   TFile* theOutputFile;
 
+  //Nu cut
+  bool applyNuCut_;
+  double nuPtCut_;
+  double nuEtaCut_;
+
   // Histograms
   TH1F* hMTInput;
   TH1F* hMETInput;
@@ -53,29 +61,46 @@ private:
   TH1F* hCaloMETInput;
   TH1F* hVBPtInput;
   TH2F* hCaloMETvsVBPtInput;
+  TH2F* hCaloMETPhivsVBPhiInput;
+  TH2F* hMTvsVBPtInput;
   TH2F* hMETvsVBPtInput;
-
+  	
   TH1F* hMT;
   TH1F* hMET;
   TH1F* hPtNu;
+  TH1F* hPtNuSmeared;
   TH2F* hMTvsPtNu;
   TH2F* hMETvsPtNu;
 
   TH1F* hGenMET;
+  TH1F* hGenMT;
+  TH1F* hMTSmeared;
   TH1F* hCaloMET;
   TH1F* hVBPt;
   TH2F* hCaloMETvsVBPt;
+  TH2F* hCaloMETPhivsVBPhi;
+  TH2F* hMTvsVBPt;
   TH2F* hMETvsVBPt;
 
   TH1F* hVBPtRew;
 
-  TH1F* hMETfromZmumu;
   TH1F* hMTfromZmumu;
+  TH1F* hMETfromZmumu;
+  TH2F* hMTfromZmumuvsVBPt;
   TH2F* hMETfromZmumuvsVBPt;
+
+  TH2F* hCaloMEToverVBPtvsCaloMETInput;
+  TH2F* hCaloMEToverVBPtvsCaloMET;
+  TH1F* hMETCorrScale;
+  TH2F* hCaloMETCorroverVBPtvsCaloMETCorr;
 
   //Random number engine/generator
   CLHEP::HepRandomEngine* fRandomEngine;
   CLHEP::RandGauss*       fRandomGenerator;  
+
+  RandomEngine* FSRandom;
+  //FM Pt Smearer
+  FML3PtSmearer * myPtSmearer;
 };
 
 ////////// Source code ////////////////////////////////////////////////
@@ -97,6 +122,9 @@ private:
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Utilities/interface/RandomNumberGenerator.h"
 
+#include "FastSimulation/Utilities/interface/RandomEngine.h"
+#include "FastSimulation/ParamL3MuonProducer/interface/FML3PtSmearer.h"
+
 using namespace std;
 using namespace edm;
 using namespace reco;
@@ -112,6 +140,10 @@ WMETType2Analyzer::WMETType2Analyzer(const ParameterSet& pset)
 
   theInputRootFileName = pset.getUntrackedParameter<string>("InputRootFileName");
   theOutputRootFileName = pset.getUntrackedParameter<string>("OutputRootFileName");
+
+  applyNuCut_ = pset.getUntrackedParameter<bool>("ApplyNuCut",false);
+  nuPtCut_ = pset.getUntrackedParameter<double>("NuPtCut",0.0);
+  nuEtaCut_ = pset.getUntrackedParameter<double>("NuEtaCut",5.0);
 }
 
 /// Destructor
@@ -132,7 +164,11 @@ void WMETType2Analyzer::beginJob(const EventSetup& eventSetup){
   hCaloMETInput = (TH1F*)theInputFile->Get("hCaloMET");
   hVBPtInput = (TH1F*)theInputFile->Get("hVBPt");
   hCaloMETvsVBPtInput = (TH2F*)theInputFile->Get("hCaloMETvsVBPt");
+  hCaloMETPhivsVBPhiInput = (TH2F*)theInputFile->Get("hCaloMETPhivsVBPhi");
+  hMTvsVBPtInput = (TH2F*)theInputFile->Get("hMTvsVBPt");
   hMETvsVBPtInput = (TH2F*)theInputFile->Get("hMETvsVBPt");
+
+  hCaloMEToverVBPtvsCaloMETInput = (TH2F*)theInputFile->Get("hCaloMEToverVBPtvsCaloMET");
 
   hMTInput->SetName("hMTInput");
   hMETInput->SetName("hMETInput");
@@ -143,55 +179,92 @@ void WMETType2Analyzer::beginJob(const EventSetup& eventSetup){
   hCaloMETInput->SetName("hCaloMETInput");
   hVBPtInput->SetName("hVBPtInput");
   hCaloMETvsVBPtInput->SetName("hCaloMETvsVBPtInput");
+  hCaloMETPhivsVBPhiInput->SetName("hCaloMETPhivsVBPhiInput");
+  hMTvsVBPtInput->SetName("hMTvsVBPtInput");
   hMETvsVBPtInput->SetName("hMETvsVBPtInput");
+
+  hCaloMEToverVBPtvsCaloMETInput->SetName("hCaloMEToverVBPtvsCaloMETInput");
 
   hMT = (TH1F*)hMTInput->Clone("hMT");
   hMET = (TH1F*)hMETInput->Clone("hMET"); 
   hPtNu = (TH1F*)hPtNuInput->Clone("hPtNu"); 
+  hPtNuSmeared = (TH1F*)hPtNuInput->Clone("hPtNuSmeared");
   hMTvsPtNu = (TH2F*)hMTvsPtNuInput->Clone("hMTvsPtNu");
   hMETvsPtNu = (TH2F*)hMETvsPtNuInput->Clone("hMETvsPtNu"); 
 
-  hGenMET = (TH1F*)hCaloMETInput->Clone("hGenMET");
+  hGenMET = (TH1F*)hMETInput->Clone("hGenMET");
+  hGenMT = (TH1F*)hMTInput->Clone("hGenMT");
+  hMTSmeared = (TH1F*)hMTInput->Clone("hMTSmeared");
   hCaloMET = (TH1F*)hCaloMETInput->Clone("hCaloMET");
   hVBPt = (TH1F*)hVBPtInput->Clone("hVBPt");
   hCaloMETvsVBPt = (TH2F*)hCaloMETvsVBPtInput->Clone("hCaloMETvsVBPt");
+  hCaloMETPhivsVBPhi = (TH2F*)hCaloMETPhivsVBPhiInput->Clone("hCaloMETPhivsVBPhi");
+  hMTvsVBPt = (TH2F*)hMTvsVBPtInput->Clone("hMTvsVBPt");
   hMETvsVBPt = (TH2F*)hMETvsVBPtInput->Clone("hMETvsVBPt");
 
   //hVBPtRew = (TH1F*)hVBPtInput->Clone("hVBPtRew");
 
   hMTfromZmumu = (TH1F*)hMTInput->Clone("hMTfromZmumu");
   hMETfromZmumu = (TH1F*)hMETInput->Clone("hMETfromZmumu");
+  hMTfromZmumuvsVBPt = (TH2F*)hMTvsVBPtInput->Clone("hMTfromZmumuvsVBPt");
   hMETfromZmumuvsVBPt = (TH2F*)hMETvsVBPtInput->Clone("hMETfromZmumuvsVBPt");
+
+  hMETCorrScale = (TH1F*)hMETInput->Clone("hMETCorrScale");
+
+  hCaloMEToverVBPtvsCaloMET = (TH2F*)hCaloMEToverVBPtvsCaloMETInput->Clone("hCaloMEToverVBPtvsCaloMET");
+  hCaloMETCorroverVBPtvsCaloMETCorr = (TH2F*)hCaloMEToverVBPtvsCaloMETInput->Clone("hCaloMETCorroverVBPtvsCaloMETCorr");
 
   hMT->Reset();
   hMET->Reset();
   hPtNu->Reset();
+  hPtNuSmeared->Reset();
   hMTvsPtNu->Reset();
   hMETvsPtNu->Reset();
 
   hGenMET->Reset();
+  hGenMT->Reset();
+  hMTSmeared->Reset();
   hCaloMET->Reset();
   hVBPt->Reset();
   hCaloMETvsVBPt->Reset();
+  hCaloMETPhivsVBPhi->Reset();
+  hMTvsVBPt->Reset();
   hMETvsVBPt->Reset();
 
   //hVBPtRew->Reset();
 
   hMTfromZmumu->Reset();
   hMETfromZmumu->Reset();
+  hMTfromZmumuvsVBPt->Reset();
   hMETfromZmumuvsVBPt->Reset();
+
+  hMETCorrScale->Reset();
+
+  hCaloMEToverVBPtvsCaloMET->Reset();
+  hCaloMETCorroverVBPtvsCaloMETCorr->Reset();
 
   theOutputFile = new TFile(theOutputRootFileName.c_str(), "RECREATE");
   theOutputFile->cd();
 
   //Initialize random generator
-  Service<RandomNumberGenerator> rng;
+  /*Service<RandomNumberGenerator> rng;
   long seed = (long)(rng->mySeed());
   LogTrace("") << ">>>> Seed= " << seed;
   fRandomEngine = new CLHEP::HepJamesRandom(seed);
   fRandomGenerator = new CLHEP::RandGauss(fRandomEngine);
-  LogTrace("") << ">>>> Random Generator Initialized";
+  LogTrace("") << ">>>> Random Generator Initialized";*/
   
+  // Initialize the random number generator service
+  edm::Service<edm::RandomNumberGenerator> rng;
+  if ( ! rng.isAvailable() ) {
+    throw cms::Exception("Configuration") <<
+      "No RandomGeneratorService!!! \n"
+      "You must add the service in the configuration file\n"
+      "or remove the module that requires it.";
+  }
+
+  FSRandom = new RandomEngine(&(*rng));
+  myPtSmearer = new FML3PtSmearer(FSRandom);
 }
 
 void WMETType2Analyzer::endJob(){
@@ -208,32 +281,36 @@ void WMETType2Analyzer::endJob(){
   hMT->Write();
   hMET->Write();
   hPtNu->Write();
+  hPtNuSmeared->Write();
   hMTvsPtNu->Write();
   hMETvsPtNu->Write();
 
   /*hCaloMETInput->Write();
   hVBPtInput->Write(); 
   hCaloMETvsVBPtInput->Write();
+  hCaloMETPhivsVBPhiInput->Write();
+  hMTvsVBPtInput->Write();
   hMETvsVBPtInput->Write();*/
 
   hGenMET->Write();
+  hGenMT->Write();
+  hMTSmeared->Write();
   hCaloMET->Write();
   hVBPt->Write();
   hCaloMETvsVBPt->Write();
+  hCaloMETPhivsVBPhi->Write();
+  hMTvsVBPt->Write();
   hMETvsVBPt->Write();
 
   hMTfromZmumu->Write();
   hMETfromZmumu->Write();
+  hMTfromZmumuvsVBPt->Write();
   hMETfromZmumuvsVBPt->Write();
 
-  /*double contZ = hVBPtInput->Integral(0,hVBPtInput->GetNbinsX()+1);
-  double contW = hVBPt->Integral(0,hVBPt->GetNbinsX()+1);
-  if (contZ>0) hVBPtInput->Scale(1./contZ);
-  if (contW>0) hVBPt->Scale(1./contW);
-  hVBPtRew = (TH1F*)hVBPt->Clone("hVBPtRew");
-  hVBPtRew->Divide(hVBPtInput);*/
+  hMETCorrScale->Write();
 
-  //hVBPtRew->Write();
+  hCaloMEToverVBPtvsCaloMET->Write();
+  hCaloMETCorroverVBPtvsCaloMETCorr->Write();
 
   theOutputFile->Close();
 }
@@ -263,13 +340,12 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
   const Candidate* mu = &(*muonCollection)[0];
   met_px -= mu->px();
   met_py -= mu->py();
-  
+
+  //=================================================================  
   // PT of neutrino
   double ptnu = -1.;
   double pxnu,pynu;
   const Candidate* myW = 0;
-  /*const double Zmuonptcut_ = 20.;
-  const double Zmuonetacut_ = 2.;*/ 
   // Get the generator information from the event
   int myMuindex = -1;
   int myNuindex = -1;
@@ -283,14 +359,11 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
     	for( unsigned int i = 0; i < genParticles->size(); ++ i ) {
       		const Candidate & genpart = (*genParticles)[i];
       		//LogTrace("") << ">>>>>>> pid,status,px,py,px,e= "  << genpart.pdgId() << " , " << genpart.status() << " , " << genpart.px() << " , " << genpart.py() << " , " << genpart.pz() << " , " << genpart.energy();	
-      		int id1 = genpart.pdgId();
-      		/*if (abs(id1)!=14) continue;
-      		const Candidate* mother = genpart.mother();
-      		int idmother = mother->pdgId();
-      		if (fabs(idmother)!=24 && idmother!=24) continue;*/
 
-      		//if (genpart.pt()<Zmuonptcut_) continue;
-      		//if (fabs(genpart.eta())>Zmuonetacut_) continue;	
+      		int id1 = genpart.pdgId();
+
+      		if (applyNuCut_&&(genpart.pt()<nuPtCut_)) continue;
+      		if (applyNuCut_&&(fabs(genpart.eta())>nuEtaCut_)) continue;	
 
 		if (abs(id1)!=pid_ids[j]) continue;
 		const Candidate* mother = genpart.mother();
@@ -312,8 +385,8 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
     const Candidate & genneutrino = (*genParticles)[myNuindex];
     myMup4 = genmuon.p4();
     myNup4 = genneutrino.p4();
-    LogTrace("") << ">>>> Gen neutrino px,py,pz,e= " << myNup4.px() << " , " << myNup4.py() << " , " <<	myNup4.pz() << " , " << myNup4.energy();
-    LogTrace("") << ">>>> Gen muon px,py,pz,e= " << myMup4.px() << " , " << myMup4.py() << " , " << myMup4.pz() << " , " << myMup4.energy();	 
+    //LogTrace("") << ">>>> Gen neutrino px,py,pz,e= " << myNup4.px() << " , " << myNup4.py() << " , " <<	myNup4.pz() << " , " << myNup4.energy();
+    //LogTrace("") << ">>>> Gen muon px,py,pz,e= " << myMup4.px() << " , " << myMup4.py() << " , " << myMup4.pz() << " , " << myMup4.energy();	 
     ptnu = genneutrino.pt();
     pxnu = genneutrino.px();
     pynu = genneutrino.py();	 
@@ -325,16 +398,19 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
   }
   //assert(ptnu >= 0.);
   //if(theGeneratorLabel.label()!="NONE") assert(myW != 0); 
+  LogTrace("") << ">>> Gen neutrino px,py,pz,e= " << myNup4.px() << " , " << myNup4.py() << " , " << myNup4.pz() << " , " << myNup4.energy();
+  LogTrace("") << ">>> Gen muon px,py,pz,e= " << myMup4.px() << " , " << myMup4.py() << " , " << myMup4.pz() << " , " << myMup4.energy();
 
+  //=================================================================
   Handle<GenMETCollection> genMETCollection;
   ev.getByLabel(theGenMETCollectionLabel, genMETCollection);
   GenMETCollection::const_iterator genMET = genMETCollection->begin();
-  LogTrace("") << ">>> GenMET_et, GenMET_py, GenMET_py= " << genMET->pt() << ", " << genMET->px() << ", " << genMET->py();
+  LogTrace("") << ">>> GenMET_et, GenMET_px, GenMET_py= " << genMET->pt() << ", " << genMET->px() << ", " << genMET->py();
 
   Handle<CaloMETCollection> caloMETCollection;
   ev.getByLabel(theCaloMETCollectionLabel, caloMETCollection);
   CaloMETCollection::const_iterator caloMET = caloMETCollection->begin();
-  LogTrace("") << ">>> CaloMET_et, CaloMET_py, CaloMET_py= " << caloMET->pt() << ", " << caloMET->px() << ", " << caloMET->py();
+  LogTrace("") << ">>> CaloMET_et, CaloMET_px, CaloMET_py= " << caloMET->pt() << ", " << caloMET->px() << ", " << caloMET->py();
 
   met_px += caloMET->px();
   met_py += caloMET->py();
@@ -356,14 +432,70 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
 
   hGenMET->Fill(genMET->pt());
   hCaloMET->Fill(caloMET->pt());
-  //if (theGeneratorLabel.label()!="NONE") {
-  /*double pxW = myMup4.px() + myNup4.px();
-  double pyW = myMup4.py() + myNup4.py();
-  double ptW = sqrt(pxW*pxW + pyW*pyW);*/
-  double pxW = mu->px() + pxnu;
-  double pyW = mu->py() + pynu;
-  double ptW = sqrt(pxW*pxW + pyW*pyW);
 
+  //=================================================================
+  //Scale correction
+  int binCaloMET = (hCaloMEToverVBPtvsCaloMETInput->GetXaxis())->FindBin(caloMET->pt());
+  double Zscale = (hCaloMEToverVBPtvsCaloMETInput->ProfileX())->GetBinContent(binCaloMET);
+  double corrCaloMEx = caloMET->px()/Zscale;
+  double corrCaloMEy = caloMET->py()/Zscale;
+  double corrCaloMET = sqrt(corrCaloMEx*corrCaloMEx + corrCaloMEy*corrCaloMEy);
+  double corrMEx = corrCaloMEx - mu->px();
+  double corrMEy = corrCaloMEy - mu->py();
+  double corrMET = sqrt(corrMEx*corrMEx + corrMEy*corrMEy);
+  LogTrace("") << ">>> Z Scale= " << Zscale;
+  LogTrace("") << ">>> Corr MET_et, Corr MET_px, Corr MET_py= " << corrMET << ", " << corrMEx << ", " << corrMEy;
+
+  w_et = mu->pt() + corrMET;
+  w_px = mu->px() + corrMEx;
+  w_py = mu->py() + corrMEy;
+  massT = w_et*w_et - w_px*w_px - w_py*w_py;
+  massT = (massT>0) ? sqrt(massT) : 0;
+  LogTrace("") << "\t... W_et, W_px, W_py= " << w_et << ", " << w_px << ", " << w_py << " GeV";
+  LogTrace("") << "\t... Invariant transverse mass= " << massT << " GeV";
+
+  hMETCorrScale->Fill(corrMET);
+
+  //=================================================================
+  //Apply smearing
+  math::XYZVector recP3(myNup4.px(),myNup4.py(),myNup4.pz());
+  math::XYZTLorentzVector MuonFromNu = myPtSmearer->smear(myNup4,recP3);
+  LogTrace("") << ">>> Smeared neutrino px,py,pz,e= " << MuonFromNu.px() << " , " << MuonFromNu.py() << " , " << MuonFromNu.pz() << " , " << MuonFromNu.energy();
+
+  hPtNuSmeared->Fill(MuonFromNu.pt());
+
+  //=================================================================
+  /*double pxW = mu->px() + pxnu;
+  double pyW = mu->py() + pynu;
+  double ptW = sqrt(pxW*pxW + pyW*pyW);*/
+
+  double pxW = mu->px() + MuonFromNu.px();
+  double pyW = mu->py() + MuonFromNu.py();
+  double pzW = mu->pz() + MuonFromNu.pz();
+  double ptW = sqrt(pxW*pxW + pyW*pyW);
+  math::XYZVector p3W((mu->px() + MuonFromNu.px()),(mu->py() + MuonFromNu.py()),(mu->pz() + MuonFromNu.pz()));
+  double phiW = p3W.phi();
+	
+  hVBPt->Fill(ptW);
+  hCaloMETvsVBPt->Fill(ptW, caloMET->pt());
+  hCaloMETPhivsVBPhi->Fill(phiW, caloMET->phi());
+  hMTvsVBPt->Fill(ptW, massT);
+  hMETvsVBPt->Fill(ptW, met_et);
+
+  hCaloMEToverVBPtvsCaloMET->Fill(caloMET->pt(),caloMET->pt()/ptW);
+  hCaloMETCorroverVBPtvsCaloMETCorr->Fill(corrCaloMET,corrCaloMET/ptW);
+
+  w_et = mu->pt() + MuonFromNu.pt();
+  w_px = mu->px() + MuonFromNu.px();
+  w_py = mu->py() + MuonFromNu.py();
+  massT = w_et*w_et - w_px*w_px - w_py*w_py;
+  massT = (massT>0) ? sqrt(massT) : 0;
+  LogTrace("") << "\t... W_et, W_px, W_py= " << w_et << ", " << w_px << ", " << w_py << " GeV";
+  LogTrace("") << "\t... Invariant transverse mass= " << massT << " GeV";
+
+  hMTSmeared->Fill(massT);
+
+  //================================================================= 
   //Get MET from Z(data) sample
   /*int binWpt = (hMETvsVBPtInput->GetXaxis())->FindBin(ptW);
   double dataMET = (hMETvsVBPtInput->ProfileX())->GetBinContent(binWpt);
@@ -378,36 +510,64 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
 
   int binWpt = (hCaloMETvsVBPtInput->GetXaxis())->FindBin(ptW);
   TH1D* histCaloMET_binWpt = hCaloMETvsVBPtInput->ProjectionY("_pbinWpt",binWpt,binWpt);
-  double proj_mean = histCaloMET_binWpt->GetMean();
-  double proj_sigma = histCaloMET_binWpt->GetRMS();
-  double dataMET = fRandomGenerator->fire(proj_mean,proj_sigma);
+  double pt_mean = histCaloMET_binWpt->GetMean();
+  double pt_sigma = histCaloMET_binWpt->GetRMS();
+  //double dataMET = fRandomGenerator->fire(pt_mean,pt_sigma);
+  double dataMET = FSRandom->gaussShoot(pt_mean,pt_sigma);
   LogTrace("") << "\t... W pt, bin in CaloMET dist.= " << ptW << " , " << binWpt;
   LogTrace("") << "\t... CaloMET from Z events= " << dataMET;
 
-  double scale = dataMET/caloMET->pt();
+  int binWphi = (hCaloMETPhivsVBPhiInput->GetXaxis())->FindBin(phiW);
+  TH1D* histCaloMETPhi_binWphi = hCaloMETPhivsVBPhiInput->ProjectionY("_pbinWphi",binWphi,binWphi);
+  double phi_mean = histCaloMETPhi_binWphi->GetMean();
+  double phi_sigma = histCaloMETPhi_binWphi->GetRMS();
+  //double dataPhi = fRandomGenerator->fire(phi_mean,phi_sigma);
+  double dataPhi = FSRandom->gaussShoot(phi_mean,phi_sigma);
+  LogTrace("") << "\t... W phi, bin in CaloMET Phi dist.= " << phiW << " , " << binWphi;
+  LogTrace("") << "\t... CaloMET Phi from Z events= " << dataPhi;
+
+  /*double scale = dataMET/caloMET->pt();
   double dataMEx = scale*caloMET->px();
   dataMEx -= mu->px();
   double dataMEy = scale*caloMET->py();
   dataMEy -= mu->py();
-  dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy);	
-  double W_et = mu->pt() + dataMET;
-  double W_px = mu->px() + dataMEx;
-  double W_py = mu->py() + dataMEy;
+  dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy);*/	
 
-  double MassT = W_et*W_et - W_px*W_px - W_py*W_py;
-  MassT = (MassT>0) ? sqrt(MassT) : 0;
-  LogTrace("") << "\t... W_et, W_px, W_py= " << W_et << ", " << W_px << ", " << W_py << " GeV";
-  LogTrace("") << "\t... Invariant transverse mass= " << MassT << " GeV";
+  double scale = dataMET/ptW;
+  double dataMEx = scale*pxW;
+  dataMEx -= mu->px();
+  double dataMEy = scale*pyW;
+  dataMEy -= mu->py();
+  dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy);
 
-  //ptW = sqrt(w_px*w_px + w_py*w_py);
-  hVBPt->Fill(ptW);
-  hCaloMETvsVBPt->Fill(ptW, caloMET->pt());
-  hMETvsVBPt->Fill(ptW, met_et);
+  /*double dataMEx = dataMET*cos(dataPhi);
+  dataMEx -= mu->px();
+  double dataMEy = dataMET*sin(dataPhi);
+  dataMEy -= mu->py();
+  dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy);*/
 
-  hMTfromZmumu->Fill(MassT);
+  w_et = mu->pt() + dataMET;
+  w_px = mu->px() + dataMEx;
+  w_py = mu->py() + dataMEy;
+
+  massT = w_et*w_et - w_px*w_px - w_py*w_py;
+  massT = (massT>0) ? sqrt(massT) : 0;
+  LogTrace("") << "\t... W_et, W_px, W_py= " << w_et << ", " << w_px << ", " << w_py << " GeV";
+  LogTrace("") << "\t... Invariant transverse mass= " << massT << " GeV";
+
+  hMTfromZmumu->Fill(massT);
   hMETfromZmumu->Fill(dataMET);
+  hMTfromZmumuvsVBPt->Fill(ptW, massT);
   hMETfromZmumuvsVBPt->Fill(ptW, dataMET);
-  //} 
+
+  //=================================================================
+  //Gen MT
+  double w_et_gen = myMup4.pt() + myNup4.pt();
+  double w_px_gen = myMup4.px() + myNup4.px();
+  double w_py_gen = myMup4.py() + myNup4.py();
+  double massT_gen = w_et_gen*w_et_gen - w_px_gen*w_px_gen - w_py_gen*w_py_gen;
+  massT_gen = (massT_gen>0) ? sqrt(massT_gen) : 0;
+  hGenMT->Fill(massT_gen);
 }
 
 DEFINE_FWK_MODULE(WMETType2Analyzer);
