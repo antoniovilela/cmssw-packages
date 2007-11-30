@@ -32,6 +32,9 @@ private:
   // Input from cfg file
   edm::InputTag theZCollectionLabel;
   edm::InputTag theMETCollectionLabel;
+
+  bool useMuonCorrMET;
+
   unsigned int theNbinsMT;
   double theMTMin;
   double theMTMax;
@@ -41,6 +44,9 @@ private:
   unsigned int theNbinsPtNu;
   double thePtNuMin;
   double thePtNuMax;
+  unsigned int theNbinsEtaNu;
+  double theEtaNuMin;
+  double theEtaNuMax;
 
   unsigned int theNbinsCaloMET;
   double theCaloMETMin;
@@ -85,14 +91,19 @@ private:
   TH1F* hMET;
   TH1F* hPtNu;
   TH1F* hEtaNu;
+  TH2F* hPtNuvsEtaNu;
   TH2F* hMTvsPtNu;
   TH2F* hMETvsPtNu; 
   TH2F* hMTvsEtaNu;
   TH2F* hMETvsEtaNu;
+  TH3F* hMTvsPtNuvsEtaNu;
+  TH3F* hMETvsPtNuvsEtaNu;
 
   TH1F* hCaloMET;
+  TH1F* hCaloMETPhi;
   TH1F* hVBPt;
   TH1F* hVBEta;
+  TH1F* hVBPhi;
   TH1F* hresVBPt; 	
   TH2F* hMETvsVBPt;
   TH2F* hMETvsVBEta;
@@ -136,6 +147,8 @@ ZMETAnalyzer::ZMETAnalyzer(const ParameterSet& pset)
   theZCollectionLabel = edm::InputTag(theZCollectionLabel.label(),"ZGMGM");
   theMETCollectionLabel = pset.getUntrackedParameter<InputTag>("METCollectionLabel");
 
+  useMuonCorrMET = pset.getUntrackedParameter<bool>("UseMuonCorrectedMET",false);
+
   theNbinsMT = pset.getUntrackedParameter<unsigned int>("NbinsMT");
   theMTMin = pset.getUntrackedParameter<double>("MTMin");
   theMTMax = pset.getUntrackedParameter<double>("MTMax");
@@ -145,6 +158,9 @@ ZMETAnalyzer::ZMETAnalyzer(const ParameterSet& pset)
   theNbinsPtNu = pset.getUntrackedParameter<unsigned int>("NbinsPtNu");
   thePtNuMin = pset.getUntrackedParameter<double>("PtNuMin");
   thePtNuMax = pset.getUntrackedParameter<double>("PtNuMax");
+  theNbinsEtaNu = pset.getUntrackedParameter<unsigned int>("NbinsEtaNu");
+  theEtaNuMin = pset.getUntrackedParameter<double>("EtaNuMin");
+  theEtaNuMax = pset.getUntrackedParameter<double>("EtaNuMax");
   
   theNbinsCaloMET = pset.getUntrackedParameter<unsigned int>("NbinsCaloMET");
   theCaloMETMin = pset.getUntrackedParameter<double>("CaloMETMin");
@@ -203,36 +219,57 @@ void ZMETAnalyzer::beginJob(const EventSetup& eventSetup){
   hMET = new TH1F(chname, chtitle, theNbinsMET, theMETMin, theMETMax);
 
   snprintf(chname, 255, "hPtNu");
-  snprintf(chtitle, 255, "PT?#nu (GeV) in Z events");
+  snprintf(chtitle, 255, "PT #nu (GeV) in Z events");
   hPtNu = new TH1F(chname, chtitle, theNbinsPtNu, thePtNuMin, thePtNuMax);
 
   snprintf(chname, 255, "hEtaNu");
-  snprintf(chtitle, 255, "#eta?#nu in Z events");
-  hEtaNu = new TH1F(chname, chtitle, theNbinsPtNu, 0.0, 2.0);
+  snprintf(chtitle, 255, "#eta #nu in Z events");
+  hEtaNu = new TH1F(chname, chtitle, theNbinsEtaNu, theEtaNuMin, theEtaNuMax);
+
+  snprintf(chname, 255, "hPtNuvsEtaNu");
+  snprintf(chtitle, 255, "PT #nu (GeV) vs #eta #nu in Z events");
+  hPtNuvsEtaNu = new TH2F(chname, chtitle, theNbinsEtaNu, theEtaNuMin, theEtaNuMax
+                                      , theNbinsPtNu, thePtNuMin, thePtNuMax);
 
   snprintf(chname, 255, "hMTvsPtNu");
-  snprintf(chtitle, 255, "MT (GeV) vs PT?#nu (GeV) in Z events");
+  snprintf(chtitle, 255, "MT (GeV) vs PT #nu (GeV) in Z events");
   hMTvsPtNu = new TH2F(chname, chtitle, theNbinsPtNu, thePtNuMin, thePtNuMax
                                       , theNbinsMT, theMTMin, theMTMax);
 
   snprintf(chname, 255, "hMETvsPtNu");
-  snprintf(chtitle, 255, "MET (GeV) vs PT?#nu (GeV) in Z events");
+  snprintf(chtitle, 255, "MET (GeV) vs PT #nu (GeV) in Z events");
   hMETvsPtNu = new TH2F(chname, chtitle, theNbinsPtNu, thePtNuMin, thePtNuMax
                                       , theNbinsMET, theMETMin, theMETMax);
 
   snprintf(chname, 255, "hMTvsEtaNu");
-  snprintf(chtitle, 255, "MT (GeV) vs #eta?#nu (GeV) in Z events");
-  hMTvsEtaNu = new TH2F(chname, chtitle, theNbinsPtNu, 0.0, 2.0
+  snprintf(chtitle, 255, "MT (GeV) vs #eta #nu in Z events");
+  hMTvsEtaNu = new TH2F(chname, chtitle, theNbinsEtaNu, theEtaNuMin, theEtaNuMax
                                       , theNbinsMT, theMTMin, theMTMax);
  
   snprintf(chname, 255, "hMETvsEtaNu");
-  snprintf(chtitle, 255, "MET (GeV) vs #eta?#nu (GeV) in Z events");
-  hMETvsEtaNu = new TH2F(chname, chtitle, theNbinsPtNu, 0.0, 2.0
+  snprintf(chtitle, 255, "MET (GeV) vs #eta #nu in Z events");
+  hMETvsEtaNu = new TH2F(chname, chtitle, theNbinsEtaNu, theEtaNuMin, theEtaNuMax
+                                      , theNbinsMET, theMETMin, theMETMax);
+
+  snprintf(chname, 255, "hMTvsPtNuvsEtaNu");
+  snprintf(chtitle, 255, "MT (GeV) vs PT #nu (GeV) vs #eta #nu in Z events");
+  hMTvsPtNuvsEtaNu = new TH3F(chname, chtitle, theNbinsPtNu, thePtNuMin, thePtNuMax
+				      , theNbinsEtaNu, theEtaNuMin, theEtaNuMax
+                                      , theNbinsMT, theMTMin, theMTMax);
+
+  snprintf(chname, 255, "hMETvsPtNuvsEtaNu");
+  snprintf(chtitle, 255, "MET (GeV) vs PT #nu (GeV) vs #eta #nu in Z events");
+  hMETvsPtNuvsEtaNu = new TH3F(chname, chtitle, theNbinsPtNu, thePtNuMin, thePtNuMax
+                                      , theNbinsEtaNu, theEtaNuMin, theEtaNuMax
                                       , theNbinsMET, theMETMin, theMETMax);
 
   snprintf(chname, 255, "hCaloMET");
   snprintf(chtitle, 255, "Calo MET (GeV) in Z events");
   hCaloMET = new TH1F(chname, chtitle, theNbinsCaloMET, theCaloMETMin, theCaloMETMax);
+
+  snprintf(chname, 255, "hCaloMETPhi");
+  snprintf(chtitle, 255, "Calo MET Phi in Z events");
+  hCaloMETPhi = new TH1F(chname, chtitle, theNbinsCaloMETPhi, theCaloMETPhiMin, theCaloMETPhiMax);
 
   snprintf(chname, 255, "hVBPt");
   snprintf(chtitle, 255, "VB PT (GeV) in Z events");
@@ -241,6 +278,10 @@ void ZMETAnalyzer::beginJob(const EventSetup& eventSetup){
   snprintf(chname, 255, "hVBEta");
   snprintf(chtitle, 255, "VB Eta in Z events");
   hVBEta = new TH1F(chname, chtitle, theNbinsVBEta, theVBEtaMin, theVBEtaMax);
+
+  snprintf(chname, 255, "hVBPhi");
+  snprintf(chtitle, 255, "VB Phi in Z events");
+  hVBPhi = new TH1F(chname, chtitle, theNbinsVBPhi, theVBPhiMin, theVBPhiMax);
 
   snprintf(chname, 255, "hresVBPt");
   snprintf(chtitle, 255, "(VB Pt - CaloMET)/VBPt in Z events");	
@@ -327,14 +368,19 @@ void ZMETAnalyzer::endJob(){
   hMET->Write();
   hPtNu->Write();
   hEtaNu->Write();
+  hPtNuvsEtaNu->Write();
   hMTvsPtNu->Write();
   hMETvsPtNu->Write();
   hMTvsEtaNu->Write();
   hMETvsEtaNu->Write();
+  hMTvsPtNuvsEtaNu->Write();
+  hMETvsPtNuvsEtaNu->Write();
 
   hCaloMET->Write();
+  hCaloMETPhi->Write();
   hVBPt->Write();
   hVBEta->Write();
+  hVBPhi->Write();
   hresVBPt->Write();
   hMETvsVBPt->Write();
   hMETvsVBEta->Write();
@@ -382,8 +428,10 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   double etanu = nu->eta();*/
 
   const Candidate* mu = myZ.daughter(0);
-  met_px -= mu->px();
-  met_py -= mu->py();	
+  if(!useMuonCorrMET){
+	met_px -= mu->px();
+  	met_py -= mu->py();	
+  }
 
   const Candidate* nu = myZ.daughter(1);
   double ptnu = nu->pt();
@@ -393,11 +441,27 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   Handle<CaloMETCollection> metCollection;
   ev.getByLabel(theMETCollectionLabel, metCollection);
   CaloMETCollection::const_iterator caloMET = metCollection->begin();
-  LogTrace("") << ">>> CaloMET_et, CaloMET_py, CaloMET_py= " << caloMET->et() << ", " << caloMET->px() << ", " << caloMET->py();
+  LogTrace("") << ">>> Input CaloMET_et, CaloMET_py, CaloMET_py= " << caloMET->et() << ", " << caloMET->px() << ", " << caloMET->py();
   met_px += caloMET->px();
   met_py += caloMET->py();
+  if(useMuonCorrMET){
+	met_px += nu->px();
+        met_py += nu->py();
+  } 	
   double met_et = sqrt(met_px*met_px+met_py*met_py);
+  LogTrace("") << ">>> MET_et, MET_py, MET_py= " << met_et << ", " << met_px << ", " << met_py;
 
+  double myCaloMEx = caloMET->px();
+  double myCaloMEy = caloMET->py();
+  if(useMuonCorrMET){
+	myCaloMEx += mu->px();
+	myCaloMEx += nu->px();
+	myCaloMEy += mu->py();
+        myCaloMEy += nu->py();
+  }
+  double myCaloMET = sqrt(myCaloMEx*myCaloMEx + myCaloMEy*myCaloMEy);
+  math::XYZTLorentzVector recCaloMET(myCaloMEx,myCaloMEy,0.,myCaloMET);
+	
   double w_et = mu->pt() + met_et;
   double w_px = mu->px() + met_px;
   double w_py = mu->py() + met_py;
@@ -416,10 +480,14 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   tree_NuPt = fromZtoW*ptnu;
   tree_NuEta = etanu;
   tree_NuPhi = phinu;
-  tree_CaloMET = fromZtoW*caloMET->pt();
+  /*tree_CaloMET = fromZtoW*caloMET->pt();
   tree_CaloMET_Phi = caloMET->phi();
   tree_CaloMEx = fromZtoW*caloMET->px();
-  tree_CaloMEy = fromZtoW*caloMET->py();
+  tree_CaloMEy = fromZtoW*caloMET->py();*/
+  tree_CaloMET = fromZtoW*recCaloMET.pt();
+  tree_CaloMET_Phi = recCaloMET.phi();
+  tree_CaloMEx = fromZtoW*recCaloMET.px();
+  tree_CaloMEy = fromZtoW*recCaloMET.py();
   tree_MET = fromZtoW*met_et;
   tree_MEx = fromZtoW*met_px;
   tree_MEy = fromZtoW*met_py;
@@ -431,14 +499,19 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   hMET->Fill(fromZtoW*met_et);
   hPtNu->Fill(fromZtoW*ptnu);
   hEtaNu->Fill(fabs(etanu));
+  hPtNuvsEtaNu->Fill(fabs(etanu),fromZtoW*ptnu);
   hMTvsPtNu->Fill(fromZtoW*ptnu, fromZtoW*massT);
   hMETvsPtNu->Fill(fromZtoW*ptnu, fromZtoW*met_et);
   hMTvsEtaNu->Fill(fabs(etanu), fromZtoW*massT);
   hMETvsEtaNu->Fill(fabs(etanu), fromZtoW*met_et);
+  hMTvsPtNuvsEtaNu->Fill(fromZtoW*ptnu, fabs(etanu), fromZtoW*massT);
+  hMETvsPtNuvsEtaNu->Fill(fromZtoW*ptnu, fabs(etanu), fromZtoW*met_et);
 
   hCaloMET->Fill(fromZtoW*caloMET->pt());
+  hCaloMETPhi->Fill(recCaloMET.phi());
   hVBPt->Fill(fromZtoW*myZ.pt());
   hVBEta->Fill(fabs(myZ.eta()));
+  hVBPhi->Fill(myZ.phi());
   hresVBPt->Fill(resVBPt);	
   hMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*met_et);
   hMETvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*met_et);
@@ -446,13 +519,20 @@ void ZMETAnalyzer::analyze(const Event & ev, const EventSetup&){
   hMTvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*massT);
   hMTvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*massT);
   hMTvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*massT);	
-  hCaloMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*caloMET->pt());
+  /*hCaloMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*caloMET->pt());
   hCaloMETvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*caloMET->pt());
   hCaloMETvsVBPhi->Fill(myZ.phi(), fromZtoW*caloMET->pt());
   hCaloMETvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*caloMET->pt());
   hCaloMEToverVBPtvsVBPt->Fill(fromZtoW*myZ.pt(),caloMET->pt()/myZ.pt());
   hCaloMEToverVBPtvsCaloMET->Fill(fromZtoW*caloMET->pt(),caloMET->pt()/myZ.pt());
-  hCaloMETPhivsVBPhi->Fill(myZ.phi(), caloMET->phi());
+  hCaloMETPhivsVBPhi->Fill(myZ.phi(), caloMET->phi());*/
+  hCaloMETvsVBPt->Fill(fromZtoW*myZ.pt(), fromZtoW*recCaloMET.pt());
+  hCaloMETvsVBEta->Fill(fabs(myZ.eta()), fromZtoW*recCaloMET.pt());
+  hCaloMETvsVBPhi->Fill(myZ.phi(), fromZtoW*recCaloMET.pt());
+  hCaloMETvsVBPtvsVBEta->Fill(fromZtoW*myZ.pt(), fabs(myZ.eta()), fromZtoW*recCaloMET.pt());
+  hCaloMEToverVBPtvsVBPt->Fill(fromZtoW*myZ.pt(),recCaloMET.pt()/myZ.pt());
+  hCaloMEToverVBPtvsCaloMET->Fill(fromZtoW*recCaloMET.pt(),recCaloMET.pt()/myZ.pt());
+  hCaloMETPhivsVBPhi->Fill(myZ.phi(), recCaloMET.phi());
 }
 
 DEFINE_FWK_MODULE(ZMETAnalyzer);
