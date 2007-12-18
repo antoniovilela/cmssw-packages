@@ -57,6 +57,12 @@ private:
   //Nu smearing
   bool applyNuPtSmearing_;
 
+  //Sample CaloMET phi
+  bool sampleCaloMETPhi_;
+
+  //Sample from histos or gaussian
+  bool sampleFromHistos_;
+
   // Histograms
   TH1F* hMTInput;
   TH1F* hMETInput;
@@ -176,6 +182,10 @@ WMETType2Analyzer::WMETType2Analyzer(const ParameterSet& pset)
   nuEtaCut_ = pset.getUntrackedParameter<double>("NuEtaCut",5.0);
 
   applyNuPtSmearing_ = pset.getUntrackedParameter<bool>("ApplyNuPtSmearing",false);
+
+  sampleCaloMETPhi_ = pset.getUntrackedParameter<bool>("SampleCaloMETPhi",false);
+
+  sampleFromHistos_ = pset.getUntrackedParameter<bool>("SampleFromHistos",true);
 }
 
 /// Destructor
@@ -636,21 +646,23 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
 
   int binWpt = (hCaloMETvsVBPtInput->GetXaxis())->FindBin(ptW);
   TH1D* histCaloMET_binWpt = hCaloMETvsVBPtInput->ProjectionY("_pbinWpt",binWpt,binWpt);
-  //double pt_mean = histCaloMET_binWpt->GetMean();
-  //double pt_sigma = histCaloMET_binWpt->GetRMS();
+  double pt_mean = histCaloMET_binWpt->GetMean();
+  double pt_sigma = histCaloMET_binWpt->GetRMS();
   //double dataMET = fRandomGenerator->fire(pt_mean,pt_sigma);
   //double dataMET = FSRandom->gaussShoot(pt_mean,pt_sigma);
-  double dataCaloMET = histCaloMET_binWpt->GetRandom();	
+  //double dataCaloMET = histCaloMET_binWpt->GetRandom();	
+  double dataCaloMET = (sampleFromHistos_)?(histCaloMET_binWpt->GetRandom()):(FSRandom->gaussShoot(pt_mean,pt_sigma));
   LogTrace("") << "\t... W pt, bin in CaloMET dist.= " << ptW << " , " << binWpt;
   LogTrace("") << "\t... CaloMET from Z events= " << dataCaloMET;
 
   int binWphi = (hCaloMETPhivsVBPhiInput->GetXaxis())->FindBin(phiW);
   TH1D* histCaloMETPhi_binWphi = hCaloMETPhivsVBPhiInput->ProjectionY("_pbinWphi",binWphi,binWphi);
-  //double phi_mean = histCaloMETPhi_binWphi->GetMean();
-  //double phi_sigma = histCaloMETPhi_binWphi->GetRMS();
+  double phi_mean = histCaloMETPhi_binWphi->GetMean();
+  double phi_sigma = histCaloMETPhi_binWphi->GetRMS();
   //double dataPhi = fRandomGenerator->fire(phi_mean,phi_sigma);
   //double dataPhi = FSRandom->gaussShoot(phi_mean,phi_sigma);
-  double dataPhi = histCaloMETPhi_binWphi->GetRandom();	
+  //double dataPhi = histCaloMETPhi_binWphi->GetRandom();	
+  double dataPhi = (sampleFromHistos_)?(histCaloMETPhi_binWphi->GetRandom()):(FSRandom->gaussShoot(phi_mean,phi_sigma));
   LogTrace("") << "\t... W phi, bin in CaloMET Phi dist.= " << phiW << " , " << binWphi;
   LogTrace("") << "\t... CaloMET Phi from Z events= " << dataPhi;
 
@@ -666,14 +678,21 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
   dataMEx -= mu->px();
   double dataMEy = scale*pyW;
   dataMEy -= mu->py();
-  double dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy);*/
+  double dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy);
 
   double dataMEx = dataCaloMET*cos(dataPhi);
   dataMEx -= mu->px();
   double dataMEy = dataCaloMET*sin(dataPhi);
   dataMEy -= mu->py();
-  double dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy);
+  double dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy);*/
 
+  double scale = dataCaloMET/ptW;
+  double dataMEx = (sampleCaloMETPhi_)?(dataCaloMET*cos(dataPhi)):(scale*pxW);
+  dataMEx -= mu->px();
+  double dataMEy = (sampleCaloMETPhi_)?(dataCaloMET*sin(dataPhi)):(scale*pyW);
+  dataMEy -= mu->py();
+  double dataMET = sqrt(dataMEx*dataMEx + dataMEy*dataMEy); 
+ 	
   w_et = mu->pt() + dataMET;
   w_px = mu->px() + dataMEx;
   w_py = mu->py() + dataMEy;
