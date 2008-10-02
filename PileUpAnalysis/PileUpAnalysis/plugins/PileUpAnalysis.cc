@@ -49,6 +49,7 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorBase.h"
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/RecoCandidate/interface/TrackAssociation.h"
 
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
@@ -69,6 +70,7 @@ typedef std::map<std::pair<int,int>,unsigned int> TrackMultMap;
 
 PileUpAnalysis::PileUpAnalysis(const edm::ParameterSet& conf){
   tracksTag_ = conf.getParameter<edm::InputTag>("TracksTag");
+  trackAssociatorTag_ = conf.getParameter<edm::InputTag>("TrackAssociatorTag");
 }
 
 void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
@@ -159,12 +161,12 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
   event.getByLabel(tracksTag_,trackCollectionH);
   const edm::View<reco::Track> tC = *(trackCollectionH.product());
 
-  /*edm::Handle<reco::RecoToSimCollection> recoToSimCollectionH;
+  edm::Handle<reco::RecoToSimCollection> recoToSimCollectionH;
   event.getByLabel(trackAssociatorTag_,recoToSimCollectionH);
 
-  reco::RecoToSimCollection& recoToSim = *recoToSimCollectionH.product();*/
+  const reco::RecoToSimCollection& recoToSim = *recoToSimCollectionH.product();
 
-  reco::RecoToSimCollection recoToSim = associatorByHits_->associateRecoToSim(trackCollectionH,mergedPH,&event);
+  //reco::RecoToSimCollection recoToSim = associatorByHits_->associateRecoToSim(trackCollectionH,mergedPH,&event);
 
   for(edm::View<reco::Track>::size_type i=0; i < tC.size(); ++i) {
     edm::RefToBase<reco::Track> track(trackCollectionH, i);
