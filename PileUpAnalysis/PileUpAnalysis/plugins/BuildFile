@@ -1,0 +1,12 @@
+<use name=clhep>
+<use name=geant4>
+
+<library file="*.cc" name=UserCodePileUpAnalysis_plugins>
+  <use name=FWCore/Framework>
+  <use name=SimDataFormats/TrackingAnalysis>
+  <use name=SimDataFormats/Track>
+  <use name=SimDataFormats/Vertex>
+  <use name=SimDataFormats/HepMCProduct>
+  <use name=SimDataFormats/CrossingFrame>
+  <flags EDM_PLUGIN=1>
+</library>
