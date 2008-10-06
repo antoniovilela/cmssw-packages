@@ -3,6 +3,8 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include "TH1F.h"
+ 
 class InputTag;
 class TrackAssociatorBase;
 
@@ -18,8 +20,13 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
  private:
   edm::InputTag tracksTag_;
   edm::InputTag trackAssociatorTag_;
-  TrackAssociatorBase* associatorByHits_;
-  
+  //TrackAssociatorBase* associatorByHits_;
+
+  // Histograms
+  TH1F* hTrackVzSignal_;
+  TH1F* hTrackDzSignal_;
+  TH1F* hTrackVzPileUp_;
+  TH1F* hTrackDzPileUp_; 
 };
 
 #endif
@@ -54,6 +61,9 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
 
+#include <FWCore/ServiceRegistry/interface/Service.h>
+#include <PhysicsTools/UtilAlgos/interface/TFileService.h>
+
 #include <vector>
 #include <map>
 
@@ -74,11 +84,18 @@ PileUpAnalysis::PileUpAnalysis(const edm::ParameterSet& conf){
 }
 
 void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
-  edm::ESHandle<MagneticField> theMF;
+  /*edm::ESHandle<MagneticField> theMF;
   setup.get<IdealMagneticFieldRecord>().get(theMF);
   edm::ESHandle<TrackAssociatorBase> theHitsAssociator;
   setup.get<TrackAssociatorRecord>().get("TrackAssociatorByHits",theHitsAssociator);
-  associatorByHits_ = (TrackAssociatorBase *) theHitsAssociator.product();
+  associatorByHits_ = (TrackAssociatorBase *) theHitsAssociator.product();*/
+
+  // Book histograms
+  edm::Service<TFileService> fs;
+  hTrackVzSignal_ = fs->make<TH1F>("hTrackVzSignal","hTrackVzSignal",100,0.,20.);
+  hTrackDzSignal_ = fs->make<TH1F>("hTrackDzSignal","hTrackDzSignal",100,0.,20.);
+  hTrackVzPileUp_ = fs->make<TH1F>("hTrackVzPileUp","hTrackVzPileUp",100,0.,20.);
+  hTrackDzPileUp_ = fs->make<TH1F>("hTrackDzPileUp","hTrackDzPileUp",100,0.,20.);
 }
 
 void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
@@ -170,16 +187,33 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 
   for(edm::View<reco::Track>::size_type i=0; i < tC.size(); ++i) {
     edm::RefToBase<reco::Track> track(trackCollectionH, i);
-    if(recoToSim.find(track) != recoToSim.end()){
+     if(recoToSim.find(track) != recoToSim.end()){
         std::vector<std::pair<TrackingParticleRef, double> > tp = recoToSim[track];
 	edm::LogVerbatim("Analysis") << "Reco Track pT: "  << track->pt() 
 	                             <<  " matched to " << tp.size() << " MC Tracks";
 	for (std::vector<std::pair<TrackingParticleRef, double> >::const_iterator it = tp.begin(); 
 	     it != tp.end(); ++it) {
 	     TrackingParticleRef tpr = it->first;
-	     double assocChi2 = it->second;
-	     edm::LogVerbatim("Analysis") << "\t\tMCTrack " << tpr.index() << " pT: " << tpr->pt() << " NShared: " << assocChi2;
+	     double assocQuality = it->second;
+	     edm::LogVerbatim("Analysis") << "\t\tMCTrack " << tpr.index() << " pT: " << tpr->pt() << " NShared: " << assocQuality;
 	}
+     // Check if best TP match comes from pile-up
+     if(tp.size() != 0){
+        TrackingParticleRef tpr = tp.begin()->first;
+        double associationQuality = tp.begin()->second;	
+        const EncodedEventId& evtId = tpr->eventId();
+	if(evtId.bunchCrossing() == 0){ // check if from signal bunch crossing
+             if(evtId.event() == 0){ // check if it comes from signal or pile-up
+	          edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from signal";		
+                  hTrackVzSignal_->Fill(fabs(track->vz()));
+                  hTrackDzSignal_->Fill(fabs(track->dz())); 
+             } else {
+                  edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from pile-up";
+                  hTrackVzPileUp_->Fill(fabs(track->vz()));
+                  hTrackDzPileUp_->Fill(fabs(track->dz()));
+             }
+	}
+     }
      } else edm::LogWarning("Analysis") << "->   Track pT: " << track->pt() <<  " matched to 0  MC Tracks";
   }
   
