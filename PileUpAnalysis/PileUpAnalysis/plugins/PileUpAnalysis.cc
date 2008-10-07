@@ -4,6 +4,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "TH1F.h"
+
+#include <vector>
  
 class InputTag;
 class TrackAssociatorBase;
@@ -27,6 +29,12 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
   TH1F* hTrackDzSignal_;
   TH1F* hTrackVzPileUp_;
   TH1F* hTrackDzPileUp_; 
+
+  std::vector<TH1F*> hVecNrPileUp_;
+
+  TH1F* hTrkMultBx0Signal_;
+  TH1F* hTrkMultBx0PileUp_;
+  TH1F* hTrkMultOtherPileUp_;
 };
 
 #endif
@@ -92,10 +100,18 @@ void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
 
   // Book histograms
   edm::Service<TFileService> fs;
-  hTrackVzSignal_ = fs->make<TH1F>("hTrackVzSignal","hTrackVzSignal",100,0.,20.);
-  hTrackDzSignal_ = fs->make<TH1F>("hTrackDzSignal","hTrackDzSignal",100,0.,20.);
-  hTrackVzPileUp_ = fs->make<TH1F>("hTrackVzPileUp","hTrackVzPileUp",100,0.,20.);
-  hTrackDzPileUp_ = fs->make<TH1F>("hTrackDzPileUp","hTrackDzPileUp",100,0.,20.);
+  hTrackVzSignal_ = fs->make<TH1F>("TrackVzSignal","TrackVzSignal",100,0.,20.);
+  hTrackDzSignal_ = fs->make<TH1F>("TrackDzSignal","TrackDzSignal",100,0.,20.);
+  hTrackVzPileUp_ = fs->make<TH1F>("TrackVzPileUp","TrackVzPileUp",100,0.,20.);
+  hTrackDzPileUp_ = fs->make<TH1F>("TrackDzPileUp","TrackDzPileUp",100,0.,20.);
+
+  hVecNrPileUp_.push_back(fs->make<TH1F>("NrPileUpBx-1","NrPileUpBx-1",10,0,10)); // FIX: here harcoded bunches
+  hVecNrPileUp_.push_back(fs->make<TH1F>("NrPileUpBx0","NrPileUpBx0",10,0,10));
+  hVecNrPileUp_.push_back(fs->make<TH1F>("NrPileUpBx1","NrPileUpBx1",10,0,10));
+
+  hTrkMultBx0Signal_ = fs->make<TH1F>("TrkMultBx0Signal","TrkMultBx0Signal",200,0,1000);
+  hTrkMultBx0PileUp_ = fs->make<TH1F>("TrkMultBx0PileUp","TrkMultBx0PileUp",200,0,1000);
+  hTrkMultOtherPileUp_ = fs->make<TH1F>("TrkMultOtherPileUp","TrkMultOtherPileUp",200,0,1000);
 }
 
 void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
@@ -126,6 +142,7 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 
   for(unsigned int ibunch = 0; ibunch < nrEvents.size(); ++ibunch){
     edm::LogVerbatim("Analysis") << " Number of added pile-up's for bunch index " << ibunch << ": " << nrEvents[ibunch]; 
+    hVecNrPileUp_[ibunch]->Fill(nrEvents[ibunch]);
   }
 
   /*cout << endl << "Dump of initial vertices: " << endl;
@@ -168,7 +185,18 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 
   // Print out track mult.
   for(TrackMultMap::const_iterator it = trackMultMap.begin(); it != trackMultMap.end(); ++it){
-     edm::LogVerbatim("Analysis") << " Number of tracks in (bx,evt) (" << it->first.first << "," << it->first.second << "): " << it->second; 
+     int bunchCrossing = it->first.first;
+     int event = it->first.second;
+     unsigned int ntracks = it->second;
+     edm::LogVerbatim("Analysis") << " Number of tracks in (bx,evt) (" << bunchCrossing << "," << event << "): " << ntracks; 
+
+     if(bunchCrossing == 0){ // track multiplicity for bunchCrossing 0
+        if(event == 0){ // signal
+             hTrkMultBx0Signal_->Fill(ntracks);
+        } else { // pile-up
+             hTrkMultBx0PileUp_->Fill(ntracks);
+        }
+     } else hTrkMultOtherPileUp_->Fill(ntracks); // pile-up from other bunch crossing's   
   }
 
   // Add TrackAssociator info 

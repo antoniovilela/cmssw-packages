@@ -4,6 +4,7 @@ process = cms.Process("Analysis")
 # keep the logging output to a nice level ###
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.threshold = 'INFO'
+#process.MessageLogger.cerr.threshold = 'WARNING'
 process.MessageLogger.categories.append('Analysis')
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
