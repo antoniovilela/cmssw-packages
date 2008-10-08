@@ -140,10 +140,14 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
   const unsigned int s = 0;
   playbackInfo->getEventStartInfo(ids,fileNrs,nrEvents,s);
 
+  bool singleInteraction = true;
   for(unsigned int ibunch = 0; ibunch < nrEvents.size(); ++ibunch){
     edm::LogVerbatim("Analysis") << " Number of added pile-up's for bunch index " << ibunch << ": " << nrEvents[ibunch]; 
     hVecNrPileUp_[ibunch]->Fill(nrEvents[ibunch]);
+    if(nrEvents[ibunch] != 0) singleInteraction = false;
   }
+
+  if(singleInteraction) edm::LogVerbatim("Analysis") << ">>>> Single Interaction Event";
 
   /*cout << endl << "Dump of initial vertices: " << endl;
   for (TrackingVertexCollection::const_iterator iVertex = rawVH->begin(); iVertex != rawVH->end(); ++iVertex) {
