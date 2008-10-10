@@ -14,11 +14,7 @@ process.MessageLogger.cerr.DEBUG = cms.untracked.PSet(
 )
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
-    FwkSummary = cms.untracked.PSet(
-                   reportEvery = cms.untracked.int32(10),
-                   limit = cms.untracked.int32(10000000)
-                ),
-    Analysis = cms.untracked.PSet( limit = cms.untracked.int32(0))
+    Analysis = cms.untracked.PSet( limit = cms.untracked.int32(1000000))
 )
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )

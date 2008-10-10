@@ -39,6 +39,12 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
   TH1F* hTrackDistPVBx0PileUp_;
   TH1F* hTrackDistPVOtherPileUp_;
 
+  TH1F* hTrackDistMuonBx0Signal_;
+  TH1F* hTrackDistMuonBx0PileUp_;
+  TH1F* hTrackDistMuonOtherPileUp_;
+
+  TH1F* hMuonDistPV_;
+
   std::vector<TH1F*> hVecNrPileUp_;
 
   TH1F* hTrkMultBx0Signal_;
@@ -81,6 +87,9 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/RecoCandidate/interface/TrackAssociation.h"
+
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
 
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorBase.h"
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
@@ -128,6 +137,12 @@ void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
   hTrackDistPVBx0Signal_ = fs->make<TH1F>("TrackDistPVBx0Signal","TrackDistPVBx0Signal",100,-10.,10.);
   hTrackDistPVBx0PileUp_ = fs->make<TH1F>("TrackDistPVBx0PileUp","TrackDistPVBx0PileUp",100,-10.,10.);
   hTrackDistPVOtherPileUp_ = fs->make<TH1F>("TrackDistPVOtherPileUp","TrackDistPVOtherPileUp",100,-10.,10.);
+
+  hTrackDistMuonBx0Signal_ = fs->make<TH1F>("TrackDistMuonBx0Signal","TrackDistMuonBx0Signal",100,-10.,10.);
+  hTrackDistMuonBx0PileUp_ = fs->make<TH1F>("TrackDistMuonBx0PileUp","TrackDistMuonBx0PileUp",100,-10.,10.);
+  hTrackDistMuonOtherPileUp_ = fs->make<TH1F>("TrackDistMuonOtherPileUp","TrackDistMuonOtherPileUp",100,-10.,10.);
+
+  hMuonDistPV_ = fs->make<TH1F>("MuonDistPV","MuonDistPV",100,-10.,10.);
 
   char hname[20];
   for(std::vector<int>::const_iterator bunch = bunchRange_.begin(); bunch != bunchRange_.end(); ++bunch){
@@ -211,12 +226,56 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
   edm::Handle<edm::View<reco::Vertex> > vertexCollectionH;
   event.getByLabel(verticesTag_,vertexCollectionH);
   const edm::View<reco::Vertex> vtxColl = *(vertexCollectionH.product());
+
+  // Access primary vertex
+  const reco::Vertex& primaryVertex = vtxColl.front();
+  bool goodPrimaryVertex = ((primaryVertex.isValid())&&(!primaryVertex.isFake()));
+
+  // Get muon
+  edm::Handle<edm::View<reco::Muon> > muonCollectionH;
+  event.getByLabel("muons", muonCollectionH);
+  edm::View<reco::Muon> muonColl = *(muonCollectionH.product());
+  double ptcut = 10.;
+  double maxpupt = 0.;
+  const reco::Muon* muonPt10 = 0;
+  for(edm::View<reco::Muon>::const_iterator mu = muonColl.begin(); mu != muonColl.end(); ++mu){
+    if(!mu->isGlobalMuon()) continue;
+    if(mu->pt() < ptcut) continue;
+    if(mu->pt() > maxpupt){
+        muonPt10 = &(*mu);
+        maxpupt = muonPt10->pt();
+    }
+  }
+
+  // Skip event if no muon found
+  if(muonPt10 == 0){
+    edm::LogError("Analysis") << ">>>>>  No muon passing cuts found in event..skipping";
+    return;
+  } else {
+    edm::LogVerbatim("Analysis") << " Muon pt,eta,phi = " << muonPt10->pt() << ", " << muonPt10->eta() << ", " << muonPt10->phi();
+  }
+
+  // Fill difference of muon vertex to PV
+  if(goodPrimaryVertex) hMuonDistPV_->Fill(muonPt10->vz() - primaryVertex.position().z());
+
+  // Find number of good vertices; match one closest to muon vertex 
   int nGoodVertices = 0;
+  double mindist = 0.3;
+  //const reco::Vertex* vertexAssocToMuon = 0;
+  edm::View<reco::Vertex>::const_iterator vertexAssocToMuon = vtxColl.end();
   for(edm::View<reco::Vertex>::const_iterator vtx = vtxColl.begin(); vtx != vtxColl.end(); ++vtx){
     if(!vtx->isValid()) continue; // skip non-valid vertices
     if(vtx->isFake()) continue; // skip vertex from beam spot
     ++nGoodVertices;
+
+    double dz = muonPt10->vz() - vtx->position().z();
+    if(fabs(dz) < mindist){
+        //vertexAssocToMuon = &(*vtx);
+        vertexAssocToMuon = vtx;
+        mindist = fabs(dz);
+    }
   }
+ 
   edm::LogVerbatim("Analysis") << " Number of recontructed primary vertices in event: " << nGoodVertices;  
   hNPrimVertices_->Fill(nGoodVertices);
   // Number of events on bx 0
@@ -224,6 +283,17 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
   profNPVvsNPUBx0_->Fill(nPUBx0,nGoodVertices);
   profNPUBx0vsNPV_->Fill(nGoodVertices,nPUBx0);
   hNPUBx0vsNPV_->Fill(nGoodVertices,nPUBx0);
+
+  // Check matched vertex to muon
+  if(vertexAssocToMuon == vtxColl.end()){
+    edm::LogPrint("Analysis") << ">>>>>  Could not associate vertex to muon";
+  } else {
+    bool primVtxisMuon = (vertexAssocToMuon == vtxColl.begin()); // Hardest vertex is the one corresponding to the muon
+    if(!primVtxisMuon){
+        edm::LogError("Analysis") << ">>>>>  Hardest vertex is not associated to the muon..skipping";
+        return;
+    }
+  }
 
   // Access TrackingVertex collection
   edm::LogVerbatim("Analysis") << " Tracking vertices summary:";
@@ -275,8 +345,8 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 
   //reco::RecoToSimCollection recoToSim = associatorByHits_->associateRecoToSim(trackCollectionH,mergedPH,&event);
 
-  const reco::Vertex& primaryVertex = vtxColl[0];
-  bool goodPrimaryVertex = ((primaryVertex.isValid())&&(!primaryVertex.isFake()));
+  //const reco::Vertex& primaryVertex = vtxColl[0];
+  //bool goodPrimaryVertex = ((primaryVertex.isValid())&&(!primaryVertex.isFake()));
   for(edm::View<reco::Track>::size_type i=0; i < tC.size(); ++i) {
     edm::RefToBase<reco::Track> track(trackCollectionH, i);
     if(recoToSim.find(track) != recoToSim.end()){
@@ -301,15 +371,18 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
                      hTrackDzSignal_->Fill(fabs(track->dz()));
 
                      if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(track->vz() - primaryVertex.position().z());
+                     hTrackDistMuonBx0Signal_->Fill(track->vz() - muonPt10->vz()); 
                  } else {
                      edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from pile-up";
                      hTrackVzPileUp_->Fill(fabs(track->vz()));
                      hTrackDzPileUp_->Fill(fabs(track->dz()));
 
                      if(goodPrimaryVertex) hTrackDistPVBx0PileUp_->Fill(track->vz() - primaryVertex.position().z());
+                     hTrackDistMuonBx0PileUp_->Fill(track->vz() - muonPt10->vz());
                 }
 	     } else { // other bunch crossings
                      if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(track->vz() - primaryVertex.position().z());
+                     hTrackDistMuonOtherPileUp_->Fill(track->vz() - muonPt10->vz());
              }
         }
     } else edm::LogVerbatim("Analysis") << "->   Track pT: " << track->pt() <<  " matched to 0  MC Tracks";
