@@ -32,8 +32,14 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
   // Histograms
   TH1F* hTrackVzSignal_;
   TH1F* hTrackDzSignal_;
+  TH1F* hTrackSigzSignal_;
+  TH1F* hTrackDxySignal_;
+  TH1F* hTrackSigxySignal_;
   TH1F* hTrackVzPileUp_;
-  TH1F* hTrackDzPileUp_; 
+  TH1F* hTrackDzPileUp_;
+  TH1F* hTrackSigzPileUp_;
+  TH1F* hTrackDxyPileUp_;
+  TH1F* hTrackSigxyPileUp_; 
 
   TH1F* hTrackDistPVBx0Signal_;
   TH1F* hTrackDistPVBx0PileUp_;
@@ -51,7 +57,12 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
   TH1F* hTrkMultBx0PileUp_;
   TH1F* hTrkMultOtherPileUp_;
 
+  TH1F* hNTracksAwayPV_;
+
   TH1F* hNPrimVertices_;
+  TH1F* hNPrimVerticesSingleInt_;
+  TH1F* hNPrimVerticesPileUp_;
+
   TProfile* profNPVvsNPUBx0_;
   TProfile* profNPUBx0vsNPV_;
   TH2F* hNPUBx0vsNPV_;
@@ -94,6 +105,8 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorBase.h"
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 
+//#include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
+
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
 
@@ -129,14 +142,20 @@ void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
 
   // Book histograms
   edm::Service<TFileService> fs;
-  hTrackVzSignal_ = fs->make<TH1F>("TrackVzSignal","TrackVzSignal",100,0.,20.);
-  hTrackDzSignal_ = fs->make<TH1F>("TrackDzSignal","TrackDzSignal",100,0.,20.);
-  hTrackVzPileUp_ = fs->make<TH1F>("TrackVzPileUp","TrackVzPileUp",100,0.,20.);
-  hTrackDzPileUp_ = fs->make<TH1F>("TrackDzPileUp","TrackDzPileUp",100,0.,20.);
+  hTrackVzSignal_ = fs->make<TH1F>("TrackVzSignal","TrackVzSignal",100,-10.,10.);
+  hTrackDzSignal_ = fs->make<TH1F>("TrackDzSignal","TrackDzSignal",100,-10.,10.);
+  hTrackSigzSignal_ = fs->make<TH1F>("TrackSigzSignal","TrackSigzSignal",100,-4.,4.);
+  hTrackDxySignal_ = fs->make<TH1F>("TrackDxySignal","TrackDxySignal",100,-10.,10.);
+  hTrackSigxySignal_ = fs->make<TH1F>("TrackSigxySignal","TrackSigxySignal",100,-4.,4.);
+  hTrackVzPileUp_ = fs->make<TH1F>("TrackVzPileUp","TrackVzPileUp",100,-10.,10.);
+  hTrackDzPileUp_ = fs->make<TH1F>("TrackDzPileUp","TrackDzPileUp",100,-10.,10.);
+  hTrackSigzPileUp_ = fs->make<TH1F>("TrackSigzPileUp","TrackSigzPileUp",100,-4.,4.);
+  hTrackDxyPileUp_ = fs->make<TH1F>("TrackDxyPileUp","TrackDxyPileUp",100,-10.,10.);
+  hTrackSigxyPileUp_ = fs->make<TH1F>("TrackSigxyPileUp","TrackSigxyPileUp",100,-4.,4.);
 
-  hTrackDistPVBx0Signal_ = fs->make<TH1F>("TrackDistPVBx0Signal","TrackDistPVBx0Signal",100,-10.,10.);
-  hTrackDistPVBx0PileUp_ = fs->make<TH1F>("TrackDistPVBx0PileUp","TrackDistPVBx0PileUp",100,-10.,10.);
-  hTrackDistPVOtherPileUp_ = fs->make<TH1F>("TrackDistPVOtherPileUp","TrackDistPVOtherPileUp",100,-10.,10.);
+  hTrackDistPVBx0Signal_ = fs->make<TH1F>("TrackDistPVBx0Signal","TrackDistPVBx0Signal",100,0.,10.);
+  hTrackDistPVBx0PileUp_ = fs->make<TH1F>("TrackDistPVBx0PileUp","TrackDistPVBx0PileUp",100,0.,10.);
+  hTrackDistPVOtherPileUp_ = fs->make<TH1F>("TrackDistPVOtherPileUp","TrackDistPVOtherPileUp",100,0.,10.);
 
   hTrackDistMuonBx0Signal_ = fs->make<TH1F>("TrackDistMuonBx0Signal","TrackDistMuonBx0Signal",100,-10.,10.);
   hTrackDistMuonBx0PileUp_ = fs->make<TH1F>("TrackDistMuonBx0PileUp","TrackDistMuonBx0PileUp",100,-10.,10.);
@@ -154,7 +173,12 @@ void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
   hTrkMultBx0PileUp_ = fs->make<TH1F>("TrkMultBx0PileUp","TrkMultBx0PileUp",200,0,1000);
   hTrkMultOtherPileUp_ = fs->make<TH1F>("TrkMultOtherPileUp","TrkMultOtherPileUp",200,0,1000);
 
+  hNTracksAwayPV_ = fs->make<TH1F>("NTracksAwayPV","NTracksAwayPV",100,0,100);
+ 
   hNPrimVertices_ = fs->make<TH1F>("NPrimVertices","NPrimVertices",10,0,10);
+  hNPrimVerticesSingleInt_ = fs->make<TH1F>("NPrimVerticesSingleInt","NPrimVerticesSingleInt",10,0,10);
+  hNPrimVerticesPileUp_ = fs->make<TH1F>("NPrimVerticesPileUp","NPrimVerticesPileUp",10,0,10);
+
   profNPVvsNPUBx0_ = fs->make<TProfile>("profNPVvsNPUBx0","profNPVvsNPUBx0",10,0,10);
   profNPUBx0vsNPV_ = fs->make<TProfile>("profNPUBx0vsNPV","profNPUBx0vsNPV",10,0,10);
   hNPUBx0vsNPV_ = fs->make<TH2F>("NPUBx0vsNPV","NPUBx0vsNPV",10,0,10,10,0,10);
@@ -276,8 +300,11 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
     }
   }
  
-  edm::LogVerbatim("Analysis") << " Number of recontructed primary vertices in event: " << nGoodVertices;  
+  edm::LogVerbatim("Analysis") << " Number of reconstructed primary vertices in event: " << nGoodVertices;  
   hNPrimVertices_->Fill(nGoodVertices);
+  if(singleInteraction) hNPrimVerticesSingleInt_->Fill(nGoodVertices);
+  else hNPrimVerticesPileUp_->Fill(nGoodVertices);
+
   // Number of events on bx 0
   int nPUBx0 = playbackInfo->getNrEvents(0,0);
   profNPVvsNPUBx0_->Fill(nPUBx0,nGoodVertices);
@@ -286,7 +313,8 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 
   // Check matched vertex to muon
   if(vertexAssocToMuon == vtxColl.end()){
-    edm::LogPrint("Analysis") << ">>>>>  Could not associate vertex to muon";
+    edm::LogError("Analysis") << ">>>>>  Could not associate any vertex to muon..skipping";
+    return;
   } else {
     bool primVtxisMuon = (vertexAssocToMuon == vtxColl.begin()); // Hardest vertex is the one corresponding to the muon
     if(!primVtxisMuon){
@@ -347,8 +375,18 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 
   //const reco::Vertex& primaryVertex = vtxColl[0];
   //bool goodPrimaryVertex = ((primaryVertex.isValid())&&(!primaryVertex.isFake()));
+  double distminpv = 0.4;
+  int ntracks_away = 0;
   for(edm::View<reco::Track>::size_type i=0; i < tC.size(); ++i) {
     edm::RefToBase<reco::Track> track(trackCollectionH, i);
+
+    math::XYZPoint trackDistPV;
+    trackDistPV.SetX(track->vx() - primaryVertex.position().x());
+    trackDistPV.SetY(track->vy() - primaryVertex.position().y());
+    trackDistPV.SetZ(track->vz() - primaryVertex.position().z());
+
+    if(goodPrimaryVertex&&(sqrt(trackDistPV.mag2()) >= distminpv)) ++ntracks_away;
+
     if(recoToSim.find(track) != recoToSim.end()){
         std::vector<std::pair<TrackingParticleRef, double> > tp = recoToSim[track];
 	edm::LogVerbatim("Analysis") << "Reco Track pT: "  << track->pt() 
@@ -359,6 +397,7 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 	     double assocQuality = it->second;
 	     edm::LogVerbatim("Analysis") << "\t\tMCTrack " << tpr.index() << " pT: " << tpr->pt() << " NShared: " << assocQuality;
 	}
+         
         // Check if best TP match comes from pile-up
         if(tp.size() != 0){
              TrackingParticleRef tpr = tp.begin()->first;
@@ -367,27 +406,40 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 	     if(evtId.bunchCrossing() == 0){ // check if from signal bunch crossing
                  if(evtId.event() == 0){ // check if it comes from signal or pile-up
 	             edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from signal";		
-                     hTrackVzSignal_->Fill(fabs(track->vz()));
-                     hTrackDzSignal_->Fill(fabs(track->dz()));
+                     //hTrackVzSignal_->Fill(fabs(track->vz()));
+                     //hTrackDzSignal_->Fill(fabs(track->dz()));
+                     hTrackVzSignal_->Fill(track->vz());
+                     hTrackDzSignal_->Fill(track->dz());
+                     hTrackSigzSignal_->Fill(track->dz()/track->dzError());
+                     hTrackDxySignal_->Fill(track->dxy());
+                     hTrackSigxySignal_->Fill(track->dxy()/track->dxyError());
 
-                     if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(track->vz() - primaryVertex.position().z());
+                     //if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(track->vz() - primaryVertex.position().z());
+                     if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(sqrt(trackDistPV.mag2()));
                      hTrackDistMuonBx0Signal_->Fill(track->vz() - muonPt10->vz()); 
                  } else {
                      edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from pile-up";
-                     hTrackVzPileUp_->Fill(fabs(track->vz()));
-                     hTrackDzPileUp_->Fill(fabs(track->dz()));
+                     //hTrackVzPileUp_->Fill(fabs(track->vz()));
+                     //hTrackDzPileUp_->Fill(fabs(track->dz()));
+                     hTrackVzPileUp_->Fill(track->vz());
+                     hTrackDzPileUp_->Fill(track->dz());
+                     hTrackSigzPileUp_->Fill(track->dz()/track->dzError());
+                     hTrackDxyPileUp_->Fill(track->dxy());
+                     hTrackSigxyPileUp_->Fill(track->dxy()/track->dxyError());
 
-                     if(goodPrimaryVertex) hTrackDistPVBx0PileUp_->Fill(track->vz() - primaryVertex.position().z());
+                     //if(goodPrimaryVertex) hTrackDistPVBx0PileUp_->Fill(track->vz() - primaryVertex.position().z());
+                     if(goodPrimaryVertex) hTrackDistPVBx0PileUp_->Fill(sqrt(trackDistPV.mag2()));
                      hTrackDistMuonBx0PileUp_->Fill(track->vz() - muonPt10->vz());
                 }
 	     } else { // other bunch crossings
-                     if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(track->vz() - primaryVertex.position().z());
+                     //if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(track->vz() - primaryVertex.position().z());
+                     if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(sqrt(trackDistPV.mag2()));
                      hTrackDistMuonOtherPileUp_->Fill(track->vz() - muonPt10->vz());
              }
         }
     } else edm::LogVerbatim("Analysis") << "->   Track pT: " << track->pt() <<  " matched to 0  MC Tracks";
   }
-  
+  hNTracksAwayPV_->Fill(ntracks_away);
 }
 
 DEFINE_SEAL_MODULE();
