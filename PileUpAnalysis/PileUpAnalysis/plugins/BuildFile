@@ -15,6 +15,7 @@
   <use name=SimDataFormats/CrossingFrame>
   <use name=SimTracker/TrackerHitAssociation>
   <use name=SimTracker/TrackAssociation>
+  <use name=SimTracker/VertexAssociation>
   <use name=SimTracker/Records>
   <use name=PhysicsTools/UtilAlgos>	
   <use name=root>

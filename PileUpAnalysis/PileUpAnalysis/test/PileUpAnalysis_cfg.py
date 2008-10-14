@@ -27,6 +27,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.load("Configuration.StandardSequences.MagneticField_cff") 
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
 #process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
+process.load("SimTracker.VertexAssociation.VertexAssociatorByTracks_cfi")
 process.load("SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cfi")
 #process.TrackAssociatorByHits.
 
