@@ -38,11 +38,18 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
-process.pileupanalysis = cms.EDFilter("PileUpAnalysis",
+
+process.pileUpAnalysis = cms.EDAnalyzer("PileUpAnalysis",
                               TracksTag = cms.InputTag("generalTracks"),
                               VerticesTag = cms.InputTag("offlinePrimaryVertices"),
 			      TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation"),
                               BunchCrossings = cms.vint32(-1,0,1)
+)
+
+process.vtxEffAnalysis = cms.EDAnalyzer("VertexEfficiencyAnalyzer",
+                              TracksTag = cms.InputTag("generalTracks"),
+                              VerticesTag = cms.InputTag("offlinePrimaryVertices"),
+                              TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation")
 )
 
 process.add_(cms.Service("TFileService",
@@ -50,10 +57,12 @@ process.add_(cms.Service("TFileService",
 	)
 )
 
-#process.p = cms.EndPath(process.mix*process.trackingParticles*process.pileupanalysis)
+#process.p = cms.EndPath(process.mix*process.trackingParticles*process.pileUpAnalysis)
 
-#process.p = cms.Path(process.trackingParticles*process.pileupanalysis)
+#process.p = cms.Path(process.trackingParticles*process.pileUpAnalysis)
 
-process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.pileupanalysis)
+#process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.pileUpAnalysis)
+
+process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis)
 
 #process.p = cms.Path(process.pileupanalysis)
