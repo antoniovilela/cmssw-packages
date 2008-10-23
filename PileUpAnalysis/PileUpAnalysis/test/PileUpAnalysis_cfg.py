@@ -5,8 +5,8 @@ process = cms.Process("Analysis")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.debugModules = cms.untracked.vstring('pileupanalysis')
 #process.MessageLogger.cerr.threshold = 'DEBUG'
-process.MessageLogger.cerr.threshold = 'INFO'
-#process.MessageLogger.cerr.threshold = 'WARNING'
+#process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.cerr.threshold = 'WARNING'
 process.MessageLogger.categories.append('Analysis')
 process.MessageLogger.cerr.DEBUG = cms.untracked.PSet(
     default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
@@ -43,10 +43,17 @@ process.pileUpAnalysis = cms.EDAnalyzer("PileUpAnalysis",
                               TracksTag = cms.InputTag("generalTracks"),
                               VerticesTag = cms.InputTag("offlinePrimaryVertices"),
 			      TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation"),
+                              #BunchCrossings = cms.vint32(0)
                               BunchCrossings = cms.vint32(-1,0,1)
 )
 
 process.vtxEffAnalysis = cms.EDAnalyzer("VertexEfficiencyAnalyzer",
+                              TracksTag = cms.InputTag("generalTracks"),
+                              VerticesTag = cms.InputTag("offlinePrimaryVertices"),
+                              TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation")
+)
+
+process.trkEffAnalysis = cms.EDAnalyzer("TrackEfficiencyAnalyzer",
                               TracksTag = cms.InputTag("generalTracks"),
                               VerticesTag = cms.InputTag("offlinePrimaryVertices"),
                               TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation")
@@ -57,12 +64,13 @@ process.add_(cms.Service("TFileService",
 	)
 )
 
+#process.p = cms.Path(process.pileupanalysis)
+
 #process.p = cms.EndPath(process.mix*process.trackingParticles*process.pileUpAnalysis)
 
 #process.p = cms.Path(process.trackingParticles*process.pileUpAnalysis)
 
 #process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.pileUpAnalysis)
 
-process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis)
+process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
 
-#process.p = cms.Path(process.pileupanalysis)
