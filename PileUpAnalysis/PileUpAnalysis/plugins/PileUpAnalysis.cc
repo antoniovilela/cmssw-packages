@@ -73,7 +73,10 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
   TH1F* hTrkMultOtherPileUp_;
 
   TH1F* hNTracksAwayPV_;
-
+  TH1F* hFracTracksAwayPV_;
+  TH2F* hFracTracksAwayPVvsNPUBx0_;
+  TH2F* hFracTracksAwayPVvsNPUBx0SingleVtx_;
+ 
   TH1F* hNPrimVertices_;
   TH1F* hNPrimVerticesSingleInt_;
   TH1F* hNPrimVerticesPileUp_;
@@ -207,7 +210,10 @@ void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
   hTrkMultOtherPileUp_ = fs->make<TH1F>("TrkMultOtherPileUp","TrkMultOtherPileUp",200,0,1000);
 
   hNTracksAwayPV_ = fs->make<TH1F>("NTracksAwayPV","NTracksAwayPV",100,0,100);
- 
+  hFracTracksAwayPV_ = fs->make<TH1F>("FracTracksAwayPV","FracTracksAwayPV",100,0.,1.);  
+  hFracTracksAwayPVvsNPUBx0_ = fs->make<TH2F>("FracTracksAwayPVvsNPUBx0","FracTracksAwayPVvsNPUBx0",10,0,10,100,0.,1.);
+  hFracTracksAwayPVvsNPUBx0SingleVtx_ = fs->make<TH2F>("FracTracksAwayPVvsNPUBx0SingleVtx","FracTracksAwayPVvsNPUBx0SingleVtx",10,0,10,100,0.,1.);
+
   hNPrimVertices_ = fs->make<TH1F>("NPrimVertices","NPrimVertices",10,0,10);
   hNPrimVerticesSingleInt_ = fs->make<TH1F>("NPrimVerticesSingleInt","NPrimVerticesSingleInt",10,0,10);
   hNPrimVerticesPileUp_ = fs->make<TH1F>("NPrimVerticesPileUp","NPrimVerticesPileUp",10,0,10);
@@ -562,6 +568,10 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
     } else edm::LogVerbatim("Analysis") << "->   Track pT: " << track->pt() <<  " matched to 0  MC Tracks";
   }
   hNTracksAwayPV_->Fill(ntracks_away);
+  double fracTracksAway = (float)ntracks_away/(float)trkColl.size();
+  hFracTracksAwayPV_->Fill(fracTracksAway);
+  hFracTracksAwayPVvsNPUBx0_->Fill(nPUBx0,fracTracksAway);
+  if(nGoodVertices == 1) hFracTracksAwayPVvsNPUBx0SingleVtx_->Fill(nPUBx0,fracTracksAway);
 }
 
 DEFINE_SEAL_MODULE();
