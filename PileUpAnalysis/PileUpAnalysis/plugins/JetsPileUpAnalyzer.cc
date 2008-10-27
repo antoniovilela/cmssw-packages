@@ -1,5 +1,5 @@
-#ifndef PileUpAnalysis_h
-#define PileUpAnalysis_h
+#ifndef JetsPileUpAnalyzer_h
+#define JetsPileUpAnalyzer_h
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
@@ -13,12 +13,12 @@ class InputTag;
 class TrackAssociatorBase;
 class VertexAssociatorBase;
 
-class PileUpAnalysis  : public edm::EDAnalyzer {
+class JetsPileUpAnalyzer  : public edm::EDAnalyzer {
  public:
 
-  explicit PileUpAnalysis(const edm::ParameterSet& conf);
+  explicit JetsPileUpAnalyzer(const edm::ParameterSet& conf);
 
-  virtual ~PileUpAnalysis(){}
+  virtual ~JetsPileUpAnalyzer(){}
 
   virtual void analyze(const edm::Event& e, const edm::EventSetup& c);
   virtual void beginJob(const edm::EventSetup & setup);
@@ -51,10 +51,6 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
   TH1F* hTrackDistPVBx0PileUp_;
   TH1F* hTrackDistPVOtherPileUp_;
 
-  TH1F* hTrackDistMuonBx0Signal_;
-  TH1F* hTrackDistMuonBx0PileUp_;
-  TH1F* hTrackDistMuonOtherPileUp_;
-
   TH1F* hPrimVtxPosXBx0Signal_;
   TH1F* hPrimVtxPosXBx0PileUp_;
   TH1F* hPrimVtxPosXOtherPileUp_;
@@ -66,8 +62,6 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
   TH1F* hPrimVtxPosZBx0Signal_;
   TH1F* hPrimVtxPosZBx0PileUp_;
   TH1F* hPrimVtxPosZOtherPileUp_;
-
-  TH1F* hMuonDistPV_;
 
   std::vector<TH1F*> hVecNrPileUp_;
 
@@ -125,9 +119,6 @@ class PileUpAnalysis  : public edm::EDAnalyzer {
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 
-#include "DataFormats/MuonReco/interface/Muon.h"
-#include "DataFormats/MuonReco/interface/MuonFwd.h"
-
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorBase.h"
 #include "SimTracker/VertexAssociation/interface/VertexAssociatorBase.h"
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
@@ -155,7 +146,7 @@ typedef TrackingVertex::g4v_iterator                     g4v_iterator;
 
 typedef std::map<std::pair<int,int>,unsigned int> TrackMultMap;
 
-PileUpAnalysis::PileUpAnalysis(const edm::ParameterSet& conf):
+JetsPileUpAnalyzer::JetsPileUpAnalyzer(const edm::ParameterSet& conf):
   tracksTag_(conf.getParameter<edm::InputTag>("TracksTag")),
   verticesTag_(conf.getParameter<edm::InputTag>("VerticesTag")),
   trackAssociatorTag_(conf.getParameter<edm::InputTag>("TrackAssociatorTag")),
@@ -163,7 +154,7 @@ PileUpAnalysis::PileUpAnalysis(const edm::ParameterSet& conf):
   bunchRange_(conf.getParameter<std::vector<int> >("BunchCrossings")),
   EBeam_(5000.){}
 
-void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
+void JetsPileUpAnalyzer::beginJob(const edm::EventSetup& setup) {
   /*edm::ESHandle<MagneticField> theMF;
   setup.get<IdealMagneticFieldRecord>().get(theMF);
   edm::ESHandle<TrackAssociatorBase> theHitsAssociator;
@@ -191,10 +182,6 @@ void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
   hTrackDistPVBx0PileUp_ = fs->make<TH1F>("TrackDistPVBx0PileUp","TrackDistPVBx0PileUp",100,0.,10.);
   hTrackDistPVOtherPileUp_ = fs->make<TH1F>("TrackDistPVOtherPileUp","TrackDistPVOtherPileUp",100,0.,10.);
 
-  hTrackDistMuonBx0Signal_ = fs->make<TH1F>("TrackDistMuonBx0Signal","TrackDistMuonBx0Signal",100,-10.,10.);
-  hTrackDistMuonBx0PileUp_ = fs->make<TH1F>("TrackDistMuonBx0PileUp","TrackDistMuonBx0PileUp",100,-10.,10.);
-  hTrackDistMuonOtherPileUp_ = fs->make<TH1F>("TrackDistMuonOtherPileUp","TrackDistMuonOtherPileUp",100,-10.,10.);
-
   hPrimVtxPosXBx0Signal_ = fs->make<TH1F>("PrimVtxPosXBx0Signal","PrimVtxPosXBx0Signal",100,-10.,10.);
   hPrimVtxPosXBx0PileUp_ = fs->make<TH1F>("PrimVtxPosXBx0PileUp","PrimVtxPosXBx0PileUp",100,-10.,10.);
   hPrimVtxPosXOtherPileUp_ = fs->make<TH1F>("PrimVtxPosXOtherPileUp","PrimVtxPosXOtherPileUp",100,-10.,10.);
@@ -206,8 +193,6 @@ void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
   hPrimVtxPosZBx0Signal_ = fs->make<TH1F>("PrimVtxPosZBx0Signal","PrimVtxPosZBx0Signal",100,-10.,10.);
   hPrimVtxPosZBx0PileUp_ = fs->make<TH1F>("PrimVtxPosZBx0PileUp","PrimVtxPosZBx0PileUp",100,-10.,10.);
   hPrimVtxPosZOtherPileUp_ = fs->make<TH1F>("PrimVtxPosZOtherPileUp","PrimVtxPosZOtherPileUp",100,-10.,10.);
-
-  hMuonDistPV_ = fs->make<TH1F>("MuonDistPV","MuonDistPV",100,-10.,10.);
 
   char hname[20];
   for(std::vector<int>::const_iterator bunch = bunchRange_.begin(); bunch != bunchRange_.end(); ++bunch){
@@ -236,17 +221,10 @@ void PileUpAnalysis::beginJob(const edm::EventSetup& setup) {
   hXiFromTowersMinus_ = fs->make<TH1F>("XiFromTowersMinus","XiFromTowersMinus",100,0.,1.2);
 }
 
-void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
+void JetsPileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& c){
 
-  /*edm::Handle<TrackingParticleCollection> elecPH;
-  edm::Handle<TrackingParticleCollection> rawPH;
-  edm::Handle<TrackingVertexCollection>   rawVH;*/
   edm::Handle<TrackingParticleCollection> mergedPH;
   edm::Handle<TrackingVertexCollection>   mergedVH;
-
-  /*event.getByLabel("trackingtruthprod",                 rawPH);
-  event.getByLabel("trackingtruthprod",                 rawVH);
-  event.getByLabel("electrontruth","ElectronTrackTruth",elecPH);*/
   event.getByLabel("mergedtruth","MergedTrackTruth",    mergedPH);
   event.getByLabel("mergedtruth","MergedTrackTruth",    mergedVH);
 
@@ -262,7 +240,7 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
   playbackInfo->getEventStartInfo(ids,fileNrs,nrEvents,s);
 
   if(bunchRange_.size() != nrEvents.size()){
-    throw edm::Exception(edm::errors::Configuration,"PileUpAnalysisError") << " Expecting different bunch ranges\n"; 
+    throw edm::Exception(edm::errors::Configuration,"JetsPileUpAnalyzerError") << " Expecting different bunch ranges\n"; 
   }
 
   bool singleInteraction = true;
@@ -273,30 +251,6 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
   }
 
   if(singleInteraction) edm::LogVerbatim("Analysis") << ">>>> Single Interaction Event";
-
-  /*cout << endl << "Dump of initial vertices: " << endl;
-  for (TrackingVertexCollection::const_iterator iVertex = rawVH->begin(); iVertex != rawVH->end(); ++iVertex) {
-    cout << *iVertex;
-  }
-
-  cout << endl << "Dump of initital tracks: " << endl;
-  for (TrackingParticleCollection::const_iterator iTrack = rawPH->begin(); iTrack != rawPH->end(); ++iTrack) {
-    cout << *iTrack;
-  }
-
-  cout << endl << "Dump of electron tracks: " << endl;
-  for (TrackingParticleCollection::const_iterator iTrack = elecPH->begin(); iTrack != elecPH->end(); ++iTrack) {
-    cout << *iTrack;
-  }*/
-
-  /*cout << endl << "Dump of merged vertices: " << endl;
-  for (TrackingVertexCollection::const_iterator iVertex = mergedVH->begin(); iVertex != mergedVH->end(); ++iVertex) {
-    cout << endl << *iVertex;
-    cout << "Daughters of this vertex:" << endl;
-    for (tp_iterator iTrack = iVertex->daughterTracks_begin(); iTrack != iVertex->daughterTracks_end(); ++iTrack) {
-      cout << **iTrack;
-    }
-  }*/
 
   // Get reconstructed tracks
   edm::Handle<edm::View<reco::Track> > trackCollectionH;
@@ -317,33 +271,6 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
   // Access primary vertex
   const reco::Vertex& primaryVertex = vtxColl.front();
   bool goodPrimaryVertex = ((primaryVertex.isValid())&&(!primaryVertex.isFake()));
-
-  // Get muon
-  edm::Handle<edm::View<reco::Muon> > muonCollectionH;
-  event.getByLabel("muons", muonCollectionH);
-  edm::View<reco::Muon> muonColl = *(muonCollectionH.product());
-  double ptcut = 10.;
-  double maxpupt = 0.;
-  const reco::Muon* muonPt10 = 0;
-  for(edm::View<reco::Muon>::const_iterator mu = muonColl.begin(); mu != muonColl.end(); ++mu){
-    if(!mu->isGlobalMuon()) continue;
-    if(mu->pt() < ptcut) continue;
-    if(mu->pt() > maxpupt){
-        muonPt10 = &(*mu);
-        maxpupt = muonPt10->pt();
-    }
-  }
-
-  // Skip event if no muon found
-  if(muonPt10 == 0){
-    edm::LogError("Analysis") << ">>>>>  No muon passing cuts found in event..skipping";
-    return;
-  } else {
-    edm::LogVerbatim("Analysis") << " Muon pt,eta,phi = " << muonPt10->pt() << ", " << muonPt10->eta() << ", " << muonPt10->phi();
-  }
-
-  // Fill difference of muon vertex to PV
-  if(goodPrimaryVertex) hMuonDistPV_->Fill(muonPt10->vz() - primaryVertex.position().z());
 
   // TrackAssociator/VertexAssociator info 
   // RecoToSim
@@ -416,22 +343,11 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 
   // Find number of good vertices; match one closest to muon vertex 
   int nGoodVertices = 0;
-  double mindist = 0.3;
-  //const reco::Vertex* vertexAssocToMuon = 0;
-  //edm::View<reco::Vertex>::const_iterator vertexAssocToMuon = vtxColl.end();
-  reco::VertexCollection::const_iterator vertexAssocToMuon = vtxColl.end();
   //for(edm::View<reco::Vertex>::const_iterator vtx = vtxColl.begin(); vtx != vtxColl.end(); ++vtx){
   for(reco::VertexCollection::const_iterator vtx = vtxColl.begin(); vtx != vtxColl.end(); ++vtx){
     if(!vtx->isValid()) continue; // skip non-valid vertices
     if(vtx->isFake()) continue; // skip vertex from beam spot
     ++nGoodVertices;
-
-    double dz = muonPt10->vz() - vtx->position().z();
-    if(fabs(dz) < mindist){
-        //vertexAssocToMuon = &(*vtx);
-        vertexAssocToMuon = vtx;
-        mindist = fabs(dz);
-    }
   }
  
   edm::LogVerbatim("Analysis") << " Number of reconstructed primary vertices in event: " << nGoodVertices;  
@@ -444,18 +360,6 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
   profNPVvsNPUBx0_->Fill(nPUBx0,nGoodVertices);
   profNPUBx0vsNPV_->Fill(nGoodVertices,nPUBx0);
   hNPUBx0vsNPV_->Fill(nGoodVertices,nPUBx0);
-
-  // Check matched vertex to muon
-  if(vertexAssocToMuon == vtxColl.end()){
-    edm::LogError("Analysis") << ">>>>>  Could not associate any vertex to muon..skipping";
-    return;
-  } else {
-    bool primVtxisMuon = (vertexAssocToMuon == vtxColl.begin()); // Hardest vertex is the one corresponding to the muon
-    if(!primVtxisMuon){
-        edm::LogError("Analysis") << ">>>>>  Hardest vertex is not associated to the muon..skipping";
-        return;
-    }
-  }
 
   // Access TrackingVertex collection
   edm::LogVerbatim("Analysis") << " Tracking vertices summary:";
@@ -556,7 +460,6 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 
                      //if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(track->vz() - primaryVertex.position().z());
                      if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(sqrt(trackDistPV.mag2()));
-                     hTrackDistMuonBx0Signal_->Fill(track->vz() - muonPt10->vz()); 
                  } else {
                      edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from pile-up";
                      //hTrackVzPileUp_->Fill(fabs(track->vz()));
@@ -569,13 +472,11 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 
                      //if(goodPrimaryVertex) hTrackDistPVBx0PileUp_->Fill(track->vz() - primaryVertex.position().z());
                      if(goodPrimaryVertex) hTrackDistPVBx0PileUp_->Fill(sqrt(trackDistPV.mag2()));
-                     hTrackDistMuonBx0PileUp_->Fill(track->vz() - muonPt10->vz());
                 }
 	     } else { // other bunch crossings
                      edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from out-of-time bunch crossing";
                      //if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(track->vz() - primaryVertex.position().z());
                      if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(sqrt(trackDistPV.mag2()));
-                     hTrackDistMuonOtherPileUp_->Fill(track->vz() - muonPt10->vz());
              }
         }
     } else edm::LogVerbatim("Analysis") << "->   Track pT: " << track->pt() <<  " matched to 0  MC Tracks";
@@ -605,4 +506,4 @@ void PileUpAnalysis::analyze(const edm::Event& event, const edm::EventSetup& c){
 }
 
 DEFINE_SEAL_MODULE();
-DEFINE_ANOTHER_FWK_MODULE(PileUpAnalysis);
+DEFINE_ANOTHER_FWK_MODULE(JetsPileUpAnalyzer);
