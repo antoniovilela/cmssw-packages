@@ -5,8 +5,8 @@ process = cms.Process("Analysis")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.debugModules = cms.untracked.vstring('pileupanalysis')
 #process.MessageLogger.cerr.threshold = 'DEBUG'
-process.MessageLogger.cerr.threshold = 'INFO'
-#process.MessageLogger.cerr.threshold = 'WARNING'
+#process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.cerr.threshold = 'WARNING'
 process.MessageLogger.categories.append('Analysis')
 process.MessageLogger.cerr.DEBUG = cms.untracked.PSet(
     default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
@@ -44,8 +44,8 @@ process.pileUpAnalysis = cms.EDAnalyzer("PileUpAnalysis",
                               VerticesTag = cms.InputTag("offlinePrimaryVertices"),
 			      TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation"),
                               CaloTowersTag = cms.InputTag("towerMaker"),
-                              #BunchCrossings = cms.vint32(0)
-                              BunchCrossings = cms.vint32(-1,0,1)
+                              BunchCrossings = cms.vint32(0)
+                              #BunchCrossings = cms.vint32(-1,0,1)
 )
 
 process.vtxEffAnalysis = cms.EDAnalyzer("VertexEfficiencyAnalyzer",
