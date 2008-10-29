@@ -84,6 +84,9 @@ class JetsPileUpAnalyzer  : public edm::EDAnalyzer {
 
   TH1F* hXiFromTowersPlus_;
   TH1F* hXiFromTowersMinus_;
+
+  TH1F* hXiFromTracksPVPlus_;
+  TH1F* hXiFromTracksPVMinus_;
 };
 
 #endif
@@ -219,6 +222,8 @@ void JetsPileUpAnalyzer::beginJob(const edm::EventSetup& setup) {
 
   hXiFromTowersPlus_ = fs->make<TH1F>("XiFromTowersPlus","XiFromTowersPlus",100,0.,1.2);
   hXiFromTowersMinus_ = fs->make<TH1F>("XiFromTowersMinus","XiFromTowersMinus",100,0.,1.2);
+  hXiFromTracksPVPlus_ = fs->make<TH1F>("XiFromTracksPVPlus","XiFromTracksPVPlus",100,0.,1.2);
+  hXiFromTracksPVMinus_ = fs->make<TH1F>("XiFromTracksPVMinus","XiFromTracksPVMinus",100,0.,1.2);
 }
 
 void JetsPileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& c){
@@ -271,6 +276,12 @@ void JetsPileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
   // Access primary vertex
   const reco::Vertex& primaryVertex = vtxColl.front();
   bool goodPrimaryVertex = ((primaryVertex.isValid())&&(!primaryVertex.isFake()));
+
+  // Skip event if not well reconstructed primary vertex
+  if(!goodPrimaryVertex){
+    edm::LogError("Analysis") << ">>>>>  Could not find any good vertex ..skipping";
+    return;
+  } 
 
   // TrackAssociator/VertexAssociator info 
   // RecoToSim
@@ -419,6 +430,8 @@ void JetsPileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
   //bool goodPrimaryVertex = ((primaryVertex.isValid())&&(!primaryVertex.isFake()));
   double distminpv = 0.4;
   int ntracks_away = 0;
+  double xiFromTracksPVPlus = 0.;
+  double xiFromTracksPVMinus = 0.;
   for(edm::View<reco::Track>::size_type i=0; i < trkColl.size(); ++i) {
   //for(size_te itrk = 0; itrk < trkColl.size(); ++itrk) {
     edm::RefToBase<reco::Track> track(trackCollectionH, i);
@@ -429,8 +442,13 @@ void JetsPileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
     trackDistPV.SetY(track->vy() - primaryVertex.position().y());
     trackDistPV.SetZ(track->vz() - primaryVertex.position().z());
 
-    if(goodPrimaryVertex&&(sqrt(trackDistPV.mag2()) >= distminpv)) ++ntracks_away;
-
+    //if(goodPrimaryVertex&&(sqrt(trackDistPV.mag2()) >= distminpv)) ++ntracks_away;
+    if(sqrt(trackDistPV.mag2()) >= distminpv) ++ntracks_away;
+    else {
+        xiFromTracksPVPlus += track->pt()*exp(track->eta());
+        xiFromTracksPVMinus += track->pt()*exp(-track->eta()); 
+    }
+    
     if(recoToSim.find(track) != recoToSim.end()){
         std::vector<std::pair<TrackingParticleRef, double> > tp = recoToSim[track];
 	edm::LogVerbatim("Analysis") << "Reco Track pT: "  << track->pt() 
@@ -459,7 +477,8 @@ void JetsPileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
                      hTrackSigxySignal_->Fill(track->dxy()/track->dxyError());
 
                      //if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(track->vz() - primaryVertex.position().z());
-                     if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(sqrt(trackDistPV.mag2()));
+                     //if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(sqrt(trackDistPV.mag2()));
+                     hTrackDistPVBx0Signal_->Fill(sqrt(trackDistPV.mag2()));
                  } else {
                      edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from pile-up";
                      //hTrackVzPileUp_->Fill(fabs(track->vz()));
@@ -471,12 +490,14 @@ void JetsPileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
                      hTrackSigxyPileUp_->Fill(track->dxy()/track->dxyError());
 
                      //if(goodPrimaryVertex) hTrackDistPVBx0PileUp_->Fill(track->vz() - primaryVertex.position().z());
-                     if(goodPrimaryVertex) hTrackDistPVBx0PileUp_->Fill(sqrt(trackDistPV.mag2()));
+                     //if(goodPrimaryVertex) hTrackDistPVBx0PileUp_->Fill(sqrt(trackDistPV.mag2()));
+                     hTrackDistPVBx0PileUp_->Fill(sqrt(trackDistPV.mag2()));
                 }
 	     } else { // other bunch crossings
                      edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from out-of-time bunch crossing";
                      //if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(track->vz() - primaryVertex.position().z());
-                     if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(sqrt(trackDistPV.mag2()));
+                     //if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(sqrt(trackDistPV.mag2()));
+                     hTrackDistPVOtherPileUp_->Fill(sqrt(trackDistPV.mag2()));
              }
         }
     } else edm::LogVerbatim("Analysis") << "->   Track pT: " << track->pt() <<  " matched to 0  MC Tracks";
@@ -486,6 +507,12 @@ void JetsPileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
   hFracTracksAwayPV_->Fill(fracTracksAway);
   hFracTracksAwayPVvsNPUBx0_->Fill(nPUBx0,fracTracksAway);
   if(nGoodVertices == 1) hFracTracksAwayPVvsNPUBx0SingleVtx_->Fill(nPUBx0,fracTracksAway);
+
+  xiFromTracksPVPlus /= EBeam_;
+  xiFromTracksPVMinus /= EBeam_;
+
+  hXiFromTracksPVPlus_->Fill(xiFromTracksPVPlus);
+  hXiFromTracksPVMinus_->Fill(xiFromTracksPVMinus);
 
   // Access Calo Towers
   edm::Handle<CaloTowerCollection> towerCollectionH;  
