@@ -216,6 +216,7 @@ void SimplePileUpAnalyzer::beginJob(const edm::EventSetup& setup) {
   data_->Branch("nPileUp",eventData_.nPileUp_,"nPileUp[nBunches]/I");
   data_->Branch("nPrimVertices",&eventData_.nPrimVertices_,"nPrimVertices/I");
   data_->Branch("fracTracksAwayPV",&eventData_.fracTracksAwayPV_,"fracTracksAwayPV/F");
+  data_->Branch("xiGen",&eventData_.xiGen_,"xiGen/F");
   data_->Branch("xiFromTowersPlus",&eventData_.xiFromTowersPlus_,"xiFromTowersPlus/F");
   data_->Branch("xiFromTowersMinus",&eventData_.xiFromTowersMinus_,"xiFromTowersMinus/F");
   data_->Branch("xiFromTracksPlus",&eventData_.xiFromTracksPlus_,"xiFromTracksPlus/F");
