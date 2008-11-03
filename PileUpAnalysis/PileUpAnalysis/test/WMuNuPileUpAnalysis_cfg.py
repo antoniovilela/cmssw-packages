@@ -19,17 +19,11 @@ process.MessageLogger.cerr.INFO = cms.untracked.PSet(
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-# Tracking Truth and mixing module, if needed
-#process.load("SimGeneral.MixingModule.mixNoPU_cfi")
-
-#process.load("SimGeneral.TrackingAnalysis.trackingParticles_cfi")
-
 process.load("Configuration.StandardSequences.MagneticField_cff") 
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
 #process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
 process.load("SimTracker.VertexAssociation.VertexAssociatorByTracks_cfi")
 process.load("SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cfi")
-#process.TrackAssociatorByHits.
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('file:/tmp/antoniov/PYTHIA6_EWK_Wmunu_10TeV_InitialLumPU_cff_py_RAW2DIGI_RECO_FEVTDEBUGEventContent.root')
@@ -66,15 +60,6 @@ process.wmunuSelFilter = cms.EDFilter("WMuNuSelector",
     #NJetMax = cms.int32(999999)
 )
 
-#process.pileUpAnalysis = cms.EDAnalyzer("PileUpAnalysis",
-#                              TracksTag = cms.InputTag("generalTracks"),
-#                              VerticesTag = cms.InputTag("offlinePrimaryVertices"),
-#			      TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation"),
-#                              CaloTowersTag = cms.InputTag("towerMaker"),
-#                              #BunchCrossings = cms.vint32(0)
-#                              BunchCrossings = cms.vint32(-1,0,1)
-#)
-
 process.pileUpAnalysis = cms.EDAnalyzer("SimplePileUpAnalyzer",
                               TracksTag = cms.InputTag("generalTracks"),
                               VerticesTag = cms.InputTag("offlinePrimaryVertices"),
@@ -97,18 +82,11 @@ process.trkEffAnalysis = cms.EDAnalyzer("TrackEfficiencyAnalyzer",
 )
 
 process.add_(cms.Service("TFileService",
-		fileName = cms.string("analysisPileUp_histos.root")
+		fileName = cms.string("analysisWMuNuPileUp_histos.root")
 	)
 )
 
-#process.p = cms.Path(process.pileupanalysis)
-
-#process.p = cms.EndPath(process.mix*process.trackingParticles*process.pileUpAnalysis)
-
-#process.p = cms.Path(process.trackingParticles*process.pileUpAnalysis)
-
-#process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.pileUpAnalysis)
-
 process.selection = cms.Sequence(process.wmunuSelFilter)
-process.p = cms.Path(process.selection*process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
+#process.p = cms.Path(process.selection*process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
+process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
 
