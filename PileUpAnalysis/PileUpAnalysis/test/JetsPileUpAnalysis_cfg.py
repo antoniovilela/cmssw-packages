@@ -39,6 +39,7 @@ process.pileUpAnalysis = cms.EDAnalyzer("SimplePileUpAnalyzer",
                               VerticesTag = cms.InputTag("offlinePrimaryVertices"),
                               TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation"),
                               CaloTowersTag = cms.InputTag("towerMaker"),
+                              GenParticlesTag = cms.InputTag("genParticles"),
                               BunchCrossings = cms.vint32(0)
                               #BunchCrossings = cms.vint32(-1,0,1)
 )
