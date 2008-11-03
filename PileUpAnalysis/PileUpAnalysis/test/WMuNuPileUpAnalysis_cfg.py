@@ -65,6 +65,7 @@ process.pileUpAnalysis = cms.EDAnalyzer("SimplePileUpAnalyzer",
                               VerticesTag = cms.InputTag("offlinePrimaryVertices"),
                               TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation"),
                               CaloTowersTag = cms.InputTag("towerMaker"),
+                              GenParticlesTag = cms.InputTag("genParticles"),
                               #BunchCrossings = cms.vint32(0)
                               BunchCrossings = cms.vint32(-1,0,1)
 )
@@ -87,6 +88,6 @@ process.add_(cms.Service("TFileService",
 )
 
 process.selection = cms.Sequence(process.wmunuSelFilter)
-#process.p = cms.Path(process.selection*process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
-process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
+process.p = cms.Path(process.selection*process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
+#process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
 
