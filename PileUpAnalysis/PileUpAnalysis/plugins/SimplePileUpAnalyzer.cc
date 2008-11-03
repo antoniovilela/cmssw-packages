@@ -28,6 +28,7 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
   edm::InputTag verticesTag_;
   edm::InputTag trackAssociatorTag_;
   edm::InputTag caloTowersTag_;
+  edm::InputTag genParticlesTag_;
 
   std::vector<int> bunchRange_;
 
@@ -53,6 +54,7 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
     int nPileUp_[9];
     int nPrimVertices_;
     float fracTracksAwayPV_;
+    float xiGen_;
     float xiFromTowersPlus_;
     float xiFromTowersMinus_;
     float xiFromTracksPlus_;
@@ -138,6 +140,8 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingVertexContainer.h"
 #include "SimDataFormats/CrossingFrame/interface/CrossingFramePlaybackInfo.h"
 
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -178,6 +182,7 @@ SimplePileUpAnalyzer::SimplePileUpAnalyzer(const edm::ParameterSet& conf):
   verticesTag_(conf.getParameter<edm::InputTag>("VerticesTag")),
   trackAssociatorTag_(conf.getParameter<edm::InputTag>("TrackAssociatorTag")),
   caloTowersTag_(conf.getParameter<edm::InputTag>("CaloTowersTag")),
+  genParticlesTag_(conf.getParameter<edm::InputTag>("GenParticlesTag")),
   bunchRange_(conf.getParameter<std::vector<int> >("BunchCrossings")),
   EBeam_(5000.){}
 
@@ -331,6 +336,27 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
     edm::LogError("Analysis") << ">>>>>  Could not find any good vertex ..skipping";
     return;
   } 
+
+  // Gen info
+  edm::Handle<reco::GenParticleCollection> genParticleCollectionH;
+  event.getByLabel(genParticlesTag_,genParticleCollectionH);
+
+  const reco::GenParticle* diffProton = 0;
+  for(reco::GenParticleCollection::const_iterator genpart = genParticleCollectionH->begin(); genpart != genParticleCollectionH->end(); ++genpart){
+    // Find first stable proton
+    if((genpart->status() == 1)&&(genpart->pdgId() == 2212)){
+        diffProton = &(*genpart);
+        break;
+    }
+  }
+
+  float xiGen = -1; 
+  if(diffProton){
+    if(diffProton->pz() > 0.75*EBeam_) xiGen = 1 - diffProton->pz()/EBeam_; 
+    else if(diffProton->pz() < -0.75*EBeam_) xiGen = 1 + diffProton->pz()/EBeam_;
+  }
+
+  eventData_.xiGen_ = xiGen;
 
   // TrackAssociator/VertexAssociator info 
   // RecoToSim
