@@ -1,0 +1,110 @@
+process wToMuNuMET = {
+      #include "FWCore/MessageLogger/data/MessageLogger.cfi"
+
+      service = MessageLogger {
+          untracked vstring destinations = { "cout" }
+          untracked vstring categories = {"FwkJob", "FwkReport", "FwkSummary", "Root_NoDictionary"}
+          untracked PSet cout = {
+                    untracked string threshold = "DEBUG"
+          }
+          untracked vstring debugModules = { "wMuNuSelFilter", "wmet" }
+      }
+
+      service = AdaptorConfig {}
+
+      untracked PSet options = {
+               untracked bool wantSummary = true
+               untracked bool makeTriggerResults = true }
+
+      untracked PSet maxEvents = { untracked int32 input = 1000 }
+
+      source = PoolSource {
+            untracked vstring fileNames = {
+            '/store/mc/2007/10/19/CSA07-Wmunu-1192835438/0005/00590CD1-7C87-DC11-85A4-0019B9E4FD8E.root'
+            }
+            untracked uint32 debugVerbosity = 0
+            untracked bool   debugFlag     = false
+      }
+      include "ElectroWeakAnalysis/WMuNu/test/ReReco10pb.cff"
+
+      # Start ranmdom number service
+      service = RandomNumberGeneratorService {
+            untracked uint32 sourceSeed = 54321
+            PSet moduleSeeds = {
+                untracked uint32 wmet = 12345
+            }
+      }
+
+      # Conversion to GenParticles
+      include "PhysicsTools/HepMCCandAlgos/data/genParticleCandidates2GenParticles.cfi"
+      path genparticles = {genParticles}
+
+      # Muon corrections for MET
+      //include "JetMETCorrections/Type1MET/data/MetMuonCorrections.cff"           
+      //path muonMETcorr = {MetMuonCorrections}
+
+      # Jet corrections for MET
+      //es_source MCJetCorrectorIcone5 = MCJetCorrectionService {
+      //      string tagName = 'CMSSW_152_iterativeCone5'
+      //      string label = 'MCJetCorrectorIcone5' 
+      //}
+      #include "JetMETCorrections/Type1MET/data/MetType1Corrections.cff"
+      #replace corMetType1Icone5.inputUncorMetLabel = "corMetGlobalMuons"
+      #path jetMETcorr = {corMetType1Icone5}
+      //module corMetMuonCorrJetCorr = corMetType1Icone5 from "JetMETCorrections/Type1MET/data/MetType1Corrections.cff"	
+      //replace corMetMuonCorrJetCorr.inputUncorMetLabel = "corMetGlobalMuons"
+      //path jetMETcorr = {corMetMuonCorrJetCorr}
+			
+      # HLT paths
+      include "ElectroWeakAnalysis/WReco/data/wToMuNuHLTPaths.cfi"	
+
+      # Selection used for AN Note 2007/031
+      include "ElectroWeakAnalysis/WMuNu/data/WMuNuSel_16x.cff"
+      replace wMuNuSelFilter.MassTMin = 0.0
+      replace wMuNuSelFilter.IsoCut = 0.09	
+      replace wMuNuSelFilter.UseNormalizedIso = true
+	
+      sequence wToMuNuselection = { wToMuNuHLTFilter, wmunusel }
+
+      # W MET Analyzer
+      module wmet = WMETType2Analyzer {
+            untracked InputTag GeneratorTag = genParticles
+            untracked InputTag MuonTag = muons
+            untracked InputTag GenMETTag = genMetNoNuBSM
+            //untracked InputTag METTag = corMetMuonCorrJetCorr
+	    untracked InputTag METTag = met	
+
+            untracked string InputRootFileName = "ZMETType2NewIso_noMuonCorr_noJetCorr.root"
+            untracked string OutputRootFileName = "WMET.root"
+
+            //untracked bool ApplyNuPtSmearing = true
+            untracked bool SampleCaloMETPhi = true
+            untracked bool Use1DCaloMETPhi = true
+            untracked bool SampleFromHistos = true               
+      }
+
+      path analysis = { wToMuNuselection, wmet}
+
+      # Output file
+      include "Configuration/EventContent/data/EventContent.cff"
+
+      module wToMuNuOutput = PoolOutputModule {
+        untracked string fileName = "wToMuNu.root"
+        using AODSIMEventContent
+        untracked PSet SelectEvents = {
+                vstring SelectEvents = {"wmunu"}
+        }
+        untracked PSet dataset ={
+                untracked string dataTier = "USER"
+                untracked string filterName = "wToMuNu_Selector"
+        }
+      }
+
+      #-------------------------------------------------------
+
+      //endpath end = { wToMuNuOutput }
+
+      schedule = { genparticles, analysis }	
+      #schedule = { genparticles, muonMETcorr, jetMETcorr, analysis }
+      //schedule = { genparticles, muonMETcorr, jetMETcorr, analysis, end }	
+}
