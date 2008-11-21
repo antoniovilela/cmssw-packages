@@ -52,6 +52,8 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
   struct EventData {
     int nBunches_;
     int nPileUp_[9];
+    int nPileUpBx0_;
+    int processIdPileUpBx0_[20];
     int nPrimVertices_;
     float fracTracksAwayPV_;
     float xiGen_;
@@ -131,9 +133,9 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Provenance/interface/EventID.h"
 
-//#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-//#include "SimDataFormats/CrossingFrame/interface/CrossingFrame.h"
-//#include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
+#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "SimDataFormats/CrossingFrame/interface/CrossingFrame.h"
+#include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
 #include "SimDataFormats/EncodedEventId/interface/EncodedEventId.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingVertex.h"
@@ -165,6 +167,7 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
 
 #include <vector>
 #include <map>
+#include <memory>
 
 typedef edm::RefVector< std::vector<TrackingParticle> > TrackingParticleContainer;
 typedef std::vector<TrackingParticle>                   TrackingParticleCollection;
@@ -214,6 +217,8 @@ void SimplePileUpAnalyzer::beginJob(const edm::EventSetup& setup) {
 
   data_->Branch("nBunches",&eventData_.nBunches_,"nBunches/I");
   data_->Branch("nPileUp",eventData_.nPileUp_,"nPileUp[nBunches]/I");
+  data_->Branch("nPileUpBx0",&eventData_.nPileUpBx0_,"nPileUpBx0/I");
+  data_->Branch("processIdPileUpBx0",eventData_.processIdPileUpBx0_,"processIdPileUpBx0[nPileUpBx0]/I");
   data_->Branch("nPrimVertices",&eventData_.nPrimVertices_,"nPrimVertices/I");
   data_->Branch("fracTracksAwayPV",&eventData_.fracTracksAwayPV_,"fracTracksAwayPV/F");
   data_->Branch("xiGen",&eventData_.xiGen_,"xiGen/F");
@@ -285,7 +290,7 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
   event.getByLabel("mergedtruth","MergedTrackTruth", mergedPH);
   event.getByLabel("mergedtruth","MergedTrackTruth", mergedVH);
 
-  // Access CrossingFramePalybackInfo
+  /*// Access CrossingFramePalybackInfo
   
   edm::Handle<CrossingFramePlaybackInfo>  playbackInfo;
   event.getByLabel("mix", playbackInfo);
@@ -308,7 +313,45 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
     edm::LogVerbatim("Analysis") << " Number of added pile-up's for bunch index " << ibunch << ": " << nrEvents[ibunch]; 
     hVecNrPileUp_[ibunch]->Fill(nrEvents[ibunch]);
     if(nrEvents[ibunch] != 0) singleInteraction = false;
+  }*/
+
+  // Access CrossingFrame of HepMCProducts
+  edm::Handle<CrossingFrame<edm::HepMCProduct> > crossingFrameHepMCH;
+  event.getByLabel("mix","source",crossingFrameHepMCH);
+
+  unsigned int nbunches = 0; 
+  bool singleInteraction = true;
+  for(int ibunch = crossingFrameHepMCH->getBunchRange().first; ibunch <= crossingFrameHepMCH->getBunchRange().second; ++ibunch,++nbunches){
+    if(bunchRange_[nbunches] != ibunch) throw edm::Exception(edm::errors::Configuration,"SimplePileUpAnalyzerError") << " Expecting different bunch ranges\n";
+    int nrPileUp = crossingFrameHepMCH->getNrPileups(ibunch);
+    eventData_.nPileUp_[nbunches] = nrPileUp;
+    edm::LogVerbatim("Analysis") << " Number of added pile-up's for bunch " << ibunch << ": " << nrPileUp;
+    hVecNrPileUp_[nbunches]->Fill(nrPileUp);
+    if(nrPileUp != 0) singleInteraction = false;
   }
+  eventData_.nBunches_ = nbunches;
+
+  eventData_.nPileUpBx0_ = crossingFrameHepMCH->getNrPileups(0);
+
+  std::auto_ptr<MixCollection<edm::HepMCProduct> > cfHepMCColl(new MixCollection<edm::HepMCProduct>(crossingFrameHepMCH.product()));
+
+  int countHepMC = 0;
+  int countHepMCPileUpBx0 = 0;
+  for(MixCollection<edm::HepMCProduct>::iterator it_hepmc = cfHepMCColl->begin(); it_hepmc != cfHepMCColl->end(); ++it_hepmc,++countHepMC){
+    const HepMC::GenEvent* genEvt = it_hepmc->GetEvent();
+    edm::LogVerbatim("Analysis") << "edm::HepMCProduct " << countHepMC << ": \n" 
+                                  << "     Event number: " << genEvt->event_number() << "\n"
+                                  << "     Process Id: " << genEvt->signal_process_id() << "\n"
+                                  << "     Number of vertices: " << genEvt->vertices_size() << "\n"
+                                  << "     Number of particles: " << genEvt->particles_size() << "\n"
+                                  << "     Bunch: " << it_hepmc.bunch() << "\n"
+                                  << "     Source type: " << it_hepmc.getSourceType() << "\n"
+                                  << "     Trigger: " << it_hepmc.getTrigger() << "\n";
+    if(it_hepmc.bunch() == 0){
+        eventData_.processIdPileUpBx0_[countHepMCPileUpBx0] = genEvt->signal_process_id(); 
+        ++countHepMCPileUpBx0;
+    }
+  } 
 
   if(singleInteraction) edm::LogVerbatim("Analysis") << ">>>> Single Interaction Event";
 
@@ -444,7 +487,8 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
   else hNPrimVerticesPileUp_->Fill(nGoodVertices);
 
   // Number of events on bx 0
-  int nPUBx0 = playbackInfo->getNrEvents(0,0);
+  //int nPUBx0 = playbackInfo->getNrEvents(0,0);
+  int nPUBx0 = crossingFrameHepMCH->getNrPileups(0);
   profNPVvsNPUBx0_->Fill(nPUBx0,nGoodVertices);
   profNPUBx0vsNPV_->Fill(nGoodVertices,nPUBx0);
   hNPUBx0vsNPV_->Fill(nGoodVertices,nPUBx0);
