@@ -52,8 +52,8 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
   struct EventData {
     int nBunches_;
     int nPileUp_[9];
-    int nPileUpBx0_;
-    int processIdPileUpBx0_[20];
+    int nEventsBx0_;
+    int processIdBx0_[20];
     int nPrimVertices_;
     float fracTracksAwayPV_;
     float xiGen_;
@@ -217,8 +217,8 @@ void SimplePileUpAnalyzer::beginJob(const edm::EventSetup& setup) {
 
   data_->Branch("nBunches",&eventData_.nBunches_,"nBunches/I");
   data_->Branch("nPileUp",eventData_.nPileUp_,"nPileUp[nBunches]/I");
-  data_->Branch("nPileUpBx0",&eventData_.nPileUpBx0_,"nPileUpBx0/I");
-  data_->Branch("processIdPileUpBx0",eventData_.processIdPileUpBx0_,"processIdPileUpBx0[nPileUpBx0]/I");
+  data_->Branch("nEventsBx0",&eventData_.nEventsBx0_,"nEventsBx0/I");
+  data_->Branch("processIdBx0",eventData_.processIdBx0_,"processIdBx0[nEventsBx0]/I");
   data_->Branch("nPrimVertices",&eventData_.nPrimVertices_,"nPrimVertices/I");
   data_->Branch("fracTracksAwayPV",&eventData_.fracTracksAwayPV_,"fracTracksAwayPV/F");
   data_->Branch("xiGen",&eventData_.xiGen_,"xiGen/F");
@@ -331,12 +331,12 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
   }
   eventData_.nBunches_ = nbunches;
 
-  eventData_.nPileUpBx0_ = crossingFrameHepMCH->getNrPileups(0);
+  eventData_.nEventsBx0_ = crossingFrameHepMCH->getNrPileups(0) + 1;
 
   std::auto_ptr<MixCollection<edm::HepMCProduct> > cfHepMCColl(new MixCollection<edm::HepMCProduct>(crossingFrameHepMCH.product()));
 
   int countHepMC = 0;
-  int countHepMCPileUpBx0 = 0;
+  int countHepMCBx0 = 0;
   for(MixCollection<edm::HepMCProduct>::iterator it_hepmc = cfHepMCColl->begin(); it_hepmc != cfHepMCColl->end(); ++it_hepmc,++countHepMC){
     const HepMC::GenEvent* genEvt = it_hepmc->GetEvent();
     edm::LogVerbatim("Analysis") << "edm::HepMCProduct " << countHepMC << ": \n" 
@@ -348,8 +348,8 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
                                   << "     Source type: " << it_hepmc.getSourceType() << "\n"
                                   << "     Trigger: " << it_hepmc.getTrigger() << "\n";
     if(it_hepmc.bunch() == 0){
-        eventData_.processIdPileUpBx0_[countHepMCPileUpBx0] = genEvt->signal_process_id(); 
-        ++countHepMCPileUpBx0;
+        eventData_.processIdBx0_[countHepMCBx0] = genEvt->signal_process_id(); 
+        ++countHepMCBx0;
     }
   } 
 
