@@ -14,7 +14,7 @@ process.MessageLogger.cerr.DEBUG = cms.untracked.PSet(
 )
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
-    Analysis = cms.untracked.PSet( limit = cms.untracked.int32(1000000))
+    Analysis = cms.untracked.PSet( limit = cms.untracked.int32(-1))
 )
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -26,7 +26,7 @@ process.load("SimTracker.VertexAssociation.VertexAssociatorByTracks_cfi")
 process.load("SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cfi")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/tmp/antoniov/PYTHIA6_EWK_Wmunu_10TeV_InitialLumPU_cff_py_RAW2DIGI_RECO_FEVTDEBUGEventContent.root')
+    fileNames = cms.untracked.vstring('file:/tmp/antoniov/POMWIG_SingleDiffractiveWmunuPlus_10TeV_InitialLumPU_cff_py_RAW2DIGI_RECO.root')
 )
 
 process.maxEvents = cms.untracked.PSet(
@@ -83,7 +83,7 @@ process.trkEffAnalysis = cms.EDAnalyzer("TrackEfficiencyAnalyzer",
 )
 
 process.add_(cms.Service("TFileService",
-		fileName = cms.string("analysisWMuNuPileUp_histos.root")
+		fileName = cms.string("analysisSDWMuNuPileUp_histos.root")
 	)
 )
 
