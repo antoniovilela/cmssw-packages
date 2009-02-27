@@ -3,10 +3,10 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Analysis")
 # keep the logging output to a nice level ###
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.debugModules = cms.untracked.vstring('pileupanalysis')
+process.MessageLogger.debugModules = cms.untracked.vstring('')
 #process.MessageLogger.cerr.threshold = 'DEBUG'
-#process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.cerr.threshold = 'WARNING'
+process.MessageLogger.cerr.threshold = 'INFO'
+#process.MessageLogger.cerr.threshold = 'WARNING'
 process.MessageLogger.categories.append('Analysis')
 process.MessageLogger.cerr.DEBUG = cms.untracked.PSet(
     default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
@@ -33,36 +33,11 @@ process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
 
-process.wmunuSelFilter = cms.EDFilter("WMuNuSelector",
-    # Defaults follow...
-    #
-    # Input collections ->
-    MuonTag = cms.untracked.InputTag("muons"),
-    METTag = cms.untracked.InputTag("met"),
-    JetTag = cms.untracked.InputTag("iterativeCone5CaloJets"),
-    VerticesTag = cms.untracked.InputTag("offlinePrimaryVertices"),
-    #UseOnlyGlobalMuons = cms.bool(True),
-    #
-    # Main cuts ->
-    PtCut = cms.untracked.double(15.0),
-    EtaCut = cms.untracked.double(2.1),
-    IsRelativeIso = cms.untracked.bool(True),
-    IsoCut03 = cms.untracked.double(0.1),
-    MassTMin = cms.untracked.double(30.0),
-    MassTMax = cms.untracked.double(200.0),
-    #
-    # To suppress Zmm ->
-    #PtThrForZCount = cms.double(20.0),
-    #
-    # To suppress ttbar ->
-    #AcopCut = cms.double(999999.),
-    #EJetMin = cms.double(999999.),
-    #NJetMax = cms.int32(999999)
-)
+process.load('PileUpAnalysis.PileUpAnalysis.wmunuSelFilter_cfi')
 
 process.pileUpAnalysis = cms.EDAnalyzer("SimplePileUpAnalyzer",
                               TracksTag = cms.InputTag("generalTracks"),
-                              VerticesTag = cms.InputTag("offlinePrimaryVertices"),
+                              VertexTag = cms.InputTag("offlinePrimaryVertices"),
                               TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation"),
                               CaloTowersTag = cms.InputTag("towerMaker"),
                               GenParticlesTag = cms.InputTag("genParticles"),
@@ -72,13 +47,13 @@ process.pileUpAnalysis = cms.EDAnalyzer("SimplePileUpAnalyzer",
 
 process.vtxEffAnalysis = cms.EDAnalyzer("VertexEfficiencyAnalyzer",
                               TracksTag = cms.InputTag("generalTracks"),
-                              VerticesTag = cms.InputTag("offlinePrimaryVertices"),
+                              VertexTag = cms.InputTag("offlinePrimaryVertices"),
                               TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation")
 )
 
 process.trkEffAnalysis = cms.EDAnalyzer("TrackEfficiencyAnalyzer",
                               TracksTag = cms.InputTag("generalTracks"),
-                              VerticesTag = cms.InputTag("offlinePrimaryVertices"),
+                              VertexTag = cms.InputTag("offlinePrimaryVertices"),
                               TrackAssociatorTag = cms.InputTag("trackingParticleRecoTrackAsssociation")
 )
 
@@ -89,5 +64,4 @@ process.add_(cms.Service("TFileService",
 
 process.selection = cms.Sequence(process.wmunuSelFilter)
 process.p = cms.Path(process.selection*process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
-#process.p = cms.Path(process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis*process.trkEffAnalysis*process.pileUpAnalysis)
-
+#process.p = cms.Path(process.selection*process.trackingParticleRecoTrackAsssociation*process.vtxEffAnalysis)

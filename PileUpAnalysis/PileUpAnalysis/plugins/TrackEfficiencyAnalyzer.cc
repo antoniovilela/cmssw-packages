@@ -20,7 +20,7 @@ class TrackEfficiencyAnalyzer  : public edm::EDAnalyzer {
   virtual void endJob();
  private:
   edm::InputTag tracksTag_;
-  edm::InputTag verticesTag_;
+  edm::InputTag vertexTag_;
   edm::InputTag trackAssociatorTag_;
 
   float nMatchedTracks_,nMatchedTracksBx0Signal_,nMatchedTracksBx0PileUp_;
@@ -98,7 +98,7 @@ typedef TrackingVertex::g4v_iterator                     g4v_iterator;
 
 TrackEfficiencyAnalyzer::TrackEfficiencyAnalyzer(const edm::ParameterSet& conf):
   tracksTag_(conf.getParameter<edm::InputTag>("TracksTag")),
-  verticesTag_(conf.getParameter<edm::InputTag>("VerticesTag")),
+  vertexTag_(conf.getParameter<edm::InputTag>("VertexTag")),
   trackAssociatorTag_(conf.getParameter<edm::InputTag>("TrackAssociatorTag")),
   nMatchedTracks_(0),nMatchedTracksBx0Signal_(0),nMatchedTracksBx0PileUp_(0),
   nTracks_(0),nTracksBx0Signal_(0),nTracksBx0PileUp_(0){}
@@ -153,9 +153,9 @@ void TrackEfficiencyAnalyzer::analyze(const edm::Event& event, const edm::EventS
   event.getByLabel(tracksTag_,trackCollectionH);
   const edm::View<reco::Track> trkColl = *(trackCollectionH.product());
 
-  /*// Get reconstructed vertices
+  /*// Get reconstructed vertexes
   edm::Handle<edm::View<reco::Vertex> > vertexCollectionH;
-  event.getByLabel(verticesTag_,vertexCollectionH);
+  event.getByLabel(vertexTag_,vertexCollectionH);
   const edm::View<reco::Vertex> vtxColl = *(vertexCollectionH.product());
 
   // Access primary vertex
@@ -189,36 +189,36 @@ void TrackEfficiencyAnalyzer::analyze(const edm::Event& event, const edm::EventS
     ++nTracks_;
     hSimTracksPt_->Fill(simTrack->pt());
     hSimTracksEta_->Fill(simTrack->eta());
-    edm::LogVerbatim("Analysis") << "Sim Track pt,charge,vx,vy,vz: "  << simTrack->pt() << ", " << simTrack->charge() << ", " << simTrack->vx() << ", " << simTrack->vy() << ", "  << simTrack->vz();
+    LogTrace("Analysis") << "Sim Track pt,charge,vx,vy,vz: "  << simTrack->pt() << ", " << simTrack->charge() << ", " << simTrack->vx() << ", " << simTrack->vy() << ", "  << simTrack->vz();
     // Check if sim track from signal or pile-up
     const EncodedEventId& evtId = simTrack->eventId();
     if(evtId.bunchCrossing() == 0){ // check if from signal bunch crossing
         if(evtId.event() == 0){ // comes from signal
-             edm::LogVerbatim("Analysis") << "\t\tComes from signal";
+             LogTrace("Analysis") << "\t\tComes from signal";
              ++nTracksBx0Signal_;
              hSimTracksPtBx0Signal_->Fill(simTrack->pt());
              hSimTracksEtaBx0Signal_->Fill(simTrack->eta());
         } else { // comes from pile-up
-             edm::LogVerbatim("Analysis") << "\t\tComes from pile-up";
+             LogTrace("Analysis") << "\t\tComes from pile-up";
              ++nTracksBx0PileUp_;
              hSimTracksPtBx0PileUp_->Fill(simTrack->pt());
              hSimTracksEtaBx0PileUp_->Fill(simTrack->eta());
         }
     } else { // comes from other bunch crossing 
-        edm::LogVerbatim("Analysis") << "\t\tComes from out-of-time pile-up";
+        LogTrace("Analysis") << "\t\tComes from out-of-time pile-up";
     }
 
     // Find tracking particle in sim to reco association
     //std::vector<std::pair<edm::RefToBase<reco::Track>, double> > recoTracks = itSimtoReco->val;
     if(simToReco.find(simTrack) != simToReco.end()){
         std::vector<std::pair<edm::RefToBase<reco::Track>, double> > recoTracks = simToReco[simTrack];
-        edm::LogVerbatim("Analysis") <<  " \t\t  Matched to " << recoTracks.size() << " Reconstructed Tracks";
+        LogTrace("Analysis") <<  " \t\t  Matched to " << recoTracks.size() << " Reconstructed Tracks";
 
         for(std::vector<std::pair<edm::RefToBase<reco::Track>, double> >::const_iterator trkMatch = recoTracks.begin(); trkMatch != recoTracks.end(); ++trkMatch){
              edm::RefToBase<reco::Track> recoTrack = trkMatch->first;
              double assocQuality = trkMatch->second;
 
-             edm::LogVerbatim("Analysis") << "\t\t    Reco Track pt: " << recoTrack->pt() << " Quality: " << assocQuality;
+             LogTrace("Analysis") << "\t\t    Reco Track pt: " << recoTrack->pt() << " Quality: " << assocQuality;
         }
 
         // Get best match
