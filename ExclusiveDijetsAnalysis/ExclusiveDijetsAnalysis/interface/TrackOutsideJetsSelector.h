@@ -12,6 +12,7 @@ class TrackOutsideJetsSelector {
       bool operator()(const reco::Track&, const edm::Event&) const;
    private:
       edm::InputTag jetTag_;
+      double coneSize_; 
 };
 
 #endif

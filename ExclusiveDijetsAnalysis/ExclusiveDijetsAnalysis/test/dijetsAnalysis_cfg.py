@@ -24,7 +24,7 @@ process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.leadingJets_cfi")
 process.leadingJets.src = "L2L3CorJetSC7PF"
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectGoodTracks_cfi")
-process.selectGoodTracks.cut = "pt > 1.0 & numberOfValidHits > 7 & d0 <= 3.5"
+process.selectGoodTracks.cut = "pt > 0.5 & numberOfValidHits > 7 & d0 <= 3.5"
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi")
 process.tracksOutsideJets.src = "selectGoodTracks" 
 process.tracksOutsideJets.JetTag = "leadingJets"
@@ -36,6 +36,9 @@ process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.trackMultipl
 process.trackMultiplicity.TracksTag = "selectGoodTracks"
 process.trackMultiplicityOutsideJets = process.trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
 process.trackMultiplicityAssociatedToPV = process.trackMultiplicity.clone(TracksTag = "selectTracksAssociatedToPV")
+
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_cfi")
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
 
 process.analysis = cms.EDAnalyzer("SimpleDijetsAnalyzer",
     JetTag = cms.InputTag("L2L3CorJetSC7PF")
@@ -52,6 +55,7 @@ process.MyEventContent.outputCommands.append('keep *_L2L3CorJetSC7PF_*_Analysis'
 process.MyEventContent.outputCommands.append('keep *_trackMultiplicity_*_Analysis')
 process.MyEventContent.outputCommands.append('keep *_trackMultiplicityOutsideJets_*_Analysis')
 process.MyEventContent.outputCommands.append('keep *_trackMultiplicityAssociatedToPV_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_pileUpInfo_*_Analysis')
 #process.MyEventContent.outputCommands.append('keep recoMuons_muons_*_*')
 #process.MyEventContent.outputCommands.append('keep recoTracks_generalTracks_*_*')
 #process.MyEventContent.outputCommands.append('keep *_offlinePrimaryVertices_*_*')
@@ -66,7 +70,7 @@ process.output = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     SelectEvents = cms.untracked.PSet(
-        SelectEvents = cms.vstring('hlt_step')
+        SelectEvents = cms.vstring('selection_step')
     )
 )
 
@@ -79,9 +83,10 @@ process.jets = cms.Sequence(process.L2L3CorJetSC7PF*process.leadingJets)
 process.tracks = cms.Sequence(process.selectGoodTracks*process.tracksOutsideJets*process.selectTracksAssociatedToPV) 
 process.edmDump = cms.Sequence(process.trackMultiplicity+
                                process.trackMultiplicityOutsideJets+
-                               process.trackMultiplicityAssociatedToPV)
+                               process.trackMultiplicityAssociatedToPV+
+                               process.pileUpInfo)
 
-process.hlt_step = cms.Path(process.hlt)
+process.selection_step = cms.Path(process.hlt)
 process.reco_step = cms.Path(process.hlt*process.jets*process.tracks*process.edmDump)
 process.analysis_step = cms.Path(process.hlt*process.analysis)
 

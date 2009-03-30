@@ -11,7 +11,8 @@
 using namespace reco;
 
 TrackOutsideJetsSelector::TrackOutsideJetsSelector(const edm::ParameterSet& pset):
-   jetTag_(pset.getParameter<edm::InputTag>("JetTag")){}
+   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
+   coneSize_(pset.getParameter<double>("JetConeSize")){}
 
 TrackOutsideJetsSelector::~TrackOutsideJetsSelector() {}
 
@@ -23,7 +24,7 @@ bool TrackOutsideJetsSelector::operator()(const reco::Track& track, const edm::E
    bool associated = false;
    for(edm::View<Candidate>::const_iterator jet = jetColl.begin(); jet != jetColl.end(); ++jet){
       //FIXME: use jet-tracks association
-      if(deltaR(jet->eta(),jet->phi(),track.eta(),track.phi()) < 0.5) associated = true;
+      if(deltaR(jet->eta(),jet->phi(),track.eta(),track.phi()) < coneSize_) associated = true;
    }
 
    bool accept = !associated;
