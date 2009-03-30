@@ -83,3 +83,5 @@ void SimpleDijetsAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
 
   data_->Fill();
 }
+
+DEFINE_FWK_MODULE(SimpleDijetsAnalyzer);
