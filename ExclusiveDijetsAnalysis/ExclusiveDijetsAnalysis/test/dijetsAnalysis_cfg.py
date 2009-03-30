@@ -28,6 +28,7 @@ process.selectGoodTracks.cut = "pt > 0.5 & numberOfValidHits > 7 & d0 <= 3.5"
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi")
 process.tracksOutsideJets.src = "selectGoodTracks" 
 process.tracksOutsideJets.JetTag = "leadingJets"
+process.tracksOutsideJets.JetConeSize = 0.7
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi")
 process.selectTracksAssociatedToPV.src = "tracksOutsideJets"
 process.selectTracksAssociatedToPV.MaxDistanceFromVertex = 0.2
