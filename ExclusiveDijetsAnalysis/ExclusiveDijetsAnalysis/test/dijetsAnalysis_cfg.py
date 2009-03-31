@@ -41,9 +41,14 @@ process.trackMultiplicityAssociatedToPV = process.trackMultiplicity.clone(Tracks
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_cfi")
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
 
-process.analysis = cms.EDAnalyzer("SimpleDijetsAnalyzer",
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.hfTower_cfi")
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi")
+process.xiTower.UseMETInfo = False
+
+process.analysisBeforeSelection = cms.EDAnalyzer("SimpleDijetsAnalyzer",
     JetTag = cms.InputTag("L2L3CorJetSC7PF")
 )
+process.analysisAfterSelection = process.analysisBeforeSelection.clone()
 
 process.MyEventContent = cms.PSet(
         outputCommands = cms.untracked.vstring('drop *')
@@ -57,15 +62,15 @@ process.MyEventContent.outputCommands.append('keep *_trackMultiplicity_*_Analysi
 process.MyEventContent.outputCommands.append('keep *_trackMultiplicityOutsideJets_*_Analysis')
 process.MyEventContent.outputCommands.append('keep *_trackMultiplicityAssociatedToPV_*_Analysis')
 process.MyEventContent.outputCommands.append('keep *_pileUpInfo_*_Analysis')
-#process.MyEventContent.outputCommands.append('keep recoMuons_muons_*_*')
-#process.MyEventContent.outputCommands.append('keep recoTracks_generalTracks_*_*')
-#process.MyEventContent.outputCommands.append('keep *_offlinePrimaryVertices_*_*')
-#process.MyEventContent.outputCommands.append('keep *_offlinePrimaryVerticesWithBS_*_*')
-#process.MyEventContent.outputCommands.append('keep *_pixelVertices_*_*')
+process.MyEventContent.outputCommands.append('keep *_hfTower_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_xiTower_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_genParticles_*_*')
+process.MyEventContent.outputCommands.append('keep recoTracks_generalTracks_*_*')
+process.MyEventContent.outputCommands.append('keep *_offlinePrimaryVertices_*_*')
 
 process.output = cms.OutputModule("PoolOutputModule",
     process.MyEventContent,
-    fileName = cms.untracked.string('/tmp/antoniov/edmDump_CEPDijetsGG_M100_10TeV.root'),
+    fileName = cms.untracked.string('edmDump_CEPDijetsGG_M100_10TeV.root'),
     dataset = cms.untracked.PSet(
         dataTier = cms.untracked.string('USER'),
         filterName = cms.untracked.string('')
@@ -85,11 +90,16 @@ process.tracks = cms.Sequence(process.selectGoodTracks*process.tracksOutsideJets
 process.edmDump = cms.Sequence(process.trackMultiplicity+
                                process.trackMultiplicityOutsideJets+
                                process.trackMultiplicityAssociatedToPV+
-                               process.pileUpInfo)
+                               process.pileUpInfo+
+                               process.hfTower+
+                               process.xiTower)
+process.analysisBefore = cms.Sequence(process.analysisBeforeSelection)
+process.analysisAfter = cms.Sequence(process.hlt*process.analysisAfterSelection)
 
 process.selection_step = cms.Path(process.hlt)
-process.reco_step = cms.Path(process.hlt*process.jets*process.tracks*process.edmDump)
-process.analysis_step = cms.Path(process.hlt*process.analysis)
+process.reco_step = cms.Path(process.jets*process.tracks*process.edmDump)
+process.analysis_step = cms.Path(process.analysisBefore+
+                                 process.analysisAfter)
 
 process.out_step = cms.EndPath(process.output)
 #process.schedule = cms.Schedule(process.hlt_step,process.reco_step,process.analysis_step,process.out_step)
