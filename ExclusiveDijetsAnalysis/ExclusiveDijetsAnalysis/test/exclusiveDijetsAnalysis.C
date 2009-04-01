@@ -91,8 +91,10 @@ void exclusiveDijetsAnalysis(std::vector<std::string>& fileNames,int maxEvents =
    double ptmin = 50.;
    double etamax = 2.5;
    // Track multiplicity
+   bool doTrackSelection = true; 
    int nTracksMax = 5;
    // HF-multiplicity
+   bool doHFMultiplicitySelection = false; 
    int nHFPlusMax = 1;
    int nHFMinusMax = 1;
 
@@ -214,9 +216,9 @@ void exclusiveDijetsAnalysis(std::vector<std::string>& fileNames,int maxEvents =
      h_missingMassFromXi->Fill(missingMass);
 
      // Selection
-     if(nTracks > nTracksMax) continue;
-     if(nHF_plus > nHFPlusMax) continue;
-     if(nHF_minus > nHFMinusMax) continue;
+     if(doTrackSelection&&(nTracks > nTracksMax)) continue;
+     if(doHFMultiplicitySelection&&(nHF_plus > nHFPlusMax)) continue;
+     if(doHFMultiplicitySelection&&(nHF_minus > nHFMinusMax)) continue;
 
      h_xiPlusAfterSel->Fill(xiTower_plus);
      h_xiMinusAfterSel->Fill(xiTower_minus);
