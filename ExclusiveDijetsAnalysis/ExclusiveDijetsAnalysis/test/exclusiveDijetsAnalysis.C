@@ -76,18 +76,32 @@ void exclusiveDijetsAnalysis(std::vector<std::string>& fileNames,int maxEvents =
 
    TH1F* h_EnergyVsEta = new TH1F("EnergyVsEta","EnergyVsEta",300,-15.,15.);
 
+   TH1F* h_xiPlusAfterSel = new TH1F("xiPlusAfterSel","xiPlusAfterSel",200,0.,1.);
+   TH1F* h_xiMinusAfterSel = new TH1F("xiMinusAfterSel","xiMinusAfterSel",200,0.,1.);
+   TH1F* h_RjjAfterSel = new TH1F("RjjAfterSel","RjjAfterSel",200,-0.1,1.5);
+
+   double Ebeam = 5000.;
    int thresholdHF = 10;// 2 GeV
+
+   bool selectPileUp = false;
+   int nEventsPUBx0 = 0;
+
+   // Event selection
+   // Di-jet
    double ptmin = 50.;
    double etamax = 2.5;
-   double Ebeam = 5000.;
-   
-   bool selectPileUp = true;
-   int nEventsPUBx0 = 0;
+   // Track multiplicity
+   int nTracksMax = 5;
+   // HF-multiplicity
+   int nHFPlusMax = 1;
+   int nHFMinusMax = 1;
+
    // Loop over the events
    int nEvts = 0;
    for( ev.toBegin(); ! ev.atEnd(); ++ev) {
 
-     if(nEvts == maxEvents) break;	
+     if((maxEvents > 0)&&(nEvts == maxEvents)) break;
+	
      ++nEvts;
      if(verbose) std::cout << ">>> Event number: " << nEvts << endl;	
      // Access pile-up info 
@@ -132,7 +146,9 @@ void exclusiveDijetsAnalysis(std::vector<std::string>& fileNames,int maxEvents =
                                                   jet != jetCollection->end(); ++jet) allJets += jet->p4();
 
      h_MxFromJets->Fill(allJets.M());
-     h_RjjFromJets->Fill(dijetSystem.M()/allJets.M());
+
+     double RjjFromJets = dijetSystem.M()/allJets.M();
+     h_RjjFromJets->Fill(RjjFromJets);
      
      // Gen particles
      fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
@@ -196,6 +212,16 @@ void exclusiveDijetsAnalysis(std::vector<std::string>& fileNames,int maxEvents =
 
      double missingMass = 10000.*sqrt(xiTower_plus*xiTower_minus);
      h_missingMassFromXi->Fill(missingMass);
+
+     // Selection
+     if(nTracks > nTracksMax) continue;
+     if(nHF_plus > nHFPlusMax) continue;
+     if(nHF_minus > nHFMinusMax) continue;
+
+     h_xiPlusAfterSel->Fill(xiTower_plus);
+     h_xiMinusAfterSel->Fill(xiTower_minus);
+     h_RjjAfterSel->Fill(RjjFromJets);
+ 
    }  // End loop over events
   
    hfile->Write();
