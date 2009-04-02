@@ -20,6 +20,7 @@ private:
   edm::InputTag vertexTag_;
 
   bool useOnlyGlobalMuons_;
+  bool associateMuonWithPV_;
   double ptCut_;
   double etaCut_;
   bool isRelativeIso_;
@@ -75,6 +76,7 @@ WMuNuSelector::WMuNuSelector( const ParameterSet & cfg ) :
       jetTag_(cfg.getParameter<edm::InputTag> ("JetTag")),
       vertexTag_(cfg.getParameter<edm::InputTag>("VertexTag")),
       useOnlyGlobalMuons_(cfg.getParameter<bool>("UseOnlyGlobalMuons")),
+      associateMuonWithPV_(cfg.getParameter<bool>("AssociateMuonWithPV")),
       ptCut_(cfg.getParameter<double>("PtCut")),
       etaCut_(cfg.getParameter<double>("EtaCut")),
       isRelativeIso_(cfg.getParameter<bool>("IsRelativeIso")),
@@ -320,11 +322,12 @@ bool WMuNuSelector::filter (Event & ev, const EventSetup &) {
             if (acop>acopCut_) continue;
             ntop++;
 
-            if(!goodPrimaryVertex) continue;
+            if(associateMuonWithPV_){
+              if(!goodPrimaryVertex) continue;
 
-            double mindistVtx = 0.5;
-            View<Vertex>::const_iterator vertexAssocToMuon = vtxColl.end();
-            for(View<Vertex>::const_iterator vtx = vtxColl.begin(); vtx != vtxColl.end(); ++vtx){
+              double mindistVtx = 0.5;
+              View<Vertex>::const_iterator vertexAssocToMuon = vtxColl.end();
+              for(View<Vertex>::const_iterator vtx = vtxColl.begin(); vtx != vtxColl.end(); ++vtx){
                 if(!vtx->isValid()) continue; // skip non-valid vertex
                 if(vtx->isFake()) continue; // skip vertex from beam spot
                 
@@ -333,15 +336,16 @@ bool WMuNuSelector::filter (Event & ev, const EventSetup &) {
                     mindistVtx = fabs(dz);
                     vertexAssocToMuon = vtx;
                 }
+              }
+              LogTrace("") << "\t... min. dist(mu,vtx)= " << mindistVtx;
+              // Check matched vertex to muon
+              bool muAssociatedToPV = (vertexAssocToMuon == primaryVertex);  
+              LogTrace("") << "\t... matched to primary vtx? " << muAssociatedToPV;
+              if(!muAssociatedToPV) continue;
             }
-            LogTrace("") << "\t... min. dist(mu,vtx)= " << mindistVtx;
-            // Check matched vertex to muon
-            bool muAssociatedToPV = (vertexAssocToMuon == primaryVertex);  
-            LogTrace("") << "\t... matched to primary vtx? " << muAssociatedToPV;
-            if(!muAssociatedToPV) continue;
             ++nvtx;
 
-            nmuons++;
+            ++nmuons;
       }
       LogTrace("") << "> Muon counts to reject Z= " << nmuonsForZ;
       if (nmuonsForZ>=2) {
