@@ -9,7 +9,7 @@ process.MessageLogger.cerr.threshold = 'INFO'
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('file:/tmp/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_cff_py_RAW2DIGI_RECO_1.root')
@@ -17,6 +17,7 @@ process.source = cms.Source("PoolSource",
 
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsHLTPaths_cfi")
 
+process.load("RecoJets.Configuration.RecoPFJets_cff")
 process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08_cff")
 #process.prefer("L2L3JetCorrectorSC7PF")
 
@@ -53,7 +54,8 @@ process.MyEventContent = cms.PSet(
 process.MyEventContent.outputCommands.append('keep *_selectGoodTracks_*_Analysis')
 process.MyEventContent.outputCommands.append('keep *_tracksOutsideJets_*_Analysis')
 process.MyEventContent.outputCommands.append('keep *_selectTracksAssociatedToPV_*_Analysis')
-process.MyEventContent.outputCommands.append('keep *_iterativeCone5PFJets_*_*')
+#process.MyEventContent.outputCommands.append('keep *_iterativeCone5PFJets_*_*')
+process.MyEventContent.outputCommands.append('keep *_sisCone7PFJets_*_*')
 process.MyEventContent.outputCommands.append('keep *_L2L3CorJetSC7PF_*_Analysis')
 process.MyEventContent.outputCommands.append('keep *_trackMultiplicity_*_Analysis')
 process.MyEventContent.outputCommands.append('keep *_trackMultiplicityOutsideJets_*_Analysis')
@@ -81,7 +83,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 process.hlt = cms.Sequence(process.exclusiveDijetsHLTFilter)
-process.jets = cms.Sequence(process.L2L3CorJetSC7PF*process.leadingJets)
+process.jets = cms.Sequence(process.sisCone7PFJets*process.L2L3CorJetSC7PF*process.leadingJets)
 process.tracks = cms.Sequence(process.selectGoodTracks*process.tracksOutsideJets*process.selectTracksAssociatedToPV) 
 process.edmDump = cms.Sequence(process.trackMultiplicity+
                                process.trackMultiplicityOutsideJets+
