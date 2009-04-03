@@ -6,6 +6,7 @@
   <use name=DataFormats/JetReco> 
   <use name=DataFormats/TrackReco>
   <use name=DataFormats/VertexReco>
+  <use name=DataFormats/L1GlobalCaloTrigger>
   <use name=PhysicsTools/UtilAlgos>
   <use name=ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis> 
   <use name=root>
