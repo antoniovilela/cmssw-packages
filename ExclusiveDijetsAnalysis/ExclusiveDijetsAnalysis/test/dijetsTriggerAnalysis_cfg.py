@@ -21,7 +21,9 @@ process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_c
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi import *
 process.filter0PU = pileUpNumberFilter.clone(NumberOfPileUpEvents = 0)
 
-process.analysis = cms.EDAnalyzer("DijetsTriggerAnalyzer")
+process.analysis = cms.EDAnalyzer("DijetsTriggerAnalyzer",
+  HFRingETSumThreshold = cms.int32(1) #bit counts per ring
+)
 
 process.analysis0PU = process.analysis.clone()
 
