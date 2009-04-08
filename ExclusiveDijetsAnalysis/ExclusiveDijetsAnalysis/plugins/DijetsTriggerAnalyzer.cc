@@ -18,6 +18,7 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
   private:
     int thresholdHFRingEtSum_;
+    bool accessL1GctHFRingEtSums_;
 
     std::vector<std::string> ringNames_;
 
@@ -40,6 +41,7 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 #include <DataFormats/L1GlobalCaloTrigger/interface/L1GctHFRingEtSums.h>
 #include <DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h>
 #include <DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h>
+#include <DataFormats/L1GlobalCaloTrigger/interface/L1GctJetCounts.h>
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "PhysicsTools/UtilAlgos/interface/TFileService.h"
@@ -49,7 +51,8 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 typedef std::vector<L1GctHFRingEtSums> L1GctHFRingEtSumsCollection;
 
 DijetsTriggerAnalyzer::DijetsTriggerAnalyzer(const edm::ParameterSet& pset):
-     thresholdHFRingEtSum_(pset.getParameter<int>("HFRingETSumThreshold")){}
+     thresholdHFRingEtSum_(pset.getParameter<int>("HFRingETSumThreshold")),
+     accessL1GctHFRingEtSums_(pset.getUntrackedParameter<bool>("AccessL1GctHFRingEtSums",true)){}
 
 DijetsTriggerAnalyzer::~DijetsTriggerAnalyzer() {}
 
@@ -128,18 +131,33 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
   if(!acceptL1Jets) return;
   h_countAll_->Fill(1);
 
-  edm::Handle<L1GctHFRingEtSumsCollection> ringSumsH;
-  event.getByLabel("hltGctDigis", ringSumsH);
-  L1GctHFRingEtSumsCollection::const_iterator ringSumItr;
-  
-  // Require sum(ET) threshold for all rings
   bool acceptHFRingEtSum = true;
-  for(ringSumItr=ringSumsH->begin(); ringSumItr->bx()==0 && ringSumItr != ringSumsH->end(); ++ringSumItr){
-    LogTrace("") << "Is empty: " << ringSumItr->empty();  
-    for(size_t k = 0; k < 4; ++k){ 
-      LogTrace("") << "ET Sum for " << ringNames_[k] << ": " << ringSumItr->etSum(k);
-      histosRingSum_[k]->Fill(ringSumItr->etSum(k));
-      if(ringSumItr->etSum(k) > thresholdHFRingEtSum_) acceptHFRingEtSum = false;
+  if(accessL1GctHFRingEtSums_){
+    edm::Handle<L1GctHFRingEtSumsCollection> ringSumsH;
+    event.getByLabel("hltGctDigis", ringSumsH);
+    L1GctHFRingEtSumsCollection::const_iterator ringSumItr;
+  
+    // Require sum(ET) threshold for all rings
+    for(ringSumItr=ringSumsH->begin(); ringSumItr->bx()==0 && ringSumItr != ringSumsH->end(); ++ringSumItr){
+      LogTrace("") << "Is empty: " << ringSumItr->empty();  
+      for(size_t k = 0; k < 4; ++k){ 
+        LogTrace("") << "ET Sum for " << ringNames_[k] << ": " << ringSumItr->etSum(k);
+        histosRingSum_[k]->Fill(ringSumItr->etSum(k));
+        if(ringSumItr->etSum(k) > thresholdHFRingEtSum_) acceptHFRingEtSum = false;
+      }
+    }
+  } else{
+    edm::Handle<std::vector<L1GctJetCounts> > jetCountsH;
+    event.getByLabel("hltGctDigis", jetCountsH);
+
+    for(std::vector<L1GctJetCounts>::const_iterator jetCountItr = jetCountsH->begin();
+                                                    jetCountItr != jetCountsH->end(); ++jetCountItr){
+      int iring = 0;
+      for(int icount = 8; icount <= 11; ++icount,++iring){
+        LogTrace("") << "ET Sum index " << icount << ": " << jetCountItr->count(icount);
+        histosRingSum_[iring]->Fill(jetCountItr->count(icount));
+        if(jetCountItr->count(icount) > thresholdHFRingEtSum_) acceptHFRingEtSum = false; 
+      }
     }
   }
 
