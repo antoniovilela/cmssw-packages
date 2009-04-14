@@ -9,10 +9,10 @@ process.MessageLogger.cerr.threshold = 'INFO'
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/tmp/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_cff_py_RAW2DIGI_RECO_1.root')
+    fileNames = cms.untracked.vstring('file:/tmp/antoniov/QCDpt30_Summer08_IDEAL_V11_redigi_v1_RECO_345194AC-4EE3-DD11-9EF6-001D0967D634.root')
 )
 
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsHLTPaths_cfi")
@@ -42,6 +42,12 @@ process.trackMultiplicityAssociatedToPV = process.trackMultiplicity.clone(Tracks
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.hfTower_cfi")
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi")
 process.xiTower.UseMETInfo = False
+
+process.l1filter = cms.EDFilter("L1TriggerTestFilter",
+  HFRingETSumThreshold = cms.int32(0),
+  L1TriggerNames = cms.vstring("L1_SingleJet30"),
+  AccessL1GctHFRingEtSums = cms.untracked.bool(False) 
+)
 
 process.analysisBeforeSelection = cms.EDAnalyzer("SimpleDijetsAnalyzer",
     JetTag = cms.InputTag("L2L3CorJetSC7PF")
@@ -82,7 +88,7 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysis_histos.root")
 )
 
-process.hlt = cms.Sequence(process.exclusiveDijetsHLTFilter)
+process.hlt = cms.Sequence(process.l1filter + process.exclusiveDijetsHLTFilter)
 process.jets = cms.Sequence(process.sisCone7PFJets*process.L2L3CorJetSC7PF*process.leadingJets)
 process.tracks = cms.Sequence(process.selectGoodTracks*process.tracksOutsideJets*process.selectTracksAssociatedToPV) 
 process.edmDump = cms.Sequence(process.trackMultiplicity+

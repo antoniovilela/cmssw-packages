@@ -45,6 +45,12 @@ process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.hfTower_cfi"
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi")
 process.xiTower.UseMETInfo = False
 
+process.l1filter = cms.EDFilter("L1TriggerTestFilter",
+  HFRingETSumThreshold = cms.int32(0),
+  L1TriggerNames = cms.vstring("L1_SingleJet30"),
+  AccessL1GctHFRingEtSums = cms.untracked.bool(True) 
+)
+
 process.analysisBeforeSelection = cms.EDAnalyzer("SimpleDijetsAnalyzer",
     JetTag = cms.InputTag("L2L3CorJetSC7PF")
 )
@@ -84,7 +90,7 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysis_histos.root")
 )
 
-process.hlt = cms.Sequence(process.exclusiveDijetsHLTFilter)
+process.hlt = cms.Sequence(process.l1filter + process.exclusiveDijetsHLTFilter)
 process.jets = cms.Sequence(process.L2L3CorJetSC7PF*process.leadingJets)
 process.tracks = cms.Sequence(process.selectGoodTracks*process.tracksOutsideJets*process.selectTracksAssociatedToPV) 
 process.edmDump = cms.Sequence(process.trackMultiplicity+
