@@ -83,7 +83,7 @@ void exclusiveDijetsAnalysis(std::vector<std::string>& fileNames,int maxEvents =
    double Ebeam = 5000.;
    int thresholdHF = 10;// 2 GeV
 
-   bool selectPileUp = true;
+   bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 
    // Event selection
