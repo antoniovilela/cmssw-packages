@@ -17,6 +17,9 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
     virtual void endJob();
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
   private:
+    edm::InputTag gtDigisTag_;
+    edm::InputTag l1GtObjectMapTag_; 
+
     int thresholdHFRingEtSum_;
     bool accessL1GctHFRingEtSums_;
 
@@ -51,6 +54,8 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 typedef std::vector<L1GctHFRingEtSums> L1GctHFRingEtSumsCollection;
 
 DijetsTriggerAnalyzer::DijetsTriggerAnalyzer(const edm::ParameterSet& pset):
+     gtDigisTag_(pset.getParameter<edm::InputTag>("GTDigisTag")),
+     l1GtObjectMapTag_(pset.getParameter<edm::InputTag>("L1GTObjectMapTag")),
      thresholdHFRingEtSum_(pset.getParameter<int>("HFRingETSumThreshold")),
      accessL1GctHFRingEtSums_(pset.getUntrackedParameter<bool>("AccessL1GctHFRingEtSums",true)){}
 
@@ -95,10 +100,10 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
 
   // Access L1 bits
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GTReadoutRcdH;
-  event.getByLabel("hltGtDigis", l1GTReadoutRcdH);
+  event.getByLabel(gtDigisTag_, l1GTReadoutRcdH);
 
   edm::Handle<L1GlobalTriggerObjectMapRecord> l1GTObjMapRcdH;
-  event.getByLabel("hltL1GtObjectMap",l1GTObjMapRcdH);
+  event.getByLabel(l1GtObjectMapTag_,l1GTObjMapRcdH);
    TString Tname;
    // int Tbits[20];
   if(!l1GTReadoutRcdH.isValid() || !l1GTObjMapRcdH.isValid()) return;  
@@ -134,7 +139,7 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
   bool acceptHFRingEtSum = true;
   if(accessL1GctHFRingEtSums_){
     edm::Handle<L1GctHFRingEtSumsCollection> ringSumsH;
-    event.getByLabel("hltGctDigis", ringSumsH);
+    event.getByLabel(gtDigisTag_, ringSumsH);
     L1GctHFRingEtSumsCollection::const_iterator ringSumItr;
   
     // Require sum(ET) threshold for all rings
@@ -148,7 +153,7 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
     }
   } else{
     edm::Handle<std::vector<L1GctJetCounts> > jetCountsH;
-    event.getByLabel("hltGctDigis", jetCountsH);
+    event.getByLabel(gtDigisTag_, jetCountsH);
 
     for(std::vector<L1GctJetCounts>::const_iterator jetCountItr = jetCountsH->begin();
                                                     jetCountItr != jetCountsH->end(); ++jetCountItr){
