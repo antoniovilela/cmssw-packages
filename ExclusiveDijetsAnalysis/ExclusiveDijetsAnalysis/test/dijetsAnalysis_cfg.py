@@ -100,7 +100,8 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysis_histos.root")
 )
 
-process.hlt = cms.Sequence(process.l1filter + process.exclusiveDijetsHLTFilter)
+#process.hlt = cms.Sequence(process.l1filter + process.exclusiveDijetsHLTFilter)
+process.hlt = cms.Sequence(process.exclusiveDijetsHLTFilter)
 process.jets = cms.Sequence(process.L2L3CorJetSC7PF*process.leadingJets)
 process.tracks = cms.Sequence(process.selectGoodTracks*
                               process.selectTracksAssociatedToPV*

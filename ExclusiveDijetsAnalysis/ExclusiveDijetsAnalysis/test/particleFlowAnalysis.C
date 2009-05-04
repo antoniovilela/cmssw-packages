@@ -11,6 +11,7 @@
 #include "TLegend.h"
 #include "TRandom.h"
 #include "TTree.h"
+#include "TMath.h"
 #include "Math/GenVector/LorentzVector.h"
 #include <cmath>
 #include <iostream>
@@ -32,6 +33,9 @@
 
 //typedef std::vector<std::string> (*GetFiles)();
  
+template <class Coll>
+std::pair<double,double> xi(Coll&);
+
 void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool verbose = false) {
    // Create a vector of input files
    //vector<string> fileNames = func();
@@ -59,7 +63,9 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    TH1F* h_jetsDeltaEta = new TH1F("jetsDeltaEta","jetsDeltaEta",100,-5.,5.);
    TH1F* h_jetsDeltaPhi = new TH1F("jetsDeltaPhi","jetsDeltaPhi",100,-1.1*M_PI,1.1*M_PI);
 
-   TH1F* h_trackMultiplicity = new TH1F("trackMultiplicity","trackMultiplicity",20,0,20);
+   TH1F* h_trackMultiplicityAssociatedToPV = new TH1F("trackMultiplicityAssociatedToPV","trackMultiplicityAssociatedToPV",20,0,20);
+   TH1F* h_trackMultiplicityOutsideJets = new TH1F("trackMultiplicityOutsideJets","trackMultiplicityOutsideJets",20,0,20);
+   TH1F* h_trackMultiplicityTransverseRegion = new TH1F("trackMultiplicityTransverseRegion","trackMultiplicityTransverseRegion",20,0,20);
    TH1F* h_multiplicityHFPlus = new TH1F("multiplicityHFPlus","multiplicityHFPlus",20,0,20);
    TH1F* h_multiplicityHFMinus = new TH1F("multiplicityHFMinus","multiplicityHFMinus",20,0,20);
 
@@ -69,6 +75,8 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    TH1F* h_xiMinus = new TH1F("xiMinus","xiMinus",200,0.,1.);
    TH2F* h_xiTowerVsxiGenPlus = new TH2F("xiTowerVsxiGenPlus","xiTowerVsxiGenPlus",100,0.,1.,100,0.,1.);
    TH2F* h_xiTowerVsxiGenMinus = new TH2F("xiTowerVsxiGenMinus","xiTowerVsxiGenMinus",100,0.,1.,100,0.,1.);
+   TH1F* h_ResXiPlus = new TH1F("ResXiPlus","ResXiPlus",200,-1.,1.);
+   TH1F* h_ResXiMinus = new TH1F("ResXiMinus","ResXiMinus",200,-1.,1.);
 
    TH1F* h_massDijets = new TH1F("massDijets","massDijets",200,-10.,200.);
    TH1F* h_missingMassFromXi = new TH1F("missingMassFromXi","missingMassFromXi",200,-10.,200.);
@@ -76,6 +84,14 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    TH1F* h_RjjFromJets = new TH1F("RjjFromJets","RjjFromJets",200,-0.1,1.5);
    TH1F* h_MxFromPFCands = new TH1F("MxFromPFCands","MxFromPFCands",200,-10.,200.);
    TH1F* h_RjjFromPFCands = new TH1F("RjjFromPFCands","RjjFromPFCands",200,-0.1,1.5);
+
+   TH1F* h_xiPlusFromJets = new TH1F("xiPlusFromJets","xiPlusFromJets",200,0.,1.);
+   TH1F* h_xiMinusFromJets = new TH1F("xiMinusFromJets","xiMinusFromJets",200,0.,1.);
+   TH1F* h_ResXiPlusFromJets = new TH1F("ResXiPlusFromJets","ResXiPlusFromJets",200,-1.,1.);
+   TH1F* h_ResXiMinusFromJets = new TH1F("ResXiMinusFromJets","ResXiMinusFromJets",200,-1.,1.);
+
+   TH1F* h_xiPlusFromPFCands = new TH1F("xiPlusFromPFCands","xiPlusFromPFCands",200,0.,1.);
+   TH1F* h_xiMinusFromPFCands = new TH1F("xiMinusFromPFCands","xiMinusFromPFCands",200,0.,1.);
 
    TH1F* h_EnergyVsEta = new TH1F("EnergyVsEta","EnergyVsEta",300,-15.,15.);
 
@@ -86,10 +102,10 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    double Ebeam = 5000.;
    int thresholdHF = 10;// 2 GeV
 
-   bool selectPileUp = false;
+   bool selectPileUp = true;
    int nEventsPUBx0 = 0;
 
-   bool accessEdmDump = false;
+   bool accessEdmDump = true;
 
    // Event selection
    // Di-jet
@@ -174,6 +190,12 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
      double RjjFromPFCands = dijetSystem.M()/allPFCands.M();
      h_RjjFromPFCands->Fill(RjjFromPFCands);
 
+     std::pair<double,double> xiFromJets = xi(*jetCollection);
+     h_xiPlusFromJets->Fill(xiFromJets.first);
+     h_xiMinusFromJets->Fill(xiFromJets.second);
+     //std::cout << "xi plus from jets= " << xiFromJets.first << std::endl;
+     //std::cout << "xi minus from jets= " << xiFromJets.second << std::endl;
+
      // Gen particles
      fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
      genParticlesCollection.getByLabel(ev,"genParticles");
@@ -200,11 +222,20 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
      h_xiGenPlus->Fill(xigen_plus);
      h_xiGenMinus->Fill(xigen_minus); 
 
+     h_ResXiPlusFromJets->Fill((xiFromJets.first - xigen_plus)/xigen_plus);
+     h_ResXiMinusFromJets->Fill((xiFromJets.second - xigen_minus)/xigen_minus);
+  
      if(!accessEdmDump) continue;
 
      // Access multiplicities
-     fwlite::Handle<unsigned int> trackMultiplicity; 
-     trackMultiplicity.getByLabel(ev,"trackMultiplicityAssociatedToPV","trackMultiplicity");
+     fwlite::Handle<unsigned int> trackMultiplicityAssociatedToPV; 
+     trackMultiplicityAssociatedToPV.getByLabel(ev,"trackMultiplicityAssociatedToPV","trackMultiplicity");
+
+     fwlite::Handle<unsigned int> trackMultiplicityOutsideJets;
+     trackMultiplicityOutsideJets.getByLabel(ev,"trackMultiplicityOutsideJets","trackMultiplicity");
+
+     fwlite::Handle<unsigned int> trackMultiplicityTransverseRegion;
+     trackMultiplicityTransverseRegion.getByLabel(ev,"trackMultiplicityTransverseRegion","trackMultiplicity");
 
      fwlite::Handle<std::vector<unsigned int> > nHFPlus;
      nHFPlus.getByLabel(ev,"hfTower","nHFplus");
@@ -218,7 +249,9 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
      fwlite::Handle<double> xiTowerMinus;
      xiTowerMinus.getByLabel(ev,"xiTower","xiTowerminus");
 
-     unsigned int nTracks = *trackMultiplicity;
+     unsigned int nTracksAssociatedToPV = *trackMultiplicityAssociatedToPV;
+     unsigned int nTracksOutsideJets = *trackMultiplicityOutsideJets;
+     unsigned int nTracksTransverseRegion = *trackMultiplicityTransverseRegion; 
 
      unsigned int nHF_plus = (*nHFPlus)[thresholdHF];
      unsigned int nHF_minus = (*nHFMinus)[thresholdHF];
@@ -226,7 +259,10 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
      double xiTower_plus = *xiTowerPlus;
      double xiTower_minus = *xiTowerMinus;
  
-     h_trackMultiplicity->Fill(nTracks);
+     h_trackMultiplicityAssociatedToPV->Fill(nTracksAssociatedToPV);
+     h_trackMultiplicityOutsideJets->Fill(nTracksOutsideJets);
+     h_trackMultiplicityTransverseRegion->Fill(nTracksTransverseRegion);
+
      h_multiplicityHFPlus->Fill(nHF_plus);
      h_multiplicityHFMinus->Fill(nHF_minus);     
 
@@ -236,11 +272,14 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
      h_xiTowerVsxiGenPlus->Fill(xigen_plus,xiTower_plus);
      h_xiTowerVsxiGenMinus->Fill(xigen_minus,xiTower_minus);
 
+     h_ResXiPlus->Fill((xiTower_plus - xigen_plus)/xigen_plus);
+     h_ResXiMinus->Fill((xiTower_minus - xigen_minus)/xigen_minus);
+
      double missingMass = 10000.*sqrt(xiTower_plus*xiTower_minus);
      h_missingMassFromXi->Fill(missingMass);
 
      // Selection
-     if(doTrackSelection&&(nTracks > nTracksMax)) continue;
+     if(doTrackSelection&&(nTracksOutsideJets > nTracksMax)) continue;
      if(doHFMultiplicitySelection&&(nHF_plus > nHFPlusMax)) continue;
      if(doHFMultiplicitySelection&&(nHF_minus > nHFMinusMax)) continue;
 
@@ -254,3 +293,18 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    hfile->Close();
 }
 
+template <class Coll>
+std::pair<double,double> xi(Coll& partCollection){
+
+   double xi_towers_plus = 0.;
+   double xi_towers_minus = 0.;
+   for(typename Coll::const_iterator part = partCollection.begin(); part != partCollection.end(); ++part){
+     xi_towers_plus += part->et()*TMath::Exp(part->eta());
+     xi_towers_minus += part->et()*TMath::Exp(-part->eta());
+   }
+
+   xi_towers_plus /= 10000.;
+   xi_towers_minus /= 10000.;
+   
+   return std::make_pair(xi_towers_plus,xi_towers_minus);
+}
