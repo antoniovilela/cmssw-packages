@@ -92,6 +92,8 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
 
    TH1F* h_xiPlusFromPFCands = new TH1F("xiPlusFromPFCands","xiPlusFromPFCands",200,0.,1.);
    TH1F* h_xiMinusFromPFCands = new TH1F("xiMinusFromPFCands","xiMinusFromPFCands",200,0.,1.);
+   TH1F* h_ResXiPlusFromPFCands = new TH1F("ResXiPlusFromPFCands","ResXiPlusFromPFCands",200,-1.,1.);
+   TH1F* h_ResXiMinusFromPFCands = new TH1F("ResXiMinusFromPFCands","ResXiMinusFromPFCands",200,-1.,1.);
 
    TH1F* h_EnergyVsEta = new TH1F("EnergyVsEta","EnergyVsEta",300,-15.,15.);
 
@@ -140,8 +142,8 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
 
      // Di-jets
      fwlite::Handle<std::vector<reco::PFJet> > jetCollection;
-     //jetCollection.getByLabel(ev,"L2L3CorJetSC7PF");
-     jetCollection.getByLabel(ev,"sisCone7PFJets");
+     jetCollection.getByLabel(ev,"L2L3CorJetSC7PF");
+     //jetCollection.getByLabel(ev,"sisCone7PFJets");
 
      const reco::PFJet& jet1 = (*jetCollection)[0];// they come out ordered right?
      const reco::PFJet& jet2 = (*jetCollection)[1];
@@ -196,6 +198,10 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
      //std::cout << "xi plus from jets= " << xiFromJets.first << std::endl;
      //std::cout << "xi minus from jets= " << xiFromJets.second << std::endl;
 
+     std::pair<double,double> xiFromPFCands = xi(*pfCandCollection);
+     h_xiPlusFromPFCands->Fill(xiFromPFCands.first);
+     h_xiMinusFromPFCands->Fill(xiFromPFCands.second);
+
      // Gen particles
      fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
      genParticlesCollection.getByLabel(ev,"genParticles");
@@ -225,6 +231,9 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
      h_ResXiPlusFromJets->Fill((xiFromJets.first - xigen_plus)/xigen_plus);
      h_ResXiMinusFromJets->Fill((xiFromJets.second - xigen_minus)/xigen_minus);
   
+     h_ResXiPlusFromPFCands->Fill((xiFromPFCands.first - xigen_plus)/xigen_plus);
+     h_ResXiMinusFromPFCands->Fill((xiFromPFCands.second - xigen_minus)/xigen_minus);
+
      if(!accessEdmDump) continue;
 
      // Access multiplicities

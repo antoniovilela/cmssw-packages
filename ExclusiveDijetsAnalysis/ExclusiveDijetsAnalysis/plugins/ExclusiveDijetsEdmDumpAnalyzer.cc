@@ -15,6 +15,9 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     virtual void beginJob(const edm::EventSetup&);
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
   private:
+    template <class Coll>
+    std::pair<double,double> xi(Coll& partCollection);
+
     edm::InputTag jetTag_;
 
     double ptJetMin_;
@@ -48,8 +51,8 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_xiGenMinus_;
       TH1F* h_xiPlus_;
       TH1F* h_xiMinus_;
-      TH2F* h_xiTowerVsxiGenPlus_;
-      TH2F* h_xiTowerVsxiGenMinus_;
+      TH2F* h_xiPlusVsxiGenPlus_;
+      TH2F* h_xiMinusVsxiGenMinus_;
 
       TH1F* h_massDijets_;
       TH1F* h_missingMassFromXi_;
@@ -121,8 +124,8 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_xiGenMinus_ = fs->make<TH1F>("xiGenMinus","xiGenMinus",200,0.,1.);
   histos_.h_xiPlus_ = fs->make<TH1F>("xiPlus","xiPlus",200,0.,1.);
   histos_.h_xiMinus_ = fs->make<TH1F>("xiMinus","xiMinus",200,0.,1.);
-  histos_.h_xiTowerVsxiGenPlus_ = fs->make<TH2F>("xiTowerVsxiGenPlus","xiTowerVsxiGenPlus",100,0.,1.,100,0.,1.);
-  histos_.h_xiTowerVsxiGenMinus_ = fs->make<TH2F>("xiTowerVsxiGenMinus","xiTowerVsxiGenMinus",100,0.,1.,100,0.,1.);
+  histos_.h_xiPlusVsxiGenPlus_ = fs->make<TH2F>("xiPlusVsxiGenPlus","xiPlusVsxiGenPlus",100,0.,1.,100,0.,1.);
+  histos_.h_xiMinusVsxiGenMinus_ = fs->make<TH2F>("xiMinusVsxiGenMinus","xiMinusVsxiGenMinus",100,0.,1.,100,0.,1.);
 
   histos_.h_massDijets_ = fs->make<TH1F>("massDijets","massDijets",200,-10.,200.);
   histos_.h_missingMassFromXi_ = fs->make<TH1F>("missingMassFromXi","missingMassFromXi",200,-10.,200.);
@@ -207,7 +210,7 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
 
   // Access multiplicities
   edm::Handle<unsigned int> trackMultiplicity; 
-  event.getByLabel("trackMultiplicityAssociatedToPV","trackMultiplicity",trackMultiplicity);
+  event.getByLabel("trackMultiplicityTransverseRegion","trackMultiplicity",trackMultiplicity);
 
   edm::Handle<std::vector<unsigned int> > nHFPlus;
   event.getByLabel("hfTower","nHFplus",nHFPlus);
@@ -215,32 +218,36 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   edm::Handle<std::vector<unsigned int> > nHFMinus;
   event.getByLabel("hfTower","nHFminus",nHFMinus);
 
-  edm::Handle<double> xiTowerPlus;
+  /*edm::Handle<double> xiTowerPlus;
   event.getByLabel("xiTower","xiTowerplus",xiTowerPlus);
 
   edm::Handle<double> xiTowerMinus;
-  event.getByLabel("xiTower","xiTowerminus",xiTowerMinus);
+  event.getByLabel("xiTower","xiTowerminus",xiTowerMinus);*/
 
   unsigned int nTracks = *trackMultiplicity;
 
   unsigned int nHF_plus = (*nHFPlus)[thresholdHF_];
   unsigned int nHF_minus = (*nHFMinus)[thresholdHF_];
 
-  double xiTower_plus = *xiTowerPlus;
-  double xiTower_minus = *xiTowerMinus;
+  /*double xi_plus = *xiTowerPlus;
+  double xi_minus = *xiTowerMinus;*/
  
+  std::pair<double,double> xiFromJets = xi(*jetCollectionH);
+  double xi_plus = xiFromJets.first;
+  double xi_minus = xiFromJets.second;  
+
   histos_.h_trackMultiplicity_->Fill(nTracks);
   histos_.h_multiplicityHFPlus_->Fill(nHF_plus);
   histos_.h_multiplicityHFMinus_->Fill(nHF_minus);     
 
-  histos_.h_xiPlus_->Fill(xiTower_plus);
-  histos_.h_xiMinus_->Fill(xiTower_minus);
+  histos_.h_xiPlus_->Fill(xi_plus);
+  histos_.h_xiMinus_->Fill(xi_minus);
   if((proton1 != genParticlesCollectionH->end())&&(proton2 != genParticlesCollectionH->end())){
-    histos_.h_xiTowerVsxiGenPlus_->Fill(xigen_plus,xiTower_plus);
-    histos_.h_xiTowerVsxiGenMinus_->Fill(xigen_minus,xiTower_minus);
+    histos_.h_xiPlusVsxiGenPlus_->Fill(xigen_plus,xi_plus);
+    histos_.h_xiMinusVsxiGenMinus_->Fill(xigen_minus,xi_minus);
   }
 
-  double missingMass = 2*Ebeam_*sqrt(xiTower_plus*xiTower_minus);
+  double missingMass = 2*Ebeam_*sqrt(xi_plus*xi_minus);
   histos_.h_missingMassFromXi_->Fill(missingMass);
 
   // Selection
@@ -248,10 +255,26 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   if(nHF_plus > nHFPlusMax_) return;
   if(nHF_minus > nHFMinusMax_) return;
 
-  histos_.h_xiPlusAfterSel_->Fill(xiTower_plus);
-  histos_.h_xiMinusAfterSel_->Fill(xiTower_minus);
+  histos_.h_xiPlusAfterSel_->Fill(xi_plus);
+  histos_.h_xiMinusAfterSel_->Fill(xi_minus);
   histos_.h_RjjAfterSel_->Fill(RjjFromJets);
 
+}
+
+template <class Coll>
+std::pair<double,double> ExclusiveDijetsEdmDumpAnalyzer::xi(Coll& partCollection){
+
+   double xi_towers_plus = 0.;
+   double xi_towers_minus = 0.;
+   for(typename Coll::const_iterator part = partCollection.begin(); part != partCollection.end(); ++part){
+     xi_towers_plus += part->et()*exp(part->eta());
+     xi_towers_minus += part->et()*exp(-part->eta());
+   }
+
+   xi_towers_plus /= 2*Ebeam_;
+   xi_towers_minus /= 2*Ebeam_;
+   
+   return std::make_pair(xi_towers_plus,xi_towers_minus);
 }
 
 DEFINE_FWK_MODULE(ExclusiveDijetsEdmDumpAnalyzer);

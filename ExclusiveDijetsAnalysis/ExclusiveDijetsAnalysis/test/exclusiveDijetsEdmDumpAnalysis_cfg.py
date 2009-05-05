@@ -16,7 +16,13 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/tmp/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_cff_py_RAW2DIGI_RECO_1.root')
+    fileNames = cms.untracked.vstring(
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v1/edmDump_CEPDijetsGG_10TeV_1.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v1/edmDump_CEPDijetsGG_10TeV_2.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v1/edmDump_CEPDijetsGG_10TeV_3.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v1/edmDump_CEPDijetsGG_10TeV_4.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v1/edmDump_CEPDijetsGG_10TeV_5.root"
+    )
 )
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi import *
@@ -28,7 +34,7 @@ process.analysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
     EtaMaxJet = cms.double(2.5),
     DeltaEtaMax = cms.double(1.4),
     DeltaPhiMax = cms.double(0.2),
-    NTracksMax = cms.uint32(7),
+    NTracksMax = cms.uint32(3),
     NHFPlusMax = cms.uint32(0),
     NHFMinusMax = cms.uint32(0),
     HFThresholdIndex = cms.uint32(10)
