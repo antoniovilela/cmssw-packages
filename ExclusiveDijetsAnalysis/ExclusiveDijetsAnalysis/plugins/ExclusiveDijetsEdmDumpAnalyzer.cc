@@ -6,6 +6,8 @@ class TTree;
 class TH1F;
 class TH2F;
 
+class JetCorrector;
+
 class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
 {
   public: 
@@ -13,12 +15,14 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     ~ExclusiveDijetsEdmDumpAnalyzer();
 
     virtual void beginJob(const edm::EventSetup&);
+    virtual void beginRun(const edm::Run&, const edm::EventSetup&);
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
   private:
     template <class Coll>
-    std::pair<double,double> xi(Coll& partCollection);
+    std::pair<double,double> xi(Coll& partCollection,bool useJetCorr = false);
 
     edm::InputTag jetTag_;
+    edm::InputTag particleFlowTag_;
 
     double ptJetMin_;
     double etaJetMax_;
@@ -29,6 +33,7 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     unsigned int nHFMinusMax_;
 
     unsigned int thresholdHF_;
+    bool useJetCorrection_;
     double Ebeam_;
  
     struct {
@@ -51,9 +56,11 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_xiGenMinus_;
       TH1F* h_xiPlus_;
       TH1F* h_xiMinus_;
+      TH1F* h_ResXiPlus_;
+      TH1F* h_ResXiMinus_;
       TH2F* h_xiPlusVsxiGenPlus_;
       TH2F* h_xiMinusVsxiGenMinus_;
-
+      
       TH1F* h_massDijets_;
       TH1F* h_missingMassFromXi_;
       TH1F* h_MxFromJets_;
@@ -65,6 +72,9 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_xiMinusAfterSel_;
       TH1F* h_RjjAfterSel_;
     } histos_;
+
+    std::string jetCorrectionService_;
+    const JetCorrector* corrector_;
 };
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -76,7 +86,9 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
 
 #include "DataFormats/JetReco/interface/Jet.h"
 //#include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "PhysicsTools/UtilAlgos/interface/TFileService.h"
@@ -89,6 +101,7 @@ using namespace reco;
 
 ExclusiveDijetsEdmDumpAnalyzer::ExclusiveDijetsEdmDumpAnalyzer(const edm::ParameterSet& pset):
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
+  particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
   ptJetMin_(pset.getParameter<double>("PtMinJet")),
   etaJetMax_(pset.getParameter<double>("EtaMaxJet")),
   deltaEtaMax_(pset.getParameter<double>("DeltaEtaMax")),
@@ -97,10 +110,13 @@ ExclusiveDijetsEdmDumpAnalyzer::ExclusiveDijetsEdmDumpAnalyzer(const edm::Parame
   nHFPlusMax_(pset.getParameter<unsigned int>("NHFPlusMax")),
   nHFMinusMax_(pset.getParameter<unsigned int>("NHFMinusMax")),
   thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
+  useJetCorrection_(pset.getParameter<bool>("UseJetCorrection")),
   Ebeam_(5000.)
-{}
+{
+  if(useJetCorrection_) jetCorrectionService_ = pset.getParameter<std::string>("JetCorrectionService");
+}
 
-ExclusiveDijetsEdmDumpAnalyzer::~ExclusiveDijetsEdmDumpAnalyzer() {}
+ExclusiveDijetsEdmDumpAnalyzer::~ExclusiveDijetsEdmDumpAnalyzer(){}
 
 void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   edm::Service<TFileService> fs;
@@ -124,12 +140,14 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_xiGenMinus_ = fs->make<TH1F>("xiGenMinus","xiGenMinus",200,0.,1.);
   histos_.h_xiPlus_ = fs->make<TH1F>("xiPlus","xiPlus",200,0.,1.);
   histos_.h_xiMinus_ = fs->make<TH1F>("xiMinus","xiMinus",200,0.,1.);
+  histos_.h_ResXiPlus_ = fs->make<TH1F>("ResXiPlus","ResXiPlus",100,-1.,1.);
+  histos_.h_ResXiMinus_ = fs->make<TH1F>("ResXiMinus","ResXiMinus",100,-1.,1.);
   histos_.h_xiPlusVsxiGenPlus_ = fs->make<TH2F>("xiPlusVsxiGenPlus","xiPlusVsxiGenPlus",100,0.,1.,100,0.,1.);
   histos_.h_xiMinusVsxiGenMinus_ = fs->make<TH2F>("xiMinusVsxiGenMinus","xiMinusVsxiGenMinus",100,0.,1.,100,0.,1.);
 
-  histos_.h_massDijets_ = fs->make<TH1F>("massDijets","massDijets",200,-10.,200.);
-  histos_.h_missingMassFromXi_ = fs->make<TH1F>("missingMassFromXi","missingMassFromXi",200,-10.,200.);
-  histos_.h_MxFromJets_ = fs->make<TH1F>("MxFromJets","MxFromJets",200,-10.,200.);
+  histos_.h_massDijets_ = fs->make<TH1F>("massDijets","massDijets",200,-10.,400.);
+  histos_.h_missingMassFromXi_ = fs->make<TH1F>("missingMassFromXi","missingMassFromXi",200,-10.,400.);
+  histos_.h_MxFromJets_ = fs->make<TH1F>("MxFromJets","MxFromJets",200,-10.,400.);
   histos_.h_RjjFromJets_ = fs->make<TH1F>("RjjFromJets","RjjFromJets",200,-0.1,1.5);
 
   histos_.h_EnergyVsEta_ = fs->make<TH1F>("EnergyVsEta","EnergyVsEta",300,-15.,15.);
@@ -140,12 +158,19 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
 
 }
 
+void ExclusiveDijetsEdmDumpAnalyzer::beginRun(const edm::Run& run, const edm::EventSetup& setup){
+  if(useJetCorrection_) corrector_ = JetCorrector::getJetCorrector(jetCorrectionService_,setup);
+}
+
 void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup){
   edm::Handle<edm::View<Jet> > jetCollectionH;
   event.getByLabel(jetTag_,jetCollectionH);
 
   const reco::Jet& jet1 = (*jetCollectionH)[0];// they come out ordered right?
   const reco::Jet& jet2 = (*jetCollectionH)[1];
+
+  edm::Handle<edm::View<PFCandidate> > particleFlowCollectionH;
+  event.getByLabel("particleFlow",particleFlowCollectionH);
 
   histos_.h_leadingJetPt_->Fill(jet1.pt());
   histos_.h_secondJetPt_->Fill(jet2.pt());
@@ -232,9 +257,13 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   /*double xi_plus = *xiTowerPlus;
   double xi_minus = *xiTowerMinus;*/
  
-  std::pair<double,double> xiFromJets = xi(*jetCollectionH);
+  /*std::pair<double,double> xiFromJets = xi(*jetCollectionH);
   double xi_plus = xiFromJets.first;
-  double xi_minus = xiFromJets.second;  
+  double xi_minus = xiFromJets.second;*/
+
+  std::pair<double,double> xiFromPFCands = xi(*particleFlowCollectionH,useJetCorrection_);
+  double xi_plus = xiFromPFCands.first;
+  double xi_minus = xiFromPFCands.second;
 
   histos_.h_trackMultiplicity_->Fill(nTracks);
   histos_.h_multiplicityHFPlus_->Fill(nHF_plus);
@@ -243,6 +272,9 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   histos_.h_xiPlus_->Fill(xi_plus);
   histos_.h_xiMinus_->Fill(xi_minus);
   if((proton1 != genParticlesCollectionH->end())&&(proton2 != genParticlesCollectionH->end())){
+    histos_.h_ResXiPlus_->Fill((xi_plus - xigen_plus)/xigen_plus);
+    histos_.h_ResXiMinus_->Fill((xi_minus - xigen_minus)/xigen_minus);
+
     histos_.h_xiPlusVsxiGenPlus_->Fill(xigen_plus,xi_plus);
     histos_.h_xiMinusVsxiGenMinus_->Fill(xigen_minus,xi_minus);
   }
@@ -262,13 +294,15 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
 }
 
 template <class Coll>
-std::pair<double,double> ExclusiveDijetsEdmDumpAnalyzer::xi(Coll& partCollection){
+std::pair<double,double> ExclusiveDijetsEdmDumpAnalyzer::xi(Coll& partCollection, bool useJetCorr){
 
    double xi_towers_plus = 0.;
    double xi_towers_minus = 0.;
+   double pt_min = 10.;   
    for(typename Coll::const_iterator part = partCollection.begin(); part != partCollection.end(); ++part){
-     xi_towers_plus += part->et()*exp(part->eta());
-     xi_towers_minus += part->et()*exp(-part->eta());
+     double correction = (useJetCorr&&corrector_&&(part->pt() >= pt_min))?(corrector_->correction(part->p4())):1.;
+     xi_towers_plus += correction*part->et()*exp(part->eta());
+     xi_towers_minus += correction*part->et()*exp(-part->eta());
    }
 
    xi_towers_plus /= 2*Ebeam_;

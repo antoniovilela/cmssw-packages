@@ -45,7 +45,12 @@ analysisBeforeSelection = cms.EDAnalyzer("SimpleDijetsAnalyzer",
 analysisAfterSelection = analysisBeforeSelection.clone()
 
 hlt = cms.Sequence(exclusiveDijetsHLTFilter)
-jets = cms.Sequence(L2L3CorJetSC7PF*leadingJets)
+jets = cms.Sequence(L2L3CorJetKT6Calo+
+                    L2L3CorJetSC5Calo+
+                    L2L3CorJetSC7Calo+
+                    L2L3CorJetKT6PF+
+                    L2L3CorJetSC5PF+
+                    L2L3CorJetSC7PF*leadingJets) 
 tracks = cms.Sequence(selectGoodTracks*
                       selectTracksAssociatedToPV*
                       tracksOutsideJets+

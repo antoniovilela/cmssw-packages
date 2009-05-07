@@ -8,6 +8,7 @@
   <use name=DataFormats/VertexReco>
   <use name=DataFormats/L1GlobalCaloTrigger>
   <use name=DataFormats/L1GlobalTrigger>
+  <use name=JetMETCorrections/Objects>
   <use name=PhysicsTools/UtilAlgos>
   <use name=ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis> 
   <use name=root>

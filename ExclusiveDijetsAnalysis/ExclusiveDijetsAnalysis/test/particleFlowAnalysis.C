@@ -29,6 +29,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+//#include "CondFormats/JetMETObjects/interface/CombinedJetCorrector.h"
 #endif
 
 //typedef std::vector<std::string> (*GetFiles)();
@@ -41,7 +42,7 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    //vector<string> fileNames = func();
    if(verbose){
      std::cout << ">>> Reading files: " << std::endl;
-     for(vector<string>::const_iterator it = fileNames.begin(); it != fileNames.end(); ++it)
+     for(std::vector<std::string>::const_iterator it = fileNames.begin(); it != fileNames.end(); ++it)
                std::cout << "  " << *it << std::endl; 
    } 
 
@@ -50,6 +51,10 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    
    // Create output file
    TFile* hfile = new TFile("analysisPF_histos.root","recreate","data histograms");
+
+   /*std::vector<std::string> jetAlgos;
+   jetAlgos.push_back("sisCone5PFJets");
+   jetAlgos.push_back("sisCone7PFJets");*/
 
    // Book Histograms
    TH1F* h_leadingJetPt = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
@@ -78,9 +83,9 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    TH1F* h_ResXiPlus = new TH1F("ResXiPlus","ResXiPlus",200,-1.,1.);
    TH1F* h_ResXiMinus = new TH1F("ResXiMinus","ResXiMinus",200,-1.,1.);
 
-   TH1F* h_massDijets = new TH1F("massDijets","massDijets",200,-10.,200.);
-   TH1F* h_missingMassFromXi = new TH1F("missingMassFromXi","missingMassFromXi",200,-10.,200.);
-   TH1F* h_MxFromJets = new TH1F("MxFromJets","MxFromJets",200,-10.,200.);
+   TH1F* h_massDijets = new TH1F("massDijets","massDijets",200,-10.,400.);
+   TH1F* h_missingMassFromXi = new TH1F("missingMassFromXi","missingMassFromXi",200,-10.,400.);
+   TH1F* h_MxFromJets = new TH1F("MxFromJets","MxFromJets",200,-10.,400.);
    TH1F* h_RjjFromJets = new TH1F("RjjFromJets","RjjFromJets",200,-0.1,1.5);
    TH1F* h_MxFromPFCands = new TH1F("MxFromPFCands","MxFromPFCands",200,-10.,200.);
    TH1F* h_RjjFromPFCands = new TH1F("RjjFromPFCands","RjjFromPFCands",200,-0.1,1.5);
@@ -102,7 +107,7 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    TH1F* h_RjjAfterSel = new TH1F("RjjAfterSel","RjjAfterSel",200,-0.1,1.5);
 
    double Ebeam = 5000.;
-   int thresholdHF = 10;// 2 GeV
+   int thresholdHF = 12;// 2.4 GeV
 
    bool selectPileUp = true;
    int nEventsPUBx0 = 0;
@@ -120,6 +125,11 @@ void particleFlowAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1
    bool doHFMultiplicitySelection = true; 
    int nHFPlusMax = 0;
    int nHFMinusMax = 0;
+
+   /*// Get jet corrector
+   std::string Levels = "L2:L3";
+   std::string Tags = "Summer08Redigi_L2Relative_SC5PF:Summer08Redigi_L3Absolute_SC5PF";
+   CombinedJetCorrector *L2L3JetCorrector = new CombinedJetCorrector(Levels,Tags);*/
 
    // Loop over the events
    int nEvts = 0;
@@ -308,6 +318,7 @@ std::pair<double,double> xi(Coll& partCollection){
    double xi_towers_plus = 0.;
    double xi_towers_minus = 0.;
    for(typename Coll::const_iterator part = partCollection.begin(); part != partCollection.end(); ++part){
+     //double correction = (jetCorrector)?(jetCorrector->getCorrection(part->pt(),part->eta())):1.;
      xi_towers_plus += part->et()*TMath::Exp(part->eta());
      xi_towers_minus += part->et()*TMath::Exp(-part->eta());
    }
