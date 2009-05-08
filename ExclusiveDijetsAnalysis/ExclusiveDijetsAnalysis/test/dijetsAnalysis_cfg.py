@@ -24,6 +24,23 @@ process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.patSequences_cff")
 
 import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
+#jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
+
+jetAlgos = ['KT6','SC5','SC7']
+jetTypes = ['Calo','PF']
+
+for algo in jetAlgos:
+    for type in jetTypes:
+        algo_full = (algo.replace('KT','kt')).replace('SC','sisCone')
+        label = algo+type
+        coll = algo_full+type+'Jets'
+        genColl = algo_full+'GenJets'
+        jetTools.addJetCollection(process,coll,label,
+                                  runCleaner=None,doJTA=True,doBTagging=False,
+                                  jetCorrLabel=(algo,type),
+                                  doType1MET=True,doL1Counters=False,
+                                  genJetCollection=cms.InputTag(genColl))
+
 jetTools.switchJetCollection(process,
                              "sisCone7PFJets",
                              layers=[0,1],
@@ -32,9 +49,8 @@ jetTools.switchJetCollection(process,
                              doBTagging=False,
                              jetCorrLabel=('SC7','PF'),
                              doType1MET=False,
-                             genJetCollection=cms.InputTag("sisCone7GenJets")) 
+                             genJetCollection=cms.InputTag("sisCone7GenJets"))
 
-#jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
 
 #process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_expanded_cff")

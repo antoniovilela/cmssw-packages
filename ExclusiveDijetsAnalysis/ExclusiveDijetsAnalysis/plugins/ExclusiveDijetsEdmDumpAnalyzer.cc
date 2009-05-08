@@ -101,8 +101,6 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
 #include "TH1F.h"
 #include "TH2F.h"
 
-using namespace reco;
-
 ExclusiveDijetsEdmDumpAnalyzer::ExclusiveDijetsEdmDumpAnalyzer(const edm::ParameterSet& pset):
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
@@ -175,7 +173,13 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   const reco::Jet& jet1 = (*jetCollectionH)[0];// they come out ordered right?
   const reco::Jet& jet2 = (*jetCollectionH)[1];
 
-  edm::Handle<edm::View<PFCandidate> > particleFlowCollectionH;
+  /*edm::Handle<edm::View<pat::Jet> > jetCollectionH;
+  event.getByLabel(jetTag_,jetCollectionH);
+
+  const pat::Jet& jet1 = (*jetCollectionH)[0];// they come out ordered right?
+  const pat::Jet& jet2 = (*jetCollectionH)[1];*/
+
+  edm::Handle<edm::View<reco::PFCandidate> > particleFlowCollectionH;
   event.getByLabel("particleFlow",particleFlowCollectionH);
 
   histos_.h_leadingJetPt_->Fill(jet1.pt());
@@ -203,8 +207,8 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   histos_.h_massDijets_->Fill(dijetSystem.M());
 
   math::XYZTLorentzVector allJets(0.,0.,0.,0.);
-  for(edm::View<Jet>::const_iterator jet = jetCollectionH->begin();
-                                     jet != jetCollectionH->end(); ++jet) allJets += jet->p4();
+  for(edm::View<reco::Jet>::const_iterator jet = jetCollectionH->begin();
+                                           jet != jetCollectionH->end(); ++jet) allJets += jet->p4();
 
   histos_.h_MxFromJets_->Fill(allJets.M());
 
@@ -214,10 +218,12 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   if(usePAT_){
     const pat::Jet* patJet1 = dynamic_cast<const pat::Jet*>(&jet1);
     const pat::Jet* patJet2 = dynamic_cast<const pat::Jet*>(&jet2);
-    if(!patJet1 || !patJet2) throw edm::Exception(edm::errors::Configuration) << "Expecting PATJet's as input";  
+    if(!patJet1 || !patJet2) throw edm::Exception(edm::errors::Configuration) << "Expecting PATJet's as input";
 
     const reco::GenJet* genJet1 = patJet1->genJet();
     const reco::GenJet* genJet2 = patJet2->genJet();
+    /*const reco::GenJet* genJet1 = jet1.genJet();
+    const reco::GenJet* genJet2 = jet2.genJet();*/
     if(genJet1&&genJet2){
       math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
       dijetGenSystem += genJet1->p4();
@@ -228,13 +234,13 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   }
 
   // Gen particles
-  edm::Handle<edm::View<GenParticle> > genParticlesCollectionH;
+  edm::Handle<edm::View<reco::GenParticle> > genParticlesCollectionH;
   event.getByLabel("genParticles",genParticlesCollectionH);
 
-  edm::View<GenParticle>::const_iterator proton1 = genParticlesCollectionH->end();
-  edm::View<GenParticle>::const_iterator proton2 = genParticlesCollectionH->end();
-  for(edm::View<GenParticle>::const_iterator genpart = genParticlesCollectionH->begin();
-                                             genpart != genParticlesCollectionH->end(); ++genpart){
+  edm::View<reco::GenParticle>::const_iterator proton1 = genParticlesCollectionH->end();
+  edm::View<reco::GenParticle>::const_iterator proton2 = genParticlesCollectionH->end();
+  for(edm::View<reco::GenParticle>::const_iterator genpart = genParticlesCollectionH->begin();
+                                                   genpart != genParticlesCollectionH->end(); ++genpart){
     if(genpart->status() != 1) continue;
     histos_.h_EnergyVsEta_->Fill(genpart->eta(),genpart->energy());	
 		
