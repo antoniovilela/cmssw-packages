@@ -15,27 +15,46 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('file:/tmp/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_cff_py_RAW2DIGI_RECO_1.root')
 )
 
+process.load('Configuration/StandardSequences/GeometryPilot2_cff')
+process.load('Configuration/StandardSequences/MagneticField_38T_cff')
+process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = 'IDEAL_V12::All'
+
 process.load("PhysicsTools.PatAlgos.patLayer0_cff")
 process.load("PhysicsTools.PatAlgos.patLayer1_cff")
 
 import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
-process.patBeforeLevel0Reco_new = cms.Sequence(process.patAODJetMETCorrections)
-process.patLayer0Cleaners_new = cms.Sequence(process.allLayer0Jets*
-                                             process.allLayer0METs)
+#process.patBeforeLevel0Reco = cms.Sequence(process.patAODElectronIsolation*
+#                                           process.patAODJetMETCorrections)
 
-process.patHighLevelReco_new = cms.Sequence(process.patJetFlavourId*
-                                            process.patLayer0JetMETCorrections*
-                                            process.patLayer0JetTracksCharge)
+#process.patLayer0Cleaners = cms.Sequence(process.allLayer0Electrons*
+#                                         process.allLayer0Jets*
+#                                         process.allLayer0METs)
 
-process.patMCTruth_new = cms.Sequence(process.patMCTruth_Jet)
+process.patBeforeLevel0Reco = cms.Sequence(process.patAODJetMETCorrections)
 
-process.patLayer0_withoutTrigMatch_new = cms.Sequence(process.patBeforeLevel0Reco_new*
-                                                      process.patLayer0Cleaners_new*
-                                                      process.patHighLevelReco_new*
-                                                      process.patMCTruth_new)
+process.patLayer0Cleaners = cms.Sequence(process.allLayer0Jets*
+                                         process.allLayer0METs)
+
+process.patHighLevelReco = cms.Sequence(process.patJetFlavourId*
+                                        process.patLayer0JetMETCorrections*
+                                        process.patLayer0JetTracksCharge)
+
+process.patMCTruth = cms.Sequence(process.patMCTruth_Jet)
+
+process.patLayer0_withoutTrigMatch_new = cms.Sequence(process.patBeforeLevel0Reco*
+                                                      process.patLayer0Cleaners*
+                                                      process.patHighLevelReco*
+                                                      process.patMCTruth)
 
 process.patLayer0 = process.patLayer0_withoutTrigMatch_new
+
+process.allLayer1Jets.addTrigMatch = False
+#process.allLayer1Jets.trigPrimMatch = cms.VInputTag()
+
+process.allLayer1METs.addTrigMatch = False
+
 process.patLayer1 = cms.Sequence(process.layer1Jets*process.layer1METs)
 
 jetTools.switchJetCollection(process,
@@ -45,7 +64,7 @@ jetTools.switchJetCollection(process,
                              True,
                              False,
                              ('SC7','PF'),
-                             True,
+                             False,
                              cms.InputTag("sisCone7GenJets")) 
 
 #process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
@@ -56,7 +75,7 @@ process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumber
 
 #process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_expanded_cfi")
-process.output.fileName = 'edmDump_exclusiveDijets.root'
+process.output.fileName = '/tmp/antoniov/edmDump_exclusiveDijets.root'
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 
 process.TFileService = cms.Service("TFileService",
