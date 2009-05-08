@@ -17,11 +17,11 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v2/edmDump_exclusiveDijets_1.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v2/edmDump_exclusiveDijets_2.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v2/edmDump_exclusiveDijets_3.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v2/edmDump_exclusiveDijets_4.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v2/edmDump_exclusiveDijets_5.root"
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_1.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_2.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_3.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_4.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_5.root"
     )
 )
 
@@ -31,7 +31,7 @@ from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cf
 process.filter0PU = pileUpNumberFilter.clone(NumberOfPileUpEvents = 0)
 
 process.analysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
-    JetTag = cms.InputTag("L2L3CorJetSC7PF"),
+    JetTag = cms.InputTag("selectedLayer1Jets"),
     ParticleFlowTag = cms.InputTag("particleFlow"),
     PtMinJet = cms.double(50.0),
     EtaMaxJet = cms.double(2.5),

@@ -35,7 +35,8 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     unsigned int thresholdHF_;
     bool useJetCorrection_;
     double Ebeam_;
- 
+    bool usePAT_; 
+
     struct {
       TH1F* h_leadingJetPt_;
       TH1F* h_leadingJetEta_;
@@ -65,6 +66,7 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_missingMassFromXi_;
       TH1F* h_MxFromJets_;
       TH1F* h_RjjFromJets_;
+      TH1F* h_ResMassDijets_;
 
       TH1F* h_EnergyVsEta_;
 
@@ -88,6 +90,8 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
 //#include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -111,7 +115,8 @@ ExclusiveDijetsEdmDumpAnalyzer::ExclusiveDijetsEdmDumpAnalyzer(const edm::Parame
   nHFMinusMax_(pset.getParameter<unsigned int>("NHFMinusMax")),
   thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
   useJetCorrection_(pset.getParameter<bool>("UseJetCorrection")),
-  Ebeam_(5000.)
+  Ebeam_(5000.),
+  usePAT_(true)
 {
   if(useJetCorrection_) jetCorrectionService_ = pset.getParameter<std::string>("JetCorrectionService");
 }
@@ -149,6 +154,7 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_missingMassFromXi_ = fs->make<TH1F>("missingMassFromXi","missingMassFromXi",200,-10.,400.);
   histos_.h_MxFromJets_ = fs->make<TH1F>("MxFromJets","MxFromJets",200,-10.,400.);
   histos_.h_RjjFromJets_ = fs->make<TH1F>("RjjFromJets","RjjFromJets",200,-0.1,1.5);
+  histos_.h_ResMassDijets_ = fs->make<TH1F>("ResMassDijets","ResMassDijets",100,-1.,1.);
 
   histos_.h_EnergyVsEta_ = fs->make<TH1F>("EnergyVsEta","EnergyVsEta",300,-15.,15.);
 
@@ -163,7 +169,7 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginRun(const edm::Run& run, const edm::Ev
 }
 
 void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup){
-  edm::Handle<edm::View<Jet> > jetCollectionH;
+  edm::Handle<edm::View<reco::Jet> > jetCollectionH;
   event.getByLabel(jetTag_,jetCollectionH);
 
   const reco::Jet& jet1 = (*jetCollectionH)[0];// they come out ordered right?
@@ -205,6 +211,22 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   double RjjFromJets = dijetSystem.M()/allJets.M();
   histos_.h_RjjFromJets_->Fill(RjjFromJets);
      
+  if(usePAT_){
+    const pat::Jet* patJet1 = dynamic_cast<const pat::Jet*>(&jet1);
+    const pat::Jet* patJet2 = dynamic_cast<const pat::Jet*>(&jet2);
+    if(!patJet1 || !patJet2) throw edm::Exception(edm::errors::Configuration) << "Expecting PATJet's as input";  
+
+    const reco::GenJet* genJet1 = patJet1->genJet();
+    const reco::GenJet* genJet2 = patJet2->genJet();
+    if(genJet1&&genJet2){
+      math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
+      dijetGenSystem += genJet1->p4();
+      dijetGenSystem += genJet2->p4();
+      double massGen = dijetGenSystem.M();
+      histos_.h_ResMassDijets_->Fill((dijetSystem.M() - massGen)/massGen);
+    }
+  }
+
   // Gen particles
   edm::Handle<edm::View<GenParticle> > genParticlesCollectionH;
   event.getByLabel("genParticles",genParticlesCollectionH);
@@ -296,19 +318,19 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
 template <class Coll>
 std::pair<double,double> ExclusiveDijetsEdmDumpAnalyzer::xi(Coll& partCollection, bool useJetCorr){
 
-   double xi_towers_plus = 0.;
-   double xi_towers_minus = 0.;
-   double pt_min = 10.;   
-   for(typename Coll::const_iterator part = partCollection.begin(); part != partCollection.end(); ++part){
-     double correction = (useJetCorr&&corrector_&&(part->pt() >= pt_min))?(corrector_->correction(part->p4())):1.;
-     xi_towers_plus += correction*part->et()*exp(part->eta());
-     xi_towers_minus += correction*part->et()*exp(-part->eta());
-   }
+  double xi_towers_plus = 0.;
+  double xi_towers_minus = 0.;
+  double pt_min = 10.;   
+  for(typename Coll::const_iterator part = partCollection.begin(); part != partCollection.end(); ++part){
+    double correction = (useJetCorr&&corrector_&&(part->pt() >= pt_min))?(corrector_->correction(part->p4())):1.;
+    xi_towers_plus += correction*part->et()*exp(part->eta());
+    xi_towers_minus += correction*part->et()*exp(-part->eta());
+  }
 
-   xi_towers_plus /= 2*Ebeam_;
-   xi_towers_minus /= 2*Ebeam_;
+  xi_towers_plus /= 2*Ebeam_;
+  xi_towers_minus /= 2*Ebeam_;
    
-   return std::make_pair(xi_towers_plus,xi_towers_minus);
+  return std::make_pair(xi_towers_plus,xi_towers_minus);
 }
 
 DEFINE_FWK_MODULE(ExclusiveDijetsEdmDumpAnalyzer);

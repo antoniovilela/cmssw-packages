@@ -27,7 +27,9 @@
 #include "DataFormats/FWLite/interface/Event.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
 #endif
 
 template <class Coll>
@@ -85,6 +87,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    TH1F* h_RjjFromJets = new TH1F("RjjFromJets","RjjFromJets",200,-0.1,1.5);
    TH1F* h_MxFromPFCands = new TH1F("MxFromPFCands","MxFromPFCands",200,-10.,200.);
    TH1F* h_RjjFromPFCands = new TH1F("RjjFromPFCands","RjjFromPFCands",200,-0.1,1.5);
+   TH1F* h_ResMassDijets = new TH1F("ResMassDijets","ResMassDijets",200,-1.,1.);
 
    TH1F* h_xiPlusFromJets = new TH1F("xiPlusFromJets","xiPlusFromJets",200,0.,1.);
    TH1F* h_xiMinusFromJets = new TH1F("xiMinusFromJets","xiMinusFromJets",200,0.,1.);
@@ -148,10 +151,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      const pat::Jet& jet1 = (*jetCollection)[0];// they come out ordered right?
      const pat::Jet& jet2 = (*jetCollection)[1];
 
-     if(verbose){
-       std::cout << jet1;
-       std::cout << jet2;
-     }
+     //if(verbose) std::cout << " JEC level: " << jet1.jetCorrName() << std::endl;
 
      h_leadingJetPt->Fill(jet1.pt());
      h_secondJetPt->Fill(jet2.pt());
@@ -175,8 +175,8 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_massDijets->Fill(dijetSystem.M());
 
      math::XYZTLorentzVector allJets(0.,0.,0.,0.);
-     for(std::vector<reco::PFJet>::const_iterator jet = jetCollection->begin();
-                                                  jet != jetCollection->end(); ++jet) allJets += jet->p4();
+     for(std::vector<pat::Jet>::const_iterator jet = jetCollection->begin();
+                                               jet != jetCollection->end(); ++jet) allJets += jet->p4();
 
      h_MxFromJets->Fill(allJets.M());
 
@@ -207,6 +207,19 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_xiPlusFromPFCands->Fill(xiFromPFCands.first);
      h_xiMinusFromPFCands->Fill(xiFromPFCands.second);
 
+     /*// Access gen jets
+     const reco::GenJet* genJet1 = jet1.genJet();
+     const reco::GenJet* genJet2 = jet2.genJet();
+ 
+     if(genJet1 && genJet2){
+       math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
+       dijetGenSystem += genJet1->p4();
+       dijetGenSystem += genJet2->p4();
+       double massGen = dijetGenSystem.M();
+       h_ResMassDijets->Fill((dijetSystem.M() - massGen)/massGen);
+       
+     }*/
+ 
      // Gen particles
      fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
      genParticlesCollection.getByLabel(ev,"genParticles");
@@ -215,12 +228,12 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      reco::GenParticleCollection::const_iterator proton1 = genParticles.end();
      reco::GenParticleCollection::const_iterator proton2 = genParticles.end();
      for(reco::GenParticleCollection::const_iterator genpart = genParticles.begin(); genpart != genParticles.end(); ++genpart){
-		if(genpart->status() != 1) continue;
-		h_EnergyVsEta->Fill(genpart->eta(),genpart->energy());	
+       if(genpart->status() != 1) continue;
+       h_EnergyVsEta->Fill(genpart->eta(),genpart->energy());	
 		
-		double pz = genpart->pz();
-     		if((proton1 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz > 0.75*Ebeam)) proton1 = genpart;
-		else if((proton2 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz < -0.75*Ebeam)) proton2 = genpart;
+       double pz = genpart->pz();
+       if((proton1 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz > 0.75*Ebeam)) proton1 = genpart;
+       else if((proton2 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz < -0.75*Ebeam)) proton2 = genpart;
      }
      if(verbose){
        std::cout << "Proton (z-plus): " << proton1->pt() << "  " << proton1->eta() << "  " << proton1->phi() << std::endl;

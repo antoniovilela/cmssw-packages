@@ -20,52 +20,21 @@ process.load('Configuration/StandardSequences/MagneticField_38T_cff')
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'IDEAL_V12::All'
 
-process.load("PhysicsTools.PatAlgos.patLayer0_cff")
-process.load("PhysicsTools.PatAlgos.patLayer1_cff")
+process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.patSequences_cff")
 
 import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
-#process.patBeforeLevel0Reco = cms.Sequence(process.patAODElectronIsolation*
-#                                           process.patAODJetMETCorrections)
-
-#process.patLayer0Cleaners = cms.Sequence(process.allLayer0Electrons*
-#                                         process.allLayer0Jets*
-#                                         process.allLayer0METs)
-
-process.patBeforeLevel0Reco = cms.Sequence(process.patAODJetMETCorrections)
-
-process.patLayer0Cleaners = cms.Sequence(process.allLayer0Jets*
-                                         process.allLayer0METs)
-
-process.patHighLevelReco = cms.Sequence(process.patJetFlavourId*
-                                        process.patLayer0JetMETCorrections*
-                                        process.patLayer0JetTracksCharge)
-
-process.patMCTruth = cms.Sequence(process.patMCTruth_Jet)
-
-process.patLayer0_withoutTrigMatch_new = cms.Sequence(process.patBeforeLevel0Reco*
-                                                      process.patLayer0Cleaners*
-                                                      process.patHighLevelReco*
-                                                      process.patMCTruth)
-
-process.patLayer0 = process.patLayer0_withoutTrigMatch_new
-
-process.allLayer1Jets.addTrigMatch = False
-#process.allLayer1Jets.trigPrimMatch = cms.VInputTag()
-
-process.allLayer1METs.addTrigMatch = False
-
-process.patLayer1 = cms.Sequence(process.layer1Jets*process.layer1METs)
-
 jetTools.switchJetCollection(process,
                              "sisCone7PFJets",
-                             [0,1],
-                             None,
-                             True,
-                             False,
-                             ('SC7','PF'),
-                             False,
-                             cms.InputTag("sisCone7GenJets")) 
+                             layers=[0,1],
+                             runCleaner=None,
+                             doJTA=True,
+                             doBTagging=False,
+                             jetCorrLabel=('SC7','PF'),
+                             doType1MET=False,
+                             genJetCollection=cms.InputTag("sisCone7GenJets")) 
+
+#jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
 
 #process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_expanded_cff")
@@ -75,7 +44,7 @@ process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumber
 
 #process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_expanded_cfi")
-process.output.fileName = '/tmp/antoniov/edmDump_exclusiveDijets.root'
+process.output.fileName = 'edmDump_exclusiveDijets.root'
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 
 process.TFileService = cms.Service("TFileService",
