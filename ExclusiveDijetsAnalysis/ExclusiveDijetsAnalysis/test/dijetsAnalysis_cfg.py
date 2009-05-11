@@ -51,6 +51,12 @@ jetTools.switchJetCollection(process,
                              doType1MET=False,
                              genJetCollection=cms.InputTag("sisCone7GenJets"))
 
+"""
+L = ['Muons','Electrons','Taus']
+
+for item in L:
+    process.patLayer0.remove(getattr(process,'allLayer0'+item))
+"""
 
 #process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_expanded_cff")

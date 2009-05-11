@@ -207,7 +207,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_xiPlusFromPFCands->Fill(xiFromPFCands.first);
      h_xiMinusFromPFCands->Fill(xiFromPFCands.second);
 
-     /*// Access gen jets
+     // Access gen jets
      const reco::GenJet* genJet1 = jet1.genJet();
      const reco::GenJet* genJet2 = jet2.genJet();
  
@@ -218,7 +218,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
        double massGen = dijetGenSystem.M();
        h_ResMassDijets->Fill((dijetSystem.M() - massGen)/massGen);
        
-     }*/
+     }
  
      // Gen particles
      fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
