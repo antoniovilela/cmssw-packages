@@ -35,6 +35,9 @@
 template <class Coll>
 std::pair<double,double> xi(Coll&);
 
+template <class JetColl,class PartColl>
+double Rjj(JetColl&,PartColl&);
+
 void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool verbose = false) {
    // Create a vector of input files
    //vector<string> fileNames = func();
@@ -111,6 +114,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    std::vector<TH1F*> histos_ResMassDijets;
    std::vector<TH1F*> histos_ResXiPlusFromJets;
    std::vector<TH1F*> histos_ResXiMinusFromJets;
+   std::vector<TH1F*> histos_RjjFromJets;
    for(std::vector<std::string>::const_iterator it = jetColls.begin(); it != jetColls.end(); ++it){
       std::string hname = "ResMassDijets_" + *it;
       histos_ResMassDijets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-1.,1.));
@@ -118,6 +122,8 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
       histos_ResXiPlusFromJets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-1.,1.));
       hname = "ResXiMinusFromJets_" + *it;
       histos_ResXiMinusFromJets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-1.,1.));
+      hname = "RjjFromJets_" + *it;
+      histos_RjjFromJets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-0.1,1.5));
    }
 
    double Ebeam = 5000.;
@@ -170,10 +176,10 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      const pat::Jet& jet1 = (*jetCollection)[0];// they come out ordered right?
      const pat::Jet& jet2 = (*jetCollection)[1];
 
-     if(verbose){
+     /*if(verbose){
        std::cout << " JEC set: " << jet1.corrFactorSetLabel() << std::endl;
        std::cout << " JEC level: " << jet1.corrStep() << std::endl;
-     }
+     }*/
 
      h_leadingJetPt->Fill(jet1.pt());
      h_secondJetPt->Fill(jet2.pt());
@@ -196,20 +202,20 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      dijetSystem += jet2.p4();
      h_massDijets->Fill(dijetSystem.M());
 
-     math::XYZTLorentzVector allJets(0.,0.,0.,0.);
+     /*math::XYZTLorentzVector allJets(0.,0.,0.,0.);
      for(std::vector<pat::Jet>::const_iterator jet = jetCollection->begin();
                                                jet != jetCollection->end(); ++jet) allJets += jet->p4();
 
      h_MxFromJets->Fill(allJets.M());
 
      double RjjFromJets = dijetSystem.M()/allJets.M();
-     h_RjjFromJets->Fill(RjjFromJets);
+     h_RjjFromJets->Fill(RjjFromJets);*/
      
      // PF candidates
      fwlite::Handle<std::vector<reco::PFCandidate> > pfCandCollection;
      pfCandCollection.getByLabel(ev,"particleFlow");
 
-     math::XYZTLorentzVector allPFCands(0.,0.,0.,0.);
+     /*math::XYZTLorentzVector allPFCands(0.,0.,0.,0.);
      for(std::vector<reco::PFCandidate>::const_iterator pfCand = pfCandCollection->begin();
                                                         pfCand != pfCandCollection->end();
                                                         ++pfCand) allPFCands += pfCand->p4();
@@ -217,13 +223,16 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_MxFromPFCands->Fill(allPFCands.M());
 
      double RjjFromPFCands = dijetSystem.M()/allPFCands.M();
-     h_RjjFromPFCands->Fill(RjjFromPFCands);
+     h_RjjFromPFCands->Fill(RjjFromPFCands);*/
+
+     double RjjFromJets = Rjj(*jetCollection,*jetCollection);
+     h_RjjFromJets->Fill(RjjFromJets);
+
+     h_RjjFromPFCands->Fill(Rjj(*jetCollection,*pfCandCollection));
 
      std::pair<double,double> xiFromJets = xi(*jetCollection);
      h_xiPlusFromJets->Fill(xiFromJets.first);
      h_xiMinusFromJets->Fill(xiFromJets.second);
-     //std::cout << "xi plus from jets= " << xiFromJets.first << std::endl;
-     //std::cout << "xi minus from jets= " << xiFromJets.second << std::endl;
 
      std::pair<double,double> xiFromPFCands = xi(*pfCandCollection);
      h_xiPlusFromPFCands->Fill(xiFromPFCands.first);
@@ -284,6 +293,8 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
         std::pair<double,double> xiFromJets = xi(*(jetCollections[k]));
         (histos_ResXiPlusFromJets[k])->Fill((xiFromJets.first - xigen_plus)/xigen_plus);
         (histos_ResXiMinusFromJets[k])->Fill((xiFromJets.second - xigen_minus)/xigen_minus);
+
+        (histos_RjjFromJets[k])->Fill(Rjj(*(jetCollections[k]),*(jetCollections[k])));
      }
 
      if(!accessEdmDump) continue;
@@ -369,4 +380,17 @@ std::pair<double,double> xi(Coll& partCollection){
    xi_towers_minus /= 10000.;
    
    return std::make_pair(xi_towers_plus,xi_towers_minus);
+}
+
+template <class JetColl,class PartColl>
+double Rjj(JetColl& jetCollection,PartColl& partCollection){
+   math::XYZTLorentzVector dijetSystem(0.,0.,0.,0.);
+   dijetSystem += (jetCollection[0]).p4();
+   dijetSystem += (jetCollection[1]).p4(); 
+
+   math::XYZTLorentzVector allCands(0.,0.,0.,0.);
+   for(typename PartColl::const_iterator part = partCollection.begin();
+                                         part != partCollection.end(); ++part) allCands += part->p4();
+
+   return (dijetSystem.M()/allCands.M());
 }
