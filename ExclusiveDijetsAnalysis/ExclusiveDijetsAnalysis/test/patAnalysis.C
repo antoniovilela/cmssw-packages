@@ -50,9 +50,13 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    // Create output file
    TFile* hfile = new TFile("analysisPAT_histos.root","recreate","data histograms");
 
-   /*std::vector<std::string> jetAlgos;
-   jetAlgos.push_back("sisCone5PFJets");
-   jetAlgos.push_back("sisCone7PFJets");*/
+   std::vector<std::string> jetColls;
+   jetColls.push_back("selectedLayer1JetsSC7PF");
+   jetColls.push_back("selectedLayer1JetsSC7Calo");
+   jetColls.push_back("selectedLayer1JetsSC5PF");
+   jetColls.push_back("selectedLayer1JetsSC5Calo");
+   jetColls.push_back("selectedLayer1JetsKT6PF");
+   jetColls.push_back("selectedLayer1JetsKT6Calo");
 
    // Book Histograms
    TH1F* h_leadingJetPt = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
@@ -87,8 +91,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    TH1F* h_RjjFromJets = new TH1F("RjjFromJets","RjjFromJets",200,-0.1,1.5);
    TH1F* h_MxFromPFCands = new TH1F("MxFromPFCands","MxFromPFCands",200,-10.,200.);
    TH1F* h_RjjFromPFCands = new TH1F("RjjFromPFCands","RjjFromPFCands",200,-0.1,1.5);
-   TH1F* h_ResMassDijets = new TH1F("ResMassDijets","ResMassDijets",200,-1.,1.);
-
+   
    TH1F* h_xiPlusFromJets = new TH1F("xiPlusFromJets","xiPlusFromJets",200,0.,1.);
    TH1F* h_xiMinusFromJets = new TH1F("xiMinusFromJets","xiMinusFromJets",200,0.,1.);
    TH1F* h_ResXiPlusFromJets = new TH1F("ResXiPlusFromJets","ResXiPlusFromJets",200,-1.,1.);
@@ -104,6 +107,18 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    TH1F* h_xiPlusAfterSel = new TH1F("xiPlusAfterSel","xiPlusAfterSel",200,0.,1.);
    TH1F* h_xiMinusAfterSel = new TH1F("xiMinusAfterSel","xiMinusAfterSel",200,0.,1.);
    TH1F* h_RjjAfterSel = new TH1F("RjjAfterSel","RjjAfterSel",200,-0.1,1.5);
+
+   std::vector<TH1F*> histos_ResMassDijets;
+   std::vector<TH1F*> histos_ResXiPlusFromJets;
+   std::vector<TH1F*> histos_ResXiMinusFromJets;
+   for(std::vector<std::string>::const_iterator it = jetColls.begin(); it != jetColls.end(); ++it){
+      std::string hname = "ResMassDijets_" + *it;
+      histos_ResMassDijets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-1.,1.));
+      hname = "ResXiPlusFromJets_" + *it;
+      histos_ResXiPlusFromJets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-1.,1.));
+      hname = "ResXiMinusFromJets_" + *it;
+      histos_ResXiMinusFromJets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-1.,1.));
+   }
 
    double Ebeam = 5000.;
    int thresholdHF = 12;// 2.4 GeV
@@ -145,13 +160,20 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      }
 
      // Di-jets
-     fwlite::Handle<std::vector<pat::Jet> > jetCollection;
-     jetCollection.getByLabel(ev,"selectedLayer1Jets");
+     std::vector<fwlite::Handle<std::vector<pat::Jet> > > jetCollections(jetColls.size());
+     for(size_t k = 0; k < jetColls.size(); ++k){
+       jetCollections[k].getByLabel(ev,jetColls[k].c_str());
+     }
 
+     const fwlite::Handle<std::vector<pat::Jet> >& jetCollection = jetCollections[0];
+  
      const pat::Jet& jet1 = (*jetCollection)[0];// they come out ordered right?
      const pat::Jet& jet2 = (*jetCollection)[1];
 
-     //if(verbose) std::cout << " JEC level: " << jet1.jetCorrName() << std::endl;
+     if(verbose){
+       std::cout << " JEC set: " << jet1.corrFactorSetLabel() << std::endl;
+       std::cout << " JEC level: " << jet1.corrStep() << std::endl;
+     }
 
      h_leadingJetPt->Fill(jet1.pt());
      h_secondJetPt->Fill(jet2.pt());
@@ -207,19 +229,6 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_xiPlusFromPFCands->Fill(xiFromPFCands.first);
      h_xiMinusFromPFCands->Fill(xiFromPFCands.second);
 
-     // Access gen jets
-     const reco::GenJet* genJet1 = jet1.genJet();
-     const reco::GenJet* genJet2 = jet2.genJet();
- 
-     if(genJet1 && genJet2){
-       math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
-       dijetGenSystem += genJet1->p4();
-       dijetGenSystem += genJet2->p4();
-       double massGen = dijetGenSystem.M();
-       h_ResMassDijets->Fill((dijetSystem.M() - massGen)/massGen);
-       
-     }
- 
      // Gen particles
      fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
      genParticlesCollection.getByLabel(ev,"genParticles");
@@ -251,6 +260,31 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
   
      h_ResXiPlusFromPFCands->Fill((xiFromPFCands.first - xigen_plus)/xigen_plus);
      h_ResXiMinusFromPFCands->Fill((xiFromPFCands.second - xigen_minus)/xigen_minus);
+
+     // Access all jet collections
+     for(size_t k = 0; k < jetColls.size(); ++k){
+        const pat::Jet& jet1 = (jetCollections[k])->at(0);
+        const pat::Jet& jet2 = (jetCollections[k])->at(1);
+
+        math::XYZTLorentzVector dijetSystem(0.,0.,0.,0.);
+        dijetSystem += jet1.p4();
+        dijetSystem += jet2.p4();
+
+        const reco::GenJet* genJet1 = jet1.genJet();
+        const reco::GenJet* genJet2 = jet2.genJet();
+
+        if(genJet1 && genJet2){
+          math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
+          dijetGenSystem += genJet1->p4();
+          dijetGenSystem += genJet2->p4();
+          double massGen = dijetGenSystem.M();
+          (histos_ResMassDijets[k])->Fill((dijetSystem.M() - massGen)/massGen);
+        }
+
+        std::pair<double,double> xiFromJets = xi(*(jetCollections[k]));
+        (histos_ResXiPlusFromJets[k])->Fill((xiFromJets.first - xigen_plus)/xigen_plus);
+        (histos_ResXiMinusFromJets[k])->Fill((xiFromJets.second - xigen_minus)/xigen_minus);
+     }
 
      if(!accessEdmDump) continue;
 

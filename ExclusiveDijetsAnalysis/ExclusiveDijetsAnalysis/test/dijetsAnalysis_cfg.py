@@ -5,7 +5,11 @@ process = cms.Process("Analysis")
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.debugModules = cms.untracked.vstring('')
 process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.cerr.INFO.limit = -1
+process.MessageLogger.categories.append('PATSummaryTables')
+process.MessageLogger.cerr.INFO = cms.untracked.PSet(
+    default          = cms.untracked.PSet( limit = cms.untracked.int32(0)  ),
+    PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) )
+)
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
@@ -20,8 +24,9 @@ process.load('Configuration/StandardSequences/MagneticField_38T_cff')
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'IDEAL_V12::All'
 
-process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.patSequences_cff")
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
+import PhysicsTools.PatAlgos.tools.coreTools as coreTools
 import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
 #jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
@@ -29,34 +34,34 @@ import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 jetAlgos = ['KT6','SC5','SC7']
 jetTypes = ['Calo','PF']
 
+#jetAlgos = ['KT6']
+#jetTypes = ['Calo']
+
 for algo in jetAlgos:
     for type in jetTypes:
         algo_full = (algo.replace('KT','kt')).replace('SC','sisCone')
         label = algo+type
         coll = algo_full+type+'Jets'
         genColl = algo_full+'GenJets'
-        jetTools.addJetCollection(process,coll,label,
-                                  runCleaner=None,doJTA=True,doBTagging=False,
+        jetTools.addJetCollection(process,cms.InputTag(coll),label,
+                                  doJTA=True,doBTagging=False,
                                   jetCorrLabel=(algo,type),
-                                  doType1MET=True,doL1Counters=False,
-                                  genJetCollection=cms.InputTag(genColl))
+                                  doType1MET=False,doL1Counters=False,
+                                  genJetCollection=cms.InputTag(genColl),
+                                  doTrigMatch=False)
 
 jetTools.switchJetCollection(process,
-                             "sisCone7PFJets",
-                             layers=[0,1],
-                             runCleaner=None,
+                             cms.InputTag("sisCone7PFJets"),
                              doJTA=True,
-                             doBTagging=False,
+                             doBTagging=True,
                              jetCorrLabel=('SC7','PF'),
                              doType1MET=False,
                              genJetCollection=cms.InputTag("sisCone7GenJets"))
 
-"""
-L = ['Muons','Electrons','Taus']
+objs = ['Muons','Electrons','Taus','Photons']
+for item in objs: coreTools.removeSpecificPATObject(process,item)
 
-for item in L:
-    process.patLayer0.remove(getattr(process,'allLayer0'+item))
-"""
+coreTools.removeCleaning(process)
 
 #process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_expanded_cff")
@@ -66,7 +71,7 @@ process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumber
 
 #process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_expanded_cfi")
-process.output.fileName = 'edmDump_exclusiveDijets.root'
+process.output.fileName = '/tmp/antoniov/edmDump_exclusiveDijets.root'
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 
 process.TFileService = cms.Service("TFileService",
@@ -75,7 +80,7 @@ process.TFileService = cms.Service("TFileService",
 
 process.selection_step = cms.Path(process.hlt)
 process.reco_step = cms.Path(process.jets*process.tracks*process.edmDump+process.pileUpInfo)
-process.pat_step = cms.Path(process.patLayer0*process.patLayer1)
+process.pat_step = cms.Path(process.patDefaultSequence)
 process.analysis_step = cms.Path(process.analysisBefore+
                                  process.analysisAfter)
 

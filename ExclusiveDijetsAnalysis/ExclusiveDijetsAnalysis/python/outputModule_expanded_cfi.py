@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 PatEventContent = cms.PSet(
     outputCommands = cms.untracked.vstring(
           'keep *_selectedLayer1Jets*_*_*',
-          'keep *_selectedLayer1METs_*_*'
+          'keep *_layer1METs_*_*'
     )
 )
 
