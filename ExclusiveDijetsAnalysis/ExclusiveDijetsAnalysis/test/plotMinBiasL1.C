@@ -22,6 +22,7 @@ void plotMinBiasL1(std::vector<std::string>& fileNames){
    std::vector<std::string> triggerBits;
    triggerBits.push_back("L1_SingleJet15");
    triggerBits.push_back("L1_SingleJet30");
+   triggerBits.push_back("HLT_DiJetAve30");
    std::vector<std::pair<std::string,TH1F*> > histosTriggerBits;
    for(std::vector<std::string>::const_iterator it = triggerBits.begin(); it != triggerBits.end(); ++it){
       histosTriggerBits.push_back(std::make_pair(*it,new TH1F(it->c_str(),it->c_str(),2,0,2)));
