@@ -4,7 +4,7 @@ process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.debugModules = cms.untracked.vstring('')
-process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.cerr.threshold = 'WARNING'
 process.MessageLogger.categories.append('PATSummaryTables')
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default          = cms.untracked.PSet( limit = cms.untracked.int32(0)  ),
@@ -71,7 +71,7 @@ process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumber
 
 #process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_expanded_cfi")
-process.output.fileName = '/tmp/antoniov/edmDump_exclusiveDijets.root'
+process.output.fileName = 'edmDump_exclusiveDijets.root'
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 
 process.TFileService = cms.Service("TFileService",

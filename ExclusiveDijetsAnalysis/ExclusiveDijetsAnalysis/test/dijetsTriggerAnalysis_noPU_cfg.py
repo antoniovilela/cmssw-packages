@@ -4,8 +4,8 @@ process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.debugModules = cms.untracked.vstring('analysis')
-process.MessageLogger.cerr.threshold = 'DEBUG'
-#process.MessageLogger.cerr.INFO.limit = -1
+process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.cerr.INFO.limit = -1
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
@@ -36,7 +36,7 @@ process.l1filter = cms.EDFilter("L1TriggerTestFilter",
 process.l1filterHLT = process.l1filter.clone()
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("/tmp/antoniov/analysisDijetsTrigger_histos.root")
+                                   fileName = cms.string("analysisDijetsTrigger_histos.root")
 )
 
 process.hlt = cms.Sequence(process.exclusiveDijetsHLTFilter)
