@@ -21,6 +21,9 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     template <class Coll>
     std::pair<double,double> xi(Coll& partCollection,bool useJetCorr = false);
 
+    template <class JetColl,class PartColl>
+    double Rjj(JetColl& jetCollection,PartColl& partCollection);
+
     edm::InputTag jetTag_;
     edm::InputTag particleFlowTag_;
 
@@ -57,8 +60,12 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_xiGenMinus_;
       TH1F* h_xiPlus_;
       TH1F* h_xiMinus_;
+      TH1F* h_xiPlusFromJets_;
+      TH1F* h_xiMinusFromJets_;
       TH1F* h_ResXiPlus_;
       TH1F* h_ResXiMinus_;
+      TH1F* h_ResXiPlusFromJets_;
+      TH1F* h_ResXiMinusFromJets_;
       TH2F* h_xiPlusVsxiGenPlus_;
       TH2F* h_xiMinusVsxiGenMinus_;
       
@@ -66,6 +73,7 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_missingMassFromXi_;
       TH1F* h_MxFromJets_;
       TH1F* h_RjjFromJets_;
+      TH1F* h_RjjFromPFCands_;
       TH1F* h_ResMassDijets_;
 
       TH1F* h_EnergyVsEta_;
@@ -143,8 +151,12 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_xiGenMinus_ = fs->make<TH1F>("xiGenMinus","xiGenMinus",200,0.,1.);
   histos_.h_xiPlus_ = fs->make<TH1F>("xiPlus","xiPlus",200,0.,1.);
   histos_.h_xiMinus_ = fs->make<TH1F>("xiMinus","xiMinus",200,0.,1.);
+  histos_.h_xiPlusFromJets_ = fs->make<TH1F>("xiPlusFromJets","xiPlusFromJets",200,0.,1.);
+  histos_.h_xiMinusFromJets_ = fs->make<TH1F>("xiMinusFromJets","xiMinusFromJets",200,0.,1.);
   histos_.h_ResXiPlus_ = fs->make<TH1F>("ResXiPlus","ResXiPlus",100,-1.,1.);
   histos_.h_ResXiMinus_ = fs->make<TH1F>("ResXiMinus","ResXiMinus",100,-1.,1.);
+  histos_.h_ResXiPlusFromJets_ = fs->make<TH1F>("ResXiPlusFromJets","ResXiPlusFromJets",100,-1.,1.);
+  histos_.h_ResXiMinusFromJets_ = fs->make<TH1F>("ResXiMinusFromJets","ResXiMinusFromJets",100,-1.,1.);
   histos_.h_xiPlusVsxiGenPlus_ = fs->make<TH2F>("xiPlusVsxiGenPlus","xiPlusVsxiGenPlus",100,0.,1.,100,0.,1.);
   histos_.h_xiMinusVsxiGenMinus_ = fs->make<TH2F>("xiMinusVsxiGenMinus","xiMinusVsxiGenMinus",100,0.,1.,100,0.,1.);
 
@@ -152,6 +164,7 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_missingMassFromXi_ = fs->make<TH1F>("missingMassFromXi","missingMassFromXi",200,-10.,400.);
   histos_.h_MxFromJets_ = fs->make<TH1F>("MxFromJets","MxFromJets",200,-10.,400.);
   histos_.h_RjjFromJets_ = fs->make<TH1F>("RjjFromJets","RjjFromJets",200,-0.1,1.5);
+  histos_.h_RjjFromPFCands_ = fs->make<TH1F>("RjjFromPFCands","RjjFromPFCands",200,-0.1,1.5);
   histos_.h_ResMassDijets_ = fs->make<TH1F>("ResMassDijets","ResMassDijets",100,-1.,1.);
 
   histos_.h_EnergyVsEta_ = fs->make<TH1F>("EnergyVsEta","EnergyVsEta",300,-15.,15.);
@@ -206,15 +219,20 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   dijetSystem += jet2.p4();
   histos_.h_massDijets_->Fill(dijetSystem.M());
 
-  math::XYZTLorentzVector allJets(0.,0.,0.,0.);
+  /*math::XYZTLorentzVector allJets(0.,0.,0.,0.);
   for(edm::View<reco::Jet>::const_iterator jet = jetCollectionH->begin();
                                            jet != jetCollectionH->end(); ++jet) allJets += jet->p4();
 
   histos_.h_MxFromJets_->Fill(allJets.M());
 
   double RjjFromJets = dijetSystem.M()/allJets.M();
-  histos_.h_RjjFromJets_->Fill(RjjFromJets);
+  histos_.h_RjjFromJets_->Fill(RjjFromJets);*/
      
+  double RjjFromJets = Rjj(*jetCollectionH,*jetCollectionH);
+  histos_.h_RjjFromJets_->Fill(RjjFromJets);
+  
+  histos_.h_RjjFromPFCands_->Fill(Rjj(*jetCollectionH,*particleFlowCollectionH));
+
   if(usePAT_){
     const pat::Jet* patJet1 = dynamic_cast<const pat::Jet*>(&jet1);
     const pat::Jet* patJet2 = dynamic_cast<const pat::Jet*>(&jet2);
@@ -286,12 +304,12 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   double xi_minus = *xiTowerMinus;*/
  
   std::pair<double,double> xiFromJets = xi(*jetCollectionH);
-  double xi_plus = xiFromJets.first;
-  double xi_minus = xiFromJets.second;
+  double xiFromJets_plus = xiFromJets.first;
+  double xiFromJets_minus = xiFromJets.second;
 
-  /*std::pair<double,double> xiFromPFCands = xi(*particleFlowCollectionH,useJetCorrection_);
+  std::pair<double,double> xiFromPFCands = xi(*particleFlowCollectionH,useJetCorrection_);
   double xi_plus = xiFromPFCands.first;
-  double xi_minus = xiFromPFCands.second;*/
+  double xi_minus = xiFromPFCands.second;
 
   histos_.h_trackMultiplicity_->Fill(nTracks);
   histos_.h_multiplicityHFPlus_->Fill(nHF_plus);
@@ -299,10 +317,14 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
 
   histos_.h_xiPlus_->Fill(xi_plus);
   histos_.h_xiMinus_->Fill(xi_minus);
+  histos_.h_xiPlusFromJets_->Fill(xiFromJets_plus);
+  histos_.h_xiMinusFromJets_->Fill(xiFromJets_minus);
   if((proton1 != genParticlesCollectionH->end())&&(proton2 != genParticlesCollectionH->end())){
     histos_.h_ResXiPlus_->Fill((xi_plus - xigen_plus)/xigen_plus);
     histos_.h_ResXiMinus_->Fill((xi_minus - xigen_minus)/xigen_minus);
-
+    histos_.h_ResXiPlusFromJets_->Fill((xiFromJets_plus - xigen_plus)/xigen_plus);
+    histos_.h_ResXiMinusFromJets_->Fill((xiFromJets_minus - xigen_minus)/xigen_minus);
+ 
     histos_.h_xiPlusVsxiGenPlus_->Fill(xigen_plus,xi_plus);
     histos_.h_xiMinusVsxiGenMinus_->Fill(xigen_minus,xi_minus);
   }
@@ -337,6 +359,19 @@ std::pair<double,double> ExclusiveDijetsEdmDumpAnalyzer::xi(Coll& partCollection
   xi_towers_minus /= 2*Ebeam_;
    
   return std::make_pair(xi_towers_plus,xi_towers_minus);
+}
+
+template <class JetColl,class PartColl>
+double ExclusiveDijetsEdmDumpAnalyzer::Rjj(JetColl& jetCollection,PartColl& partCollection){
+   math::XYZTLorentzVector dijetSystem(0.,0.,0.,0.);
+   dijetSystem += (jetCollection[0]).p4();
+   dijetSystem += (jetCollection[1]).p4(); 
+
+   math::XYZTLorentzVector allCands(0.,0.,0.,0.);
+   for(typename PartColl::const_iterator part = partCollection.begin();
+                                         part != partCollection.end(); ++part) allCands += part->p4();
+
+   return (dijetSystem.M()/allCands.M());
 }
 
 DEFINE_FWK_MODULE(ExclusiveDijetsEdmDumpAnalyzer);
