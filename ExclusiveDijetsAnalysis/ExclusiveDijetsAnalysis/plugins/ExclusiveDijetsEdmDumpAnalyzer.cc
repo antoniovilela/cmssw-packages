@@ -113,8 +113,8 @@ ExclusiveDijetsEdmDumpAnalyzer::ExclusiveDijetsEdmDumpAnalyzer(const edm::Parame
   nHFMinusMax_(pset.getParameter<unsigned int>("NHFMinusMax")),
   thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
   useJetCorrection_(pset.getParameter<bool>("UseJetCorrection")),
-  Ebeam_(5000.),
-  usePAT_(true)
+  Ebeam_(pset.getUntrackedParameter<double>("EBeam",5000.)),
+  usePAT_(pset.getUntrackedParameter<bool>("UsePAT",true))
 {
   if(useJetCorrection_) jetCorrectionService_ = pset.getParameter<std::string>("JetCorrectionService");
 }
@@ -285,13 +285,13 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   /*double xi_plus = *xiTowerPlus;
   double xi_minus = *xiTowerMinus;*/
  
-  /*std::pair<double,double> xiFromJets = xi(*jetCollectionH);
+  std::pair<double,double> xiFromJets = xi(*jetCollectionH);
   double xi_plus = xiFromJets.first;
-  double xi_minus = xiFromJets.second;*/
+  double xi_minus = xiFromJets.second;
 
-  std::pair<double,double> xiFromPFCands = xi(*particleFlowCollectionH,useJetCorrection_);
+  /*std::pair<double,double> xiFromPFCands = xi(*particleFlowCollectionH,useJetCorrection_);
   double xi_plus = xiFromPFCands.first;
-  double xi_minus = xiFromPFCands.second;
+  double xi_minus = xiFromPFCands.second;*/
 
   histos_.h_trackMultiplicity_->Fill(nTracks);
   histos_.h_multiplicityHFPlus_->Fill(nHF_plus);
