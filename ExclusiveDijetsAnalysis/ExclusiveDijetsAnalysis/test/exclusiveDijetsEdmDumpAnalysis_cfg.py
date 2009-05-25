@@ -17,11 +17,11 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_1.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_2.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_3.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_4.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v3/edmDump_exclusiveDijets_5.root"
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_1.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_2.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_3.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_4.root",
+       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_5.root"
     )
 )
 
@@ -31,18 +31,20 @@ from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cf
 process.filter0PU = pileUpNumberFilter.clone(NumberOfPileUpEvents = 0)
 
 process.analysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
-    JetTag = cms.InputTag("selectedLayer1Jets"),
+    JetTag = cms.InputTag("L2L3CorJetSC7PF"),
     ParticleFlowTag = cms.InputTag("particleFlow"),
     PtMinJet = cms.double(50.0),
     EtaMaxJet = cms.double(2.5),
     DeltaEtaMax = cms.double(1.4),
     DeltaPhiMax = cms.double(0.2),
     NTracksMax = cms.uint32(3),
-    NHFPlusMax = cms.uint32(0),
-    NHFMinusMax = cms.uint32(0),
+    NHFPlusMax = cms.uint32(1),
+    NHFMinusMax = cms.uint32(1),
     HFThresholdIndex = cms.uint32(12),
     UseJetCorrection = cms.bool(False),
-    #JetCorrectionService = cms.string("L2L3JetCorrectorSC5PF")
+    #JetCorrectionService = cms.string("L2L3JetCorrectorSC5PF"),
+    EBeam = cms.untracked.double(5000.),
+    UsePAT = cms.untracked.bool(False)
 )
 
 process.analysis0PU = process.analysis.clone()

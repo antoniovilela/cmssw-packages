@@ -109,16 +109,17 @@ void plotMinBiasL1(std::vector<std::string>& fileNames){
          bool trigAccept = (vars[iBit] == 1);
          if(!trigAccept) continue;
 
-         bool accept = true;
+         std::vector<int> accept(nThresholds,1);
          for(std::vector<std::string>::const_iterator itVar = varNames.begin(); itVar != varNames.end(); ++itVar){
             int iVar = mapNameToIndex[*itVar]; 
-            if(vars[iVar] > 0) accept = false;
             for(int iThreshold = 0; iThreshold < nThresholds; ++iThreshold){
-               if(vars[iVar] > iThreshold) continue;
-               histosEffVsThreshold[trigBit].second->Fill(iThreshold);
+               if(vars[iVar] > iThreshold) accept[iThreshold] = 0;
             }
          } 
-         if(accept) h_countAll->Fill(trigBit);
+         if(accept[0] == 1) h_countAll->Fill(trigBit);
+         for(int iThreshold = 0; iThreshold < nThresholds; ++iThreshold){
+            if(accept[iThreshold] == 1) histosEffVsThreshold[trigBit].second->Fill(iThreshold);
+         }
       }       
    }
    h_countAll->Scale(1./nEvents);

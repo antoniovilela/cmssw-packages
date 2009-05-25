@@ -83,7 +83,7 @@ void DijetsTriggerAnalyzer::beginJob(const edm::EventSetup& setup){
   ringNames_.push_back("Ring 2 HF-plus");
   ringNames_.push_back("Ring 2 HF-minus");
 
-  h_summaryL1_ = fs->make<TH1F>("summaryL1","summaryL1",l1TriggerNames_.size(),0,l1TriggerNames_.size());  
+  h_summaryL1_ = fs->make<TH1F>("summaryL1","summaryL1",l1TriggerNames_.size()+1,0,l1TriggerNames_.size()+1);  
   h_summaryL1_->GetXaxis()->SetBinLabel(1,"All");
   histosCountAll_.resize(l1TriggerNames_.size());
   histosRingSum_.resize(l1TriggerNames_.size());
