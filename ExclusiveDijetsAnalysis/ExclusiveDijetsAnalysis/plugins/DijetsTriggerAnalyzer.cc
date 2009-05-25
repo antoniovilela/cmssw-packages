@@ -160,10 +160,10 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
      edm::Handle<std::vector<L1GctJetCounts> > jetCountsH;
      event.getByLabel(gctDigisTag_, jetCountsH);
      jetCounts = &*jetCountsH;
-  } 
+  }
+  h_summaryL1_->Fill(0); 
   for(size_t k = 0; k < l1TriggerNames_.size(); ++k){
     histosCountAll_[k]->Fill(0);
-    h_summaryL1_->Fill(0);
     if(find(passedL1.begin(),passedL1.end(),l1TriggerNames_[k]) != passedL1.end()){ //Found trigger
        h_summaryL1_->Fill(k+1);
  
