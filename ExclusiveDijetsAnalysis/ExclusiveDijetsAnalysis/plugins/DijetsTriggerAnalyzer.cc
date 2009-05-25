@@ -33,7 +33,7 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 
     std::vector<std::string> ringNames_;
 
-    //TH1F* h_countAll_;
+    TH1F* h_summaryL1_;
     std::vector<TH1F*> histosCountAll_;
     std::vector<std::vector<TH1F*> > histosRingSum_;
 
@@ -77,15 +77,19 @@ void DijetsTriggerAnalyzer::beginJob(const edm::EventSetup& setup){
   h_countAll_->GetXaxis()->SetBinLabel(1,"All");
   h_countAll_->GetXaxis()->SetBinLabel(2,"L1Jets");
   h_countAll_->GetXaxis()->SetBinLabel(3,"L1HFRingEtSum");*/
-
+ 
   ringNames_.push_back("Ring 1 HF-plus");
   ringNames_.push_back("Ring 1 HF-minus");
   ringNames_.push_back("Ring 2 HF-plus");
   ringNames_.push_back("Ring 2 HF-minus");
-  
+
+  h_summaryL1_ = fs->make<TH1F>("summaryL1","summaryL1",l1TriggerNames_.size(),0,l1TriggerNames_.size());  
+  h_summaryL1_->GetXaxis()->SetBinLabel(1,"All");
   histosCountAll_.resize(l1TriggerNames_.size());
   histosRingSum_.resize(l1TriggerNames_.size());
   for(size_t k = 0; k < histosCountAll_.size(); ++k){
+     h_summaryL1_->GetXaxis()->SetBinLabel(k+2,l1TriggerNames_[k].c_str());
+   
      histosCountAll_[k] = fs->make<TH1F>((l1TriggerNames_[k] + "_count").c_str(),(l1TriggerNames_[k] + "_count").c_str(),3,0,3);
      histosCountAll_[k]->GetXaxis()->SetBinLabel(1,"All");
      histosCountAll_[k]->GetXaxis()->SetBinLabel(2,l1TriggerNames_[k].c_str());
@@ -159,7 +163,10 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
   } 
   for(size_t k = 0; k < l1TriggerNames_.size(); ++k){
     histosCountAll_[k]->Fill(0);
+    h_summaryL1_->Fill(0);
     if(find(passedL1.begin(),passedL1.end(),l1TriggerNames_[k]) != passedL1.end()){ //Found trigger
+       h_summaryL1_->Fill(k+1);
+ 
        histosCountAll_[k]->Fill(1);
 
        std::vector<TH1F*>& histos = histosRingSum_[k];
