@@ -15,22 +15,21 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
+from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.filesCEPGGM100_edmDump_cfi import filesPSet
+
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_1.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_2.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_3.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_4.root",
-       "rfio:/castor/cern.ch/user/a/antoniov/crab_output/crab_ExclusiveDijetsStageA156BxPU_M100_HLTDijetAve30_v6/edmDump_exclusiveDijets_5.root"
-    )
+    fileNames = filesPSet.fileNames
 )
 
 process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff")
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi import *
-process.filter0PU = pileUpNumberFilter.clone(NumberOfPileUpEvents = 0)
+filtersPU = []
+for i in range(5):
+    filtersPU.append('filter%dPU'%i)
+    setattr(process,'filter%dPU'%i,pileUpNumberFilter.clone(NumberOfPileUpEvents = i))
 
-process.analysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
+process.edmDumpAnalysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
     JetTag = cms.InputTag("L2L3CorJetSC7PF"),
     ParticleFlowTag = cms.InputTag("particleFlow"),
     PtMinJet = cms.double(50.0),
@@ -47,11 +46,18 @@ process.analysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
     UsePAT = cms.untracked.bool(False)
 )
 
-process.analysis0PU = process.analysis.clone()
+attributes = {}
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
+
+filters = filtersPU[:]
+
+makeAnalysis(process,'edmDumpAnalysis',attributes,filters)
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisDijets_histos_PU.root")
 )
 
+"""
 process.analysis_AvePU = cms.Path(process.analysis)
 process.analysis_0PU = cms.Path(process.filter0PU+process.analysis0PU)
+"""
