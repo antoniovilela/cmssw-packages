@@ -23,6 +23,12 @@ void plotMinBiasL1(std::vector<std::string>& fileNames){
    triggerBits.push_back("L1_SingleJet15");
    triggerBits.push_back("L1_SingleJet30");
    triggerBits.push_back("HLT_DiJetAve30");
+   triggerBits.push_back("L1_SingleEG2");
+   triggerBits.push_back("L1_SingleEG5");
+   triggerBits.push_back("L1_SingleEG8");
+   triggerBits.push_back("L1_SingleIsoEG5");
+   triggerBits.push_back("L1_SingleIsoEG8");
+   triggerBits.push_back("L1_DoubleEG1");
    triggerBits.push_back("L1_DoubleEG5");
    triggerBits.push_back("L1_DoubleMuOpen");
    triggerBits.push_back("L1_DoubleMu3");
