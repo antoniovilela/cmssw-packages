@@ -31,6 +31,7 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     double etaJetMax_;
     double deltaEtaMax_;
     double deltaPhiMax_;
+    double deltaPtMax_;
     unsigned int nTracksMax_;
     unsigned int nHFPlusMax_;
     unsigned int nHFMinusMax_;
@@ -51,6 +52,7 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
 
       TH1F* h_jetsDeltaEta_;
       TH1F* h_jetsDeltaPhi_;
+      TH1F* h_jetsDeltaPt_;
 
       TH1F* h_trackMultiplicity_;
       TH1F* h_multiplicityHFPlus_;
@@ -116,6 +118,7 @@ ExclusiveDijetsEdmDumpAnalyzer::ExclusiveDijetsEdmDumpAnalyzer(const edm::Parame
   etaJetMax_(pset.getParameter<double>("EtaMaxJet")),
   deltaEtaMax_(pset.getParameter<double>("DeltaEtaMax")),
   deltaPhiMax_(pset.getParameter<double>("DeltaPhiMax")),
+  deltaPtMax_(pset.getParameter<double>("DeltaPtMax")),
   nTracksMax_(pset.getParameter<unsigned int>("NTracksMax")),
   nHFPlusMax_(pset.getParameter<unsigned int>("NHFPlusMax")),
   nHFMinusMax_(pset.getParameter<unsigned int>("NHFMinusMax")),
@@ -142,6 +145,7 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
 
   histos_.h_jetsDeltaEta_ = fs->make<TH1F>("jetsDeltaEta","jetsDeltaEta",100,-5.,5.);
   histos_.h_jetsDeltaPhi_ = fs->make<TH1F>("jetsDeltaPhi","jetsDeltaPhi",100,0.,1.1*M_PI);
+  histos_.h_jetsDeltaPt_ = fs->make<TH1F>("jetsDeltaPt","jetsDeltaPt",100,0.,10.);
 
   histos_.h_trackMultiplicity_ = fs->make<TH1F>("trackMultiplicity","trackMultiplicity",20,0,20);
   histos_.h_multiplicityHFPlus_ = fs->make<TH1F>("multiplicityHFPlus","multiplicityHFPlus",20,0,20);
@@ -210,9 +214,11 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
 
   histos_.h_jetsDeltaEta_->Fill(jet1.eta() - jet2.eta());
   histos_.h_jetsDeltaPhi_->Fill(M_PI - fabs(jet1.phi() - jet2.phi()));
- 
+  histos_.h_jetsDeltaPt_->Fill(fabs(jet1.pt() - jet2.pt())); 
+
   if(fabs(jet1.eta() - jet2.eta()) > deltaEtaMax_) return;
   if((M_PI - fabs(jet1.phi() - jet2.phi())) > deltaPhiMax_) return;
+  if(fabs(jet1.pt() - jet2.pt()) > deltaPtMax_) return;
 
   math::XYZTLorentzVector dijetSystem(0.,0.,0.,0.);
   dijetSystem += jet1.p4();
@@ -227,11 +233,13 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
 
   double RjjFromJets = dijetSystem.M()/allJets.M();
   histos_.h_RjjFromJets_->Fill(RjjFromJets);*/
-     
+    
   double RjjFromJets = Rjj(*jetCollectionH,*jetCollectionH);
   histos_.h_RjjFromJets_->Fill(RjjFromJets);
   
-  histos_.h_RjjFromPFCands_->Fill(Rjj(*jetCollectionH,*particleFlowCollectionH));
+  edm::Handle<edm::View<reco::Jet> > jetCollectionNonCorrH;
+  event.getByLabel("sisCone7PFJets",jetCollectionNonCorrH);
+  histos_.h_RjjFromPFCands_->Fill(Rjj(*jetCollectionNonCorrH,*particleFlowCollectionH));
 
   if(usePAT_){
     const pat::Jet* patJet1 = dynamic_cast<const pat::Jet*>(&jet1);

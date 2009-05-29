@@ -50,4 +50,9 @@ void plot(){
    dirs.push_back(std::make_pair("N_{PU} = 4",file->GetDirectory("triggerAnalysis_filter4PU")));
 
    plot(variables,dirs,true);
+
+   std::vector<std::string> counts;
+   counts.push_back("L1_SingleJet30_count");
+
+   plot(counts,dirs,false);
 }

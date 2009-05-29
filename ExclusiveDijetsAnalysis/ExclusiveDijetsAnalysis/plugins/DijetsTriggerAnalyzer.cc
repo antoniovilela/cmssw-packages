@@ -6,8 +6,11 @@
 
 #include <vector>
 #include <string>
+#include <map>
+#include <cmath>
 
 class TH1F;
+class TH2F;
 
 class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 {
@@ -24,6 +27,26 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
     bool acceptHFRingEtSum(std::vector<TH1F*>&, const L1GctHFRingEtSumsCollection*);
     bool acceptHFRingEtSum(std::vector<TH1F*>&, const std::vector<L1GctJetCounts>*);
 
+    class Correlation{
+       public:
+          Correlation():sumEvt_(0.),sumX_(0.),sumX2_(0.),sumY_(0.),sumY2_(0.),sumXY_(0.) {}
+          void Fill(double x, double y) {++sumEvt_;sumX_ += x;sumX2_ += x*x;sumY_ += y;sumY2_ += y*y;sumXY_ += x*y;}
+          double Value() {
+             double covxy = sumXY_/sumEvt_ - (sumX_/sumEvt_)*(sumY_/sumEvt_);
+             double sigx = sqrt(fabs(sumX2_/sumEvt_ - (sumX_/sumEvt_)*(sumX_/sumEvt_)));
+             double sigy = sqrt(fabs(sumY2_/sumEvt_ - (sumY_/sumEvt_)*(sumY_/sumEvt_)));
+             
+             return ((sigx == 0.)||(sigy == 0.))?0.:covxy/(sigx*sigy);
+          }
+       private:
+          double sumEvt_;
+          double sumX_;
+          double sumX2_;
+          double sumY_;
+          double sumY2_;
+          double sumXY_;
+    };
+
     edm::InputTag gtDigisTag_;
     edm::InputTag gctDigisTag_;
     edm::InputTag l1GtObjectMapTag_; 
@@ -38,6 +61,10 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
     std::vector<std::vector<TH1F*> > histosRingSum_;
 
     std::vector<std::string> l1TriggerNames_;
+
+    TH2F* h_correlations_;
+    std::map<std::pair<int,int>,Correlation> correlations_;
+
 };
 
 
@@ -57,6 +84,7 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 #include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 
 #include "TH1F.h"
+#include "TH2F.h"
 
 //typedef std::vector<L1GctHFRingEtSums> L1GctHFRingEtSumsCollection;
 
@@ -101,6 +129,16 @@ void DijetsTriggerAnalyzer::beginJob(const edm::EventSetup& setup){
         histosRingSum_[k][ihisto] = fs->make<TH1F>(hname.c_str(),hname.c_str(),8,0,8);
      }
   }
+
+  size_t nTriggers = l1TriggerNames_.size();
+  h_correlations_ = fs->make<TH2F>("correlations","correlations",nTriggers,0,nTriggers,nTriggers,0,nTriggers);
+  for(size_t i = 0; i < nTriggers; ++i){
+     for(size_t j = 0; j < nTriggers; ++j){
+        h_correlations_->GetXaxis()->SetBinLabel(i+1,l1TriggerNames_[i].c_str());
+        h_correlations_->GetXaxis()->SetBinLabel(j+1,l1TriggerNames_[j].c_str());
+        correlations_.insert(std::make_pair(std::make_pair(i,j),Correlation()));
+     }
+  }
 }
 
 void DijetsTriggerAnalyzer::endJob(){
@@ -113,6 +151,13 @@ void DijetsTriggerAnalyzer::endJob(){
                       << "Efficiency L1 HF Rings ET sum = " << ((nall)?(nHFRingETSum/nall):-1)
                                                             << " relative = " << ((ntrig)?(nHFRingETSum/ntrig):-1);
    }
+
+   for(size_t i = 0; i < l1TriggerNames_.size(); ++i){
+      for(size_t j = 0; j < l1TriggerNames_.size(); ++j){
+         std::pair<int,int> index(i,j);
+         h_correlations_->SetBinContent(i+1,j+1,correlations_[index].Value());
+      }
+   }
 }
 
 void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup){
@@ -123,8 +168,6 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
 
   edm::Handle<L1GlobalTriggerObjectMapRecord> l1GTObjMapRcdH;
   event.getByLabel(l1GtObjectMapTag_,l1GTObjMapRcdH);
-   TString Tname;
-   // int Tbits[20];
   if(!l1GTReadoutRcdH.isValid() || !l1GTObjMapRcdH.isValid()) return;  
 
   DecisionWord gtDecisionWord = l1GTReadoutRcdH->decisionWord();
@@ -144,11 +187,25 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
   for(std::vector<std::string>::const_iterator itPassedL1 = passedL1.begin(); itPassedL1 != passedL1.end(); ++itPassedL1)
              LogTrace("") << "Passed L1 trigger " << *itPassedL1;
 
+  
   // Check if event satisfied pre-defined triggers
   //bool acceptL1Jets = false;
   /*for(std::vector<std::string>::const_iterator itTrigL1 = l1TriggerNames_.begin();
                                                itTrigL1 != l1TriggerNames_.end(); ++itTrigL1,++itrig){
     if(find(passedL1.begin(),passedL1.end(),*itTrigL1) != passedL1.end()) {acceptL1Jets = true;break;}*/
+
+  for(size_t i = 0; i < l1TriggerNames_.size(); ++i){
+     for(size_t j = 0; j < l1TriggerNames_.size(); ++j){
+        std::pair<int,int> index(i,j);
+        Correlation& corr = correlations_[index];
+        double x = 0.;
+        double y = 0.; 
+        if(find(passedL1.begin(),passedL1.end(),l1TriggerNames_[i]) != passedL1.end()) x = 1.;
+        if(find(passedL1.begin(),passedL1.end(),l1TriggerNames_[j]) != passedL1.end()) y = 1.; 
+             
+        corr.Fill(x,y); 
+     }
+  }
 
   const L1GctHFRingEtSumsCollection* ringSumCollection = 0;
   const std::vector<L1GctJetCounts>* jetCounts = 0;
