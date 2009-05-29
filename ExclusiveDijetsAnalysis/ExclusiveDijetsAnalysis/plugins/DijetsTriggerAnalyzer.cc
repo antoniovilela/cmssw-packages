@@ -135,7 +135,7 @@ void DijetsTriggerAnalyzer::beginJob(const edm::EventSetup& setup){
   for(size_t i = 0; i < nTriggers; ++i){
      for(size_t j = 0; j < nTriggers; ++j){
         h_correlations_->GetXaxis()->SetBinLabel(i+1,l1TriggerNames_[i].c_str());
-        h_correlations_->GetXaxis()->SetBinLabel(j+1,l1TriggerNames_[j].c_str());
+        h_correlations_->GetYaxis()->SetBinLabel(j+1,l1TriggerNames_[j].c_str());
         correlations_.insert(std::make_pair(std::make_pair(i,j),Correlation()));
      }
   }
