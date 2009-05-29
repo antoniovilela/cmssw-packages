@@ -16,23 +16,36 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/tmp/antoniov/edmDump_exclusiveDijets.root')
+    fileNames = cms.untracked.vstring('')
 )
 
-process.analysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
+process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff")
+
+process.edmDumpAnalysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
     JetTag = cms.InputTag("L2L3CorJetSC7PF"),
+    ParticleFlowTag = cms.InputTag("particleFlow"),
     PtMinJet = cms.double(50.0),
     EtaMaxJet = cms.double(2.5),
-    DeltaEtaMax = cms.double(1.4),
-    DeltaPhiMax = cms.double(0.2),
+    DeltaEtaMax = cms.double(2.0),
+    DeltaPhiMax = cms.double(0.4),
+    DeltaPtMax = cms.double(999.),
     NTracksMax = cms.uint32(3),
-    NHFPlusMax = cms.uint32(0),
-    NHFMinusMax = cms.uint32(0),
-    HFThresholdIndex = cms.uint32(10)
+    NHFPlusMax = cms.uint32(1),
+    NHFMinusMax = cms.uint32(1),
+    HFThresholdIndex = cms.uint32(12),
+    UseJetCorrection = cms.bool(False),
+    #JetCorrectionService = cms.string("L2L3JetCorrectorSC5PF"),
+    EBeam = cms.untracked.double(5000.),
+    UsePAT = cms.untracked.bool(False)
 )
+
+attributes = {}
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
+
+filters = []
+
+makeAnalysis(process,'edmDumpAnalysis',attributes,filters)
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("analysisDijets_histos.root")
+                                   fileName = cms.string("analysisDijets_histos_noPU.root")
 )
-
-process.analysis_AvePU = cms.Path(process.analysis)
