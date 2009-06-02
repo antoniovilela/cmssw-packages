@@ -23,29 +23,13 @@ process.source = cms.Source("PoolSource",
 
 process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff")
 
+process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.edmDumpAnalysis_cfi")
+
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi import *
 filtersPU = []
 for i in range(5):
     filtersPU.append('filter%dPU'%i)
     setattr(process,'filter%dPU'%i,pileUpNumberFilter.clone(NumberOfPileUpEvents = i))
-
-process.edmDumpAnalysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
-    JetTag = cms.InputTag("L2L3CorJetSC7PF"),
-    ParticleFlowTag = cms.InputTag("particleFlow"),
-    PtMinJet = cms.double(50.0),
-    EtaMaxJet = cms.double(2.5),
-    DeltaEtaMax = cms.double(2.0),
-    DeltaPhiMax = cms.double(0.4),
-    DeltaPtMax = cms.double(999.),
-    NTracksMax = cms.uint32(3),
-    NHFPlusMax = cms.uint32(1),
-    NHFMinusMax = cms.uint32(1),
-    HFThresholdIndex = cms.uint32(12),
-    UseJetCorrection = cms.bool(False),
-    #JetCorrectionService = cms.string("L2L3JetCorrectorSC5PF"),
-    EBeam = cms.untracked.double(5000.),
-    UsePAT = cms.untracked.bool(False)
-)
 
 attributes = [{'NHFPlusMax':0,'NHFMinusMax':0},
               {'NHFPlusMax':1,'NHFMinusMax':1},
@@ -60,8 +44,3 @@ makeAnalysis(process,'edmDumpAnalysis',attributes,filters)
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisDijets_histos_PU.root")
 )
-
-"""
-process.analysis_AvePU = cms.Path(process.analysis)
-process.analysis_0PU = cms.Path(process.filter0PU+process.analysis0PU)
-"""
