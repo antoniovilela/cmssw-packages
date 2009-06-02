@@ -25,7 +25,11 @@ process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.edmDumpAnalysis_cf
 
 attributes = [{'NHFPlusMax':0,'NHFMinusMax':0},
               {'NHFPlusMax':1,'NHFMinusMax':1},
-              {'NHFPlusMax':2,'NHFMinusMax':2}]
+              {'NHFPlusMax':2,'NHFMinusMax':2},
+              {'HFThresholdIndex':10},
+              {'HFThresholdIndex':12},
+              {'HFThresholdIndex':14},
+              {'HFThresholdIndex':16}]
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
 
