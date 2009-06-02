@@ -1,3 +1,5 @@
+#include "plotTools.h"
+
 #include <TFile.h>
 #include <TCanvas.h>
 #include <TLegend.h>
@@ -11,14 +13,16 @@
 #include <vector>
 #include <map>
 
-TH1F* getHisto(TFile*, const string&);
+/*TH1F* getHisto(TFile*, const string&);
 TH1F* getHisto(TDirectory*, const string&);
 void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int rebin = 1);
 std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<std::string>& varNames,const std::vector<std::string>& triggerBits);
 
-void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm = false);
-void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, bool Norm = false);
+template<typename KeyType,typename ValueType>
+std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values);
 
+void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm = false);
+void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, bool Norm = false);*/
 
 void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm){
    std::map<std::string,TCanvas*> canvasesVar;
@@ -97,6 +101,17 @@ std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<st
 
    return varMap;
 }
+
+/*template<typename KeyType,typename ValueType>
+std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values){
+   std::map<KeyType,ValueType> res;
+   typename std::vector<KeyType>::const_iterator key = keys.begin();
+   typename std::vector<ValueType>::const_iterator value = values.begin(); 
+   for(; key != keys.end() && value != values.end(); ++key,++value) res[*key] = *value;
+
+   return res;
+}*/
+
 
 TH1F* getHisto(TFile* file, const string& refVar){
    TH1F* hist = static_cast<TH1F*>(file->Get(refVar.c_str()));

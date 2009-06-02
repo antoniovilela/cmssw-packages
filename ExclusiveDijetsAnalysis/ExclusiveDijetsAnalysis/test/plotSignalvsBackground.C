@@ -5,19 +5,31 @@
 #include "TStyle.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "THStack.h"
 #include "TTree.h"
+
+#include "plotTools.h"
 
 #include <iostream>
 #include <vector>
 #include <map>
 
-TH1F* getHisto(TFile*, const string&);
+/*TH1F* getHisto(TFile*, const string&);
 TH1F* getHisto(TDirectory*, const string&);
-void scaleHisto(TH1F* histo, double scale, int line, int color, char* title);
+void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int rebin = 1);*/
+
+template<typename KeyType,typename ValueType>
+std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values);
+
+struct Result{
+   double eff_HLT_;
+   double nEvents_;
+   double scale_;
+};
 
 void plot(){
 
-   TFile* file_signal = TFile::Open("root/analysisDijets_CEPDijets_M100_histos_PU_nHFMax_1.root");
+   /*TFile* file_signal = TFile::Open("root/analysisDijets_CEPDijets_M100_histos_PU_nHFMax_1.root");
    double sigma_signal = 450.; //pb
    std::cout << " Cross-section (signal): " << sigma_signal << std::endl;
 
@@ -33,29 +45,45 @@ void plot(){
    double nEvents_signal = h_leadingJetPt_signal->GetEntries();
    double scale_signal = sigma_signal*eff_HLT_signal/nEvents_signal;
 
-   std::cout << " N events after L1+HLT (signal): " << nEvents_signal << std::endl;
+   std::cout << " N events after L1+HLT (signal): " << nEvents_signal << std::endl;*/
 
-   std::vector<std::string> backgrounds;
-   backgrounds.push_back("DPEDijets");
-   backgrounds.push_back("SDDijets");
+   std::vector<std::string> samples;
+   samples.push_back("signal");
+   //samples.push_back("DPEDijets");
+   //samples.push_back("SDDijets");
+   samples.push_back("QCD100to250-madgraph");
 
-   std::map<std::string,TFile*> files_back;
-   files_back["DPEDijets"] = TFile::Open("root/analysisDijets_DPEDijets_Pt40_histos_PU_nHFMax_1.root");
-   files_back["SDDijets"] = TFile::Open("root/analysisDijets_SDDijets_Pt30_histos_noPU_nHFMax_1.root");
+   std::vector<TFile*> files;
+   files.push_back(TFile::Open("root/analysisDijets_CEPDijets_M100_histos.root"));
+   //files.push_back(TFile::Open("root/analysisDijets_DPEDijets_Pt40_histos_PU_nHFMax_1.root"));
+   //files.push_back(TFile::Open("root/analysisDijets_SDDijets_Pt30_histos_noPU_nHFMax_1.root"));
+   files.push_back(TFile::Open("root/analysisDijets_QCD100to250-madgraph_histos.root"));
+   std::vector<TDirectory*> directories;
+   for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file){
+      directories.push_back((*file)->GetDirectory("edmDumpAnalysis_NHFPlusMax_0_NHFMinusMax_0"));
+   }
 
-   std::map<std::string,double> sigma_back;
-   sigma_back["DPEDijets"] = 4600.;
-   sigma_back["SDDijets"] = 0.12*1.2*300000.;
+   std::vector<double> sigmas;
+   sigmas.push_back(450.);
+   //sigmas.push_back(4600.);
+   //sigmas.push_back(0.12*1.2*300000.);
+   sigmas.push_back(0.12*1.2*15000000.);
+
+   std::vector<TFile*> filesEff;
+   filesEff.push_back(TFile::Open("root/analysis_histos_CPEDijets.root"));
+   //filesEff.push_back(TFile::Open("root/analysis_histos_DPEDijets.root"));
+   //filesEff.push_back(TFile::Open("root/analysis_histos_SDDijets.root"));
+   filesEff.push_back(TFile::Open("root/analysis_histos_QCD100-madgraph.root"));
+
+   std::map<std::string,TDirectory*> dirMap = makeMap(samples,directories);
+   std::map<std::string,double> sigmaMap = makeMap(samples,sigmas);
+   std::map<std::string,TFile*> fileEffMap = makeMap(samples,filesEff);
  
-   for(std::map<std::string,double>::const_iterator it = sigma_back.begin(); it != sigma_back.end(); ++it)
+   for(std::map<std::string,double>::const_iterator it = sigmaMap.begin(); it != sigmaMap.end(); ++it)
                std::cout << " Cross-section " << it->first << ": " << it->second << std::endl;
 
-   std::map<std::string,TFile*> files_eff_back;
-   files_eff_back["DPEDijets"] = TFile::Open("root/analysis_histos_DPEDijets.root");
-   files_eff_back["SDDijets"] = TFile::Open("root/analysis_histos_SDDijets.root");
-   
-   std::map<std::string,double> scale_back;
-   for(std::map<std::string,TFile*>::const_iterator it = files_eff_back.begin(); it != files_eff_back.end(); ++it){
+   std::map<std::string,double> scaleMap;
+   for(std::map<std::string,TFile*>::const_iterator it = fileEffMap.begin(); it != fileEffMap.end(); ++it){
       const TTree* data_before_back = static_cast<const TTree*>(it->second->Get("analysisBeforeSelection/data"));
       const TTree* data_after_back = static_cast<const TTree*>(it->second->Get("analysisAfterSelection/data"));
 
@@ -63,12 +91,12 @@ void plot(){
 
       std::cout << " Efficiency for HLT selection " << it->first << ": " << eff_HLT << std::endl;
 
-      const TH1F* h_leadingJetPt_back = static_cast<const TH1F*>(files_back[it->first]->Get("edmDumpAnalysis/leadingJetPt"));
+      const TH1F* h_leadingJetPt_back = static_cast<const TH1F*>(dirMap[it->first]->Get("leadingJetPt"));
 
       double nEvents = h_leadingJetPt_back->GetEntries();
-      double scale = sigma_back[it->first]*eff_HLT/nEvents;
-      //double scale_back = 1./nEvents_back;
-      scale_back[it->first] = scale;
+      double scale = sigmaMap[it->first]*eff_HLT/nEvents;
+      //double scaleMap = 1./nEvents_back;
+      scaleMap[it->first] = scale;
 
       std::cout << " N events after L1+HLT " << it->first << ": " << nEvents << std::endl;
    }
@@ -95,50 +123,69 @@ void plot(){
    refVar.push_back("xiMinusAfterSel");
    refVar.push_back("RjjAfterSel");
 
-   std::vector<TCanvas*> canvasesVar(refVar.size());
-   for(size_t k = 0; k < canvasesVar.size(); ++k) canvasesVar[k] = new TCanvas(refVar[k].c_str(),refVar[k].c_str());
+   std::vector<std::string> stackVars;
+   stackVars.push_back("RjjAfterSel");
 
-   std::vector<TH1F*> histos_signal(refVar.size());
-   std::map<std::string,std::vector<TH1F*> > histos_back;
-   std::vector<TH1F*> defvector(refVar.size());
-   for(size_t k = 0; k < refVar.size(); ++k){
-      histos_signal[k] = getHisto(file_signal->GetDirectory("edmDumpAnalysis"),refVar[k]);
-      scaleHisto(histos_signal[k],scale_signal,1,kBlack,"a.u.");
+   std::map<std::string,TCanvas*> canvasesVar;
+   //for(size_t k = 0; k < canvasesVar.size(); ++k) canvasesVar[k] = new TCanvas(refVar[k].c_str(),refVar[k].c_str());
+   for(std::vector<std::string>::const_iterator var = refVar.begin(); var != refVar.end(); ++var)
+      canvasesVar[*var] = new TCanvas(var->c_str(),var->c_str());
 
-      canvasesVar[k]->cd();
-      histos_signal[k]->Draw();
-      for(std::map<std::string,TFile*>::const_iterator it = files_back.begin(); it != files_back.end(); ++it){
-         if(histos_back.find(it->first) == histos_back.end()) histos_back[it->first] = defvector;
-         histos_back[it->first][k] = getHisto(it->second->GetDirectory("edmDumpAnalysis"),refVar[k]); 
-         scaleHisto(histos_back[it->first][k],scale_back[it->first],2,kRed,"a.u."); 
-         histos_back[it->first][k]->Draw("same");
+   std::map<std::string,TCanvas*> canvasesStack;
+   //for(size_t k = 0; k < canvasesStack.size(); ++k) canvasesStack[k] = new TCanvas(("c_stack_" + stackVars[k]).c_str(),stackVars[k].c_str());
+   for(std::vector<std::string>::const_iterator var = stackVars.begin(); var != stackVars.end(); ++var)   
+      canvasesStack[*var] = new TCanvas(("c_stack_" + *var).c_str(),var->c_str());
+
+   std::map<std::string,TH1F*> histos_signal;
+   std::map<std::string,std::map<std::string,TH1F*> > histos_back;
+   std::map<std::string,TH1F*> defmap;
+   int colors[5] = {kRed,kBlue,kOrange,kMagenta,kYellow};
+   //for(size_t k = 0; k < refVar.size(); ++k){
+   for(std::vector<std::string>::const_iterator var = refVar.begin(); var != refVar.end(); ++var){
+      const std::string& varName = *var; 
+      histos_signal[varName] = getHisto(dirMap["signal"],varName);
+      scaleHisto(histos_signal[varName],scaleMap["signal"],1,kBlack,16);
+ 
+      canvasesVar[varName]->cd();
+      histos_signal[varName]->Draw();
+      int index = 0;
+      for(std::map<std::string,TDirectory*>::const_iterator it = dirMap.begin(); it != dirMap.end(); ++it,++index){
+         if(it->first == "signal") continue;
+         if(histos_back.find(it->first) == histos_back.end()) histos_back[it->first] = defmap;
+         histos_back[it->first][varName] = getHisto(it->second,varName); 
+         scaleHisto(histos_back[it->first][varName],scaleMap[it->first],1,colors[index],16); 
+         histos_back[it->first][varName]->Draw("same");
       }
-   }  
+   }
+
+   std::map<std::string,THStack*> stacks;
+   //for(size_t k = 0; k < stackVars.size(); ++k){  
+   for(std::vector<std::string>::const_iterator var = stackVars.begin(); var != stackVars.end(); ++var){
+      const std::string& varName = *var;
+      TH1F* histo_signal = histos_signal[varName];
+
+      stacks[varName] = new THStack(("stack_" + varName).c_str(),varName.c_str());
+      //stacks[varName]->Add(histo_signal);
+      
+      for(std::map<std::string,std::map<std::string,TH1F*> >::iterator it = histos_back.begin();
+                                                                       it != histos_back.end(); ++it){
+         std::map<std::string,TH1F*>& histoMap = it->second;
+         stacks[varName]->Add(histoMap[varName]);
+      }
+
+      stacks[varName]->Add(histo_signal);
+
+      canvasesStack[varName]->cd();
+      stacks[varName]->Draw();
+   }
 }
 
-TH1F* getHisto(TFile* file, const string& refVar){
-   TH1F* hist = static_cast<TH1F*>(file->Get(refVar.c_str()));
+template<typename KeyType,typename ValueType>
+std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values){
+   std::map<KeyType,ValueType> res;
+   typename std::vector<KeyType>::const_iterator key = keys.begin();
+   typename std::vector<ValueType>::const_iterator value = values.begin(); 
+   for(; key != keys.end() && value != values.end(); ++key,++value) res[*key] = *value;
 
-   if(!hist) std::cout << ">>>> Error: histogram " << refVar.c_str() << " not found." << std::endl; 
-
-   return hist;
-} 
-
-TH1F* getHisto(TDirectory* dir, const string& refVar){
-   TH1F* hist = static_cast<TH1F*>(dir->Get(refVar.c_str()));
-
-   if(!hist) std::cout << ">>>> Error: histogram " << refVar.c_str() << " not found." << std::endl;
-
-   return hist;
-}
-
-void scaleHisto(TH1F* histo, double scale, int line, int color,char* title){
-
-  histo->Scale(scale);
-
-  histo->SetLineWidth(2);
-  histo->SetLineStyle(line);
-  histo->SetLineColor(color);
-
-  histo->GetYaxis()->SetTitle(title);
+   return res;
 }
