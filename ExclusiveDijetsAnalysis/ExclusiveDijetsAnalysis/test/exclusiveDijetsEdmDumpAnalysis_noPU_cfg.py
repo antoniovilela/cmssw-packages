@@ -4,7 +4,7 @@ process = cms.Process("EdmDumpAnalysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.debugModules = cms.untracked.vstring('analysis')
-process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.cerr.threshold = 'WARNING'
 process.MessageLogger.categories.append('Analysis')
 process.MessageLogger.cerr.DEBUG = cms.untracked.PSet(
     default = cms.untracked.PSet( limit = cms.untracked.int32(0)),

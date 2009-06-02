@@ -9,24 +9,19 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 TH1F* getHisto(TFile*, const string&);
 TH1F* getHisto(TDirectory*, const string&);
 void scaleHisto(TH1F* histo, double scale, int line, int color, char* title);
 
 void plot(){
-   TFile* file_signal = TFile::Open("root/analysisDijets_CEPDijets_M100_histos_PU_nHFMax_1.root");
-   TFile* file_back = TFile::Open("root/analysisDijets_DPEDijets_Pt40_histos_PU_nHFMax_1.root");
 
+   TFile* file_signal = TFile::Open("root/analysisDijets_CEPDijets_M100_histos_PU_nHFMax_1.root");
    double sigma_signal = 450.; //pb
-   double sigma_back = 4600.;
- 
    std::cout << " Cross-section (signal): " << sigma_signal << std::endl;
-   std::cout << " Cross-section (background): " << sigma_back << std::endl;
 
    TFile* file_eff_signal = TFile::Open("root/analysis_histos_CPEDijets.root");
-   TFile* file_eff_back = TFile::Open("root/analysis_histos_DPEDijets.root");
-   
    const TTree* data_before_signal = static_cast<const TTree*>(file_eff_signal->Get("analysisBeforeSelection/data"));
    const TTree* data_after_signal = static_cast<const TTree*>(file_eff_signal->Get("analysisAfterSelection/data"));
 
@@ -34,27 +29,50 @@ void plot(){
 
    std::cout << " Efficiency for HLT selection (signal): " << eff_HLT_signal << std::endl;
 
-   const TTree* data_before_back = static_cast<const TTree*>(file_eff_back->Get("analysisBeforeSelection/data"));
-   const TTree* data_after_back = static_cast<const TTree*>(file_eff_back->Get("analysisAfterSelection/data"));
-
-   double eff_HLT_back = (double)data_after_back->GetEntries()/(double)data_before_back->GetEntries();
-
-   std::cout << " Efficiency for HLT selection (background): " << eff_HLT_back << std::endl;
-
    const TH1F* h_leadingJetPt_signal = static_cast<const TH1F*>(file_signal->Get("edmDumpAnalysis/leadingJetPt"));
-   const TH1F* h_leadingJetPt_back = static_cast<const TH1F*>(file_back->Get("analysis/leadingJetPt"));
-
    double nEvents_signal = h_leadingJetPt_signal->GetEntries();
    double scale_signal = sigma_signal*eff_HLT_signal/nEvents_signal;
-   //double scale_signal = 1./nEvents_signal;
-
-   double nEvents_back = h_leadingJetPt_back->GetEntries();
-   double scale_back = sigma_back*eff_HLT_back/nEvents_back;
-   //double scale_back = 1./nEvents_back;
 
    std::cout << " N events after L1+HLT (signal): " << nEvents_signal << std::endl;
-   std::cout << " N events after L1+HLT (background): " << nEvents_back << std::endl;
+
+   std::vector<std::string> backgrounds;
+   backgrounds.push_back("DPEDijets");
+   backgrounds.push_back("SDDijets");
+
+   std::map<std::string,TFile*> files_back;
+   files_back["DPEDijets"] = TFile::Open("root/analysisDijets_DPEDijets_Pt40_histos_PU_nHFMax_1.root");
+   files_back["SDDijets"] = TFile::Open("root/analysisDijets_SDDijets_Pt30_histos_noPU_nHFMax_1.root");
+
+   std::map<std::string,double> sigma_back;
+   sigma_back["DPEDijets"] = 4600.;
+   sigma_back["SDDijets"] = 0.12*1.2*300000.;
+ 
+   for(std::map<std::string,double>::const_iterator it = sigma_back.begin(); it != sigma_back.end(); ++it)
+               std::cout << " Cross-section " << it->first << ": " << it->second << std::endl;
+
+   std::map<std::string,TFile*> files_eff_back;
+   files_eff_back["DPEDijets"] = TFile::Open("root/analysis_histos_DPEDijets.root");
+   files_eff_back["SDDijets"] = TFile::Open("root/analysis_histos_SDDijets.root");
    
+   std::map<std::string,double> scale_back;
+   for(std::map<std::string,TFile*>::const_iterator it = files_eff_back.begin(); it != files_eff_back.end(); ++it){
+      const TTree* data_before_back = static_cast<const TTree*>(it->second->Get("analysisBeforeSelection/data"));
+      const TTree* data_after_back = static_cast<const TTree*>(it->second->Get("analysisAfterSelection/data"));
+
+      double eff_HLT = (double)data_after_back->GetEntries()/(double)data_before_back->GetEntries();
+
+      std::cout << " Efficiency for HLT selection " << it->first << ": " << eff_HLT << std::endl;
+
+      const TH1F* h_leadingJetPt_back = static_cast<const TH1F*>(files_back[it->first]->Get("edmDumpAnalysis/leadingJetPt"));
+
+      double nEvents = h_leadingJetPt_back->GetEntries();
+      double scale = sigma_back[it->first]*eff_HLT/nEvents;
+      //double scale_back = 1./nEvents_back;
+      scale_back[it->first] = scale;
+
+      std::cout << " N events after L1+HLT " << it->first << ": " << nEvents << std::endl;
+   }
+
    std::vector<string> refVar;
    refVar.push_back("leadingJetPt");
    refVar.push_back("leadingJetEta");
@@ -81,21 +99,20 @@ void plot(){
    for(size_t k = 0; k < canvasesVar.size(); ++k) canvasesVar[k] = new TCanvas(refVar[k].c_str(),refVar[k].c_str());
 
    std::vector<TH1F*> histos_signal(refVar.size());
-   std::vector<TH1F*> histos_back(refVar.size());
+   std::map<std::string,std::vector<TH1F*> > histos_back;
+   std::vector<TH1F*> defvector(refVar.size());
    for(size_t k = 0; k < refVar.size(); ++k){
       histos_signal[k] = getHisto(file_signal->GetDirectory("edmDumpAnalysis"),refVar[k]);
-      histos_back[k] = getHisto(file_back->GetDirectory("analysis"),refVar[k]); 
-
       scaleHisto(histos_signal[k],scale_signal,1,kBlack,"a.u.");
-      scaleHisto(histos_back[k],scale_back,2,kRed,"a.u."); 
 
       canvasesVar[k]->cd();
       histos_signal[k]->Draw();
-      histos_back[k]->Draw("same");
-      //histos_signal[k]->Rebin(4);
-      //histos_back[k]->Rebin(8);
-      //histos_signal[k]->DrawNormalized();
-      //histos_back[k]->DrawNormalized("same");
+      for(std::map<std::string,TFile*>::const_iterator it = files_back.begin(); it != files_back.end(); ++it){
+         if(histos_back.find(it->first) == histos_back.end()) histos_back[it->first] = defvector;
+         histos_back[it->first][k] = getHisto(it->second->GetDirectory("edmDumpAnalysis"),refVar[k]); 
+         scaleHisto(histos_back[it->first][k],scale_back[it->first],2,kRed,"a.u."); 
+         histos_back[it->first][k]->Draw("same");
+      }
    }  
 }
 

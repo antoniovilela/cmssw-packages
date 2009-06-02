@@ -47,7 +47,10 @@ process.edmDumpAnalysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
     UsePAT = cms.untracked.bool(False)
 )
 
-attributes = {}
+attributes = [{'NHFPlusMax':0,'NHFMinusMax':0},
+              {'NHFPlusMax':1,'NHFMinusMax':1},
+              {'NHFPlusMax':2,'NHFMinusMax':2}]
+
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
 
 filters = filtersPU[:]
