@@ -83,6 +83,7 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_xiPlusAfterSel_;
       TH1F* h_xiMinusAfterSel_;
       TH1F* h_RjjAfterSel_;
+      TH1F* h_RjjFromPFAfterSel_;
     } histos_;
 
     std::string jetCorrectionService_;
@@ -176,7 +177,7 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_xiPlusAfterSel_ = fs->make<TH1F>("xiPlusAfterSel","xiPlusAfterSel",200,0.,1.);
   histos_.h_xiMinusAfterSel_ = fs->make<TH1F>("xiMinusAfterSel","xiMinusAfterSel",200,0.,1.);
   histos_.h_RjjAfterSel_ = fs->make<TH1F>("RjjAfterSel","RjjAfterSel",200,-0.1,1.5);
-
+  histos_.h_RjjFromPFAfterSel_ = fs->make<TH1F>("RjjFromPFAfterSel","RjjFromPFAfterSel",200,-0.1,1.5);
 }
 
 void ExclusiveDijetsEdmDumpAnalyzer::beginRun(const edm::Run& run, const edm::EventSetup& setup){
@@ -239,7 +240,8 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   
   edm::Handle<edm::View<reco::Jet> > jetCollectionNonCorrH;
   event.getByLabel("sisCone7PFJets",jetCollectionNonCorrH);
-  histos_.h_RjjFromPFCands_->Fill(Rjj(*jetCollectionNonCorrH,*particleFlowCollectionH));
+  double RjjFromPFCands = Rjj(*jetCollectionNonCorrH,*particleFlowCollectionH);
+  histos_.h_RjjFromPFCands_->Fill(RjjFromPFCands);
 
   if(usePAT_){
     const pat::Jet* patJet1 = dynamic_cast<const pat::Jet*>(&jet1);
@@ -348,7 +350,7 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   histos_.h_xiPlusAfterSel_->Fill(xi_plus);
   histos_.h_xiMinusAfterSel_->Fill(xi_minus);
   histos_.h_RjjAfterSel_->Fill(RjjFromJets);
-
+  histos_.h_RjjFromPFAfterSel_->Fill(RjjFromPFCands);
 }
 
 template <class Coll>
@@ -356,7 +358,7 @@ std::pair<double,double> ExclusiveDijetsEdmDumpAnalyzer::xi(Coll& partCollection
 
   double xi_towers_plus = 0.;
   double xi_towers_minus = 0.;
-  double pt_min = 10.;   
+  double pt_min = 5.;   
   for(typename Coll::const_iterator part = partCollection.begin(); part != partCollection.end(); ++part){
     double correction = (useJetCorr&&corrector_&&(part->pt() >= pt_min))?(corrector_->correction(part->p4())):1.;
     xi_towers_plus += correction*part->et()*exp(part->eta());

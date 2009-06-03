@@ -23,9 +23,14 @@ process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff
 
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.edmDumpAnalysis_cfi")
 
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
+
 attributes = [{'NHFPlusMax':0,'NHFMinusMax':0},
               {'NHFPlusMax':1,'NHFMinusMax':1},
               {'NHFPlusMax':2,'NHFMinusMax':2},
+              {'NHFPlusMax':3,'NHFMinusMax':3},
+              {'NHFPlusMax':4,'NHFMinusMax':4},
+              {'NHFPlusMax':5,'NHFMinusMax':5},
               {'HFThresholdIndex':10},
               {'HFThresholdIndex':12},
               {'HFThresholdIndex':14},
@@ -33,7 +38,7 @@ attributes = [{'NHFPlusMax':0,'NHFMinusMax':0},
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
 
-makeAnalysis(process,'edmDumpAnalysis',attributes)
+makeAnalysis(process,'edmDumpAnalysis',attributes,[],'singleVertexFilter')
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisDijets_histos_PU.root")

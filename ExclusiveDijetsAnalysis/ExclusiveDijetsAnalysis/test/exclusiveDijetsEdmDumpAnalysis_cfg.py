@@ -25,7 +25,9 @@ process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff
 
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.edmDumpAnalysis_cfi")
 
-from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi import *
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
+
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi import pileUpNumberFilter
 filtersPU = []
 for i in range(5):
     filtersPU.append('filter%dPU'%i)
@@ -34,16 +36,20 @@ for i in range(5):
 attributes = [{'NHFPlusMax':0,'NHFMinusMax':0},
               {'NHFPlusMax':1,'NHFMinusMax':1},
               {'NHFPlusMax':2,'NHFMinusMax':2},
+              {'NHFPlusMax':3,'NHFMinusMax':3},
+              {'NHFPlusMax':4,'NHFMinusMax':4},
+              {'NHFPlusMax':5,'NHFMinusMax':5},
               {'HFThresholdIndex':10},
               {'HFThresholdIndex':12},
               {'HFThresholdIndex':14},
               {'HFThresholdIndex':16}]
 
+#filters = ['singleVertexFilter']
+filters = [] 
+filters.extend(filtersPU)
+
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
-
-filters = filtersPU[:]
-
-makeAnalysis(process,'edmDumpAnalysis',attributes,filters)
+makeAnalysis(process,'edmDumpAnalysis',attributes,filters,'singleVertexFilter')
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisDijets_histos_PU.root")

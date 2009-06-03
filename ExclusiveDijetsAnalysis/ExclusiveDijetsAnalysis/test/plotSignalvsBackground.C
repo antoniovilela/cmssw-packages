@@ -60,7 +60,7 @@ void plot(){
    files.push_back(TFile::Open("root/analysisDijets_QCD100to250-madgraph_histos.root"));
    std::vector<TDirectory*> directories;
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file){
-      directories.push_back((*file)->GetDirectory("edmDumpAnalysis_NHFPlusMax_0_NHFMinusMax_0"));
+      directories.push_back((*file)->GetDirectory("edmDumpAnalysis_NHFPlusMax_2_NHFMinusMax_2"));
    }
 
    std::vector<double> sigmas;
