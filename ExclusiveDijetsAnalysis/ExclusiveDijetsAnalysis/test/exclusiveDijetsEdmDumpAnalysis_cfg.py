@@ -24,9 +24,7 @@ process.source = cms.Source("PoolSource",
 process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff")
 
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.edmDumpAnalysis_cfi")
-
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
-process.singleVtx = cms.Sequence(process.singleVertexFilter)
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi import pileUpNumberFilter
 filtersPU = []
@@ -50,8 +48,8 @@ filters = []
 filters.extend(filtersPU)
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
-makeAnalysis(process,'edmDumpAnalysis',None,attributes,filters)
-makeAnalysis(process,'edmDumpAnalysis',process.singleVtx,attributes,filters)
+makeAnalysis(process,'edmDumpAnalysis','',attributes,filters)
+makeAnalysis(process,'edmDumpAnalysis','singleVertexFilter',attributes,filters)
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisDijets_histos_PU.root")
