@@ -25,6 +25,8 @@ process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.edmDumpAnalysis_cf
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
 
+process.singleVtx = cms.Sequence(process.singleVertexFilter)
+
 attributes = [{'NHFPlusMax':0,'NHFMinusMax':0},
               {'NHFPlusMax':1,'NHFMinusMax':1},
               {'NHFPlusMax':2,'NHFMinusMax':2},
@@ -37,8 +39,8 @@ attributes = [{'NHFPlusMax':0,'NHFMinusMax':0},
               {'HFThresholdIndex':16}]
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
-
-makeAnalysis(process,'edmDumpAnalysis',attributes,[],'singleVertexFilter')
+makeAnalysis(process,'edmDumpAnalysis',None,attributes)
+makeAnalysis(process,'edmDumpAnalysis',process.singleVtx,attributes)
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisDijets_histos_PU.root")
