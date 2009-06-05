@@ -18,6 +18,8 @@
 TH1F* getHisto(TDirectory*, const string&);
 void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int rebin = 1);*/
 
+void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap,bool Norm = false);
+
 template<typename KeyType,typename ValueType>
 std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values);
 
@@ -49,30 +51,32 @@ void plot(){
 
    std::vector<std::string> samples;
    samples.push_back("signal");
-   //samples.push_back("DPEDijets");
-   //samples.push_back("SDDijets");
+   samples.push_back("DPEDijets");
+   samples.push_back("SDDijets");
    samples.push_back("QCD100to250-madgraph");
 
    std::vector<TFile*> files;
    files.push_back(TFile::Open("root/analysisDijets_CEPDijets_M100_histos.root"));
-   //files.push_back(TFile::Open("root/analysisDijets_DPEDijets_Pt40_histos_PU_nHFMax_1.root"));
-   //files.push_back(TFile::Open("root/analysisDijets_SDDijets_Pt30_histos_noPU_nHFMax_1.root"));
+   files.push_back(TFile::Open("root/analysisDijets_DPEDijets_Pt40_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_SDDijets_Pt30_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_QCD100to250-madgraph_histos.root"));
    std::vector<TDirectory*> directories;
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file){
-      directories.push_back((*file)->GetDirectory("edmDumpAnalysis_NHFPlusMax_2_NHFMinusMax_2"));
+      //directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter"));
+      directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter_NHFPlusMax_0_NHFMinusMax_0"));
+      //directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter_HFThresholdIndex_16"));
    }
 
    std::vector<double> sigmas;
    sigmas.push_back(450.);
-   //sigmas.push_back(4600.);
-   //sigmas.push_back(0.12*1.2*300000.);
+   sigmas.push_back(4600.);
+   sigmas.push_back(0.12*1.2*300000.);
    sigmas.push_back(0.12*1.2*15000000.);
 
    std::vector<TFile*> filesEff;
    filesEff.push_back(TFile::Open("root/analysis_histos_CPEDijets.root"));
-   //filesEff.push_back(TFile::Open("root/analysis_histos_DPEDijets.root"));
-   //filesEff.push_back(TFile::Open("root/analysis_histos_SDDijets.root"));
+   filesEff.push_back(TFile::Open("root/analysis_histos_DPEDijets.root"));
+   filesEff.push_back(TFile::Open("root/analysis_histos_SDDijets.root"));
    filesEff.push_back(TFile::Open("root/analysis_histos_QCD100-madgraph.root"));
 
    std::map<std::string,TDirectory*> dirMap = makeMap(samples,directories);
@@ -119,22 +123,35 @@ void plot(){
    refVar.push_back("missingMassFromXi");
    refVar.push_back("MxFromJets");
    refVar.push_back("RjjFromJets");
+   refVar.push_back("RjjFromPFCands");
    refVar.push_back("xiPlusAfterSel");
    refVar.push_back("xiMinusAfterSel");
    refVar.push_back("RjjAfterSel");
+   refVar.push_back("RjjFromPFAfterSel");
 
    std::vector<std::string> stackVars;
    stackVars.push_back("RjjAfterSel");
+   stackVars.push_back("RjjFromPFAfterSel");
 
+   plot(refVar,stackVars,dirMap,scaleMap);
+}
+
+void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap, bool Norm){
    std::map<std::string,TCanvas*> canvasesVar;
+   std::map<std::string,TLegend*> legendsVar;
    //for(size_t k = 0; k < canvasesVar.size(); ++k) canvasesVar[k] = new TCanvas(refVar[k].c_str(),refVar[k].c_str());
-   for(std::vector<std::string>::const_iterator var = refVar.begin(); var != refVar.end(); ++var)
+   for(std::vector<std::string>::const_iterator var = refVar.begin(); var != refVar.end(); ++var){
       canvasesVar[*var] = new TCanvas(var->c_str(),var->c_str());
+      legendsVar[*var] = new TLegend(0.4,0.7,0.95,0.8);
+   }
 
    std::map<std::string,TCanvas*> canvasesStack;
+   //std::map<std::string,TLegend*> legendsStack;
    //for(size_t k = 0; k < canvasesStack.size(); ++k) canvasesStack[k] = new TCanvas(("c_stack_" + stackVars[k]).c_str(),stackVars[k].c_str());
-   for(std::vector<std::string>::const_iterator var = stackVars.begin(); var != stackVars.end(); ++var)   
+   for(std::vector<std::string>::const_iterator var = stackVars.begin(); var != stackVars.end(); ++var){   
       canvasesStack[*var] = new TCanvas(("c_stack_" + *var).c_str(),var->c_str());
+      //legendsStack[*var] = new TLegend(0.4,0.7,0.95,0.8);
+   }
 
    std::map<std::string,TH1F*> histos_signal;
    std::map<std::string,std::map<std::string,TH1F*> > histos_back;
@@ -145,17 +162,23 @@ void plot(){
       const std::string& varName = *var; 
       histos_signal[varName] = getHisto(dirMap["signal"],varName);
       scaleHisto(histos_signal[varName],scaleMap["signal"],1,kBlack,16);
+      legendsVar[varName]->AddEntry(histos_signal[varName],"CEP di-jets","L");
  
       canvasesVar[varName]->cd();
-      histos_signal[varName]->Draw();
+      if(Norm) histos_signal[varName]->DrawNormalized();
+      else histos_signal[varName]->Draw();
       int index = 0;
       for(std::map<std::string,TDirectory*>::const_iterator it = dirMap.begin(); it != dirMap.end(); ++it,++index){
          if(it->first == "signal") continue;
          if(histos_back.find(it->first) == histos_back.end()) histos_back[it->first] = defmap;
          histos_back[it->first][varName] = getHisto(it->second,varName); 
-         scaleHisto(histos_back[it->first][varName],scaleMap[it->first],1,colors[index],16); 
-         histos_back[it->first][varName]->Draw("same");
+         scaleHisto(histos_back[it->first][varName],scaleMap[it->first],1,colors[index],16);
+         legendsVar[varName]->AddEntry(histos_back[it->first][varName],it->first.c_str(),"L"); 
+         if(Norm) histos_back[it->first][varName]->DrawNormalized("same");
+         else histos_back[it->first][varName]->Draw("same");
       }
+      legendsVar[varName]->SetFillColor(0);
+      legendsVar[varName]->Draw("same");
    }
 
    std::map<std::string,THStack*> stacks;
@@ -177,6 +200,7 @@ void plot(){
 
       canvasesStack[varName]->cd();
       stacks[varName]->Draw();
+      legendsVar[varName]->Draw("same");
    }
 }
 
