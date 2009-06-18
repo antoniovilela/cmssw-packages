@@ -37,13 +37,16 @@ GGMain: GGMain.o FortranTools.o
 GGMain_HepMC: GGMain_HepMC.o
 	g++ $(OPT) $^ $(LIBS) -lg2c -o $@
 
+GGMain_HepMC_ascii: GGMain_HepMC_ascii.o
+	g++ $(OPT) $^ $(LIBS) -lg2c -o $@
+
 DiPhotonMain:   DiPhotonMain.o FortranTools.o
 		g++ $(OPT) $^ $(LIBS) -lg2c -o $@
 
 readHepMC: readHepMC.o
 	g++ $(OPT) $^ $(LIBS) -lg2c -o $@
 
-all: GGMain GGMain_HepMC DiPhotonMain readHepMC
+all: GGMain GGMain_HepMC GGMain_HepMC_ascii DiPhotonMain readHepMC
 
 PDFsets:	
 		ln -s $(LHAPDFDIR)/PDFsets ./PDFsets
