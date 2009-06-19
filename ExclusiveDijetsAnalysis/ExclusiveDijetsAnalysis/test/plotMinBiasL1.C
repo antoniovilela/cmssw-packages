@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 
-void plotMinBiasL1(std::vector<std::string>& fileNames){
+void plotMinBiasL1(std::vector<std::string>& fileNames, double crossSection = 1.){
    TChain chain("HltTree");
    std::cout << ">>> Reading files: " << std::endl;
    for(std::vector<std::string>::const_iterator file = fileNames.begin(); file != fileNames.end(); ++file){
@@ -131,7 +131,7 @@ void plotMinBiasL1(std::vector<std::string>& fileNames){
    h_countAll->Scale(1./nEvents);
   
    std::vector<TH1F*> histosRateVsThreshold;
-   double crossSection = 80.;//mb
+   //double crossSection = 80.;//mb
    double Lum = 1.;//10^31cms-2s-2
    for(std::vector<std::pair<std::string,TH1F*> >::const_iterator it = histosEffVsThreshold.begin();
                                                                   it != histosEffVsThreshold.end(); ++it){

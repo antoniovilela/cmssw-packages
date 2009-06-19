@@ -65,10 +65,12 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    TH1F* h_leadingJetPt = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
    TH1F* h_leadingJetEta = new TH1F("leadingJetEta","leadingJetEta",100,-5.,5.);
    TH1F* h_leadingJetPhi = new TH1F("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);
+   TH1F* h_leadingJetBDiscriminator = new TH1F("leadingJetBDiscriminator","leadingJetBDiscriminator",100,-10.,30.);
 
    TH1F* h_secondJetPt = new TH1F("secondJetPt","secondJetPt",100,0.,100.);
    TH1F* h_secondJetEta = new TH1F("secondJetEta","secondJetEta",100,-5.,5.);
    TH1F* h_secondJetPhi = new TH1F("secondJetPhi","secondJetPhi",100,-1.1*M_PI,1.1*M_PI);
+   TH1F* h_secondJetBDiscriminator = new TH1F("secondJetBDiscriminator","secondJetBDiscriminator",100,-10.,30.);
 
    TH1F* h_jetsDeltaEta = new TH1F("jetsDeltaEta","jetsDeltaEta",100,-5.,5.);
    TH1F* h_jetsDeltaPhi = new TH1F("jetsDeltaPhi","jetsDeltaPhi",100,-1.1*M_PI,1.1*M_PI);
@@ -193,6 +195,9 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
 
      h_leadingJetPhi->Fill(jet1.phi());
      h_secondJetPhi->Fill(jet2.phi());
+
+     h_leadingJetBDiscriminator->Fill(jet1.bDiscriminator("default"));
+     h_secondJetBDiscriminator->Fill(jet2.bDiscriminator("default"));
 
      h_jetsDeltaEta->Fill(jet1.eta() - jet2.eta());
      h_jetsDeltaPhi->Fill(jet1.phi() - jet2.phi());

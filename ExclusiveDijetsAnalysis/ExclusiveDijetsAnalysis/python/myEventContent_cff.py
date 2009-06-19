@@ -9,6 +9,12 @@ PatEventContent = cms.PSet(
 
 MyEventContent_tracks = cms.PSet(
     outputCommands = cms.untracked.vstring(
+          'keep *_selectTracksAssociatedToPV_*_Analysis'
+    )
+)
+
+MyEventContent_tracks_expanded = cms.PSet(
+    outputCommands = cms.untracked.vstring(
           'keep *_selectGoodTracks_*_Analysis',
           'keep *_selectTracksAssociatedToPV_*_Analysis',
           'keep *_tracksOutsideJets_*_Analysis',
@@ -17,6 +23,15 @@ MyEventContent_tracks = cms.PSet(
 )
 
 MyEventContent_jets = cms.PSet(
+    outputCommands = cms.untracked.vstring(
+          'keep *_sisCone5PFJets_*_*',
+          'keep *_sisCone7PFJets_*_*',
+          'keep *_L2L3CorJetSC5PF_*_Analysis',
+          'keep *_L2L3CorJetSC7PF_*_Analysis'
+    )
+)
+
+MyEventContent_jets_expanded = cms.PSet(
     outputCommands = cms.untracked.vstring(
           'keep *_kt6CaloJets_*_*',
           'keep *_sisCone5CaloJets_*_*',
@@ -56,30 +71,38 @@ MyEventContent_edmDump = cms.PSet(
     )
 )
 
+MyEventContent_extra = cms.PSet(
+    outputCommands = cms.untracked.vstring(
+          'keep *_genParticles_*_*',
+          'keep recoTracks_generalTracks_*_*',
+          'keep *_offlinePrimaryVertices_*_*',
+          'keep *_particleFlow_*_*' 
+    )
+)
+
 MyEventContent = cms.PSet(
         outputCommands = cms.untracked.vstring('drop *')
 )
-
-MyEventContent.outputCommands.append('keep *_genParticles_*_*')
-MyEventContent.outputCommands.append('keep recoTracks_generalTracks_*_*')
-MyEventContent.outputCommands.append('keep *_offlinePrimaryVertices_*_*')
-MyEventContent.outputCommands.append('keep *_particleFlow_*_*')
-
 MyEventContent.outputCommands.extend(MyEventContent_tracks.outputCommands)
 MyEventContent.outputCommands.extend(MyEventContent_jets.outputCommands)
-MyEventContent.outputCommands.extend(MyEventContent_btag.outputCommands)
 MyEventContent.outputCommands.extend(MyEventContent_edmDump.outputCommands)
+MyEventContent.outputCommands.extend(MyEventContent_extra.outputCommands)
 
-MyEventContent.outputCommands.extend(PatEventContent.outputCommands)
-
-output = cms.OutputModule("PoolOutputModule",
-    MyEventContent,
-    fileName = cms.untracked.string(''),
-    dataset = cms.untracked.PSet(
-        dataTier = cms.untracked.string('USER'),
-        filterName = cms.untracked.string('')
-    ),
-    SelectEvents = cms.untracked.PSet(
-        SelectEvents = cms.vstring('')
-    )
+MyEventContent_PAT = cms.PSet(
+        outputCommands = cms.untracked.vstring('drop *')
 )
+MyEventContent_PAT.outputCommands.extend(MyEventContent_tracks.outputCommands)
+MyEventContent_PAT.outputCommands.extend(MyEventContent_jets.outputCommands)
+MyEventContent_PAT.outputCommands.extend(MyEventContent_edmDump.outputCommands)
+MyEventContent_PAT.outputCommands.extend(MyEventContent_extra.outputCommands)
+MyEventContent_PAT.outputCommands.extend(PatEventContent.outputCommands)
+
+MyEventContent_expanded = cms.PSet(
+        outputCommands = cms.untracked.vstring('drop *')
+)
+MyEventContent_expanded.outputCommands.extend(MyEventContent_tracks_expanded.outputCommands)
+MyEventContent_expanded.outputCommands.extend(MyEventContent_jets_expanded.outputCommands)
+MyEventContent_expanded.outputCommands.extend(MyEventContent_btag.outputCommands)
+MyEventContent_expanded.outputCommands.extend(MyEventContent_edmDump.outputCommands)
+MyEventContent_expanded.outputCommands.extend(MyEventContent_extra.outputCommands)
+MyEventContent_expanded.outputCommands.extend(PatEventContent.outputCommands)

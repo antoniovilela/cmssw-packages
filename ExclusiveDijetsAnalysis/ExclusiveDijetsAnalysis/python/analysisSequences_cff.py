@@ -18,7 +18,7 @@ selectGoodTracks.cut = "pt > 0.5 & numberOfValidHits > 7 & d0 <= 3.5"
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import *
 selectTracksAssociatedToPV.src = "selectGoodTracks"
-selectTracksAssociatedToPV.MaxDistanceFromVertex = 0.2
+selectTracksAssociatedToPV.MaxDistanceFromVertex = 0.3
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
 tracksOutsideJets.src = "selectTracksAssociatedToPV" 

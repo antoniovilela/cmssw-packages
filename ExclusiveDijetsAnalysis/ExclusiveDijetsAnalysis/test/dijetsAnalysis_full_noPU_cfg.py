@@ -20,8 +20,7 @@ process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_
 
 process.selection_step = cms.Path(process.hlt)
 process.reco_step = cms.Path(process.sisCone7PFJets*process.jets*process.tracks*process.edmDump)
-process.analysis_step = cms.Path(process.analysisBefore+
-                                 process.analysisAfter)
+#process.analysis_step = cms.Path(process.analysisBefore+process.analysisAfter)
 
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.edmDumpAnalysis_cfi")
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
@@ -42,9 +41,11 @@ from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import 
 makeAnalysis(process,'edmDumpAnalysis','hlt',attributes)
 makeAnalysis(process,'edmDumpAnalysis','singleVtx',attributes)
 
-process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
-process.output.fileName = '/tmp/antoniov/edmDump_exclusiveDijets.root'
-process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
+#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
+#process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
+#process.output.outputCommands = MyEventContent.outputCommands
+#process.output.fileName = '/tmp/antoniov/edmDump_exclusiveDijets.root'
+#process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysis_histos.root")
