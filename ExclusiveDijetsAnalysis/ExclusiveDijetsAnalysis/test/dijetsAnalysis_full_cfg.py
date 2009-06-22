@@ -4,7 +4,7 @@ from dijetsAnalysis_cfg import process
 del process.out_step
 del process.analysis_step
 
-process.source.fileNames = cms.untracked.vstring('file:/tmp/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_cff_py_RAW2DIGI_RECO.root')
+process.source.fileNames = cms.untracked.vstring('file:/tmp/antoniov/POMWIG_DPEDijets_10TeV_Pt_40_cff_py_RAW2DIGI_RECO.root')
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
 process.singleVtx = cms.Sequence(process.hlt+process.singleVertexFilter)

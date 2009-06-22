@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from dijetsAnalysis_cfg import process
 #process.maxEvents.input = 5000
 
-process.MessageLogger.cerr.threshold = 'INFO'
+#process.MessageLogger.cerr.threshold = 'INFO'
 
 process.load("RecoJets.Configuration.RecoPFJets_cff")
 #process.recoSequence_new = cms.Sequence(process.jets*process.btagging*process.tracks*process.edmDump)

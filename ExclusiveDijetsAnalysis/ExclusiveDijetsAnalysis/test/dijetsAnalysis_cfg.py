@@ -66,12 +66,14 @@ coreTools.removeCleaning(process)
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_cfi")
+process.pileUpInfo.AccessCrossingFramePlayBack = True
+process.pileUpInfo.BunchCrossings = cms.vint32(0)
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.output.outputCommands = MyEventContent.outputCommands 
-process.output.fileName = 'edmDump_exclusiveDijets_CEPGG.root'
+process.output.fileName = 'edmDump_exclusiveDijets.root'
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 
 process.TFileService = cms.Service("TFileService",
@@ -82,8 +84,8 @@ process.TFileService = cms.Service("TFileService",
 process.recoSequence = cms.Sequence(process.jets*process.tracks*process.edmDump+process.pileUpInfo)
 
 process.selection_step = cms.Path(process.hlt)
-process.reco_step = cms.Path(process.recoSequence)
-process.pat_step = cms.Path(process.patDefaultSequence)
+process.reco_step = cms.Path(process.hlt+process.recoSequence)
+process.pat_step = cms.Path(process.hlt+process.patDefaultSequence)
 process.analysis_step = cms.Path(process.analysisBefore+
                                  process.analysisAfter)
 

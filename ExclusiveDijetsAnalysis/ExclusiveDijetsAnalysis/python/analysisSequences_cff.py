@@ -43,7 +43,7 @@ xiTower.UseMETInfo = False
 #from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.BTagging_cff import *
 
 analysisBeforeSelection = cms.EDAnalyzer("SimpleDijetsAnalyzer",
-    JetTag = cms.InputTag("L2L3CorJetSC7PF")
+    JetTag = cms.InputTag("iterativeCone5CaloJets")
 )
 analysisAfterSelection = analysisBeforeSelection.clone()
 

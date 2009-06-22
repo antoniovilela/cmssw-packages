@@ -13,7 +13,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     #fileNames = filesPSet.fileNames
-    fileNames = cms.untracked.vstring('file:/tmp/antoniov/edmDump_exclusiveDijets_CEPGG.root')
+    fileNames = cms.untracked.vstring('file:/tmp/antoniov/edmDump_exclusiveDijets.root')
 )
 
 #process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff")
