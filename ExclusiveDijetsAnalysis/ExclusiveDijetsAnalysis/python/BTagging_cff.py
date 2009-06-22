@@ -1,0 +1,52 @@
+import FWCore.ParameterSet.Config as cms
+
+from TrackingTools.TransientTrack.TransientTrackBuilder_cfi import *
+from RecoBTau.JetTagComputer.jetTagRecord_cfi import *
+
+from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.jetTracksAssociatorAtVertex_cfi import jetTracksAssociatorAtVertex as jetTracksAssociatorAtVertexSC5PF
+jetTracksAssociatorAtVertexSC5PF.jets = "sisCone5PFJets"
+jetTracksAssociatorAtVertexSC5PF.coneSize = 0.5
+jetTracksAssociatorAtVertexSC7PF = jetTracksAssociatorAtVertexSC5PF.clone(jets = "sisCone7PFJets",coneSize = 0.7)
+
+from RecoBTag.ImpactParameter.impactParameter_cfi import impactParameterTagInfos as impactParameterTagInfosSC5PF
+impactParameterTagInfosSC5PF.jetTracks = "jetTracksAssociatorAtVertexSC5PF"
+impactParameterTagInfosSC7PF = impactParameterTagInfosSC5PF.clone(jetTracks = "jetTracksAssociatorAtVertexSC7PF")
+
+# MVA
+from RecoBTag.ImpactParameter.impactParameterMVAComputer_cfi import *
+from RecoBTag.ImpactParameter.impactParameterMVABJetTags_cfi import impactParameterMVABJetTags as impactParameterMVABJetTagsSC5PF
+impactParameterMVABJetTagsSC5PF.tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC5PF"))
+impactParameterMVABJetTagsSC7PF = impactParameterMVABJetTagsSC5PF.clone(tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC7PF")))
+
+#B Jet Prob
+from RecoBTag.ImpactParameter.jetBProbabilityComputer_cfi import *
+from RecoBTag.ImpactParameter.jetBProbabilityBJetTags_cfi import jetBProbabilityBJetTags as jetBProbabilityBJetTagsSC5PF
+jetBProbabilityBJetTagsSC5PF.tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC5PF"))
+jetBProbabilityBJetTagsSC7PF = jetBProbabilityBJetTagsSC5PF.clone(tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC7PF")))
+
+#Jet Prob
+from RecoBTag.ImpactParameter.jetProbabilityComputer_cfi import *
+from RecoBTag.ImpactParameter.jetProbabilityBJetTags_cfi import jetProbabilityBJetTags as jetProbabilityBJetTagsSC5PF
+jetProbabilityBJetTagsSC5PF.tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC5PF"))
+jetProbabilityBJetTagsSC7PF = jetProbabilityBJetTagsSC5PF.clone(tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC7PF")))
+
+# HighEff
+from RecoBTag.ImpactParameter.trackCounting3D2ndComputer_cfi import *
+from RecoBTag.ImpactParameter.trackCountingHighEffBJetTags_cfi import trackCountingHighEffBJetTags as trackCountingHighEffBJetTagsSC5PF
+trackCountingHighEffBJetTagsSC5PF.tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC5PF"))
+trackCountingHighEffBJetTagsSC7PF = trackCountingHighEffBJetTagsSC5PF.clone(tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC7PF")))
+
+# High Purity
+from RecoBTag.ImpactParameter.trackCounting3D3rdComputer_cfi import *
+from RecoBTag.ImpactParameter.trackCountingHighPurBJetTags_cfi import trackCountingHighPurBJetTags as trackCountingHighPurBJetTagsSC5PF
+trackCountingHighPurBJetTagsSC5PF.tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC5PF"))
+trackCountingHighPurBJetTagsSC7PF = trackCountingHighPurBJetTagsSC5PF.clone(tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosSC7PF")))
+
+#btaggingSC5PF = cms.Sequence(jetTracksAssociatorAtVertexSC5PF+impactParameterTagInfosSC5PF+secondaryVertexTagInfosSC5PF+jetBProbabilityBJetTagsSC5PF+jetProbabilityBJetTagsSC5PF+trackCountingHighPurBJetTagsSC5PF+trackCountingHighEffBJetTagsSC5PF+impactParameterMVABJetTagsSC5PF+simpleSecondaryVertexBJetTagsSC5PF+combinedSecondaryVertexBJetTagsSC5PF+combinedSecondaryVertexMVABJetTagsSC5PF)
+btaggingSC5PF = cms.Sequence(jetTracksAssociatorAtVertexSC5PF+impactParameterTagInfosSC5PF+jetBProbabilityBJetTagsSC5PF+jetProbabilityBJetTagsSC5PF+trackCountingHighPurBJetTagsSC5PF+trackCountingHighEffBJetTagsSC5PF)
+
+#btaggingSC7PF = cms.Sequence(jetTracksAssociatorAtVertexSC7PF+impactParameterTagInfosSC7PF+secondaryVertexTagInfosSC7PF+jetBProbabilityBJetTagsSC7PF+jetProbabilityBJetTagsSC7PF+trackCountingHighPurBJetTagsSC7PF+trackCountingHighEffBJetTagsSC7PF+impactParameterMVABJetTagsSC7PF+simpleSecondaryVertexBJetTagsSC7PF+combinedSecondaryVertexBJetTagsSC7PF+combinedSecondaryVertexMVABJetTagsSC7PF)
+btaggingSC7PF = cms.Sequence(jetTracksAssociatorAtVertexSC7PF+impactParameterTagInfosSC7PF+jetBProbabilityBJetTagsSC7PF+jetProbabilityBJetTagsSC7PF+trackCountingHighPurBJetTagsSC7PF+trackCountingHighEffBJetTagsSC7PF)
+
+btagging = cms.Sequence(btaggingSC5PF+btaggingSC7PF)
+

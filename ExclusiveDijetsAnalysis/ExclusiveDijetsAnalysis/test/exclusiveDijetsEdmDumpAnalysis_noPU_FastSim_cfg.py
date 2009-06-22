@@ -10,11 +10,12 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/tmp/antoniov/edmDump_exclusiveDijets.root')
+    fileNames = cms.untracked.vstring('file:/tmp/antoniov/edmDump_exclusiveDijets_FastSim.root')
 )
 
 from exclusiveDijetsEdmDumpAnalysis_cfg import process as processEdmDumpAnalysis,attributes
 process.edmDumpAnalysis = processEdmDumpAnalysis.edmDumpAnalysis
+process.edmDumpAnalysis.HFThresholdIndex = 10
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
 

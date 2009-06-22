@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from dijetsAnalysis_noPU_cfg import process
+from dijetsAnalysis_noPU_FastSim_cfg import process
 del process.out_step
 del process.analysis_step
 
@@ -11,6 +11,7 @@ process.singleVtx = cms.Sequence(process.hlt+process.singleVertexFilter)
 
 from exclusiveDijetsEdmDumpAnalysis_cfg import process as processEdmDumpAnalysis,attributes
 process.edmDumpAnalysis = processEdmDumpAnalysis.edmDumpAnalysis
+process.edmDumpAnalysis.HFThresholdIndex = 10
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
 makeAnalysis(process,'edmDumpAnalysis','hlt',attributes)

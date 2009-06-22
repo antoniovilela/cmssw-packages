@@ -72,8 +72,10 @@ void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string
          //scaleHisto(histos[k],(1./histos[k]->GetBinContent(1)),1,(index + 1));
 
          legendsVar[k]->AddEntry(histos[k],it->first.c_str(),"L");
-         if(Norm) histos[k]->DrawNormalized("same");
-         else histos[k]->Draw("same");
+         /*if(Norm) histos[k]->DrawNormalized("same");
+         else histos[k]->Draw("same");*/
+         if(Norm) histos[k]->Scale(1./histos[k]->GetEntries());         
+         histos[k]->Draw("same");
          histoMap[it->second] = histos;
       }
    }  

@@ -4,7 +4,7 @@ process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.debugModules = cms.untracked.vstring('')
-process.MessageLogger.cerr.threshold = 'WARNING'
+process.MessageLogger.cerr.threshold = 'INFO'
 process.MessageLogger.categories.append('PATSummaryTables')
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default          = cms.untracked.PSet( limit = cms.untracked.int32(0)  ),
@@ -31,11 +31,11 @@ import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
 #jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
 
-jetAlgos = ['KT6','SC5','SC7']
-jetTypes = ['Calo','PF']
+#jetAlgos = ['KT6','SC5','SC7']
+#jetTypes = ['Calo','PF']
 
-#jetAlgos = ['KT6']
-#jetTypes = ['Calo']
+jetAlgos = ['SC5','SC7']
+jetTypes = ['PF']
 
 for algo in jetAlgos:
     for type in jetTypes:
@@ -64,7 +64,6 @@ for item in objs: coreTools.removeSpecificPATObject(process,item)
 coreTools.removeCleaning(process)
 
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
-#process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_expanded_cff")
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_cfi")
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
@@ -72,15 +71,18 @@ process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumber
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.output.outputCommands = MyEventContent.outputCommands 
-process.output.fileName = '/tmp/antoniov/edmDump_exclusiveDijets.root'
+process.output.fileName = 'edmDump_exclusiveDijets_CEPGG.root'
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysis_histos.root")
 )
 
+#process.recoSequence = cms.Sequence(process.jets*process.btagging*process.tracks*process.edmDump+process.pileUpInfo)
+process.recoSequence = cms.Sequence(process.jets*process.tracks*process.edmDump+process.pileUpInfo)
+
 process.selection_step = cms.Path(process.hlt)
-process.reco_step = cms.Path(process.jets*process.tracks*process.edmDump+process.pileUpInfo)
+process.reco_step = cms.Path(process.recoSequence)
 process.pat_step = cms.Path(process.patDefaultSequence)
 process.analysis_step = cms.Path(process.analysisBefore+
                                  process.analysisAfter)

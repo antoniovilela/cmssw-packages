@@ -2,6 +2,8 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include <string>
+
 class TTree;
 class TH1F;
 class TH2F;
@@ -25,6 +27,7 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     double Rjj(JetColl& jetCollection,PartColl& partCollection);
 
     edm::InputTag jetTag_;
+    edm::InputTag jetNonCorrTag_;
     edm::InputTag particleFlowTag_;
 
     double ptJetMin_;
@@ -36,6 +39,11 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     unsigned int nHFPlusMax_;
     unsigned int nHFMinusMax_;
 
+    bool doBtag_;
+    std::string bTagMode_;
+    std::string bDiscriminatorName_;
+    double bDiscMin_;
+
     unsigned int thresholdHF_;
     bool useJetCorrection_;
     double Ebeam_;
@@ -45,10 +53,12 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_leadingJetPt_;
       TH1F* h_leadingJetEta_;
       TH1F* h_leadingJetPhi_;
-
+      TH1F* h_leadingJetBDiscriminator_;
+   
       TH1F* h_secondJetPt_;
       TH1F* h_secondJetEta_;
       TH1F* h_secondJetPhi_;
+      TH1F* h_secondJetBDiscriminator_;
 
       TH1F* h_jetsDeltaEta_;
       TH1F* h_jetsDeltaPhi_;
@@ -80,6 +90,9 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
 
       TH1F* h_EnergyVsEta_;
 
+      TH2F* h_RjjFromJetsVsBDicriminator_;
+      TH2F* h_RjjFromPFCandsVsBDicriminator_;
+ 
       TH1F* h_xiPlusAfterSel_;
       TH1F* h_xiMinusAfterSel_;
       TH1F* h_RjjAfterSel_;
@@ -114,6 +127,7 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
 
 ExclusiveDijetsEdmDumpAnalyzer::ExclusiveDijetsEdmDumpAnalyzer(const edm::ParameterSet& pset):
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
+  jetNonCorrTag_(pset.getParameter<edm::InputTag>("JetNonCorrTag")), 
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
   ptJetMin_(pset.getParameter<double>("PtMinJet")),
   etaJetMax_(pset.getParameter<double>("EtaMaxJet")),
@@ -123,12 +137,21 @@ ExclusiveDijetsEdmDumpAnalyzer::ExclusiveDijetsEdmDumpAnalyzer(const edm::Parame
   nTracksMax_(pset.getParameter<unsigned int>("NTracksMax")),
   nHFPlusMax_(pset.getParameter<unsigned int>("NHFPlusMax")),
   nHFMinusMax_(pset.getParameter<unsigned int>("NHFMinusMax")),
+  doBtag_(pset.getParameter<bool>("DoBTag")),
+  //bTagMode_(pset.getParameter<std::string>("BTagMode")),  
+  //bDiscriminatorName_(pset.getParameter<std::string>("BDiscriminatorName")),
+  //bDiscMin_(pset.getParameter<double>("BDiscMin")),
   thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
   useJetCorrection_(pset.getParameter<bool>("UseJetCorrection")),
   Ebeam_(pset.getUntrackedParameter<double>("EBeam",5000.)),
   usePAT_(pset.getUntrackedParameter<bool>("UsePAT",true))
 {
   if(useJetCorrection_) jetCorrectionService_ = pset.getParameter<std::string>("JetCorrectionService");
+  if(doBtag_){
+     bTagMode_ = pset.getParameter<std::string>("BTagMode");  
+     bDiscriminatorName_ = pset.getParameter<std::string>("BDiscriminatorName");
+     bDiscMin_ = pset.getParameter<double>("BDiscMin");
+  }  
 }
 
 ExclusiveDijetsEdmDumpAnalyzer::~ExclusiveDijetsEdmDumpAnalyzer(){}
@@ -139,10 +162,12 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_leadingJetPt_ = fs->make<TH1F>("leadingJetPt","leadingJetPt",100,0.,100.);
   histos_.h_leadingJetEta_ = fs->make<TH1F>("leadingJetEta","leadingJetEta",100,-5.,5.);
   histos_.h_leadingJetPhi_ = fs->make<TH1F>("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);
-
+  histos_.h_leadingJetBDiscriminator_ = fs->make<TH1F>("leadingJetBDiscriminator","leadingJetBDiscriminator",100,-10.,30.);
+ 
   histos_.h_secondJetPt_ = fs->make<TH1F>("secondJetPt","secondJetPt",100,0.,100.);
   histos_.h_secondJetEta_ = fs->make<TH1F>("secondJetEta","secondJetEta",100,-5.,5.);
   histos_.h_secondJetPhi_ = fs->make<TH1F>("secondJetPhi","secondJetPhi",100,-1.1*M_PI,1.1*M_PI);
+  histos_.h_secondJetBDiscriminator_ = fs->make<TH1F>("secondJetBDiscriminator","secondJetBDiscriminator",100,-10.,30.);
 
   histos_.h_jetsDeltaEta_ = fs->make<TH1F>("jetsDeltaEta","jetsDeltaEta",100,-5.,5.);
   histos_.h_jetsDeltaPhi_ = fs->make<TH1F>("jetsDeltaPhi","jetsDeltaPhi",100,0.,1.1*M_PI);
@@ -173,6 +198,9 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_ResMassDijets_ = fs->make<TH1F>("ResMassDijets","ResMassDijets",100,-1.,1.);
 
   histos_.h_EnergyVsEta_ = fs->make<TH1F>("EnergyVsEta","EnergyVsEta",300,-15.,15.);
+
+  histos_.h_RjjFromJetsVsBDicriminator_ = fs->make<TH2F>("RjjFromJetsVsBDicriminator","RjjFromJetsVsBDicriminator",200,-0.1,1.5,200,-10.,30.);
+  histos_.h_RjjFromPFCandsVsBDicriminator_ = fs->make<TH2F>("RjjFromPFCandsVsBDicriminator","RjjFromPFCandsVsBDicriminator",200,-0.1,1.5,200,-10.,30.);
 
   histos_.h_xiPlusAfterSel_ = fs->make<TH1F>("xiPlusAfterSel","xiPlusAfterSel",200,0.,1.);
   histos_.h_xiMinusAfterSel_ = fs->make<TH1F>("xiMinusAfterSel","xiMinusAfterSel",200,0.,1.);
@@ -226,23 +254,18 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   dijetSystem += jet2.p4();
   histos_.h_massDijets_->Fill(dijetSystem.M());
 
-  /*math::XYZTLorentzVector allJets(0.,0.,0.,0.);
+  math::XYZTLorentzVector allJets(0.,0.,0.,0.);
   for(edm::View<reco::Jet>::const_iterator jet = jetCollectionH->begin();
                                            jet != jetCollectionH->end(); ++jet) allJets += jet->p4();
 
   histos_.h_MxFromJets_->Fill(allJets.M());
 
-  double RjjFromJets = dijetSystem.M()/allJets.M();
-  histos_.h_RjjFromJets_->Fill(RjjFromJets);*/
-    
   double RjjFromJets = Rjj(*jetCollectionH,*jetCollectionH);
-  histos_.h_RjjFromJets_->Fill(RjjFromJets);
-  
-  edm::Handle<edm::View<reco::Jet> > jetCollectionNonCorrH;
-  event.getByLabel("sisCone7PFJets",jetCollectionNonCorrH);
-  double RjjFromPFCands = Rjj(*jetCollectionNonCorrH,*particleFlowCollectionH);
-  histos_.h_RjjFromPFCands_->Fill(RjjFromPFCands);
 
+  edm::Handle<edm::View<reco::Jet> > jetCollectionNonCorrH;
+  event.getByLabel(jetNonCorrTag_,jetCollectionNonCorrH);
+  double RjjFromPFCands = Rjj(*jetCollectionNonCorrH,*particleFlowCollectionH);
+ 
   if(usePAT_){
     const pat::Jet* patJet1 = dynamic_cast<const pat::Jet*>(&jet1);
     const pat::Jet* patJet2 = dynamic_cast<const pat::Jet*>(&jet2);
@@ -259,7 +282,33 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
       double massGen = dijetGenSystem.M();
       histos_.h_ResMassDijets_->Fill((dijetSystem.M() - massGen)/massGen);
     }
+
+    // B-tagging
+    if(doBtag_){
+       double bDiscJet1 = patJet1->bDiscriminator(bDiscriminatorName_);
+       double bDiscJet2 = patJet2->bDiscriminator(bDiscriminatorName_);
+
+       histos_.h_leadingJetBDiscriminator_->Fill(bDiscJet1);
+       histos_.h_secondJetBDiscriminator_->Fill(bDiscJet2);
+
+       histos_.h_RjjFromJetsVsBDicriminator_->Fill(RjjFromJets,bDiscJet1);
+       histos_.h_RjjFromPFCandsVsBDicriminator_->Fill(RjjFromPFCands,bDiscJet1);
+	  
+       // Selection
+       bool singleBTag = ((bDiscJet1 > bDiscMin_)||(bDiscJet2 > bDiscMin_));
+       bool doubleBTag = ((bDiscJet1 > bDiscMin_)&&(bDiscJet2 > bDiscMin_));
+       if((bTagMode_ == "1Btag")||(bTagMode_ == "1BTag")||(bTagMode_ == "single")){
+	  if(!singleBTag) return;
+       } else if(((bTagMode_ == "2Btag")||(bTagMode_ == "2BTag")||(bTagMode_ == "double"))){
+	  if(!doubleBTag) return;
+       } 
+    }
+  } else {
+    // access info from outside PAT here
   }
+
+  histos_.h_RjjFromJets_->Fill(RjjFromJets);
+  histos_.h_RjjFromPFCands_->Fill(RjjFromPFCands);
 
   // Gen particles
   edm::Handle<edm::View<reco::GenParticle> > genParticlesCollectionH;

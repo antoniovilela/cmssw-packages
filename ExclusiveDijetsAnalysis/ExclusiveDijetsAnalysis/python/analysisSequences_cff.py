@@ -11,7 +11,8 @@ from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsHLTPaths_cfi
 from JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff import *
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.leadingJets_cfi import *
-leadingJets.src = "L2L3CorJetSC7PF"
+#leadingJets.src = "L2L3CorJetSC7PF"
+leadingJets.src = "sisCone7PFJets"
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectGoodTracks_cfi import *
 selectGoodTracks.cut = "pt > 0.5 & numberOfValidHits > 7 & d0 <= 3.5"
@@ -39,13 +40,15 @@ from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.hfTower_cfi import *
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
 xiTower.UseMETInfo = False
 
+#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.BTagging_cff import *
+
 analysisBeforeSelection = cms.EDAnalyzer("SimpleDijetsAnalyzer",
     JetTag = cms.InputTag("L2L3CorJetSC7PF")
 )
 analysisAfterSelection = analysisBeforeSelection.clone()
 
 hlt = cms.Sequence(exclusiveDijetsHLTFilter)
-jets = cms.Sequence(L2L3CorJetSC7PF*leadingJets)
+jets = cms.Sequence(L2L3CorJetSC5PF+L2L3CorJetSC7PF*leadingJets)
 tracks = cms.Sequence(selectGoodTracks*
                       selectTracksAssociatedToPV*
                       tracksOutsideJets+

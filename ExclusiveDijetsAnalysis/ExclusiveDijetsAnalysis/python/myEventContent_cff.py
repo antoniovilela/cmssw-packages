@@ -50,12 +50,27 @@ MyEventContent_jets_expanded = cms.PSet(
 
 MyEventContent_btag = cms.PSet(
     outputCommands = cms.untracked.vstring(
-          'keep *_trackCountingHighEffBJetTags_*_*',
-          'keep *_jetBProbabilityBJetTags_*_*',
-          'keep *_jetProbabilityBJetTags_*_*',
-          'keep *_simpleSecondaryVertexBJetTags_*_*',
-          'keep *_combinedSecondaryVertexBJetTags_*_*',
-          'keep *_combinedSecondaryVertexMVABJetTags_*_*' 
+          'keep *_jetBProbabilityBJetTagsSC5PF_*_*',
+          'keep *_jetProbabilityBJetTagsSC5PF_*_*',
+          'keep *_jetBProbabilityBJetTagsSC7PF_*_*',
+          'keep *_jetProbabilityBJetTagsSC7PF_*_*'
+    )
+)
+
+MyEventContent_btag_expanded = cms.PSet(
+    outputCommands = cms.untracked.vstring(
+          'keep *_trackCountingHighEffBJetTagsSC5PF_*_*',
+          'keep *_jetBProbabilityBJetTagsSC5PF_*_*',
+          'keep *_jetProbabilityBJetTagsSC5PF_*_*',
+          'keep *_simpleSecondaryVertexBJetTagsSC5PF_*_*',
+          'keep *_combinedSecondaryVertexBJetTagsSC5PF_*_*',
+          'keep *_combinedSecondaryVertexMVABJetTagsSC5PF_*_*',
+          'keep *_trackCountingHighEffBJetTagsSC7PF_*_*',
+          'keep *_jetBProbabilityBJetTagsSC7PF_*_*',
+          'keep *_jetProbabilityBJetTagsSC7PF_*_*',
+          'keep *_simpleSecondaryVertexBJetTagsSC7PF_*_*',
+          'keep *_combinedSecondaryVertexBJetTagsSC7PF_*_*',
+          'keep *_combinedSecondaryVertexMVABJetTagsSC7PF_*_*'
     )
 )
 
@@ -85,6 +100,7 @@ MyEventContent = cms.PSet(
 )
 MyEventContent.outputCommands.extend(MyEventContent_tracks.outputCommands)
 MyEventContent.outputCommands.extend(MyEventContent_jets.outputCommands)
+MyEventContent.outputCommands.extend(MyEventContent_btag.outputCommands)
 MyEventContent.outputCommands.extend(MyEventContent_edmDump.outputCommands)
 MyEventContent.outputCommands.extend(MyEventContent_extra.outputCommands)
 
@@ -93,6 +109,7 @@ MyEventContent_PAT = cms.PSet(
 )
 MyEventContent_PAT.outputCommands.extend(MyEventContent_tracks.outputCommands)
 MyEventContent_PAT.outputCommands.extend(MyEventContent_jets.outputCommands)
+MyEventContent_PAT.outputCommands.extend(MyEventContent_btag.outputCommands)
 MyEventContent_PAT.outputCommands.extend(MyEventContent_edmDump.outputCommands)
 MyEventContent_PAT.outputCommands.extend(MyEventContent_extra.outputCommands)
 MyEventContent_PAT.outputCommands.extend(PatEventContent.outputCommands)

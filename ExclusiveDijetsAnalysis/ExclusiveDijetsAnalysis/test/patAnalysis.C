@@ -61,6 +61,10 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    jetColls.push_back("selectedLayer1JetsKT6PF");
    jetColls.push_back("selectedLayer1JetsKT6Calo");
 
+   std::vector<std::string> jetCollsNonCorr;
+   jetCollsNonCorr.push_back("sisCone7PFJets");
+   jetCollsNonCorr.push_back("sisCone5PFJets");
+
    // Book Histograms
    TH1F* h_leadingJetPt = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
    TH1F* h_leadingJetEta = new TH1F("leadingJetEta","leadingJetEta",100,-5.,5.);
@@ -109,9 +113,15 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
 
    TH1F* h_EnergyVsEta = new TH1F("EnergyVsEta","EnergyVsEta",300,-15.,15.);
 
+   TH2F* h_RjjFromJetsVsBDicriminator = new TH2F("RjjFromJetsVsBDicriminator","RjjFromJetsVsBDicriminator",200,-0.1,1.5,200,-10.,30.);
+   TH2F* h_RjjFromPFCandsVsBDicriminator = new TH2F("RjjFromPFCandsVsBDicriminator","RjjFromPFCandsVsBDicriminator",200,-0.1,1.5,200,-10.,30.);
+
    TH1F* h_xiPlusAfterSel = new TH1F("xiPlusAfterSel","xiPlusAfterSel",200,0.,1.);
    TH1F* h_xiMinusAfterSel = new TH1F("xiMinusAfterSel","xiMinusAfterSel",200,0.,1.);
    TH1F* h_RjjAfterSel = new TH1F("RjjAfterSel","RjjAfterSel",200,-0.1,1.5);
+   TH1F* h_RjjFromPFAfterSel = new TH1F("RjjFromPFAfterSel","RjjFromPFAfterSel",200,-0.1,1.5);
+
+   TH1F* h_forwardBackwardAsymmetryHFEnergy_ = new TH1F("forwardBackwardAsymmetryHFEnergy","forwardBackwardAsymmetryHFEnergy",200,-1.1,1.1);
 
    std::vector<TH1F*> histos_ResMassDijets;
    std::vector<TH1F*> histos_ResXiPlusFromJets;
@@ -128,6 +138,12 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
       histos_RjjFromJets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-0.1,1.5));
    }
 
+   std::vector<TH1F*> histos_RjjFromPFCands;
+   for(std::vector<std::string>::const_iterator it = jetCollsNonCorr.begin(); it != jetCollsNonCorr.end(); ++it){
+      std::string hname = "RjjFromPFCands" + *it;
+      histos_RjjFromPFCands.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-0.1,1.5));
+   }
+
    double Ebeam = 5000.;
    int thresholdHF = 12;// 2.4 GeV
 
@@ -140,6 +156,10 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    // Di-jet
    double ptmin = 50.;
    double etamax = 2.5;
+   //B-tag
+   bool doBTag = false;
+   std::string bDiscriminatorName = "jetBProbabilityBJetTags";
+   double bDiscMinValue = 3.0;
    // Track multiplicity
    bool doTrackSelection = true; 
    int nTracksMax = 5;
@@ -173,8 +193,14 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
        jetCollections[k].getByLabel(ev,jetColls[k].c_str());
      }
 
+     std::vector<fwlite::Handle<std::vector<reco::PFJet> > > jetCollectionsNonCorr(jetCollsNonCorr.size());
+     for(size_t k = 0; k < jetCollsNonCorr.size(); ++k){
+       jetCollectionsNonCorr[k].getByLabel(ev,jetCollsNonCorr[k].c_str());
+     }
+
      const fwlite::Handle<std::vector<pat::Jet> >& jetCollection = jetCollections[0];
-  
+     const fwlite::Handle<std::vector<reco::PFJet> >& jetCollectionNonCorr = jetCollectionsNonCorr[0];  
+
      const pat::Jet& jet1 = (*jetCollection)[0];// they come out ordered right?
      const pat::Jet& jet2 = (*jetCollection)[1];
 
@@ -196,9 +222,6 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_leadingJetPhi->Fill(jet1.phi());
      h_secondJetPhi->Fill(jet2.phi());
 
-     h_leadingJetBDiscriminator->Fill(jet1.bDiscriminator("default"));
-     h_secondJetBDiscriminator->Fill(jet2.bDiscriminator("default"));
-
      h_jetsDeltaEta->Fill(jet1.eta() - jet2.eta());
      h_jetsDeltaPhi->Fill(jet1.phi() - jet2.phi());
  
@@ -207,33 +230,46 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      dijetSystem += jet2.p4();
      h_massDijets->Fill(dijetSystem.M());
 
-     /*math::XYZTLorentzVector allJets(0.,0.,0.,0.);
+     math::XYZTLorentzVector allJets(0.,0.,0.,0.);
      for(std::vector<pat::Jet>::const_iterator jet = jetCollection->begin();
                                                jet != jetCollection->end(); ++jet) allJets += jet->p4();
 
      h_MxFromJets->Fill(allJets.M());
 
-     double RjjFromJets = dijetSystem.M()/allJets.M();
-     h_RjjFromJets->Fill(RjjFromJets);*/
-     
      // PF candidates
      fwlite::Handle<std::vector<reco::PFCandidate> > pfCandCollection;
      pfCandCollection.getByLabel(ev,"particleFlow");
 
-     /*math::XYZTLorentzVector allPFCands(0.,0.,0.,0.);
+     math::XYZTLorentzVector allPFCands(0.,0.,0.,0.);
      for(std::vector<reco::PFCandidate>::const_iterator pfCand = pfCandCollection->begin();
                                                         pfCand != pfCandCollection->end();
                                                         ++pfCand) allPFCands += pfCand->p4();
 
      h_MxFromPFCands->Fill(allPFCands.M());
 
-     double RjjFromPFCands = dijetSystem.M()/allPFCands.M();
-     h_RjjFromPFCands->Fill(RjjFromPFCands);*/
-
+     // Compute Rjj
      double RjjFromJets = Rjj(*jetCollection,*jetCollection);
+
+     double RjjFromPFCands = Rjj(*jetCollectionNonCorr,*pfCandCollection);
+
+     // B-tag
+     double bDiscJet1 = jet1.bDiscriminator(bDiscriminatorName);
+     double bDiscJet2 = jet2.bDiscriminator(bDiscriminatorName);
+
+     h_leadingJetBDiscriminator->Fill(bDiscJet1);
+     h_secondJetBDiscriminator->Fill(bDiscJet2);
+
+     h_RjjFromJetsVsBDicriminator->Fill(RjjFromJets,bDiscJet1);
+     h_RjjFromPFCandsVsBDicriminator->Fill(RjjFromPFCands,bDiscJet1);
+
+     bool singleBTag = ((bDiscJet1 > bDiscMinValue)||(bDiscJet2 > bDiscMinValue));
+     bool doubleBTag = ((bDiscJet1 > bDiscMinValue)&&(bDiscJet2 > bDiscMinValue));
+
+     if(doBTag && !doubleBTag) continue;
+
      h_RjjFromJets->Fill(RjjFromJets);
 
-     h_RjjFromPFCands->Fill(Rjj(*jetCollection,*pfCandCollection));
+     h_RjjFromPFCands->Fill(RjjFromPFCands);
 
      std::pair<double,double> xiFromJets = xi(*jetCollection);
      h_xiPlusFromJets->Fill(xiFromJets.first);
@@ -302,6 +338,10 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
         (histos_RjjFromJets[k])->Fill(Rjj(*(jetCollections[k]),*(jetCollections[k])));
      }
 
+     for(size_t k = 0; k < jetCollsNonCorr.size(); ++k){
+        (histos_RjjFromPFCands[k])->Fill(Rjj(*(jetCollectionsNonCorr[k]),*pfCandCollection));
+     }
+ 
      if(!accessEdmDump) continue;
 
      // Access multiplicities
@@ -363,7 +403,21 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_xiPlusAfterSel->Fill(xiTower_plus);
      h_xiMinusAfterSel->Fill(xiTower_minus);
      h_RjjAfterSel->Fill(RjjFromJets);
+     h_RjjFromPFAfterSel->Fill(RjjFromPFCands);
  
+     fwlite::Handle<std::vector<double> > sumEHFplus;
+     sumEHFplus.getByLabel(ev,"hfTower","sumEHFplus");
+   
+     fwlite::Handle<std::vector<double> > sumEHFminus;
+     sumEHFminus.getByLabel(ev,"hfTower","sumEHFminus");
+
+     double sumE_plus = (*sumEHFplus)[thresholdHF];
+     double sumE_minus = (*sumEHFminus)[thresholdHF];
+
+     double fbAsymmetryEnergy = ((sumE_plus + sumE_minus) > 0.)?((sumE_plus - sumE_minus)/(sumE_plus + sumE_minus)):0.;
+
+     h_forwardBackwardAsymmetryHFEnergy_->Fill(fbAsymmetryEnergy);
+
    }  // End loop over events
   
    hfile->Write();
