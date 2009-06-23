@@ -38,6 +38,8 @@ std::pair<double,double> xi(Coll&);
 template <class JetColl,class PartColl>
 double Rjj(JetColl&,PartColl&);
 
+unsigned int nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& mapTreshToiEta, unsigned int thresholdHF, unsigned int ieta);
+
 void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool verbose = false) {
    // Create a vector of input files
    //vector<string> fileNames = func();
@@ -55,11 +57,11 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
 
    std::vector<std::string> jetColls;
    jetColls.push_back("selectedLayer1JetsSC7PF");
-   jetColls.push_back("selectedLayer1JetsSC7Calo");
+   //jetColls.push_back("selectedLayer1JetsSC7Calo");
    jetColls.push_back("selectedLayer1JetsSC5PF");
-   jetColls.push_back("selectedLayer1JetsSC5Calo");
-   jetColls.push_back("selectedLayer1JetsKT6PF");
-   jetColls.push_back("selectedLayer1JetsKT6Calo");
+   //jetColls.push_back("selectedLayer1JetsSC5Calo");
+   //jetColls.push_back("selectedLayer1JetsKT6PF");
+   //jetColls.push_back("selectedLayer1JetsKT6Calo");
 
    std::vector<std::string> jetCollsNonCorr;
    jetCollsNonCorr.push_back("sisCone7PFJets");
@@ -76,6 +78,11 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    TH1F* h_secondJetPhi = new TH1F("secondJetPhi","secondJetPhi",100,-1.1*M_PI,1.1*M_PI);
    TH1F* h_secondJetBDiscriminator = new TH1F("secondJetBDiscriminator","secondJetBDiscriminator",100,-10.,30.);
 
+   TH1F* h_thirdJetPt = new TH1F("thirdJetPt","thirdJetPt",100,0.,40.);
+   TH1F* h_thirdJetEta = new TH1F("thirdJetEta","thirdJetEta",100,-5.,5.);
+
+   TH1F* h_jetsAveEta = new TH1F("jetsAveEta","jetsAveEta",100,-5.,5.);
+
    TH1F* h_jetsDeltaEta = new TH1F("jetsDeltaEta","jetsDeltaEta",100,-5.,5.);
    TH1F* h_jetsDeltaPhi = new TH1F("jetsDeltaPhi","jetsDeltaPhi",100,-1.1*M_PI,1.1*M_PI);
 
@@ -85,6 +92,9 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    TH1F* h_multiplicityHFPlus = new TH1F("multiplicityHFPlus","multiplicityHFPlus",20,0,20);
    TH1F* h_multiplicityHFMinus = new TH1F("multiplicityHFMinus","multiplicityHFMinus",20,0,20);
 
+   TH2F* h_iEtaVsHFCountPlus = new TH2F("iEtaVsHFCountPlus","iEtaVsHFCountPlus",12,29,41,20,0,20);
+   TH2F* h_iEtaVsHFCountMinus = new TH2F("iEtaVsHFCountMinus","iEtaVsHFCountMinus",12,29,41,20,0,20);
+ 
    TH1F* h_xiGenPlus = new TH1F("xiGenPlus","xiGenPlus",200,0.,1.);
    TH1F* h_xiGenMinus = new TH1F("xiGenMinus","xiGenMinus",200,0.,1.);
    TH1F* h_xiPlus = new TH1F("xiPlus","xiPlus",200,0.,1.);
@@ -219,8 +229,16 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      if(fabs(jet1.eta()) > etamax) continue;
      if(fabs(jet2.eta()) > etamax) continue; 
 
+     h_jetsAveEta->Fill((jet1.eta() + jet2.eta())/2);
+     
      h_leadingJetPhi->Fill(jet1.phi());
      h_secondJetPhi->Fill(jet2.phi());
+
+     if(jetCollection->size() > 2){
+        const pat::Jet& jet3 = (*jetCollection)[2];
+        h_thirdJetPt->Fill(jet3.pt());
+        h_thirdJetEta->Fill(jet3.eta());
+     }
 
      h_jetsDeltaEta->Fill(jet1.eta() - jet2.eta());
      h_jetsDeltaPhi->Fill(jet1.phi() - jet2.phi());
@@ -360,6 +378,18 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      fwlite::Handle<std::vector<unsigned int> > nHFMinus;
      nHFMinus.getByLabel(ev,"hfTower","nHFminus");
 
+     fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaPlus;
+     mapThreshToiEtaPlus.getByLabel(ev,"hfTower","mapTreshToiEtaplus");
+
+     fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaMinus;
+     mapThreshToiEtaMinus.getByLabel(ev,"hfTower","mapTreshToiEtaminus");
+
+     fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > iEtaHFMultiplicityPlus;
+     iEtaHFMultiplicityPlus.getByLabel(ev,"hfTower","iEtaHFMultiplicityPlus");
+
+     fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > iEtaHFMultiplicityMinus;
+     iEtaHFMultiplicityMinus.getByLabel(ev,"hfTower","iEtaHFMultiplicityMinus");
+
      fwlite::Handle<double> xiTowerPlus;
      xiTowerPlus.getByLabel(ev,"xiTower","xiTowerplus");
 
@@ -372,7 +402,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
 
      unsigned int nHF_plus = (*nHFPlus)[thresholdHF];
      unsigned int nHF_minus = (*nHFMinus)[thresholdHF];
-
+ 
      double xiTower_plus = *xiTowerPlus;
      double xiTower_minus = *xiTowerMinus;
  
@@ -383,6 +413,26 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_multiplicityHFPlus->Fill(nHF_plus);
      h_multiplicityHFMinus->Fill(nHF_minus);     
 
+     for(unsigned int ieta = 29; ieta <= 41; ++ieta){
+        //const std::map<unsigned int, std::vector<unsigned int> >& mapThreshToiEta_plus = *mapThreshToiEtaPlus;
+        unsigned int nHFPlus_ieta = nHFSlice(*mapThreshToiEtaPlus,thresholdHF,ieta);
+        h_iEtaVsHFCountPlus->Fill(ieta,nHFPlus_ieta);
+
+        std::map<unsigned int, std::vector<unsigned int> >::const_iterator ieta_plus = iEtaHFMultiplicityPlus->find(ieta);
+        unsigned int nHFPlus_ieta_v2 = (ieta_plus == iEtaHFMultiplicityPlus->end())?0:ieta_plus->second[thresholdHF]; 
+        //std::cout << "ieta= " << ieta << " HF mult. plus= " << nHFPlus_ieta << ", " << nHFPlus_ieta_v2 << std::endl;
+        if(nHFPlus_ieta != nHFPlus_ieta_v2) std::cout << "ieta= " << ieta << " different multiplicity plus " << nHFPlus_ieta << ", " << nHFPlus_ieta_v2 << std::endl;
+
+        //const std::map<unsigned int, std::vector<unsigned int> >& mapThreshToiEta_minus = *mapThreshToiEtaMinus;
+        unsigned int nHFMinus_ieta = nHFSlice(*mapThreshToiEtaMinus,thresholdHF,ieta);
+        h_iEtaVsHFCountMinus->Fill(ieta,nHFMinus_ieta); 
+
+        std::map<unsigned int, std::vector<unsigned int> >::const_iterator ieta_minus = iEtaHFMultiplicityMinus->find(ieta);
+        unsigned int nHFMinus_ieta_v2 = (ieta_minus == iEtaHFMultiplicityMinus->end())?0:ieta_minus->second[thresholdHF]; 
+        //std::cout << "ieta= " << ieta << " HF mult. minus= " << nHFMinus_ieta << ", " << nHFMinus_ieta_v2 << std::endl;
+        if(nHFMinus_ieta != nHFMinus_ieta_v2) std::cout << "ieta= " << ieta << " different multiplicity minus " << nHFMinus_ieta << ", " << nHFMinus_ieta_v2 << std::endl;
+     }
+ 
      h_xiPlus->Fill(xiTower_plus);
      h_xiMinus->Fill(xiTower_minus);
 
@@ -452,4 +502,13 @@ double Rjj(JetColl& jetCollection,PartColl& partCollection){
                                          part != partCollection.end(); ++part) allCands += part->p4();
 
    return (dijetSystem.M()/allCands.M());
+}
+
+unsigned int nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& mapTreshToiEta, unsigned int thresholdHF, unsigned int ieta){
+   const std::vector<unsigned int>& vec_iEta = mapTreshToiEta.find(thresholdHF)->second;
+
+   // Count number of ieta entries in vector 
+   int count_ieta = (int)std::count(vec_iEta.begin(),vec_iEta.end(),ieta);
+
+   return count_ieta;
 }
