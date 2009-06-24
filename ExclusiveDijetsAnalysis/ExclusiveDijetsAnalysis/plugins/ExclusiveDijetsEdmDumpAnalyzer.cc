@@ -26,6 +26,8 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     template <class JetColl,class PartColl>
     double Rjj(JetColl& jetCollection,PartColl& partCollection);
 
+    unsigned int nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& mapTreshToiEta, unsigned int thresholdHF, unsigned int ieta);
+
     edm::InputTag jetTag_;
     edm::InputTag jetNonCorrTag_;
     edm::InputTag particleFlowTag_;
@@ -60,6 +62,10 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_secondJetPhi_;
       TH1F* h_secondJetBDiscriminator_;
 
+      TH1F* h_thirdJetPt_;
+      TH1F* h_thirdJetEta_;
+
+      TH1F* h_jetsAveEta_;
       TH1F* h_jetsDeltaEta_;
       TH1F* h_jetsDeltaPhi_;
       TH1F* h_jetsDeltaPt_;
@@ -68,6 +74,9 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
       TH1F* h_multiplicityHFPlus_;
       TH1F* h_multiplicityHFMinus_;
 
+      TH2F* h_iEtaVsHFCountPlus_;
+      TH2F* h_iEtaVsHFCountMinus_;
+  
       TH1F* h_xiGenPlus_;
       TH1F* h_xiGenMinus_;
       TH1F* h_xiPlus_;
@@ -169,6 +178,10 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_secondJetPhi_ = fs->make<TH1F>("secondJetPhi","secondJetPhi",100,-1.1*M_PI,1.1*M_PI);
   histos_.h_secondJetBDiscriminator_ = fs->make<TH1F>("secondJetBDiscriminator","secondJetBDiscriminator",100,-10.,30.);
 
+  histos_.h_thirdJetPt_ = fs->make<TH1F>("thirdJetPt","thirdJetPt",100,0.,80.);
+  histos_.h_thirdJetEta_ = fs->make<TH1F>("thirdJetEta","thirdJetEta",100,-5.,5.);
+
+  histos_.h_jetsAveEta_ = fs->make<TH1F>("jetsAveEta","jetsAveEta",100,-5.,5.);
   histos_.h_jetsDeltaEta_ = fs->make<TH1F>("jetsDeltaEta","jetsDeltaEta",100,-5.,5.);
   histos_.h_jetsDeltaPhi_ = fs->make<TH1F>("jetsDeltaPhi","jetsDeltaPhi",100,0.,1.1*M_PI);
   histos_.h_jetsDeltaPt_ = fs->make<TH1F>("jetsDeltaPt","jetsDeltaPt",100,0.,10.);
@@ -176,6 +189,9 @@ void ExclusiveDijetsEdmDumpAnalyzer::beginJob(const edm::EventSetup& setup){
   histos_.h_trackMultiplicity_ = fs->make<TH1F>("trackMultiplicity","trackMultiplicity",20,0,20);
   histos_.h_multiplicityHFPlus_ = fs->make<TH1F>("multiplicityHFPlus","multiplicityHFPlus",20,0,20);
   histos_.h_multiplicityHFMinus_ = fs->make<TH1F>("multiplicityHFMinus","multiplicityHFMinus",20,0,20);
+
+  histos_.h_iEtaVsHFCountPlus_ = fs->make<TH2F>("iEtaVsHFCountPlus","iEtaVsHFCountPlus",11,30,41,20,0,20);
+  histos_.h_iEtaVsHFCountMinus_ = fs->make<TH2F>("iEtaVsHFCountMinus","iEtaVsHFCountMinus",11,30,41,20,0,20);
 
   histos_.h_xiGenPlus_ = fs->make<TH1F>("xiGenPlus","xiGenPlus",200,0.,1.);
   histos_.h_xiGenMinus_ = fs->make<TH1F>("xiGenMinus","xiGenMinus",200,0.,1.);
@@ -241,6 +257,13 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   histos_.h_leadingJetPhi_->Fill(jet1.phi());
   histos_.h_secondJetPhi_->Fill(jet2.phi());
 
+  if(jetCollectionH->size() > 2){
+     const reco::Jet& jet3 = (*jetCollectionH)[2];
+     histos_.h_thirdJetPt_->Fill(jet3.pt());
+     histos_.h_thirdJetEta_->Fill(jet3.eta());
+  }
+
+  histos_.h_jetsAveEta_->Fill((jet1.eta() + jet2.eta())/2);
   histos_.h_jetsDeltaEta_->Fill(jet1.eta() - jet2.eta());
   histos_.h_jetsDeltaPhi_->Fill(M_PI - fabs(jet1.phi() - jet2.phi()));
   histos_.h_jetsDeltaPt_->Fill(fabs(jet1.pt() - jet2.pt())); 
@@ -348,6 +371,18 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   edm::Handle<std::vector<unsigned int> > nHFMinus;
   event.getByLabel("hfTower","nHFminus",nHFMinus);
 
+  edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaPlus;
+  event.getByLabel("hfTower","mapTreshToiEtaplus",mapThreshToiEtaPlus);
+
+  edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaMinus;
+  event.getByLabel("hfTower","mapTreshToiEtaminus",mapThreshToiEtaMinus);
+
+  /*edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > iEtaHFMultiplicityPlus;
+  event.getByLabel("hfTower","iEtaHFMultiplicityPlus",iEtaHFMultiplicityPlus);
+
+  edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > iEtaHFMultiplicityMinus;
+  event.getByLabel("hfTower","iEtaHFMultiplicityMinus",iEtaHFMultiplicityMinus);*/
+
   /*edm::Handle<double> xiTowerPlus;
   event.getByLabel("xiTower","xiTowerplus",xiTowerPlus);
 
@@ -373,6 +408,20 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   histos_.h_trackMultiplicity_->Fill(nTracks);
   histos_.h_multiplicityHFPlus_->Fill(nHF_plus);
   histos_.h_multiplicityHFMinus_->Fill(nHF_minus);     
+
+  for(unsigned int ieta = 30; ieta <= 41; ++ieta){
+        unsigned int nHFPlus_ieta = nHFSlice(*mapThreshToiEtaPlus,thresholdHF_,ieta);
+        histos_.h_iEtaVsHFCountPlus_->Fill(ieta,nHFPlus_ieta);
+
+        /*std::map<unsigned int, std::vector<unsigned int> >::const_iterator ieta_plus = iEtaHFMultiplicityPlus->find(ieta);
+        unsigned int nHFPlus_ieta = (ieta_plus == iEtaHFMultiplicityPlus->end())?0:ieta_plus->second[thresholdHF];*/ 
+
+        unsigned int nHFMinus_ieta = nHFSlice(*mapThreshToiEtaMinus,thresholdHF_,ieta);
+        histos_.h_iEtaVsHFCountMinus_->Fill(ieta,nHFMinus_ieta); 
+
+        /*std::map<unsigned int, std::vector<unsigned int> >::const_iterator ieta_minus = iEtaHFMultiplicityMinus->find(ieta);
+        unsigned int nHFMinus_ieta_v2 = (ieta_minus == iEtaHFMultiplicityMinus->end())?0:ieta_minus->second[thresholdHF];*/ 
+  }
 
   histos_.h_xiPlus_->Fill(xi_plus);
   histos_.h_xiMinus_->Fill(xi_minus);
@@ -431,6 +480,15 @@ double ExclusiveDijetsEdmDumpAnalyzer::Rjj(JetColl& jetCollection,PartColl& part
                                          part != partCollection.end(); ++part) allCands += part->p4();
 
    return (dijetSystem.M()/allCands.M());
+}
+
+unsigned int ExclusiveDijetsEdmDumpAnalyzer::nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& mapTreshToiEta, unsigned int thresholdHF, unsigned int ieta){
+   const std::vector<unsigned int>& vec_iEta = mapTreshToiEta.find(thresholdHF)->second;
+
+   // Count number of ieta entries in vector 
+   int count_ieta = (int)std::count(vec_iEta.begin(),vec_iEta.end(),ieta);
+
+   return count_ieta;
 }
 
 DEFINE_FWK_MODULE(ExclusiveDijetsEdmDumpAnalyzer);

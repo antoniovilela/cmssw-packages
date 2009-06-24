@@ -157,7 +157,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    double Ebeam = 5000.;
    int thresholdHF = 12;// 2.4 GeV
 
-   bool selectPileUp = true;
+   bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 
    bool accessEdmDump = true;

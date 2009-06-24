@@ -18,7 +18,7 @@
 TH1F* getHisto(TDirectory*, const string&);
 void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int rebin = 1);*/
 
-void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap,bool Norm = false);
+void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap,bool Norm = false, int rebin = 1);
 
 template<typename KeyType,typename ValueType>
 std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values);
@@ -29,7 +29,7 @@ struct Result{
    double scale_;
 };
 
-void plot(bool Norm = false){
+void plot(bool Norm = false,int rebin = 1){
 
    /*TFile* file_signal = TFile::Open("root/analysisDijets_CEPDijets_M100_histos_PU_nHFMax_1.root");
    double sigma_signal = 450.; //pb
@@ -69,8 +69,8 @@ void plot(bool Norm = false){
    samplesFastSim.push_back("SDDijets");
    samplesFastSim.push_back("QCD100to250-madgraph");
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file,++index){
-      if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx_NHFPlusMax_0_NHFMinusMax_0"));
-      else directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter_NHFPlusMax_0_NHFMinusMax_0"));
+      if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx_NHFPlusMax_1_NHFMinusMax_1"));
+      else directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter_NHFPlusMax_1_NHFMinusMax_1"));
        
       //directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter"));
    }
@@ -144,10 +144,10 @@ void plot(bool Norm = false){
    stackVars.push_back("RjjAfterSel");
    stackVars.push_back("RjjFromPFAfterSel");
 
-   plot(refVar,stackVars,dirMap,scaleMap,Norm);
+   plot(refVar,stackVars,dirMap,scaleMap,Norm,rebin);
 }
 
-void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap, bool Norm){
+void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap, bool Norm, int rebin){
    std::map<std::string,TCanvas*> canvasesVar;
    std::map<std::string,TLegend*> legendsVar;
    //for(size_t k = 0; k < canvasesVar.size(); ++k) canvasesVar[k] = new TCanvas(refVar[k].c_str(),refVar[k].c_str());
@@ -172,7 +172,7 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
    for(std::vector<std::string>::const_iterator var = refVar.begin(); var != refVar.end(); ++var){
       const std::string& varName = *var; 
       histos_signal[varName] = getHisto(dirMap["signal"],varName);
-      scaleHisto(histos_signal[varName],scaleMap["signal"],1,kBlack,16);
+      scaleHisto(histos_signal[varName],scaleMap["signal"],1,kBlack,rebin);
       legendsVar[varName]->AddEntry(histos_signal[varName],"CEP di-jets","L");
  
       canvasesVar[varName]->cd();
@@ -183,7 +183,7 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
          if(it->first == "signal") continue;
          if(histos_back.find(it->first) == histos_back.end()) histos_back[it->first] = defmap;
          histos_back[it->first][varName] = getHisto(it->second,varName); 
-         scaleHisto(histos_back[it->first][varName],scaleMap[it->first],1,colors[index],16);
+         scaleHisto(histos_back[it->first][varName],scaleMap[it->first],1,colors[index],rebin);
          legendsVar[varName]->AddEntry(histos_back[it->first][varName],it->first.c_str(),"L"); 
          if(Norm) histos_back[it->first][varName]->DrawNormalized("same");
          else histos_back[it->first][varName]->Draw("same");
