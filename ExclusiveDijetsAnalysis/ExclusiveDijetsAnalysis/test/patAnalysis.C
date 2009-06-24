@@ -125,6 +125,8 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
 
    TH2F* h_RjjFromJetsVsBDicriminator = new TH2F("RjjFromJetsVsBDicriminator","RjjFromJetsVsBDicriminator",200,-0.1,1.5,200,-10.,30.);
    TH2F* h_RjjFromPFCandsVsBDicriminator = new TH2F("RjjFromPFCandsVsBDicriminator","RjjFromPFCandsVsBDicriminator",200,-0.1,1.5,200,-10.,30.);
+   TH2F* h_RjjFromJetsVsThirdJetPt = new TH2F("RjjFromJetsVsThirdJetPt","RjjFromJetsVsThirdJetPt",200,-0.1,1.5,200,0.,80.);
+   TH2F* h_RjjFromPFCandsVsThirdJetPt = new TH2F("RjjFromPFCandsVsThirdJetPt","RjjFromPFCandsVsThirdJetPt",200,-0.1,1.5,200,0.,80.);
 
    TH1F* h_xiPlusAfterSel = new TH1F("xiPlusAfterSel","xiPlusAfterSel",200,0.,1.);
    TH1F* h_xiMinusAfterSel = new TH1F("xiMinusAfterSel","xiMinusAfterSel",200,0.,1.);
@@ -157,7 +159,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    double Ebeam = 5000.;
    int thresholdHF = 12;// 2.4 GeV
 
-   bool selectPileUp = false;
+   bool selectPileUp = true;
    int nEventsPUBx0 = 0;
 
    bool accessEdmDump = true;
@@ -288,6 +290,11 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_RjjFromJets->Fill(RjjFromJets);
 
      h_RjjFromPFCands->Fill(RjjFromPFCands);
+
+     double thirdJetPt = (jetCollection->size() > 2)?(*jetCollection)[2].pt():0.;
+
+     h_RjjFromJetsVsThirdJetPt->Fill(RjjFromJets,thirdJetPt);
+     h_RjjFromPFCandsVsThirdJetPt->Fill(RjjFromPFCands,thirdJetPt);
 
      std::pair<double,double> xiFromJets = xi(*jetCollection);
      h_xiPlusFromJets->Fill(xiFromJets.first);
