@@ -2,6 +2,7 @@
 #include "TCanvas.h"
 #include "TChain.h"
 #include "TH1F.h"
+#include "TF1.h"
 
 #include <cmath>
 #include <iostream>
@@ -29,6 +30,14 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
    TH1F* h_sumEHF_plus = new TH1F("sumEHF_plus","sumEHF_plus",500,0.,1000.);
    TH1F* h_sumEHF_minus = new TH1F("sumEHF_minus","sumEHF_minus",500,0.,1000.);
 
+   int nThresholds = 100;
+   float sumEtMin = 0.;
+   float sumEtMax = 500.;
+
+   TH1F* h_EffVsThreshold = new TH1F("EffVsThreshold","EffVsThreshold",nThresholds,sumEtMin,sumEtMax);
+   TF1* func_effTrig = new TF1("effTrig","[0]",sumEtMin,sumEtMax);
+   TF1* func_effTrigL1 = new TF1("effTrigL1","[0]",sumEtMin,sumEtMax);
+   
    std::string trigName = "HLT_DiJetAve30";
 
    int trigBit;
@@ -38,16 +47,29 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
    float hfTwrEta[1000];
    float hfTwrPhi[1000];
     
+   int L1HfRing1EtSumNegativeEta;
+   int L1HfRing2EtSumNegativeEta;
+   int L1HfRing1EtSumPositiveEta;
+   int L1HfRing2EtSumPositiveEta;
+
    chain.SetBranchAddress(trigName.c_str(),&trigBit);
    chain.SetBranchAddress("NrecoTowCal",&nHFtowers);
    chain.SetBranchAddress("recoTowE",hfTwrEnergy);
    chain.SetBranchAddress("recoTowEt",hfTwrEt);
    chain.SetBranchAddress("recoTowEta",hfTwrEta);
    chain.SetBranchAddress("recoTowPhi",hfTwrPhi);
+   chain.SetBranchAddress("L1HfRing1EtSumNegativeEta",&L1HfRing1EtSumNegativeEta);
+   chain.SetBranchAddress("L1HfRing2EtSumNegativeEta",&L1HfRing2EtSumNegativeEta);
+   chain.SetBranchAddress("L1HfRing1EtSumPositiveEta",&L1HfRing1EtSumPositiveEta);
+   chain.SetBranchAddress("L1HfRing2EtSumPositiveEta",&L1HfRing2EtSumPositiveEta);
 
    int nEvents = chain.GetEntries();
    double etaMin = 3.0;
    double towerThreshold = 2.5; //energy
+   int L1EtSumThershold = 0;
+ 
+   int nPassedTrigBit = 0;
+   int nPassedTrigBitAndL1EtSum = 0;
    for(int entry = 0; entry < nEvents; ++entry){
       if((maxEvents > 0)&&(nEvents == maxEvents)) break;
       if(entry%2000 == 0) std::cout << ">>> Analysing " << entry << "th event" << std::endl;
@@ -56,6 +78,15 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
       //size_t index = 0;
 
       if(trigBit == 0) continue;
+
+      ++nPassedTrigBit;
+
+      if((L1HfRing1EtSumNegativeEta > L1EtSumThershold)||
+         (L1HfRing2EtSumNegativeEta > L1EtSumThershold)||
+         (L1HfRing1EtSumPositiveEta > L1EtSumThershold)||
+         (L1HfRing2EtSumPositiveEta > L1EtSumThershold)) continue;
+
+      ++nPassedTrigBitAndL1EtSum;
 
       h_nHFtowers->Fill(nHFtowers);
       double sumEHF_plus = 0.;
@@ -76,9 +107,27 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
          else sumEHF_minus += energy;
       }
       h_sumEHF_plus->Fill(sumEHF_plus);
-      h_sumEHF_minus->Fill(sumEHF_minus); 
+      h_sumEHF_minus->Fill(sumEHF_minus);
+
+      // Check if passes energy sum cut vs threshold
+      for(int i_bin = 0; i_bin < h_EffVsThreshold->GetXaxis()->GetNbins(); ++i_bin){
+         float threshold = h_EffVsThreshold->GetXaxis()->GetBinLowEdge(i_bin + 1);
+         float bin_center = h_EffVsThreshold->GetXaxis()->GetBinCenter(i_bin + 1);
+         // Apply veto
+         if((sumEHF_plus < threshold)&&(sumEHF_minus < threshold)) h_EffVsThreshold->Fill(bin_center);
+      } 
    }
 
+   float effTrigBit = (float)nPassedTrigBit/nEvents;
+   func_effTrig->SetParameter(0,effTrigBit);
+   
+   float effTrigBitL1 = (float)nPassedTrigBitAndL1EtSum/nEvents;
+   func_effTrigL1->SetParameter(0,effTrigBitL1); 
+
+   h_EffVsThreshold->Scale(1./nEvents);
+
+   func_effTrig->Write();
+   func_effTrigL1->Write();
    hfile->Write();
    hfile->Close();
 }
