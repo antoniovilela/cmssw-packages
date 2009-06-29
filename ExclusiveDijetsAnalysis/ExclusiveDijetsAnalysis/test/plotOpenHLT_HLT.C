@@ -30,6 +30,8 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
    TH1F* h_sumEHF_plus = new TH1F("sumEHF_plus","sumEHF_plus",500,0.,1000.);
    TH1F* h_sumEHF_minus = new TH1F("sumEHF_minus","sumEHF_minus",500,0.,1000.);
 
+   TH1F* h_fracEt = new TH1F("fracEt","fracEt",500,0.,2.);
+
    int nThresholds = 100;
    float sumEtMin = 0.;
    float sumEtMax = 500.;
@@ -47,6 +49,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
    float hfTwrEta[1000];
    float hfTwrPhi[1000];
     
+   int nJetsCal;
+   float jetCalPt[100];
+   float jetCalEta[100];
+
    int L1HfRing1EtSumNegativeEta;
    int L1HfRing2EtSumNegativeEta;
    int L1HfRing1EtSumPositiveEta;
@@ -58,6 +64,9 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
    chain.SetBranchAddress("recoTowEt",hfTwrEt);
    chain.SetBranchAddress("recoTowEta",hfTwrEta);
    chain.SetBranchAddress("recoTowPhi",hfTwrPhi);
+   chain.SetBranchAddress("NrecoJetCal",&nJetsCal);
+   chain.SetBranchAddress("recoJetCalPt",jetCalPt); 
+   chain.SetBranchAddress("recoJetCalEta",jetCalEta);
    chain.SetBranchAddress("L1HfRing1EtSumNegativeEta",&L1HfRing1EtSumNegativeEta);
    chain.SetBranchAddress("L1HfRing2EtSumNegativeEta",&L1HfRing2EtSumNegativeEta);
    chain.SetBranchAddress("L1HfRing1EtSumPositiveEta",&L1HfRing1EtSumPositiveEta);
@@ -71,7 +80,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
    int nPassedTrigBit = 0;
    int nPassedTrigBitAndL1EtSum = 0;
    for(int entry = 0; entry < nEvents; ++entry){
-      if((maxEvents > 0)&&(nEvents == maxEvents)) break;
+      if((maxEvents > 0)&&(entry == maxEvents)) break;
       if(entry%2000 == 0) std::cout << ">>> Analysing " << entry << "th event" << std::endl;
 
       chain.GetEntry(entry);
@@ -91,14 +100,16 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
       h_nHFtowers->Fill(nHFtowers);
       double sumEHF_plus = 0.;
       double sumEHF_minus = 0.;
+      double sumEt = 0.;
       for(int itwr = 0; itwr < nHFtowers; ++itwr){
          double energy = hfTwrEnergy[itwr];
          double et = hfTwrEt[itwr];
          double eta = hfTwrEta[itwr];
   
-         if(fabs(eta) < etaMin) continue;
-         if(energy < towerThreshold) continue;  
-
+         if(energy < towerThreshold) continue;
+         sumEt += hfTwrEt[itwr];
+ 
+         if(fabs(eta) < etaMin) continue; //for HF
          h_hfTwrEnergy->Fill(energy);
          h_hfTwrEt->Fill(et);		     
          h_hfTwrEta->Fill(eta);
@@ -108,6 +119,13 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
       }
       h_sumEHF_plus->Fill(sumEHF_plus);
       h_sumEHF_minus->Fill(sumEHF_minus);
+
+      double fracEt = (nJetsCal)?jetCalPt[0]:-1;
+      if(nJetsCal >=2 ) fracEt += jetCalPt[1];
+      if(sumEt) fracEt /= sumEt;
+      else fracEt = -1;
+
+      h_fracEt->Fill(fracEt);
 
       // Check if passes energy sum cut vs threshold
       for(int i_bin = 0; i_bin < h_EffVsThreshold->GetXaxis()->GetNbins(); ++i_bin){
