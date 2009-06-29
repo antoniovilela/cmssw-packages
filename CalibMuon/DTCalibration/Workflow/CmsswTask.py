@@ -7,7 +7,7 @@ class CmsswTask:
         self.pset_list = pset_list #dictionary
   
     def run(self):
-        dir = self.desc + '/Ttrig/Exec'
+        dir = self.desc
         if not os.path.exists(dir): os.makedirs(dir)
 
         cwd = os.getcwd()
@@ -16,8 +16,8 @@ class CmsswTask:
 
             os.chdir(dir)
             cmd = 'cmsRun %s'%pset
+            print "Running", cmd, "in dir", dir
             #os.system(cmd)
-            print "will run", cmd, "in dir", dir
             os.chdir(cwd)       
      
         return
@@ -33,6 +33,7 @@ if __name__ == '__main__':
     if not run: raise ValueError,'Need to set run number' 
  
     desc = 'Run%s'%run
+    desc += '/Ttrig/Exec'
 
     common_opts = {'GLOBALTAG':'CRAFT_31X::All'}
 
@@ -41,7 +42,10 @@ if __name__ == '__main__':
                       'DTTTrigCorrection_cfg.py':'Workflow/templates/config/DTTTrigCorrection_TEMPL_cfg.py',
                       'DumpDBToFile_second_cfg.py':'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py'}
 
-    result_dir = desc + '/Ttrig/Results'
+    result_dir = 'Run%s'%run
+    result_dir += '/Ttrig/Results'
+    if not os.path.exists(result_dir): os.makedirs(result_dir)
+
     timeBoxes = os.path.abspath(result_dir + '/' + 'DTTimeBoxes_' + run + '.root')
     ttrig_first = result_dir + '/' + 'ttrig_first_' + run
     ttrig_first_db = os.path.abspath(ttrig_first + '.db')

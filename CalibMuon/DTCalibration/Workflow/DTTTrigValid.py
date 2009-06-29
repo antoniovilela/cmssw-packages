@@ -2,27 +2,28 @@ from workflow import replaceTemplate
 from CrabTask import *
 import os
 
-class DTTTrigProd:
-    def __init__(run,trial):
-        self.pset_name = 'DTTTrigCalibration_cfg.py'
+class DTTTrigValid:
+    def __init__(run,input_file,trial):
+        self.pset_name = 'DTkFactValidation_1_cfg.py'
 
-        self.crab_template = 'workflow/templates/crab/crab_ttrig_prod_TEMPL.cfg'
-        self.pset_template = 'workflow/templates/config/DTTTrigCalibration_TEMPL_cfg.py'
+        self.crab_template = 'workflow/templates/crab/crab_Valid_TEMPL.cfg'
+        self.pset_template = 'workflow/templates/config/DTkFactValidation_1_TEMPL_cfg.py'
 
         self.crab_opts = {'DATASETPATH':'/Cosmics/Commissioning09-v2/RAW',
                           'RUNNUMBER':run,
                           'PSET':pset_name, 
-                          'USERDIRCAF':'TTRIGCalibration/Production/Run' + str(run) + '/v' + str(trial),
+                          'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial), 
+                          'INPUTFILE':input_file,
                           'EMAIL':'vilela@to.infn.it'}
 
         self.pset_opts = {'GLOBALTAG':'CRAFT_31X::All',
-                          'MUDIGILABEL':'muonDTDigis'}
+                          'INPUTFILE':input_file.split('/')[-1]}
 
         self.crab_cfg = replaceTemplate(crab_template,**crab_opts)
         self.pset = replaceTemplate(pset_template,**pset_opts)
 
         desc = 'Run%s'%run
-        desc += '/Ttrig/Production'
+        desc += '/Ttrig/Validation/First'
         self.desc = desc 
 
     def createCrab():
@@ -43,7 +44,12 @@ if __name__ == '__main__':
     if not run: raise ValueError,'Need to set run number'
     if not trial: raise ValueError,'Need to set trial number'
 
-    dtTtrigProd = DTTTrigProd(run,trial): 
-    project = dtTtrigProd.createCrab().run()
+    result_dir = 'Run%s'%run
+    result_dir += '/Ttrig/Results'
 
-    print "Sent production jobs with project",project
+    ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
+
+    dtTtrigValid = DTTTrigValid(run,trial,ttrig_second_db): 
+    project = dtTtrigValid.createCrab().run()
+
+    print "Sent validation jobs with project",project
