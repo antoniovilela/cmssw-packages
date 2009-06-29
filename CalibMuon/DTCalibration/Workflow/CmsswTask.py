@@ -2,10 +2,25 @@ from workflow import replaceTemplate
 import os
 
 class CmsswTask:
-    def __init__(self, desc, pset_list):
+    def __init__(self, desc, common_opts, pset_templates, pset_opts):
         self.desc = desc 
-        self.pset_list = pset_list #dictionary
+        self.common_opts = common_opts
+        self.pset_templates = pset_templates
+        self.pset_opts = pset_opts
+
+        self.pset_list = None
+        self.makePSetList()
   
+    def makePSetList(self):
+        pset_list = {}
+        for pset_name in self.pset_templates:
+            opts = self.pset_opts[pset_name]
+            opts.update(self.common_opts)
+            pset = replaceTemplate(self.pset_templates[pset_name],**opts)
+            pset_list[pset_name] = pset
+
+        self.pset_list = pset_list
+
     def run(self):
         dir = self.desc
         if not os.path.exists(dir): os.makedirs(dir)
@@ -59,14 +74,7 @@ if __name__ == '__main__':
                  'DTTTrigCorrection_cfg.py':{'INPUTFILE':ttrig_first_db,'OUTPUTFILE':ttrig_second_db},
                  'DumpDBToFile_second_cfg.py':{'INPUTFILE':ttrig_second_db,'OUTPUTFILE':ttrig_second_txt}}
 
-    pset_list = {}
-    for pset_name in pset_templates:
-        opts = pset_opts[pset_name]
-        opts.update(common_opts)
-        pset = replaceTemplate(pset_templates[pset_name],**opts)
-        pset_list[pset_name] = pset
-        
-    task = CmsswTask(desc,pset_list)
+    task = CmsswTask(desc,common_opts,pset_templates,pset_opts)
     task.run()
 
     print "Finished processing:"
