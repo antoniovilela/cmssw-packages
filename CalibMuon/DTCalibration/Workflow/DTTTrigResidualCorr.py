@@ -23,6 +23,7 @@ class DTTTrigResidualCorr:
         ttrig_ResidCorr_txt = os.path.abspath(ttrig_ResidCorr + '.txt')
         root_file = os.path.abspath(result_dir + '/' + 'DTkFactValidation_' + run + '.root')
          
+        self.pset_opts = {} 
         self.pset_opts['DTTTrigResidualCorrection_cfg.py'] = {'INPUTDBFILE':ttrig_second_db,
                                                               'OUTPUTDBFILE':ttrig_ResidCorr_db,
                                                               'INPUTROOTFILE':root_file}
