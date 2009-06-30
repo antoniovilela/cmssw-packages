@@ -38,11 +38,12 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
 
 process.DTTTrigCorrectionFirst = cms.EDFilter("DTTTrigCorrectionFirst",
     debug = cms.untracked.bool(False),
-    ttrigMax = cms.untracked.double(2600.0),
-    #	untracked double ttrigMin = 475
-    #	untracked double ttrigMax = 525
-    ttrigMin = cms.untracked.double(2400.0),
-    rmsLimit = cms.untracked.double(2.)                                          
+    #ttrigMax = cms.untracked.double(2600.0),
+    #ttrigMin = cms.untracked.double(2400.0),
+    #rmsLimit = cms.untracked.double(2.)                                          
+    ttrigMax = cms.untracked.double(850.0),
+    ttrigMin = cms.untracked.double(100.0),
+    rmsLimit = cms.untracked.double(20.)
 )
 
 process.p = cms.Path(process.DTTTrigCorrectionFirst)

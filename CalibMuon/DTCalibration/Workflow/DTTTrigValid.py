@@ -3,18 +3,18 @@ from CrabTask import *
 import os
 
 class DTTTrigValid:
-    def __init__(self,run,input_file,trial):
+    def __init__(self,run,input_file,opts,trial=1):
         pset_name = 'DTkFactValidation_1_cfg.py'
 
         self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_Valid_TEMPL.cfg'
         self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTkFactValidation_1_TEMPL_cfg.py'
-
         self.crab_opts = {'DATASETPATH':'/Cosmics/Commissioning09-v2/RAW',
                           'RUNNUMBER':run,
                           'PSET':pset_name, 
-                          'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial), 
                           'INPUTFILE':input_file,
                           'EMAIL':'vilela@to.infn.it'}
+
+        self.crab_opts.update(opts)
 
         self.pset_opts = {'GLOBALTAG':'CRAFT_31X::All',
                           'INPUTFILE':input_file.split('/')[-1]}
@@ -49,9 +49,11 @@ if __name__ == '__main__':
     result_dir = 'Run%s'%run
     result_dir += '/Ttrig/Results'
 
-    ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
+    ttrig_second_db = os.path.abspath(result_dir + '/' + 'ttrig_second_' + run + '.db')
 
-    dtTtrigValid = DTTTrigValid(run,ttrig_second_db,trial) 
+    opts = {'USERDIRCAF':'TTRIGCalibrationd/Validation/First/Run' + str(run) + '/v' + str(trial)}
+
+    dtTtrigValid = DTTTrigValid(run,ttrig_second_db,opts,trial) 
     project = dtTtrigValid.run()
 
     print "Sent validation jobs with project",project

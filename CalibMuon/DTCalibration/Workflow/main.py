@@ -47,7 +47,9 @@ for pset in dtTtrigCorrFirst.configs: print "--->",pset
 
 ttrig_second_db = os.path.abspath(result_dir + '/' + 'ttrig_second_' + run + '.db')
 
-dtTtrigValid = DTTTrigValid(run,ttrig_second_db,trial) 
+opts = {'USERDIRCAF':'TTRIGCalibrationd/Validation/First/Run' + str(run) + '/v' + str(trial)}
+
+dtTtrigValid = DTTTrigValid(run,ttrig_second_db,opts,trial) 
 project_valid_first = dtTtrigValid.run()
 
 print "Sent validation jobs with project",project_valid_first
@@ -66,7 +68,9 @@ for pset in dtTtrigResidualCorr.configs: print "--->",pset
 
 ttrig_ResidCorr_db = os.path.abspath(result_dir + '/' + 'ttrig_ResidCorr_' + run + '.db')
 
-dtTtrigValid_ResidCorr = DTTTrigValid(run,ttrig_ResidCorr_db,trial) 
+opts = {'USERDIRCAF':'TTRIGCalibrationd/Validation/ResidCorr/Run' + str(run) + '/v' + str(trial)}
+
+dtTtrigValid_ResidCorr = DTTTrigValid(run,ttrig_ResidCorr_db,opts,trial) 
 project_valid_ResidCorr = dtTtrigValid_ResidCorr.run()
 
 print "Sent validation jobs with project",project_valid_ResidCorr

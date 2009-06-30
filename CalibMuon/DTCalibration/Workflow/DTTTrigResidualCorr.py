@@ -17,7 +17,7 @@ class DTTTrigResidualCorr:
         self.pset_templates['DTTTrigResidualCorrection_cfg.py'] = base + 'Workflow/templates/config/DTTTrigResidualCorrection_TEMPL_cfg.py'
         self.pset_templates['DumpDBToFile_ResidCorr_cfg.py'] = base + 'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py'
 
-        ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
+        ttrig_second_db = os.path.abspath(result_dir + '/' + 'ttrig_second_' + run + '.db')
         ttrig_ResidCorr = result_dir + '/' + 'ttrig_ResidCorr_' + run
         ttrig_ResidCorr_db = os.path.abspath(ttrig_ResidCorr + '.db')
         ttrig_ResidCorr_txt = os.path.abspath(ttrig_ResidCorr + '.txt')
