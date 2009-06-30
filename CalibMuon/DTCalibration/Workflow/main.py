@@ -2,6 +2,7 @@ from DTTTrigProd import DTTTrigProd
 from DTTTrigCorrFirst import DTTTrigCorrFirst
 from DTTTrigValid import DTTTrigValid
 from DTTTrigResidualCorr import DTTTrigResidualCorr
+from DTValidSummary import DTValidSummary
 from workflow import haddInCastor,crabWatch,getOutput
 import sys,os,time
 
@@ -76,6 +77,18 @@ project_valid_ResidCorr = dtTtrigValid_ResidCorr.run()
 print "Sent validation jobs with project",project_valid_ResidCorr
 
 #crabWatch(getOutput,project_valid_ResidCorr)
+
+result_file = result_dir + '/DTkFactValidation_ResidCorr_%s.root'%run
+castor_dir = castor_prefix + dtTtrigValid_ResidCorr.crab_opts['USERDIRCAF']
+haddInCastor(castor_dir,result_file)
+
+input_file = os.path.abspath(result_file)
+
+dtTtrigValidSummary = DTValidSummary(run,input_file,result_dir)
+dtTtrigValidSummary.run()
+
+print "Finished processing:"
+for pset in dtTtrigValidSummary.configs: print "--->",pset
 
 stop = time.time() 
 print "DT Calibration finished for Run",run
