@@ -59,7 +59,7 @@ crabWatch(getOutput,project_valid_first)
 
 result_file = result_dir + '/DTkFactValidation_%s.root'%run
 castor_dir = castor_prefix + dtTtrigValid.crab_opts['USERDIRCAF']
-haddInCastor(castor_dir,result_file)
+haddInCastor(castor_dir,result_file,'residuals')
 
 dtTtrigResidualCorr = DTTTrigResidualCorr(run,result_dir)  
 dtTtrigResidualCorr.run()
@@ -80,7 +80,7 @@ crabWatch(getOutput,project_valid_ResidCorr)
 
 result_file = result_dir + '/DTkFactValidation_ResidCorr_%s.root'%run
 castor_dir = castor_prefix + dtTtrigValid_ResidCorr.crab_opts['USERDIRCAF']
-haddInCastor(castor_dir,result_file)
+haddInCastor(castor_dir,result_file,'residuals')
 
 input_file = os.path.abspath(result_file)
 
