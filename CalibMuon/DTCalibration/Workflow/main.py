@@ -44,7 +44,7 @@ dtTtrigCorrFirst.run()
 print "Finished processing:"
 for pset in dtTtrigCorrFirst.configs: print "--->",pset
 
-ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
+ttrig_second_db = os.path.abspath(result_dir + '/' + 'ttrig_second_' + run + '.db')
 
 dtTtrigValid = DTTTrigValid(run,ttrig_second_db,trial) 
 project_valid_first = dtTtrigValid.run()
@@ -63,7 +63,7 @@ dtTtrigResidualCorr.run()
 print "Finished processing:"
 for pset in dtTtrigResidualCorr.configs: print "--->",pset
 
-ttrig_ResidCorr_db = result_dir + '/' + 'ttrig_ResidCorr_' + run + '.db'
+ttrig_ResidCorr_db = os.path.abspath(result_dir + '/' + 'ttrig_ResidCorr_' + run + '.db')
 
 dtTtrigValid_ResidCorr = DTTTrigValid(run,ttrig_ResidCorr_db,trial) 
 project_valid_ResidCorr = dtTtrigValid_ResidCorr.run()

@@ -31,7 +31,7 @@ class CmsswTask:
         for pset in self.configs:
             os.chdir(self.dir)
             cmd = 'cmsRun %s'%pset
-            print "Running", cmd, "in dir", dir
+            print "Running", cmd, "in dir", self.dir
             #os.system(cmd)
             os.chdir(cwd)       
      
