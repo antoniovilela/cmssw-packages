@@ -2,34 +2,34 @@ from workflow import replaceTemplate
 import os
 
 class CmsswTask:
-    def __init__(self, desc, common_opts, pset_templates, pset_opts):
-        self.desc = desc 
+    def __init__(self, desc, configs, common_opts, pset_templates, pset_opts):
+        self.desc = desc
+        self.dir = desc  
+        self.configs = configs
         self.common_opts = common_opts
         self.pset_templates = pset_templates
         self.pset_opts = pset_opts
 
         self.pset_list = None
-        self.makePSetList()
+        self.initTask()
   
-    def makePSetList(self):
-        pset_list = {}
-        for pset_name in self.pset_templates:
+    def initTask(self):
+        if not os.path.exists(self.dir): os.makedirs(self.dir)
+
+        #pset_list = []
+        for pset_name in self.configs
             opts = self.pset_opts[pset_name]
             opts.update(self.common_opts)
             pset = replaceTemplate(self.pset_templates[pset_name],**opts)
-            pset_list[pset_name] = pset
-
-        self.pset_list = pset_list
+            open(dir + '/' + pset_name,'w').write(pset)
+ 
+        #self.pset_list = pset_list
 
     def run(self):
-        dir = self.desc
-        if not os.path.exists(dir): os.makedirs(dir)
 
         cwd = os.getcwd()
-        for pset in self.pset_list:
-            open(dir + '/' + pset,'w').write(self.pset_list[pset])
-
-            os.chdir(dir)
+        for pset in self.configs:
+            os.chdir(self.dir)
             cmd = 'cmsRun %s'%pset
             print "Running", cmd, "in dir", dir
             #os.system(cmd)
@@ -50,6 +50,8 @@ if __name__ == '__main__':
 
     common_opts = {'GLOBALTAG':'CRAFT_31X::All'}
 
+    configs = ['DTTTrigWriter_cfg.py','DumpDBToFile_first_cfg.py','DTTTrigCorrection_cfg.py','DumpDBToFile_second_cfg.py']
+ 
     pset_templates = {'DTTTrigWriter_cfg.py':'Workflow/templates/config/DTTTrigWriter_TEMPL_cfg.py',
                       'DumpDBToFile_first_cfg.py':'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py',
                       'DTTTrigCorrection_cfg.py':'Workflow/templates/config/DTTTrigCorrection_TEMPL_cfg.py',
@@ -72,8 +74,8 @@ if __name__ == '__main__':
                  'DTTTrigCorrection_cfg.py':{'INPUTFILE':ttrig_first_db,'OUTPUTFILE':ttrig_second_db},
                  'DumpDBToFile_second_cfg.py':{'INPUTFILE':ttrig_second_db,'OUTPUTFILE':ttrig_second_txt}}
 
-    task = CmsswTask(desc,common_opts,pset_templates,pset_opts)
+    task = CmsswTask(desc,configs,common_opts,pset_templates,pset_opts)
     task.run()
 
     print "Finished processing:"
-    for pset_name in pset_templates: print "--->",pset_name
+    for pset in configs: print "--->",pset
