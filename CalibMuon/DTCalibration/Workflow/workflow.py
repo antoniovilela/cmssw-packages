@@ -195,11 +195,11 @@ def replaceTemplate(template,**opts):
 
     return result
  
-def haddInCastor(castor_dir,result_file):
+def haddInCastor(castor_dir,result_file,type = 'root'):
     if not castor_dir: raise ValueError,'Please specify valid castor dir'
     if not result_file: raise ValueError,'Please specify valid output file name'
 
-    cmd = 'hadd %s `./listfilesCastor %s`'%(result_file,castor_dir)
+    cmd = 'hadd %s `./listfilesCastor %s | grep %s`'%(result_file,castor_dir,type)
 
     print "Running",cmd
     os.system(cmd)
