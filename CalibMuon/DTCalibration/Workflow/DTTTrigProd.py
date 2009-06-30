@@ -25,9 +25,11 @@ class DTTTrigProd:
         desc += '/Ttrig/Production'
         self.desc = desc 
 
-    def createCrab():
-        prod = CrabTask(self.desc,self.crab_cfg,self.pset,self.pset_name)
-        return prod
+        self.task = CrabTask(self.desc,self.crab_cfg,self.pset,self.pset_name)
+
+    def run():
+        self.project = self.task.run() 
+        return self.project
 
 if __name__ == '__main__':
 
@@ -43,7 +45,7 @@ if __name__ == '__main__':
     if not run: raise ValueError,'Need to set run number'
     if not trial: raise ValueError,'Need to set trial number'
 
-    dtTtrigProd = DTTTrigProd(run,trial): 
-    project = dtTtrigProd.createCrab().run()
+    dtTtrigProd = DTTTrigProd(run,trial) 
+    project = dtTtrigProd.run()
 
     print "Sent production jobs with project",project

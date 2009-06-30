@@ -35,8 +35,6 @@ class CmsswTask:
             #os.system(cmd)
             os.chdir(cwd)       
      
-        return
-
 if __name__ == '__main__':
 
     run = None

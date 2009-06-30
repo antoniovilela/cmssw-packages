@@ -26,9 +26,11 @@ class DTTTrigValid:
         desc += '/Ttrig/Validation/First'
         self.desc = desc 
 
-    def createCrab():
-        prod = CrabTask(self.desc,self.crab_cfg,self.pset,self.pset_name)
-        return prod
+        self.task = CrabTask(self.desc,self.crab_cfg,self.pset,self.pset_name)
+
+    def run(self):
+        self.project = self.task.run()
+        return self.project
 
 if __name__ == '__main__':
 
@@ -49,7 +51,7 @@ if __name__ == '__main__':
 
     ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
 
-    dtTtrigValid = DTTTrigValid(run,trial,ttrig_second_db): 
-    project = dtTtrigValid.createCrab().run()
+    dtTtrigValid = DTTTrigValid(run,ttrig_second_db,trial): 
+    project = dtTtrigValid.run()
 
     print "Sent validation jobs with project",project

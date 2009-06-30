@@ -6,11 +6,11 @@ class DTTTrigResidualCorr:
     def __init__(self, run, result_dir):
         desc = 'Run%s'%run
         desc += '/Ttrig/Exec'
-        desc = desc 
+        self.desc = desc 
 
-        common_opts = {'GLOBALTAG':'CRAFT_31X::All'}
+        self.common_opts = {'GLOBALTAG':'CRAFT_31X::All'}
 
-        pset_templates = {'DTTTrigResidualCorrection_cfg.py':'Workflow/templates/config/DTTTrigResidualCorrection_TEMPL_cfg.py',
+        self.pset_templates = {'DTTTrigResidualCorrection_cfg.py':'Workflow/templates/config/DTTTrigResidualCorrection_TEMPL_cfg.py',
                           'DumpDBToFile_ResidCorr_cfg.py':'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py'}
 
         ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
@@ -18,12 +18,10 @@ class DTTTrigResidualCorr:
         ttrig_ResidCorr_db = os.path.abspath(ttrig_ResidCorr + '.db')
         ttrig_ResidCorr_txt = os.path.abspath(ttrig_ResidCorr + '.txt')
 
-        pset_opts = {'DTTTrigResidualCorrection_cfg.py':{'INPUTDBFILE':ttrig_second_db,'OUTPUTDBFILE':ttrig_ResidCorr_db},
+        self.pset_opts = {'DTTTrigResidualCorrection_cfg.py':{'INPUTDBFILE':ttrig_second_db,'OUTPUTDBFILE':ttrig_ResidCorr_db},
                      'DumpDBToFile_ResidCorr_cfg.py':{'INPUTFILE':ttrig_ResidCorr_db,'OUTPUTFILE':ttrig_ResidCorr_txt}}
 
-        self.task = CmsswTask(common_opts,pset_templates,pset_opts)
-
-        return
+        self.task = CmsswTask(self.desc,self.common_opts,self.pset_templates,self.pset_opts)
 
     def run(self):
         self.task.run()
