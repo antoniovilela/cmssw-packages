@@ -1,6 +1,7 @@
 from DTTTrigProd import DTTTrigProd
 from DTTTrigCorrFirst import DTTTrigCorrFirst
 from DTTTrigValid import DTTTrigValid
+from DTTTrigResidualCorr import DTTTrigResidualCorr
 from workflow import haddInCastor,crabWatch,getOutput
 import sys,os,time
 
