@@ -21,7 +21,7 @@ class CmsswTask:
             opts = self.pset_opts[pset_name]
             opts.update(self.common_opts)
             pset = replaceTemplate(self.pset_templates[pset_name],**opts)
-            open(dir + '/' + pset_name,'w').write(pset)
+            open(self.dir + '/' + pset_name,'w').write(pset)
  
         #self.pset_list = pset_list
 
