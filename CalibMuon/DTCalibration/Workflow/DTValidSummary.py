@@ -19,8 +19,8 @@ class DTValidSummary:
         output_file = os.path.abspath(result_dir + '/' + 'SummaryResiduals_' + run + '.root')
 
         self.pset_opts = {} 
-        self.pset_opts['DTTTrigResidualCorrection_cfg.py'] = {'INPUTFILE':input_file,
-                                                              'OUTPUTFILE':output_file}
+        self.pset_opts['DTkFactValidation_2_cfg.py'] = {'INPUTFILE':input_file,
+                                                        'OUTPUTFILE':output_file}
 
         self.task = CmsswTask(self.desc,self.configs,self.common_opts,self.pset_templates,self.pset_opts)
 
