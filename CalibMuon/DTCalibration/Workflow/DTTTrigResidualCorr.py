@@ -21,9 +21,13 @@ class DTTTrigResidualCorr:
         ttrig_ResidCorr = result_dir + '/' + 'ttrig_ResidCorr_' + run
         ttrig_ResidCorr_db = os.path.abspath(ttrig_ResidCorr + '.db')
         ttrig_ResidCorr_txt = os.path.abspath(ttrig_ResidCorr + '.txt')
-
-        self.pset_opts = {'DTTTrigResidualCorrection_cfg.py':{'INPUTDBFILE':ttrig_second_db,'OUTPUTDBFILE':ttrig_ResidCorr_db},
-                     'DumpDBToFile_ResidCorr_cfg.py':{'INPUTFILE':ttrig_ResidCorr_db,'OUTPUTFILE':ttrig_ResidCorr_txt}}
+        root_file = os.path.abspath(result_dir + '/' + 'DTkFactValidation_' + run + '.root')
+         
+        self.pset_opts['DTTTrigResidualCorrection_cfg.py'] = {'INPUTDBFILE':ttrig_second_db,
+                                                              'OUTPUTDBFILE':ttrig_ResidCorr_db,
+                                                              'INPUTROOTFILE':root_file}
+        self.pset_opts['DumpDBToFile_ResidCorr_cfg.py'] = {'INPUTFILE':ttrig_ResidCorr_db,
+                                                           'OUTPUTFILE':ttrig_ResidCorr_txt}}
 
         self.task = CmsswTask(self.desc,self.configs,self.common_opts,self.pset_templates,self.pset_opts)
 
