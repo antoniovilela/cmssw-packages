@@ -32,7 +32,7 @@ class CmsswTask:
             os.chdir(self.dir)
             cmd = 'cmsRun %s'%pset
             print "Running", cmd, "in dir", self.dir
-            #os.system(cmd)
+            os.system(cmd)
             os.chdir(cwd)       
      
 if __name__ == '__main__':

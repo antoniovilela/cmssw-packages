@@ -202,7 +202,7 @@ def haddInCastor(castor_dir,result_file):
     cmd = 'hadd %s `./listfilesCastor %s`'%(result_file,castor_dir)
 
     print "Running",cmd
-    #os.system(cmd)
+    os.system(cmd)
 
 def setGridEnv(cmssw_dir):
     cwd = os.getcwd()

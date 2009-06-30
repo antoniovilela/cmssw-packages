@@ -19,7 +19,7 @@ class CrabTask:
         open(dir + '/' + self.pset_name,'w').write(self.pset)
      
         self.project = crabCreate(dir,self.crabCfg_name)
-        #crabSubmit(self.project)
+        crabSubmit(self.project)
 
         return self.project
 

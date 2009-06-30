@@ -28,7 +28,7 @@ project_prod = dtTtrigProd.run()
 
 print "Sent production jobs with project",project_prod
 
-#crabWatch(getOutput,project_prod) 
+crabWatch(getOutput,project_prod) 
 
 #castor_prefix = '/castor/cern.ch/cms/store/caf/user/antoniov/'
 castor_dir = castor_prefix + dtTtrigProd.crab_opts['USERDIRCAF']
@@ -55,7 +55,7 @@ project_valid_first = dtTtrigValid.run()
 
 print "Sent validation jobs with project",project_valid_first
 
-#crabWatch(getOutput,project_valid_first)
+crabWatch(getOutput,project_valid_first)
 
 result_file = result_dir + '/DTkFactValidation_%s.root'%run
 castor_dir = castor_prefix + dtTtrigValid.crab_opts['USERDIRCAF']
@@ -76,7 +76,7 @@ project_valid_ResidCorr = dtTtrigValid_ResidCorr.run()
 
 print "Sent validation jobs with project",project_valid_ResidCorr
 
-#crabWatch(getOutput,project_valid_ResidCorr)
+crabWatch(getOutput,project_valid_ResidCorr)
 
 result_file = result_dir + '/DTkFactValidation_ResidCorr_%s.root'%run
 castor_dir = castor_prefix + dtTtrigValid_ResidCorr.crab_opts['USERDIRCAF']
