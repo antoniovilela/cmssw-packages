@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 from DTTTrigProd import DTTTrigProd
 from DTTTrigCorrFirst import DTTTrigCorrFirst
 from DTTTrigValid import DTTTrigValid
@@ -48,7 +46,7 @@ for pset_name in dtTtrigCorrFirst.pset_templates: print "--->",pset_name
 
 ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
 
-dtTtrigValid = DTTTrigValid(run,ttrig_second_db,trial): 
+dtTtrigValid = DTTTrigValid(run,ttrig_second_db,trial) 
 project_valid_first = dtTtrigValid.run()
 
 print "Sent validation jobs with project",project_valid_first

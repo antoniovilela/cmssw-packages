@@ -4,7 +4,7 @@ import os
 
 class DTTTrigProd:
     def __init__(self,run,trial):
-        self.pset_name = 'DTTTrigCalibration_cfg.py'
+        pset_name = 'DTTTrigCalibration_cfg.py'
 
         self.crab_template = 'workflow/templates/crab/crab_ttrig_prod_TEMPL.cfg'
         self.pset_template = 'workflow/templates/config/DTTTrigCalibration_TEMPL_cfg.py'

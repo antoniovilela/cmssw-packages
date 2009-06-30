@@ -3,7 +3,7 @@ from CrabTask import *
 import os
 
 class DTTTrigValid:
-    def __init__(run,input_file,trial):
+    def __init__(self,run,input_file,trial):
         self.pset_name = 'DTkFactValidation_1_cfg.py'
 
         self.crab_template = 'workflow/templates/crab/crab_Valid_TEMPL.cfg'
@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
 
-    dtTtrigValid = DTTTrigValid(run,ttrig_second_db,trial): 
+    dtTtrigValid = DTTTrigValid(run,ttrig_second_db,trial) 
     project = dtTtrigValid.run()
 
     print "Sent validation jobs with project",project
