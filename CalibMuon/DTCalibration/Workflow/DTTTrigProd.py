@@ -25,7 +25,7 @@ class DTTTrigProd:
         desc += '/Ttrig/Production'
         self.desc = desc 
 
-        self.task = CrabTask(self.desc,self.crab_cfg,self.pset,self.pset_name)
+        self.task = CrabTask(self.desc,self.crab_cfg,self.pset,pset_name)
 
     def run(self):
         self.project = self.task.run() 

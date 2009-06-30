@@ -27,7 +27,7 @@ class CmsswTask:
 
         cwd = os.getcwd()
         for pset in self.pset_list:
-            open(dir + '/' + pset,'w').write(pset_list[pset])
+            open(dir + '/' + pset,'w').write(self.pset_list[pset])
 
             os.chdir(dir)
             cmd = 'cmsRun %s'%pset
