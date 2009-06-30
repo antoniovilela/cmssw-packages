@@ -10,7 +10,7 @@
 #include <string>
 #include <map>
 
-void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
+void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., int maxEvents = -1){
    TChain chain("HltTree");
    std::cout << ">>> Reading files: " << std::endl;
    for(std::vector<std::string>::const_iterator file = fileNames.begin(); file != fileNames.end(); ++file){
@@ -143,6 +143,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, int maxEvents = -1){
    func_effTrigL1->SetParameter(0,effTrigBitL1); 
 
    h_EffVsThreshold->Scale(1./nEvents);
+
+   TH1F* h_RateVsThreshold = static_cast<TH1F*>(h_EffVsThreshold->Clone("RateVsThreshold"));
+   double Lum = 1.;//10^31cms-2s-2
+   h_RateVsThreshold->Scale(Lum*crossSection*10000.);
 
    func_effTrig->Write();
    func_effTrigL1->Write();
