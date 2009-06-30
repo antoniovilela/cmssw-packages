@@ -4,7 +4,7 @@ import os
 
 class DTTTrigValid:
     def __init__(self,run,input_file,trial):
-        self.pset_name = 'DTkFactValidation_1_cfg.py'
+        pset_name = 'DTkFactValidation_1_cfg.py'
 
         self.crab_template = 'workflow/templates/crab/crab_Valid_TEMPL.cfg'
         self.pset_template = 'workflow/templates/config/DTkFactValidation_1_TEMPL_cfg.py'
