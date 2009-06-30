@@ -18,8 +18,8 @@ class DTTTrigProd:
         self.pset_opts = {'GLOBALTAG':'CRAFT_31X::All',
                           'MUDIGILABEL':'muonDTDigis'}
 
-        self.crab_cfg = replaceTemplate(crab_template,**crab_opts)
-        self.pset = replaceTemplate(pset_template,**pset_opts)
+        self.crab_cfg = replaceTemplate(self.crab_template,**self.crab_opts)
+        self.pset = replaceTemplate(self.pset_template,**self.pset_opts)
 
         desc = 'Run%s'%run
         desc += '/Ttrig/Production'

@@ -65,7 +65,7 @@ for pset_name in dtTtrigResidualCorr.pset_templates: print "--->",pset_name
 
 ttrig_ResidCorr_db = result_dir + '/' + 'ttrig_ResidCorr_' + run + '.db'
 
-dtTtrigValid_ResidCorr = DTTTrigValid(run,ttrig_ResidCorr_db,trial): 
+dtTtrigValid_ResidCorr = DTTTrigValid(run,ttrig_ResidCorr_db,trial) 
 project_valid_ResidCorr = dtTtrigValid_ResidCorr.run()
 
 print "Sent validation jobs with project",project_valid_ResidCorr
