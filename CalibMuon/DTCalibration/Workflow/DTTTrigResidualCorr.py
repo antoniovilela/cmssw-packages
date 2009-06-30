@@ -10,8 +10,10 @@ class DTTTrigResidualCorr:
 
         self.common_opts = {'GLOBALTAG':'CRAFT_31X::All'}
 
-        self.pset_templates = {'DTTTrigResidualCorrection_cfg.py':'Workflow/templates/config/DTTTrigResidualCorrection_TEMPL_cfg.py',
-                          'DumpDBToFile_ResidCorr_cfg.py':'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py'}
+        base = os.environ['CMSSW_BASE'] + '/src/' 
+        self.pset_templates = {}
+        self.pset_templates['DTTTrigResidualCorrection_cfg.py'] = base + 'Workflow/templates/config/DTTTrigResidualCorrection_TEMPL_cfg.py'
+        self.pset_templates['DumpDBToFile_ResidCorr_cfg.py'] = base + 'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py'
 
         ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
         ttrig_ResidCorr = result_dir + '/' + 'ttrig_ResidCorr_' + run

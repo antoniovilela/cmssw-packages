@@ -6,8 +6,8 @@ class DTTTrigProd:
     def __init__(self,run,trial):
         pset_name = 'DTTTrigCalibration_cfg.py'
 
-        self.crab_template = 'workflow/templates/crab/crab_ttrig_prod_TEMPL.cfg'
-        self.pset_template = 'workflow/templates/config/DTTTrigCalibration_TEMPL_cfg.py'
+        self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_ttrig_prod_TEMPL.cfg'
+        self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTTTrigCalibration_TEMPL_cfg.py'
 
         self.crab_opts = {'DATASETPATH':'/Cosmics/Commissioning09-v2/RAW',
                           'RUNNUMBER':run,
