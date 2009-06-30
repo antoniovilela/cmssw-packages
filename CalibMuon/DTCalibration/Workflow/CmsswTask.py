@@ -17,7 +17,7 @@ class CmsswTask:
         if not os.path.exists(self.dir): os.makedirs(self.dir)
 
         #pset_list = []
-        for pset_name in self.configs
+        for pset_name in self.configs:
             opts = self.pset_opts[pset_name]
             opts.update(self.common_opts)
             pset = replaceTemplate(self.pset_templates[pset_name],**opts)

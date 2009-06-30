@@ -10,6 +10,8 @@ class DTTTrigCorrFirst:
 
         self.common_opts = {'GLOBALTAG':'CRAFT_31X::All'}
 
+        self.configs = ['DTTTrigWriter_cfg.py','DumpDBToFile_first_cfg.py','DTTTrigCorrection_cfg.py','DumpDBToFile_second_cfg.py']
+
         base = os.environ['CMSSW_BASE'] + '/src/' 
         self.pset_templates = {'DTTTrigWriter_cfg.py':base+'Workflow/templates/config/DTTTrigWriter_TEMPL_cfg.py',
                                'DumpDBToFile_first_cfg.py':base+'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py',
@@ -29,7 +31,7 @@ class DTTTrigCorrFirst:
                      'DTTTrigCorrection_cfg.py':{'INPUTFILE':ttrig_first_db,'OUTPUTFILE':ttrig_second_db},
                      'DumpDBToFile_second_cfg.py':{'INPUTFILE':ttrig_second_db,'OUTPUTFILE':ttrig_second_txt}}
 
-        self.task = CmsswTask(self.desc,self.common_opts,self.pset_templates,self.pset_opts)
+        self.task = CmsswTask(self.desc,self.configs,self.common_opts,self.pset_templates,self.pset_opts)
 
     def run(self):
         self.task.run()
@@ -52,4 +54,4 @@ if __name__ == '__main__':
     dtTtrigCorrFirst.run()
 
     print "Finished processing:"
-    for pset_name in dtTtrigCorrFirst.pset_templates: print "--->",pset_name
+    for pset in dtTtrigCorrFirst.configs: print "--->",pset

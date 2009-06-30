@@ -42,7 +42,7 @@ dtTtrigCorrFirst = DTTTrigCorrFirst(run,result_dir)
 dtTtrigCorrFirst.run()
 
 print "Finished processing:"
-for pset_name in dtTtrigCorrFirst.pset_templates: print "--->",pset_name
+for pset in dtTtrigCorrFirst.configs: print "--->",pset
 
 ttrig_second_db = result_dir + '/' + 'ttrig_second_' + run + '.db'
 
@@ -61,7 +61,7 @@ dtTtrigResidualCorr = DTTTrigResidualCorr(run,result_dir)
 dtTtrigResidualCorr.run()
 
 print "Finished processing:"
-for pset_name in dtTtrigResidualCorr.pset_templates: print "--->",pset_name
+for pset in dtTtrigResidualCorr.configs: print "--->",pset
 
 ttrig_ResidCorr_db = result_dir + '/' + 'ttrig_ResidCorr_' + run + '.db'
 
