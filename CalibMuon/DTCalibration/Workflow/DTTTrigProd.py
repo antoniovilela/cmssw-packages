@@ -3,7 +3,7 @@ from CrabTask import *
 import os
 
 class DTTTrigProd:
-    def __init__(run,trial):
+    def __init__(self,run,trial):
         self.pset_name = 'DTTTrigCalibration_cfg.py'
 
         self.crab_template = 'workflow/templates/crab/crab_ttrig_prod_TEMPL.cfg'
@@ -27,7 +27,7 @@ class DTTTrigProd:
 
         self.task = CrabTask(self.desc,self.crab_cfg,self.pset,self.pset_name)
 
-    def run():
+    def run(self):
         self.project = self.task.run() 
         return self.project
 
