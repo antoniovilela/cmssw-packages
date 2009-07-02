@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 
-void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1.){
+void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., int maxEvents = -1){
    TChain chain("HltTree");
    std::cout << ">>> Reading files: " << std::endl;
    for(std::vector<std::string>::const_iterator file = fileNames.begin(); file != fileNames.end(); ++file){
@@ -75,10 +75,14 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1.){
    }
 
    int nEvents = chain.GetEntries();
+   int countEvts = 0;
    for(int entry = 0; entry < nEvents; ++entry){
+      if((maxEvents > 0)&&(entry == maxEvents)) break;
       if(entry%2000 == 0) std::cout << ">>> Analysing " << entry << "th event" << std::endl;
       chain.GetEntry(entry);
       //size_t index = 0;
+      ++countEvts;
+
       for(std::vector<std::pair<std::string,TH1F*> >::const_iterator it = histosTriggerBits.begin(); it != histosTriggerBits.end(); ++it){
          int index = mapNameToIndex[it->first];
          it->second->Fill(vars[index]);
@@ -128,14 +132,14 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1.){
          }
       }       
    }
-   h_countAll->Scale(1./nEvents);
+   h_countAll->Scale(1./countEvts);
   
    std::vector<TH1F*> histosRateVsThreshold;
    //double crossSection = 80.;//mb
    double Lum = 1.;//10^31cms-2s-2
    for(std::vector<std::pair<std::string,TH1F*> >::const_iterator it = histosEffVsThreshold.begin();
                                                                   it != histosEffVsThreshold.end(); ++it){
-      it->second->Scale(1./nEvents);
+      it->second->Scale(1./countEvts);
       std::string hname = it->first + "_Rate";
       histosRateVsThreshold.push_back(static_cast<TH1F*>(it->second->Clone(hname.c_str())));
       histosRateVsThreshold.back()->Scale(Lum*crossSection*10000.);

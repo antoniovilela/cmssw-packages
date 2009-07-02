@@ -21,6 +21,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    // Create output file
    TFile* hfile = new TFile("analysisOpenHLT_histos.root","recreate","data histograms");
 
+   TH1F* h_trigBit = new TH1F("trigBit","trigBit",2,0,2);
    TH1F* h_nHFtowers = new TH1F("nHFtowers","nHFtowers",100,0.,600.);
    TH1F* h_hfTwrEnergy = new TH1F("hfTwrEnergy","hfTwrEnergy",500,0.,500.);
    TH1F* h_hfTwrEt = new TH1F("hfTwrEt","hfTwrEt",100,0.,10.);
@@ -75,25 +76,29 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    int nEvents = chain.GetEntries();
    double etaMin = 3.0;
    double towerThreshold = 2.5; //energy
-   int L1EtSumThershold = 0;
+   int L1EtSumThreshold = 1;
  
    int nPassedTrigBit = 0;
    int nPassedTrigBitAndL1EtSum = 0;
+   int countEvts = 0;
    for(int entry = 0; entry < nEvents; ++entry){
       if((maxEvents > 0)&&(entry == maxEvents)) break;
       if(entry%2000 == 0) std::cout << ">>> Analysing " << entry << "th event" << std::endl;
 
       chain.GetEntry(entry);
       //size_t index = 0;
+      ++countEvts;
+
+      h_trigBit->Fill(trigBit);
 
       if(trigBit == 0) continue;
 
       ++nPassedTrigBit;
 
-      if((L1HfRing1EtSumNegativeEta > L1EtSumThershold)||
-         (L1HfRing2EtSumNegativeEta > L1EtSumThershold)||
-         (L1HfRing1EtSumPositiveEta > L1EtSumThershold)||
-         (L1HfRing2EtSumPositiveEta > L1EtSumThershold)) continue;
+      if((L1HfRing1EtSumNegativeEta > L1EtSumThreshold)||
+         (L1HfRing2EtSumNegativeEta > L1EtSumThreshold)||
+         (L1HfRing1EtSumPositiveEta > L1EtSumThreshold)||
+         (L1HfRing2EtSumPositiveEta > L1EtSumThreshold)) continue;
 
       ++nPassedTrigBitAndL1EtSum;
 
@@ -136,13 +141,13 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       } 
    }
 
-   float effTrigBit = (float)nPassedTrigBit/nEvents;
+   float effTrigBit = (float)nPassedTrigBit/countEvts;
    func_effTrig->SetParameter(0,effTrigBit);
    
-   float effTrigBitL1 = (float)nPassedTrigBitAndL1EtSum/nEvents;
+   float effTrigBitL1 = (float)nPassedTrigBitAndL1EtSum/countEvts;
    func_effTrigL1->SetParameter(0,effTrigBitL1); 
 
-   h_EffVsThreshold->Scale(1./nEvents);
+   h_EffVsThreshold->Scale(1./countEvts);
 
    TH1F* h_RateVsThreshold = static_cast<TH1F*>(h_EffVsThreshold->Clone("RateVsThreshold"));
    double Lum = 1.;//10^31cms-2s-2
