@@ -37,6 +37,7 @@ class ExclusiveDijetsEdmDumpAnalyzer: public edm::EDAnalyzer
     double deltaEtaMax_;
     double deltaPhiMax_;
     double deltaPtMax_;
+    double thirdJetPtMax_;
     unsigned int nTracksMax_;
     unsigned int nHFPlusMax_;
     unsigned int nHFMinusMax_;
@@ -143,6 +144,7 @@ ExclusiveDijetsEdmDumpAnalyzer::ExclusiveDijetsEdmDumpAnalyzer(const edm::Parame
   deltaEtaMax_(pset.getParameter<double>("DeltaEtaMax")),
   deltaPhiMax_(pset.getParameter<double>("DeltaPhiMax")),
   deltaPtMax_(pset.getParameter<double>("DeltaPtMax")),
+  thirdJetPtMax_(pset.getParameter<double>("ThirdJetPtMax")),
   nTracksMax_(pset.getParameter<unsigned int>("NTracksMax")),
   nHFPlusMax_(pset.getParameter<unsigned int>("NHFPlusMax")),
   nHFMinusMax_(pset.getParameter<unsigned int>("NHFMinusMax")),
@@ -440,7 +442,10 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   double missingMass = 2*Ebeam_*sqrt(xi_plus*xi_minus);
   histos_.h_missingMassFromXi_->Fill(missingMass);
 
+  double thirdJetPt = (jetCollectionH->size() > 2)?(*jetCollectionH)[2].pt():0.;
+
   // Selection
+  if(thirdJetPt > thirdJetPtMax_) return;
   if(nTracks > nTracksMax_) return;
   if(nHF_plus > nHFPlusMax_) return;
   if(nHF_minus > nHFMinusMax_) return;

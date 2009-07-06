@@ -172,6 +172,9 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    bool doBTag = false;
    std::string bDiscriminatorName = "jetBProbabilityBJetTags";
    double bDiscMinValue = 3.0;
+   // Third jet
+   bool doThirdJetSelection = true;
+   double thirdJetPtMax = 15.; 
    // Track multiplicity
    bool doTrackSelection = true; 
    int nTracksMax = 5;
@@ -453,6 +456,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      h_missingMassFromXi->Fill(missingMass);
 
      // Selection
+     if(doThirdJetSelection&&(thirdJetPt > thirdJetPtMax)) continue;
      if(doTrackSelection&&(nTracksOutsideJets > nTracksMax)) continue;
      if(doHFMultiplicitySelection&&(nHF_plus > nHFPlusMax)) continue;
      if(doHFMultiplicitySelection&&(nHF_minus > nHFMinusMax)) continue;

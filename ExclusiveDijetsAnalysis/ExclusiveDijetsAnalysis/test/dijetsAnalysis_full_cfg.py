@@ -1,8 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
 from dijetsAnalysis_cfg import process
-del process.out_step
-del process.analysis_step
+if hasattr(process,'out_step'): del process.out_step
+if hasattr(process,'analysis_step'): del process.analysis_step
 
 process.source.fileNames = cms.untracked.vstring('file:/tmp/antoniov/POMWIG_DPEDijets_10TeV_Pt_40_cff_py_RAW2DIGI_RECO.root')
 
