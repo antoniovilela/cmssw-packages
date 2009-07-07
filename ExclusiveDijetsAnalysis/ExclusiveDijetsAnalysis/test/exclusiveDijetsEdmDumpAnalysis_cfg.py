@@ -51,6 +51,9 @@ attributes = [{'NHFPlusMax':0,'NHFMinusMax':0},
               {'HFThresholdIndex':16},
               {'HFThresholdIndex':17},
               {'HFThresholdIndex':18},
+              {'ThirdJetPtMax':10},
+              {'ThirdJetPtMax':15},
+              {'ThirdJetPtMax':20}, 
               {'DoBTag':True},]
 
 #filters = ['singleVertexFilter']

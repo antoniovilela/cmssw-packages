@@ -57,17 +57,22 @@ void plot(bool Norm = false,int rebin = 1){
    samples.push_back("DPEDijets");
 
    std::vector<TFile*> files;
-   files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
+   /*files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDPlusDijets_Pt30-FastSim_histos.root")); 
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDMinusDijets_Pt30-FastSim_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_QCD100to250-madgraph_histos.root"));
-   files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));*/
+   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_CEPDijets_M100_histos.root"));
+   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_SDPlusDijets_Pt30_histos.root")); 
+   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_SDMinusDijets_Pt30_histos.root"));
+   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_QCD100to250-madgraph_histos.root"));
+   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));
 
    std::vector<TDirectory*> directories;
    size_t index = 0;
    std::vector<std::string> samplesFastSim;
-   samplesFastSim.push_back("SDPlusDijets");
-   samplesFastSim.push_back("SDMinusDijets");
+   //samplesFastSim.push_back("SDPlusDijets");
+   //samplesFastSim.push_back("SDMinusDijets");
    //samplesFastSim.push_back("QCD100to250-madgraph");
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file,++index){
       if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx_NHFPlusMax_0_NHFMinusMax_0"));
