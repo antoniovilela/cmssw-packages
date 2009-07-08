@@ -1,4 +1,6 @@
-//class TH1F;
+#ifndef PlottingTools_h
+#define PlottingTools_h
+
 class TFile;
 class TDirectory;
 
@@ -8,16 +10,7 @@ class TDirectory;
 #include <string>
 #include <map>
 
-// Leave this for now here
-class BaseNorm{
-   public:
-      BaseNorm() {}
-      virtual ~BaseNorm() {}
-      virtual double GetNormFactor(const TH1F*) = 0;
-   private:
-};
-
-class DefaultNorm: public BaseNorm{
+class DefaultNorm{
    public:
       DefaultNorm() {}
 
@@ -25,9 +18,9 @@ class DefaultNorm: public BaseNorm{
    private:
 };
 
-class ConstNorm: public BaseNorm{
+class ConstNorm{
    public:
-      ConstNorm(double norm=1.):BaseNorm(),normalization_(norm) {}
+      ConstNorm(double norm=1.):normalization_(norm) {}
 
       double GetNormFactor(const TH1F* hist) {return normalization_;}   
    private:
@@ -39,9 +32,8 @@ TH1F* getHisto(TDirectory*, const std::string&);
 void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int rebin = 1);
 std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<std::string>& varNames,const std::vector<std::string>& triggerBits);
 
-/*template<typename KeyType,typename ValueType>
-std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values);*/
-
 void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm = false);
 
-void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, BaseNorm* norm=0);
+//template <class NormPolicy>
+//void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, NormPolicy& norm);
+#endif

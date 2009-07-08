@@ -5,24 +5,15 @@
 #include "TDirectory.h"
 #include "TH1F.h"
 
-#include "plotTools.h"
+//#include "plotTools.h"
+#include "PlottingTools.h"
+#include "Plotter.h"
 
 #include <iostream>
 #include <vector>
 #include <map>
 
-/*TH1F* getHisto(TFile*, const string&);
-TH1F* getHisto(TDirectory*, const string&);
-void scaleHisto(TH1F* histo, double scale, int line, int color, int rebin);
-
-void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm);
-void plot(std::vector<std::string>& variables, std::vector<TDirectory*>& directories, bool Norm);*/
-
-//void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm);
-//void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, bool Norm);
-//std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<std::string>&,const std::vector<std::string>&);
-
-void plot(bool Norm = false){
+void plot(bool doNorm = false){
    TFile* file = TFile::Open("root/analysisDijetsTrigger_CEPGG_M100_histos.root");
 
    std::vector<std::string> varNames;
@@ -51,11 +42,28 @@ void plot(bool Norm = false){
    dirs.push_back(std::make_pair("N_{PU} = 3",file->GetDirectory("triggerAnalysis_filter3PU")));
    dirs.push_back(std::make_pair("N_{PU} = 4",file->GetDirectory("triggerAnalysis_filter4PU")));
 
-   DefaultNorm defNorm(); 
-   plot(variables,dirs,&defNorm);
+   /*DefaultNorm* defNorm = new DefaultNorm(); 
+   ConstNorm* constNorm = new ConstNorm(1.);
+
+   BaseNorm* myNorm = 0;
+   if(doNorm) myNorm = constNorm;
+   else myNorm = defNorm;
+
+   plot(variables,dirs,myNorm);*/
+
+   Plotter<DefaultNorm> defPlotter;
+   Plotter<ConstNorm> constPlotter;
+   if(doNorm) constPlotter.plot(variables,dirs);
+   else defPlotter.plot(variables,dirs);
 
    std::vector<std::string> counts;
    counts.push_back("L1_SingleJet30_count");
 
-   plot(counts,dirs,&defNorm);
+   //plot(counts,dirs,myNorm);
+ 
+   if(doNorm) constPlotter.plot(counts,dirs);
+   else defPlotter.plot(counts,dirs);
+
+   /*delete defNorm;
+   delete constNorm;*/
 }
