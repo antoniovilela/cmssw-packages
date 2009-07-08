@@ -50,7 +50,8 @@ void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirect
    }
 }
 
-void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, bool Norm){
+template <class NormPolicy>
+void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, NormPolicy* norm){
 
    std::vector<TCanvas*> canvasesVar(variables.size());
    std::vector<TLegend*> legendsVar(variables.size());
@@ -69,13 +70,16 @@ void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string
          histos[k] = getHisto(it->second,variables[k]);
 
          scaleHisto(histos[k],1,1,(index + 1));
-         //scaleHisto(histos[k],(1./histos[k]->GetBinContent(1)),1,(index + 1));
 
          legendsVar[k]->AddEntry(histos[k],it->first.c_str(),"L");
-         /*if(Norm) histos[k]->DrawNormalized("same");
-         else histos[k]->Draw("same");*/
-         if(Norm) histos[k]->Scale(1./histos[k]->GetEntries());         
-         histos[k]->Draw("same");
+         /*//if(Norm) histos[k]->DrawNormalized("same",histos[k]->Integral()/histos[k]->GetEntries());
+         //if(Norm) histos[k]->DrawNormalized("same");
+         if(Norm) histos[k]->DrawNormalized("same",histos[k]->Integral()/histos[k]->GetBinContent(1));
+         else histos[k]->Draw("same");
+         //if(Norm) histos[k]->SetNormFactor(1./histos[k]->GetEntries());         
+         //histos[k]->Draw("same");*/
+         if(norm) histos[k]->DrawNormalized("same",norm->GetNormFactor(histos[k]));
+         else histos[k]->Draw("same");
          histoMap[it->second] = histos;
       }
    }  
@@ -113,7 +117,6 @@ std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::
 
    return res;
 }*/
-
 
 TH1F* getHisto(TFile* file, const string& refVar){
    TH1F* hist = static_cast<TH1F*>(file->Get(refVar.c_str()));

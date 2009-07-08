@@ -5,6 +5,8 @@
 #include "TDirectory.h"
 #include "TH1F.h"
 
+#include "plotTools.h"
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -17,10 +19,10 @@ void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirect
 void plot(std::vector<std::string>& variables, std::vector<TDirectory*>& directories, bool Norm);*/
 
 //void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm);
-void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, bool Norm);
-std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<std::string>&,const std::vector<std::string>&);
+//void plot(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, bool Norm);
+//std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<std::string>&,const std::vector<std::string>&);
 
-void plot(){
+void plot(bool Norm = false){
    TFile* file = TFile::Open("root/analysisDijetsTrigger_CEPGG_M100_histos.root");
 
    std::vector<std::string> varNames;
@@ -49,10 +51,11 @@ void plot(){
    dirs.push_back(std::make_pair("N_{PU} = 3",file->GetDirectory("triggerAnalysis_filter3PU")));
    dirs.push_back(std::make_pair("N_{PU} = 4",file->GetDirectory("triggerAnalysis_filter4PU")));
 
-   plot(variables,dirs,true);
+   DefaultNorm defNorm(); 
+   plot(variables,dirs,&defNorm);
 
    std::vector<std::string> counts;
    counts.push_back("L1_SingleJet30_count");
 
-   plot(counts,dirs,false);
+   plot(counts,dirs,&defNorm);
 }

@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 from dijetsAnalysis_cfg import process
+if hasattr(process,'output'): del process.output
 if hasattr(process,'out_step'): del process.out_step
 if hasattr(process,'analysis_step'): del process.analysis_step
 
