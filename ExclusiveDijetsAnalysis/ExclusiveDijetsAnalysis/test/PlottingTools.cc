@@ -56,16 +56,6 @@ std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<st
    return varMap;
 }
 
-/*template<typename KeyType,typename ValueType>
-std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values){
-   std::map<KeyType,ValueType> res;
-   typename std::vector<KeyType>::const_iterator key = keys.begin();
-   typename std::vector<ValueType>::const_iterator value = values.begin(); 
-   for(; key != keys.end() && value != values.end(); ++key,++value) res[*key] = *value;
-
-   return res;
-}*/
-
 TH1F* getHisto(TFile* file, const std::string& refVar){
    TH1F* hist = static_cast<TH1F*>(file->Get(refVar.c_str()));
 

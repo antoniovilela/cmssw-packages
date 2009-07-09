@@ -13,6 +13,13 @@
 #include <vector>
 #include <map>
 
+// Define normalization by first bin
+
+class FirstBinNorm{
+   public:
+      double operator()(const TH1F* hist) {return hist->GetSumOfWeights()/hist->GetBinContent(1);}
+};
+
 void plot(bool doNorm = false){
    TFile* file = TFile::Open("root/analysisDijetsTrigger_CEPGG_M100_histos.root");
 
@@ -53,6 +60,8 @@ void plot(bool doNorm = false){
 
    Plotter<DefaultNorm> defPlotter;
    Plotter<ConstNorm> constPlotter;
+   Plotter<FirstBinNorm> firstBinPlotter;
+
    if(doNorm) constPlotter.plot(variables,dirs);
    else defPlotter.plot(variables,dirs);
 
@@ -61,7 +70,7 @@ void plot(bool doNorm = false){
 
    //plot(counts,dirs,myNorm);
  
-   if(doNorm) constPlotter.plot(counts,dirs);
+   if(doNorm) firstBinPlotter.plot(counts,dirs);
    else defPlotter.plot(counts,dirs);
 
    /*delete defNorm;

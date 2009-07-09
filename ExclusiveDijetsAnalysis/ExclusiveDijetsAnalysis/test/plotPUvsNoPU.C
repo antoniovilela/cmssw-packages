@@ -6,7 +6,9 @@
 #include "TH2F.h"
 #include "TTree.h"
 
-#include "plotTools.h"
+//#include "plotTools.h"
+#include "PlottingTools.h"
+#include "Plotter.h"
 
 #include <iostream>
 #include <vector>
@@ -14,10 +16,10 @@
 void plot(){
    TFile* file = TFile::Open("~/scratch0/data/analysisDijets_PAT_CEPDijets_M100_histos.root");
 
-   //TDirectory* dir_0PU = file->GetDirectory("edmDumpAnalysis_filter0PU_singleVertexFilter");
-   //TDirectory* dir_AvePU = file->GetDirectory("edmDumpAnalysis_singleVertexFilter");
-   TDirectory* dir_0PU = file->GetDirectory("edmDumpAnalysis_filter0PU");
-   TDirectory* dir_AvePU = file->GetDirectory("edmDumpAnalysis");
+   TDirectory* dir_0PU = file->GetDirectory("edmDumpAnalysis_filter0PU_singleVertexFilter");
+   TDirectory* dir_AvePU = file->GetDirectory("edmDumpAnalysis_singleVertexFilter");
+   //TDirectory* dir_0PU = file->GetDirectory("edmDumpAnalysis_filter0PU");
+   //TDirectory* dir_AvePU = file->GetDirectory("edmDumpAnalysis");
 
    double sigma = 250.; //pb
 
@@ -82,5 +84,9 @@ void plot(){
    dirs.push_back(std::make_pair("<N_{PU}> = 2.1",dir_AvePU));
    dirs.push_back(std::make_pair("0 PU",dir_0PU));  
 
-   plot(refVar,dirs,false);
+   //plot(refVar,dirs,false);
+
+   //Plotter<NumberEntriesNorm> plotter;
+   Plotter<DefaultNorm> plotter;
+   plotter.plot(refVar,dirs);
 }

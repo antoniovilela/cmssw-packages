@@ -1,4 +1,4 @@
-<library file="PlottingTools.cc" name=PlottingTools>
+<library file="PlottingTools.cc DummyPlotter.cc" name=PlottingTools>
   <flags FFLAGS=-w>
   <use name=root>
   <use name=rootinteractive>

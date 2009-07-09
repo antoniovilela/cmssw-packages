@@ -8,7 +8,8 @@
 #include "THStack.h"
 #include "TTree.h"
 
-#include "plotTools.h"
+//#include "plotTools.h"
+#include "PlottingTools.h"
 
 #include <iostream>
 #include <vector>
@@ -20,41 +21,28 @@ void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int
 
 void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap,bool Norm = false, int rebin = 1);
 
-template<typename KeyType,typename ValueType>
-std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values);
+//template<typename KeyType,typename ValueType>
+//std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values);
 
-struct Result{
+/*struct Result{
    double eff_HLT_;
    double nEvents_;
    double scale_;
-};
+};*/
 
 void plot(bool Norm = false,int rebin = 1){
 
-   /*TFile* file_signal = TFile::Open("root/analysisDijets_CEPDijets_M100_histos_PU_nHFMax_1.root");
-   double sigma_signal = 450.; //pb
-   std::cout << " Cross-section (signal): " << sigma_signal << std::endl;
-
-   TFile* file_eff_signal = TFile::Open("root/analysis_histos_CPEDijets.root");
-   const TTree* data_before_signal = static_cast<const TTree*>(file_eff_signal->Get("analysisBeforeSelection/data"));
-   const TTree* data_after_signal = static_cast<const TTree*>(file_eff_signal->Get("analysisAfterSelection/data"));
-
-   double eff_HLT_signal = (double)data_after_signal->GetEntries()/(double)data_before_signal->GetEntries();
-
-   std::cout << " Efficiency for HLT selection (signal): " << eff_HLT_signal << std::endl;
-
-   const TH1F* h_leadingJetPt_signal = static_cast<const TH1F*>(file_signal->Get("edmDumpAnalysis/leadingJetPt"));
-   double nEvents_signal = h_leadingJetPt_signal->GetEntries();
-   double scale_signal = sigma_signal*eff_HLT_signal/nEvents_signal;
-
-   std::cout << " N events after L1+HLT (signal): " << nEvents_signal << std::endl;*/
-
    std::vector<std::string> samples;
-   samples.push_back("signal");
+   /*samples.push_back("signal");
    samples.push_back("SDPlusDijets");
    samples.push_back("SDMinusDijets");
    samples.push_back("QCD100to250-madgraph");
-   samples.push_back("DPEDijets");
+   samples.push_back("DPEDijets");*/
+   samples.push_back("signal");
+   samples.push_back("SD-plus di-jets");
+   samples.push_back("SD-minus dijets");
+   samples.push_back("QCD non-diffractive");
+   samples.push_back("DPE di-jets");
 
    std::vector<TFile*> files;
    /*files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
@@ -75,10 +63,10 @@ void plot(bool Norm = false,int rebin = 1){
    //samplesFastSim.push_back("SDMinusDijets");
    //samplesFastSim.push_back("QCD100to250-madgraph");
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file,++index){
-      if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx_NHFPlusMax_0_NHFMinusMax_0"));
-      else directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter_NHFPlusMax_0_NHFMinusMax_0"));
+      /*if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx_NHFPlusMax_0_NHFMinusMax_0"));
+      else directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter_NHFPlusMax_0_NHFMinusMax_0"));*/
        
-      //directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter"));
+      directories.push_back((*file)->GetDirectory("edmDumpAnalysis"));
    }
 
    std::vector<double> sigmas;
@@ -222,7 +210,7 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
    }
 }
 
-template<typename KeyType,typename ValueType>
+/*template<typename KeyType,typename ValueType>
 std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values){
    std::map<KeyType,ValueType> res;
    typename std::vector<KeyType>::const_iterator key = keys.begin();
@@ -230,4 +218,4 @@ std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::
    for(; key != keys.end() && value != values.end(); ++key,++value) res[*key] = *value;
 
    return res;
-}
+}*/
