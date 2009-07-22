@@ -20,7 +20,10 @@ process.GlobalTag.globaltag = "@@GLOBALTAG@@"
 
 process.load("CondCore.DBCommon.CondDBSetup_cfi")
 
-process.source = cms.Source("EmptySource")
+process.source = cms.Source("EmptySource"
+    numberEventsInRun = cms.untracked.uint32(1),
+    firstRun = cms.untracked.uint32(@@RUNNUMBER@@)
+)
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(1)

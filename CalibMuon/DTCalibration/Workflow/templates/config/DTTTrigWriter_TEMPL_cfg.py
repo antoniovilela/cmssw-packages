@@ -3,8 +3,8 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("PROD")
 
 process.load("Configuration.StandardSequences.Geometry_cff")
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "@@GLOBALTAG@@"
+process.load("Geometry.DTGeometry.dtGeometry_cfi")
+process.DTGeometryESModule.applyAlignment = False
 
 process.load("CondCore.DBCommon.CondDBSetup_cfi")
 

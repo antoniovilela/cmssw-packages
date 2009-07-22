@@ -11,9 +11,6 @@ process.MessageLogger = cms.Service("MessageLogger",
         default = cms.untracked.PSet(
             limit = cms.untracked.int32(0)
         ),
-        FwkJob = cms.untracked.PSet(
-            limit = cms.untracked.int32(0)
-        ),
         resolution = cms.untracked.PSet(
             limit = cms.untracked.int32(10000000)
         ),

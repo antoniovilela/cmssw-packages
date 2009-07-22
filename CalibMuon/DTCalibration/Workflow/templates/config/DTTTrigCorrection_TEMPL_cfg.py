@@ -8,7 +8,11 @@ process.GlobalTag.globaltag = "@@GLOBALTAG@@"
 
 process.load("CondCore.DBCommon.CondDBSetup_cfi")
 
-process.source = cms.Source("EmptySource")
+process.source = cms.Source("EmptySource"
+    numberEventsInRun = cms.untracked.uint32(1),
+    firstRun = cms.untracked.uint32(@@RUNNUMBER@@)
+)
+
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(1)
 )
@@ -41,9 +45,9 @@ process.DTTTrigCorrectionFirst = cms.EDFilter("DTTTrigCorrectionFirst",
     #ttrigMax = cms.untracked.double(2600.0),
     #ttrigMin = cms.untracked.double(2400.0),
     #rmsLimit = cms.untracked.double(2.)                                          
-    ttrigMax = cms.untracked.double(850.0),
-    ttrigMin = cms.untracked.double(100.0),
-    rmsLimit = cms.untracked.double(20.)
+    ttrigMax = cms.untracked.double(500.0),
+    ttrigMin = cms.untracked.double(200.0),
+    rmsLimit = cms.untracked.double(8.)
 )
 
 process.p = cms.Path(process.DTTTrigCorrectionFirst)

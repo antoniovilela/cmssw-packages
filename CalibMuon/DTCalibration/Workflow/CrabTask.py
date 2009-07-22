@@ -1,8 +1,10 @@
-from workflow import replaceTemplate,crabCreate,crabSubmit
+from workflow import replaceTemplate,crabCreate,crabSubmit,crabWatch,getOutput
 import os
+from threading import Thread
 
-class CrabTask:
+class CrabTask(Thread):
     def __init__(self, desc, crab_cfg, pset, pset_name='pset.py'):
+        Thread.__init__(self)
         self.desc = desc
   
         self.crabCfg_name = 'crab.cfg'
@@ -10,19 +12,34 @@ class CrabTask:
   
         self.pset_name = pset_name
         self.pset = pset
+        #self.initializeTask(dir=self.desc)
 
-    def run(self):
-        dir = self.desc
+    def initializeTask(self, dir):
         if not os.path.exists(dir): os.makedirs(dir)
 
         open(dir + '/' + self.crabCfg_name,'w').write(self.crab_cfg)
         open(dir + '/' + self.pset_name,'w').write(self.pset)
-     
-        self.project = crabCreate(dir,self.crabCfg_name)
-        crabSubmit(self.project)
 
+    def create(self,dir = self.dir):
+        self.project = crabCreate(dir,self.crabCfg_name)
         return self.project
 
+    def submit(self):
+        if not self.project: raise RuntimeError
+        crabSubmit(self.project)
+
+    def getoutput(self):
+        if not self.project: raise RuntimeError
+        getOutput(self.project)
+
+    def watch(self):
+        if not self.project: raise RuntimeError
+        crabWatch(getOutput,self.project) 
+        
+    def run(self):
+        self.initializeTask(dir=self.desc)
+        proj = self.create() 
+        self.submit()
 
 if __name__ == '__main__':
 
@@ -42,14 +59,14 @@ if __name__ == '__main__':
     #ntrial = 1 
     pset_name = 'DTTTrigCalibration_cfg.py'
 
-    crab_template = 'workflow/templates/crab/crab_ttrig_prod_TEMPL.cfg'
-    crab_opts = {'DATASETPATH':'/Cosmics/Commissioning09-v2/RAW',
+    crab_template = 'templates/crab/crab_ttrig_prod_TEMPL.cfg'
+    crab_opts = {'DATASETPATH':'/Cosmics/Commissioning09-v3/RAW',
                  'RUNNUMBER':run,
                  'PSET':pset_name, 
                  'USERDIRCAF':'TTRIGCalibration/Run' + str(run) + '/v' + str(trial),
                  'EMAIL':'vilela@to.infn.it'}
 
-    pset_template = 'workflow/templates/config/DTTTrigCalibration_TEMPL_cfg.py' 
+    pset_template = 'templates/config/DTTTrigCalibration_TEMPL_cfg.py' 
     pset_opts = {'GLOBALTAG':'CRAFT_31X::All',
                  'DIGITEMPLATE':'muonDTDigis'}
 

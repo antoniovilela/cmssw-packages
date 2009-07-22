@@ -11,9 +11,6 @@ process.MessageLogger = cms.Service("MessageLogger",
         default = cms.untracked.PSet(
             limit = cms.untracked.int32(0)
         ),
-        FwkJob = cms.untracked.PSet(
-            limit = cms.untracked.int32(0)
-        ),
         resolution = cms.untracked.PSet(
             limit = cms.untracked.int32(10000000)
         ),
@@ -24,12 +21,12 @@ process.MessageLogger = cms.Service("MessageLogger",
 )
 
 process.load("Configuration.StandardSequences.Geometry_cff")
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "@@GLOBALTAG@@"
+process.load("Geometry.DTGeometry.dtGeometry_cfi")
+process.DTGeometryESModule.applyAlignment = False
 
 process.load("CondCore.DBCommon.CondDBSetup_cfi")
 process.load("DQMServices.Core.DQM_cfg")
-process.load("RecoLocalMuon.Configuration.RecoLocalMuonCosmics_cff")
+#process.load("RecoLocalMuon.Configuration.RecoLocalMuonCosmics_cff")
 
 process.source = cms.Source("EmptyIOVSource",
      lastValue = cms.uint64(100),
