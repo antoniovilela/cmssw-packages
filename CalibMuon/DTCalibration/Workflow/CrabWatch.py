@@ -28,7 +28,7 @@ class CrabWatch(Thread):
  
         print "Finished..."
 
-        self.action(project)
+        self.action(self.project)
 
 if __name__ == '__main__':
 
