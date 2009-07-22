@@ -20,7 +20,7 @@ class CrabTask(Thread):
         open(dir + '/' + self.crabCfg_name,'w').write(self.crab_cfg)
         open(dir + '/' + self.pset_name,'w').write(self.pset)
 
-    def create(self,dir = self.dir):
+    def create(self,dir):
         self.project = crabCreate(dir,self.crabCfg_name)
         return self.project
 
