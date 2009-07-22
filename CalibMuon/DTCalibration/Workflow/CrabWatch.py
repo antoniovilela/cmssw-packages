@@ -16,7 +16,7 @@ class CrabWatch(Thread):
         self.finish = Event() 
   
     def run(self):
-        exit = false
+        exit = False
         while not exit:
             if checkStatus(self.project,80.0): break
 
