@@ -63,8 +63,8 @@ void plot(bool Norm = false,int rebin = 1){
    samplesFastSim.push_back("SD-minus di-jets");
    samplesFastSim.push_back("QCD non-diffractive");
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file,++index){
-      if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_hlt"));
-      else directories.push_back((*file)->GetDirectory("edmDumpAnalysis"));
+      if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx"));
+      else directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter"));
        
       //directories.push_back((*file)->GetDirectory("edmDumpAnalysis"));
    }
@@ -110,7 +110,7 @@ void plot(bool Norm = false,int rebin = 1){
    }
 
    std::vector<string> refVar;
-   refVar.push_back("leadingJetPt");
+   /*refVar.push_back("leadingJetPt");
    refVar.push_back("leadingJetEta");
    refVar.push_back("leadingJetPhi");
    refVar.push_back("secondJetPt");
@@ -125,7 +125,7 @@ void plot(bool Norm = false,int rebin = 1){
    refVar.push_back("xiMinus");
    refVar.push_back("massDijets");
    refVar.push_back("missingMassFromXi");
-   refVar.push_back("MxFromJets");
+   refVar.push_back("MxFromJets");*/
    refVar.push_back("RjjFromJets");
    refVar.push_back("RjjFromPFCands");
    refVar.push_back("xiPlusAfterSel");
@@ -163,6 +163,7 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
    std::map<std::string,std::map<std::string,TH1F*> > histos_back;
    std::map<std::string,TH1F*> defmap;
    int colors[5] = {kRed,kBlue,kOrange,kMagenta,kYellow};
+   int styles[5] = {3004,3005,3006,3007,3013};
    //for(size_t k = 0; k < refVar.size(); ++k){
    for(std::vector<std::string>::const_iterator var = refVar.begin(); var != refVar.end(); ++var){
       const std::string& varName = *var; 
@@ -179,6 +180,8 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
          if(histos_back.find(it->first) == histos_back.end()) histos_back[it->first] = defmap;
          histos_back[it->first][varName] = getHisto(it->second,varName); 
          scaleHisto(histos_back[it->first][varName],scaleMap[it->first],1,colors[index],rebin);
+         histos_back[it->first][varName]->SetFillColor(colors[index]);
+         histos_back[it->first][varName]->SetFillStyle(styles[index]);
          legendsVar[varName]->AddEntry(histos_back[it->first][varName],it->first.c_str(),"L"); 
          if(Norm) histos_back[it->first][varName]->DrawNormalized("same",histos_back[it->first][varName]->GetSumOfWeights()/histos_back[it->first][varName]->Integral(0,histos_back[it->first][varName]->GetNbinsX() + 1));
          else histos_back[it->first][varName]->Draw("same");
