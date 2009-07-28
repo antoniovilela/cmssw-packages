@@ -13,6 +13,8 @@
 #include <vector>
 #include <map>
 
+double ConstNorm::normalization = 1.0;
+
 void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm){
    std::map<std::string,TCanvas*> canvasesVar;
    std::map<std::string,TLegend*> legendsVar;

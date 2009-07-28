@@ -86,7 +86,7 @@ void plot(){
 
    //plot(refVar,dirs,false);
 
-   //Plotter<NumberEntriesNorm> plotter;
-   Plotter<DefaultNorm> plotter;
+   Plotter<NumberEntriesNorm> plotter;
+   //Plotter<DefaultNorm> plotter;
    plotter.plot(refVar,dirs);
 }

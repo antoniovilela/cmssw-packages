@@ -26,7 +26,7 @@ class Plotter{
       
       void plot(VarMap& variablesMap);
    private:
-      NormPolicy norm_;
+      //NormPolicy norm_;
 };
 
 /*template <class NormPolicy>
@@ -82,7 +82,7 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap){
          scaleHisto(histo,1,1,(index + 1));
 
          legendsVar[name]->AddEntry(histo,desc.c_str(),"L"); 
-         histo->DrawNormalized("same",norm_(histo));
+         histo->DrawNormalized("same",NormPolicy::GetNorm(histo));
       }
       legendsVar[name]->SetFillColor(0);
       legendsVar[name]->Draw("same");

@@ -12,28 +12,32 @@ class TDirectory;
 
 class DefaultNorm{
    public:
-      DefaultNorm() {}
-
+      /*DefaultNorm() {}
       double GetNormFactor(const TH1F* hist) {return hist->GetSumOfWeights();}
-      double operator()(const TH1F* hist) {return GetNormFactor(hist);}
+      double operator()(const TH1F* hist) {return GetNormFactor(hist);}*/
+
+      static double GetNorm(const TH1F* hist) {return hist->GetSumOfWeights();}
    private:
 };
 
 class ConstNorm{
    public:
-      ConstNorm(double norm=1.):normalization_(norm) {}
-
+      /*ConstNorm(double norm=1.):normalization_(norm) {}
       double GetNormFactor(const TH1F* hist) {return normalization_;}
-      double operator()(const TH1F* hist) {return GetNormFactor(hist);}    
+      double operator()(const TH1F* hist) {return GetNormFactor(hist);}*/
+      
+      static double GetNorm(const TH1F* hist) {return normalization;}
    private:
-      double normalization_; 
+      //double normalization_; 
+      static double normalization;
 };
 
 class NumberEntriesNorm{
    public:
-      NumberEntriesNorm() {}
+      /*NumberEntriesNorm() {}
+      double operator()(const TH1F* hist) {return hist->GetSumOfWeights()/hist->GetEntries();}*/
 
-      double operator()(const TH1F* hist) {return hist->GetSumOfWeights()/hist->GetEntries();}
+      static double GetNorm(const TH1F* hist) {return hist->GetSumOfWeights()/hist->GetEntries();}
    private:
 };
 
@@ -47,7 +51,9 @@ std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::
    std::map<KeyType,ValueType> res;
    typename std::vector<KeyType>::const_iterator key = keys.begin();
    typename std::vector<ValueType>::const_iterator value = values.begin(); 
-   for(; key != keys.end() && value != values.end(); ++key,++value) res[*key] = *value;
+   typename std::vector<KeyType>::const_iterator keys_end = keys.end();
+   typename std::vector<ValueType>::const_iterator values_end = values.end();
+   for(; key != keys_end && value != values_end; ++key,++value) res[*key] = *value;
 
    return res;
 }

@@ -21,6 +21,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    // Create output file
    TFile* hfile = new TFile("analysisOpenHLT_histos.root","recreate","data histograms");
 
+   TH1F* h_L1HfRing1EtSumNegativeEta = new TH1F("L1HfRing1EtSumNegativeEta","L1HfRing1EtSumNegativeEta",10,0,10);
+   TH1F* h_L1HfRing2EtSumNegativeEta = new TH1F("L1HfRing2EtSumNegativeEta","L1HfRing2EtSumNegativeEta",10,0,10);
+   TH1F* h_L1HfRing1EtSumPositiveEta = new TH1F("L1HfRing1EtSumPositiveEta","L1HfRing1EtSumPositiveEta",10,0,10);
+   TH1F* h_L1HfRing2EtSumPositiveEta = new TH1F("L1HfRing2EtSumPositiveEta","L1HfRing2EtSumPositiveEta",10,0,10);
+
    TH1F* h_trigBit = new TH1F("trigBit","trigBit",2,0,2);
    TH1F* h_nHFtowers = new TH1F("nHFtowers","nHFtowers",100,0.,600.);
    TH1F* h_hfTwrEnergy = new TH1F("hfTwrEnergy","hfTwrEnergy",500,0.,500.);
@@ -94,6 +99,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       if(trigBit == 0) continue;
 
       ++nPassedTrigBit;
+
+      h_L1HfRing1EtSumNegativeEta->Fill(L1HfRing1EtSumNegativeEta);
+      h_L1HfRing2EtSumNegativeEta->Fill(L1HfRing2EtSumNegativeEta);
+      h_L1HfRing1EtSumPositiveEta->Fill(L1HfRing1EtSumPositiveEta);
+      h_L1HfRing2EtSumPositiveEta->Fill(L1HfRing2EtSumPositiveEta);
 
       if((L1HfRing1EtSumNegativeEta > L1EtSumThreshold)||
          (L1HfRing2EtSumNegativeEta > L1EtSumThreshold)||

@@ -40,40 +40,40 @@ void plot(bool Norm = false,int rebin = 1){
    samples.push_back("DPEDijets");*/
    samples.push_back("signal");
    samples.push_back("SD-plus di-jets");
-   samples.push_back("SD-minus dijets");
+   samples.push_back("SD-minus di-jets");
    samples.push_back("QCD non-diffractive");
    samples.push_back("DPE di-jets");
 
    std::vector<TFile*> files;
-   /*files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDPlusDijets_Pt30-FastSim_histos.root")); 
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDMinusDijets_Pt30-FastSim_histos.root"));
-   files.push_back(TFile::Open("root/analysisDijets_PAT_QCD100to250-madgraph_histos.root"));
-   files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));*/
-   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_CEPDijets_M100_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_QCD100to250-madgraph-FastSim_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));
+   /*files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_CEPDijets_M100_histos.root"));
    files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_SDPlusDijets_Pt30_histos.root")); 
    files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_SDMinusDijets_Pt30_histos.root"));
    files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_QCD100to250-madgraph_histos.root"));
-   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));
+   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));*/
 
    std::vector<TDirectory*> directories;
    size_t index = 0;
    std::vector<std::string> samplesFastSim;
-   //samplesFastSim.push_back("SDPlusDijets");
-   //samplesFastSim.push_back("SDMinusDijets");
-   //samplesFastSim.push_back("QCD100to250-madgraph");
+   samplesFastSim.push_back("SD-plus di-jets");
+   samplesFastSim.push_back("SD-minus di-jets");
+   samplesFastSim.push_back("QCD non-diffractive");
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file,++index){
-      /*if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx_NHFPlusMax_0_NHFMinusMax_0"));
-      else directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter_NHFPlusMax_0_NHFMinusMax_0"));*/
+      if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_hlt"));
+      else directories.push_back((*file)->GetDirectory("edmDumpAnalysis"));
        
-      directories.push_back((*file)->GetDirectory("edmDumpAnalysis"));
+      //directories.push_back((*file)->GetDirectory("edmDumpAnalysis"));
    }
 
    std::vector<double> sigmas;
    sigmas.push_back(250.);
-   sigmas.push_back(0.12*1.2*300000./2);
-   sigmas.push_back(0.12*1.2*300000./2);
-   sigmas.push_back(0.12*1.2*15000000.);
+   sigmas.push_back(0.12*1.1*300000./2);
+   sigmas.push_back(0.12*1.1*300000./2);
+   sigmas.push_back(0.12*1.1*15000000.);
    sigmas.push_back(4600.);
 
    std::vector<TFile*> filesEff;
@@ -171,7 +171,7 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
       legendsVar[varName]->AddEntry(histos_signal[varName],"CEP di-jets","L");
  
       canvasesVar[varName]->cd();
-      if(Norm) histos_signal[varName]->DrawNormalized();
+      if(Norm) histos_signal[varName]->DrawNormalized("",histos_signal[varName]->GetSumOfWeights()/histos_signal[varName]->Integral(0,histos_signal[varName]->GetNbinsX() + 1));
       else histos_signal[varName]->Draw();
       int index = 0;
       for(std::map<std::string,TDirectory*>::const_iterator it = dirMap.begin(); it != dirMap.end(); ++it,++index){
@@ -180,7 +180,7 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
          histos_back[it->first][varName] = getHisto(it->second,varName); 
          scaleHisto(histos_back[it->first][varName],scaleMap[it->first],1,colors[index],rebin);
          legendsVar[varName]->AddEntry(histos_back[it->first][varName],it->first.c_str(),"L"); 
-         if(Norm) histos_back[it->first][varName]->DrawNormalized("same");
+         if(Norm) histos_back[it->first][varName]->DrawNormalized("same",histos_back[it->first][varName]->GetSumOfWeights()/histos_back[it->first][varName]->Integral(0,histos_back[it->first][varName]->GetNbinsX() + 1));
          else histos_back[it->first][varName]->Draw("same");
       }
       legendsVar[varName]->SetFillColor(0);

@@ -17,7 +17,8 @@
 
 class FirstBinNorm{
    public:
-      double operator()(const TH1F* hist) {return hist->GetSumOfWeights()/hist->GetBinContent(1);}
+      //double operator()(const TH1F* hist) {return hist->GetSumOfWeights()/hist->GetBinContent(1);}
+      static double GetNorm(const TH1F* hist) {return hist->GetSumOfWeights()/hist->GetBinContent(1);}
 };
 
 void plot(bool doNorm = false){
