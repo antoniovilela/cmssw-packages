@@ -57,16 +57,21 @@ void plot(bool Norm = false,int rebin = 1){
    files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));*/
 
    std::vector<TDirectory*> directories;
+   std::vector<TDirectory*> directoriesHLT;
+
    size_t index = 0;
    std::vector<std::string> samplesFastSim;
    samplesFastSim.push_back("SD-plus di-jets");
    samplesFastSim.push_back("SD-minus di-jets");
    samplesFastSim.push_back("QCD non-diffractive");
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file,++index){
-      if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()) directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx"));
-      else directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter"));
-       
-      //directories.push_back((*file)->GetDirectory("edmDumpAnalysis"));
+      if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()){
+         directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx"));
+         directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis_hlt"));
+      } else{
+         directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter"));
+         directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis"));
+      }
    }
 
    std::vector<double> sigmas;
@@ -84,6 +89,7 @@ void plot(bool Norm = false,int rebin = 1){
    filesEff.push_back(TFile::Open("root/analysis_histos_DPEDijets.root"));
 
    std::map<std::string,TDirectory*> dirMap = makeMap(samples,directories);
+   std::map<std::string,TDirectory*> dirMapHLT = makeMap(samples,directoriesHLT);
    std::map<std::string,double> sigmaMap = makeMap(samples,sigmas);
    std::map<std::string,TFile*> fileEffMap = makeMap(samples,filesEff);
  
@@ -92,21 +98,27 @@ void plot(bool Norm = false,int rebin = 1){
 
    std::map<std::string,double> scaleMap;
    for(std::map<std::string,TFile*>::const_iterator it = fileEffMap.begin(); it != fileEffMap.end(); ++it){
-      const TTree* data_before_back = static_cast<const TTree*>(it->second->Get("analysisBeforeSelection/data"));
-      const TTree* data_after_back = static_cast<const TTree*>(it->second->Get("analysisAfterSelection/data"));
+      const TTree* data_before = static_cast<const TTree*>(it->second->Get("analysisBeforeSelection/data"));
+      const TTree* data_after = static_cast<const TTree*>(it->second->Get("analysisAfterSelection/data"));
 
-      double eff_HLT = (double)data_after_back->GetEntries()/(double)data_before_back->GetEntries();
+      double eff_HLT = (double)data_after->GetEntries()/(double)data_before->GetEntries();
 
       std::cout << " Efficiency for HLT selection " << it->first << ": " << eff_HLT << std::endl;
 
-      const TH1F* h_leadingJetPt_back = static_cast<const TH1F*>(dirMap[it->first]->Get("leadingJetPt"));
-
-      double nEvents = h_leadingJetPt_back->GetEntries();
-      double scale = sigmaMap[it->first]*eff_HLT/nEvents;
+      const TH1F* h_leadingJetPt_HLT = static_cast<const TH1F*>(dirMapHLT[it->first]->Get("leadingJetPt"));
+      const TH1F* h_leadingJetPt_Vtx = static_cast<const TH1F*>(dirMap[it->first]->Get("leadingJetPt"));
+      
+      double eff_Vtx = (double)h_leadingJetPt_Vtx->GetEntries()/(double)h_leadingJetPt_HLT->GetEntries();
+ 
+      std::cout << " Efficiency for Vertex selection " << it->first << ": " << eff_Vtx << std::endl;
+ 
+      //double nEvents = h_leadingJetPt_HLT->GetEntries();
+      double nEvents = h_leadingJetPt_Vtx->GetEntries();
+      double scale = sigmaMap[it->first]*eff_HLT*eff_Vtx/nEvents;
       //double scaleMap = 1./nEvents_back;
       scaleMap[it->first] = scale;
 
-      std::cout << " N events after L1+HLT " << it->first << ": " << nEvents << std::endl;
+      std::cout << " N events after L1+HLT+Vtx " << it->first << ": " << nEvents << std::endl;
    }
 
    std::vector<string> refVar;
