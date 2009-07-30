@@ -50,8 +50,9 @@ void plot(){
          directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx"));
          directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis_hlt"));
       } else{
-         directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter"));
-         directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis"));
+         //directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter"));
+         directories.push_back((*file)->GetDirectory("edmDumpAnalysis_filter0PU_singleVertexFilter"));
+         directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis_filter0PU"));
       }
    }
 
@@ -101,16 +102,13 @@ void plot(){
       std::cout << " Efficiencies for " << it->first << std::endl;
       std::vector<double> const& myvec = it->second;
       for(size_t idx = 0; idx < myvec.size(); ++idx){
-         std::cout << idx << ": " << myvec[idx] << std::endl;
+         size_t idx_previous = idx ? (idx - 1) : 0;
+         std::cout << idx << ": " << myvec[idx] << "  wrt previous " << myvec[idx]/myvec[idx_previous] << std::endl;
       } 
    }
 }
 
 std::map<std::string,std::vector<double> > getEvents(std::vector<string>& vars, std::map<std::string,TDirectory*>& dirMap){
-
-   /*std::map<std::string,TH1F*> histos_signal;
-   std::map<std::string,std::map<std::string,TH1F*> > histos_back;
-   std::map<std::string,TH1F*> defmap;*/
 
    std::map<std::string,std::vector<double> > nEvents; 
    std::vector<std::string>::const_iterator vars_end = vars.end(); 
@@ -118,16 +116,9 @@ std::map<std::string,std::vector<double> > getEvents(std::vector<string>& vars, 
    std::map<std::string,TDirectory*>::const_iterator dirs_end = dirMap.end();
    for(std::vector<std::string>::const_iterator var = vars.begin(); var != vars_end; ++var){
       const std::string& varName = *var; 
-      //histos_signal[varName] = getHisto(dirMap["signal"],varName);
-     // histo_signal = getHisto(dirMap["signal"],varName);
-
       for(std::map<std::string,TDirectory*>::const_iterator it = dirs_begin; it != dirs_end; ++it){
-         //if(it->first == "signal") continue;
-         /*if(histos_back.find(it->first) == histos_back.end()) histos_back[it->first] = defmap;
-         histos_back[it->first][varName] = getHisto(it->second,varName);*/
          if(nEvents.find(it->first) == nEvents.end()) nEvents[it->first] = std::vector<double>();
          TH1F* histo = getHisto(it->second,varName);
-         //nEvents[it->first].push_back(histo->GetSumOfWeights());
          nEvents[it->first].push_back(histo->GetEntries());
       }
    }

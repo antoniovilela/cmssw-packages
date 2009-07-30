@@ -69,17 +69,17 @@ void plot(bool Norm = false,int rebin = 1){
          directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx"));
          directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis_hlt"));
       } else{
-         directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVertexFilter"));
-         directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis"));
+         directories.push_back((*file)->GetDirectory("edmDumpAnalysis_filter0PU_singleVertexFilter"));
+         directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis_filter0PU"));
       }
    }
 
    std::vector<double> sigmas;
-   sigmas.push_back(250.);
+   sigmas.push_back(0.12*1.1*250.);
    sigmas.push_back(0.12*1.1*300000./2);
    sigmas.push_back(0.12*1.1*300000./2);
    sigmas.push_back(0.12*1.1*15000000.);
-   sigmas.push_back(4600.);
+   sigmas.push_back(0.12*1.1*4600.);
 
    std::vector<TFile*> filesEff;
    filesEff.push_back(TFile::Open("root/analysis_histos_CPEDijets.root"));
