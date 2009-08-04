@@ -1,10 +1,11 @@
 from workflow import replaceTemplate,crabCreate,crabSubmit,crabWatch,getOutput
 import os
-from threading import Thread
+#from threading import Thread
 
-class CrabTask(Thread):
+#class CrabTask(Thread):
+class CrabTask:
     def __init__(self, desc, crab_cfg, pset, pset_name='pset.py'):
-        Thread.__init__(self)
+        #Thread.__init__(self)
         self.desc = desc
   
         self.crabCfg_name = 'crab.cfg'
@@ -32,14 +33,15 @@ class CrabTask(Thread):
         if not self.project: raise RuntimeError
         getOutput(self.project)
 
-    def watch(self):
-        if not self.project: raise RuntimeError
-        crabWatch(getOutput,self.project) 
+    #def watch(self):
+    #    if not self.project: raise RuntimeError
+    #    crabWatch(getOutput,self.project) 
         
     def run(self):
         self.initializeTask(dir=self.desc)
-        proj = self.create() 
+        proj = self.create(self.desc) 
         self.submit()
+        return proj
 
 if __name__ == '__main__':
 

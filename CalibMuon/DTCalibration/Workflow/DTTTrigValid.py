@@ -8,7 +8,7 @@ class DTTTrigValid:
 
         self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_Valid_TEMPL.cfg'
         self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTkFactValidation_1_TEMPL_cfg.py'
-        self.crab_opts = {'DATASETPATH':'/Cosmics/Commissioning09-v2/RAW',
+        self.crab_opts = {'DATASETPATH':'/Cosmics/Commissioning09-v3/RAW',
                           'RUNNUMBER':run,
                           'PSET':pset_name, 
                           'INPUTFILE':input_file,
@@ -16,7 +16,7 @@ class DTTTrigValid:
 
         self.crab_opts.update(opts)
 
-        self.pset_opts = {'GLOBALTAG':'CRAFT_31X::All',
+        self.pset_opts = {'GLOBALTAG':'GR09_31X_V5P::All',
                           'INPUTFILE':input_file.split('/')[-1]}
 
         self.crab_cfg = replaceTemplate(self.crab_template,**self.crab_opts)

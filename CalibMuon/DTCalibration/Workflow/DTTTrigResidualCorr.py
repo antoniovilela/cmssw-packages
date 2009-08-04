@@ -8,7 +8,7 @@ class DTTTrigResidualCorr:
         desc += '/Ttrig/Exec'
         self.desc = desc 
 
-        self.common_opts = {'GLOBALTAG':'CRAFT_31X::All'}
+        self.common_opts = {'GLOBALTAG':'GR09_31X_V5P::All'}
 
         self.configs = ['DTTTrigResidualCorrection_cfg.py','DumpDBToFile_ResidCorr_cfg.py']
 
@@ -26,7 +26,8 @@ class DTTTrigResidualCorr:
         self.pset_opts = {} 
         self.pset_opts['DTTTrigResidualCorrection_cfg.py'] = {'INPUTDBFILE':ttrig_second_db,
                                                               'OUTPUTDBFILE':ttrig_ResidCorr_db,
-                                                              'INPUTROOTFILE':root_file}
+                                                              'INPUTROOTFILE':root_file,
+                                                              'RUNNUMBER':run}
         self.pset_opts['DumpDBToFile_ResidCorr_cfg.py'] = {'INPUTFILE':ttrig_ResidCorr_db,
                                                            'OUTPUTFILE':ttrig_ResidCorr_txt}
 

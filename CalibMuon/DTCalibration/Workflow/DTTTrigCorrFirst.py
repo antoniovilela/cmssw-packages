@@ -8,7 +8,7 @@ class DTTTrigCorrFirst:
         desc += '/Ttrig/Exec'
         self.desc = desc 
 
-        self.common_opts = {'GLOBALTAG':'CRAFT_31X::All'}
+        self.common_opts = {'GLOBALTAG':'GR09_31X_V5P::All'}
 
         self.configs = ['DTTTrigWriter_cfg.py','DumpDBToFile_first_cfg.py','DTTTrigCorrection_cfg.py','DumpDBToFile_second_cfg.py']
 
@@ -27,9 +27,11 @@ class DTTTrigCorrFirst:
         ttrig_second_txt = os.path.abspath(ttrig_second + '.txt')
 
         self.pset_opts = {'DTTTrigWriter_cfg.py':{'INPUTFILE':timeBoxes,'OUTPUTFILE':ttrig_first_db},
-                     'DumpDBToFile_first_cfg.py':{'INPUTFILE':ttrig_first_db,'OUTPUTFILE':ttrig_first_txt},
-                     'DTTTrigCorrection_cfg.py':{'INPUTFILE':ttrig_first_db,'OUTPUTFILE':ttrig_second_db},
-                     'DumpDBToFile_second_cfg.py':{'INPUTFILE':ttrig_second_db,'OUTPUTFILE':ttrig_second_txt}}
+                          'DumpDBToFile_first_cfg.py':{'INPUTFILE':ttrig_first_db,'OUTPUTFILE':ttrig_first_txt},
+                          'DTTTrigCorrection_cfg.py':{'INPUTFILE':ttrig_first_db,
+                                                      'OUTPUTFILE':ttrig_second_db,
+                                                      'RUNNUMBER':run},
+                          'DumpDBToFile_second_cfg.py':{'INPUTFILE':ttrig_second_db,'OUTPUTFILE':ttrig_second_txt}}
 
         self.task = CmsswTask(self.desc,self.configs,self.common_opts,self.pset_templates,self.pset_opts)
 

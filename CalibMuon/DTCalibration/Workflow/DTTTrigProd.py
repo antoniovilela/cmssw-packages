@@ -9,13 +9,13 @@ class DTTTrigProd:
         self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_ttrig_prod_TEMPL.cfg'
         self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTTTrigCalibration_TEMPL_cfg.py'
 
-        self.crab_opts = {'DATASETPATH':'/Cosmics/Commissioning09-v2/RAW',
+        self.crab_opts = {'DATASETPATH':'/Cosmics/Commissioning09-v3/RAW',
                           'RUNNUMBER':run,
                           'PSET':pset_name, 
                           'USERDIRCAF':'TTRIGCalibration/Production/Run' + str(run) + '/v' + str(trial),
                           'EMAIL':'vilela@to.infn.it'}
 
-        self.pset_opts = {'GLOBALTAG':'CRAFT_31X::All',
+        self.pset_opts = {'GLOBALTAG':'GR09_31X_V5P::All',
                           'MUDIGILABEL':'muonDTDigis'}
 
         self.crab_cfg = replaceTemplate(self.crab_template,**self.crab_opts)
