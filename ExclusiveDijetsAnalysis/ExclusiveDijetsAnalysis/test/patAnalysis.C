@@ -30,6 +30,7 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/VertexReco/interface/Vertex.h" 
 #endif
 
 template <class Coll>
@@ -68,6 +69,10 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    jetCollsNonCorr.push_back("sisCone5PFJets");
 
    // Book Histograms
+   TH1F* h_NPUBx0 = new TH1F("NPUBx0","NPUBx0",10,0,10);
+   TH1F* h_NPrimVtx = new TH1F("NPrimVtx","NPrimVtx",10,0,10);
+   TH2F* h_NPUBx0vsNPrimVtx = new TH2F("NPUBx0vsNPrimVtx","NPUBx0vsNPrimVtx",10,0,10,10,0,10);
+
    TH1F* h_leadingJetPt = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
    TH1F* h_leadingJetEta = new TH1F("leadingJetEta","leadingJetEta",100,-5.,5.);
    TH1F* h_leadingJetPhi = new TH1F("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);
@@ -130,8 +135,12 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
 
    TH1F* h_xiPlusAfterSel = new TH1F("xiPlusAfterSel","xiPlusAfterSel",200,0.,1.);
    TH1F* h_xiMinusAfterSel = new TH1F("xiMinusAfterSel","xiMinusAfterSel",200,0.,1.);
-   TH1F* h_RjjAfterSel = new TH1F("RjjAfterSel","RjjAfterSel",200,-0.1,1.5);
-   TH1F* h_RjjFromPFAfterSel = new TH1F("RjjFromPFAfterSel","RjjFromPFAfterSel",200,-0.1,1.5);
+
+   double xbins[8] = {0.,0.4,0.7,0.8,0.85,0.9,0.95,1.0};
+   //TH1F* h_RjjAfterSel = new TH1F("RjjAfterSel","RjjAfterSel",200,-0.1,1.5);
+   //TH1F* h_RjjFromPFAfterSel = new TH1F("RjjFromPFAfterSel","RjjFromPFAfterSel",200,-0.1,1.5);
+   TH1F* h_RjjAfterSel = new TH1F("RjjAfterSel","RjjAfterSel",7,xbins);
+   TH1F* h_RjjFromPFAfterSel = new TH1F("RjjFromPFAfterSel","RjjFromPFAfterSel",7,xbins);
 
    TH1F* h_forwardBackwardAsymmetryHFEnergy_ = new TH1F("forwardBackwardAsymmetryHFEnergy","forwardBackwardAsymmetryHFEnergy",200,-1.1,1.1);
 
@@ -157,9 +166,10 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    }
 
    double Ebeam = 5000.;
-   int thresholdHF = 12;// 2.4 GeV
+   int thresholdHF = 16;// 2.4 GeV
 
-   bool selectPileUp = true;
+   bool accessPileUp = true;
+   bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 
    bool accessEdmDump = true;
@@ -190,15 +200,32 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
      if((maxEvents > 0)&&(nEvts == maxEvents)) break;
 	
      ++nEvts;
-     if(verbose) std::cout << ">>> Event number: " << nEvts << endl;	
+     if(verbose) std::cout << ">>> Event number: " << nEvts << endl;
+
+     // Vertex Info
+     fwlite::Handle<std::vector<reco::Vertex> > vertexCollection;
+     vertexCollection.getByLabel(ev,"offlinePrimaryVertices");
+
+     int nGoodVertices = 0;
+     std::vector<reco::Vertex>::const_iterator vtx = vertexCollection->begin();
+     std::vector<reco::Vertex>::const_iterator vtx_end = vertexCollection->end();
+     for(; vtx != vtx_end; ++vtx){
+        if(!vtx->isValid()) continue; // skip non-valid vertices
+        if(vtx->isFake()) continue; // skip vertex from beam spot
+        ++nGoodVertices;
+     }
+     h_NPrimVtx->Fill(nGoodVertices);
+
      // Access pile-up info 
-     if(selectPileUp) {
+     if(accessPileUp) {
        fwlite::Handle<std::map<int,int> > pileUpMap;
        pileUpMap.getByLabel(ev,"pileUpInfo");
 
        std::map<int,int>::const_iterator bx0Iter = pileUpMap->find(0);
        int nPileUpBx0 = bx0Iter->second;
 
+       h_NPUBx0->Fill(nPileUpBx0);
+       h_NPUBx0vsNPrimVtx->Fill(nPileUpBx0,nGoodVertices);
        if(selectPileUp&&(nPileUpBx0 != nEventsPUBx0)) continue;
      }
 

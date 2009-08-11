@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 double ConstNorm::normalization = 1.0;
 
@@ -76,12 +77,42 @@ TH1F* getHisto(TDirectory* dir, const std::string& refVar){
 
 void scaleHisto(TH1F* histo, double scale, int line, int color, int rebin){
 
-  histo->Scale(scale);
+   histo->Scale(scale);
 
-  histo->Rebin(rebin);
-  histo->SetLineWidth(2);
-  histo->SetLineStyle(line);
-  histo->SetLineColor(color);
+   histo->Rebin(rebin);
+   histo->SetLineWidth(2);
+   histo->SetLineStyle(line);
+   histo->SetLineColor(color);
 
-  histo->GetYaxis()->SetTitle("a.u.");
+   histo->GetYaxis()->SetTitle("a.u.");
+}
+
+TH1F* rebinHisto(TH1F const* histo, std::vector<int> const& groups){
+   int nBins = histo->GetNbinsX();
+   int nBins_new = groups.size(); 
+ 
+   //int sum = std::for_each(groups.begin(),groups.end(),Sum<int>(0)).value();
+
+   // Create array with new (variable) binning
+   double xbins[400];
+   xbins[0] = histo->GetBinLowEdge(1);
+   int bin = 1; 
+   for(int k = 0; k < nBins_new; ++k){
+      bin += groups[k];
+      xbins[k+1] = histo->GetBinLowEdge(bin);
+   }
+   TH1F histo_temp("_temp","",nBins_new,xbins);
+
+   int firstbin = 1;
+   for(int k = 0; k <= nBins_new; ++k){
+      histo_temp.SetBinContent((k + 1), histo->Integral(firstbin,firstbin + groups[k] - 1));
+      firstbin += groups[k]; 
+   } 
+
+   std::string hname = histo->GetName();
+   hname += "_rebinned";
+   histo_temp.SetName(hname.c_str());
+   TH1F* histo_new = new TH1F(histo_temp);
+   
+   return histo_new;
 }

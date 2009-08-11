@@ -41,10 +41,36 @@ class NumberEntriesNorm{
    private:
 };
 
+template <typename T>
+class Sum{
+   public:
+      typedef T value_type;
+
+      // Expect built-in's, passing everything by value
+      Sum(T init): sum_(init) {}
+      inline void operator()(T const x) {sum_ += x;}
+      inline T value() const {return sum_;}
+   private:
+      T sum_;
+};
+
+template <typename T>
+class Mult{
+   public:
+      typedef T value_type;
+ 
+      Mult(T x): val_(x) {}
+      inline T operator()(T const x) {return x*val_;}
+   private:
+      T val_;
+};
+
 TH1F* getHisto(TFile*, const std::string&); 
 TH1F* getHisto(TDirectory*, const std::string&);
 void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int rebin = 1);
+TH1F* rebinHisto(TH1F const* histo, std::vector<int> const& groups);
 std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<std::string>& varNames,const std::vector<std::string>& triggerBits);
+
 
 template<typename KeyType,typename ValueType>
 std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values){

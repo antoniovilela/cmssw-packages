@@ -14,14 +14,6 @@
 
 std::map<std::string,std::vector<double> > getEvents(std::vector<string>& vars, std::map<std::string,TDirectory*>& dirMap);
 
-class Mult{
-   public: 
-      Mult(double x): val_(x) {}
-      double operator()(double x) {return x*val_;}
-   private:
-      double val_;
-};
-
 void plot(){
 
    std::vector<std::string> samples;
@@ -94,7 +86,7 @@ void plot(){
       std::vector<double>& myvec = nEvents[it->first];
       myvec.insert(myvec.begin(),(double)h_leadingJetPt_HLT->GetEntries());
       double nHLT = myvec[0];
-      std::transform(myvec.begin(),myvec.end(),myvec.begin(),Mult(eff_HLT/nHLT));
+      std::transform(myvec.begin(),myvec.end(),myvec.begin(),Mult<double>(eff_HLT/nHLT));
    }
 
    std::map<std::string,std::vector<double> >::const_iterator nEvents_end = nEvents.end();

@@ -19,7 +19,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    }
 
    // Create output file
-   TFile* hfile = new TFile("analysisOpenHLT_histos.root","recreate","data histograms");
+   TFile* hfile = new TFile("analysisOpenHLT_histos_HLT.root","recreate","data histograms");
 
    TH1F* h_L1HfRing1EtSumNegativeEta = new TH1F("L1HfRing1EtSumNegativeEta","L1HfRing1EtSumNegativeEta",10,0,10);
    TH1F* h_L1HfRing2EtSumNegativeEta = new TH1F("L1HfRing2EtSumNegativeEta","L1HfRing2EtSumNegativeEta",10,0,10);
@@ -27,6 +27,18 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    TH1F* h_L1HfRing2EtSumPositiveEta = new TH1F("L1HfRing2EtSumPositiveEta","L1HfRing2EtSumPositiveEta",10,0,10);
 
    TH1F* h_trigBit = new TH1F("trigBit","trigBit",2,0,2);
+   TH1F* h_L1CenJetEt = new TH1F("L1CenJetEt","L1CenJetEt",100,0.,100.);
+   TH1F* h_L1ForJetEt = new TH1F("L1ForJetEt","L1ForJetEt",100,0.,100.);
+   TH1F* h_L1TauEt = new TH1F("L1TauEt","L1TauEt",100,0.,100.);
+   TH1F* h_L1MetHad = new TH1F("L1MetHad","L1MetHad",100,0.,100.);
+   TH1F* h_L1MetTot = new TH1F("L1MetTot","L1MetTot",100,0.,100.);
+
+   TH1F* h_L1LeadingJetEt = new TH1F("L1LeadingJetEt","L1LeadingJetEt",100,0.,100.);
+   TH1F* h_L1FracEt_HT = new TH1F("L1FracEt_HT","L1FracEt_HT",100,0.,5.);
+   TH1F* h_L1FracEt_EtTot = new TH1F("L1FracEt_EtTot","L1FracEt_EtTot",100,0.,5.);
+   TH1F* h_L1ResHT = new TH1F("L1ResHT","L1ResHT",100,-5.0,5.0);
+   TH1F* h_L1ResEtTot = new TH1F("L1ResEtTot","L1ResEtTot",100,-5.0,5.0);
+
    TH1F* h_nHFtowers = new TH1F("nHFtowers","nHFtowers",100,0.,600.);
    TH1F* h_hfTwrEnergy = new TH1F("hfTwrEnergy","hfTwrEnergy",500,0.,500.);
    TH1F* h_hfTwrEt = new TH1F("hfTwrEt","hfTwrEt",100,0.,10.);
@@ -47,8 +59,23 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    TF1* func_effTrigL1 = new TF1("effTrigL1","[0]",sumEtMin,sumEtMax);
    
    std::string trigName = "HLT_DiJetAve30";
+   //std::string trigName = "L1_SingleJet30";
 
    int trigBit;
+   int nL1CenJet;
+   float l1CenJetEt[4];
+   int nL1ForJet;
+   float l1ForJetEt[4];
+   int nL1Tau;
+   float l1TauEt[4];
+   float l1MetHad;
+   float l1MetTot;
+   
+   int L1HfRing1EtSumNegativeEta;
+   int L1HfRing2EtSumNegativeEta;
+   int L1HfRing1EtSumPositiveEta;
+   int L1HfRing2EtSumPositiveEta;
+
    int nHFtowers;
    float hfTwrEnergy[1000];
    float hfTwrEt[1000];
@@ -59,12 +86,19 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    float jetCalPt[100];
    float jetCalEta[100];
 
-   int L1HfRing1EtSumNegativeEta;
-   int L1HfRing2EtSumNegativeEta;
-   int L1HfRing1EtSumPositiveEta;
-   int L1HfRing2EtSumPositiveEta;
-
    chain.SetBranchAddress(trigName.c_str(),&trigBit);
+   chain.SetBranchAddress("NL1CenJet",&nL1CenJet);
+   chain.SetBranchAddress("L1CenJetEt",l1CenJetEt);
+   chain.SetBranchAddress("NL1ForJet",&nL1ForJet);
+   chain.SetBranchAddress("L1ForJetEt",l1ForJetEt); 
+   chain.SetBranchAddress("NL1Tau",&nL1Tau);
+   chain.SetBranchAddress("L1TauEt",l1TauEt);
+   chain.SetBranchAddress("L1MetHad",&l1MetHad);
+   chain.SetBranchAddress("L1MetTot",&l1MetTot);
+   chain.SetBranchAddress("L1HfRing1EtSumNegativeEta",&L1HfRing1EtSumNegativeEta);
+   chain.SetBranchAddress("L1HfRing2EtSumNegativeEta",&L1HfRing2EtSumNegativeEta);
+   chain.SetBranchAddress("L1HfRing1EtSumPositiveEta",&L1HfRing1EtSumPositiveEta);
+   chain.SetBranchAddress("L1HfRing2EtSumPositiveEta",&L1HfRing2EtSumPositiveEta);
    chain.SetBranchAddress("NrecoTowCal",&nHFtowers);
    chain.SetBranchAddress("recoTowE",hfTwrEnergy);
    chain.SetBranchAddress("recoTowEt",hfTwrEt);
@@ -73,11 +107,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    chain.SetBranchAddress("NrecoJetCal",&nJetsCal);
    chain.SetBranchAddress("recoJetCalPt",jetCalPt); 
    chain.SetBranchAddress("recoJetCalEta",jetCalEta);
-   chain.SetBranchAddress("L1HfRing1EtSumNegativeEta",&L1HfRing1EtSumNegativeEta);
-   chain.SetBranchAddress("L1HfRing2EtSumNegativeEta",&L1HfRing2EtSumNegativeEta);
-   chain.SetBranchAddress("L1HfRing1EtSumPositiveEta",&L1HfRing1EtSumPositiveEta);
-   chain.SetBranchAddress("L1HfRing2EtSumPositiveEta",&L1HfRing2EtSumPositiveEta);
-
+   
    int nEvents = chain.GetEntries();
    double etaMin = 3.0;
    double towerThreshold = 2.5; //energy
@@ -100,15 +130,37 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
 
       ++nPassedTrigBit;
 
+      h_L1CenJetEt->Fill(l1CenJetEt[0]);
+      h_L1ForJetEt->Fill(l1ForJetEt[0]);
+      h_L1TauEt->Fill(l1TauEt[0]);
+      h_L1MetHad->Fill(l1MetHad);
+      h_L1MetTot->Fill(l1MetTot);
+
+      // Find leading L1 jet Et
+      float leadingJetEt = (l1CenJetEt[0] > l1ForJetEt[0]) ? l1CenJetEt[0] : l1ForJetEt[0];
+      leadingJetEt = (l1TauEt[0] > leadingJetEt) ? l1TauEt[0] : leadingJetEt;
+
+      h_L1LeadingJetEt->Fill(leadingJetEt);
+
+      // Compute Et fractions
+      float l1FracEt_HT = 2*leadingJetEt/l1MetHad;
+      float l1FracEt_EtTot = 2*leadingJetEt/l1MetTot;
+    
+      h_L1FracEt_HT->Fill(l1FracEt_HT); 
+      h_L1FracEt_EtTot->Fill(l1FracEt_EtTot);
+
+      h_L1ResHT->Fill((2*leadingJetEt - l1MetHad)/(2*leadingJetEt));
+      h_L1ResEtTot->Fill((2*leadingJetEt - l1MetTot)/(2*leadingJetEt));
+
       h_L1HfRing1EtSumNegativeEta->Fill(L1HfRing1EtSumNegativeEta);
       h_L1HfRing2EtSumNegativeEta->Fill(L1HfRing2EtSumNegativeEta);
       h_L1HfRing1EtSumPositiveEta->Fill(L1HfRing1EtSumPositiveEta);
       h_L1HfRing2EtSumPositiveEta->Fill(L1HfRing2EtSumPositiveEta);
 
-      if((L1HfRing1EtSumNegativeEta > L1EtSumThreshold)||
+      /*if((L1HfRing1EtSumNegativeEta > L1EtSumThreshold)||
          (L1HfRing2EtSumNegativeEta > L1EtSumThreshold)||
          (L1HfRing1EtSumPositiveEta > L1EtSumThreshold)||
-         (L1HfRing2EtSumPositiveEta > L1EtSumThreshold)) continue;
+         (L1HfRing2EtSumPositiveEta > L1EtSumThreshold)) continue;*/
 
       ++nPassedTrigBitAndL1EtSum;
 

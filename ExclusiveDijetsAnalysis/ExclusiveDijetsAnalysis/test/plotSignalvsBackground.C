@@ -19,7 +19,7 @@
 TH1F* getHisto(TDirectory*, const string&);
 void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int rebin = 1);*/
 
-void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap,bool Norm = false, int rebin = 1);
+void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap,bool Norm, int rebinFactor, bool variableBin, std::vector<int> const& groups);
 
 //template<typename KeyType,typename ValueType>
 //std::map<KeyType,ValueType> makeMap(const std::vector<KeyType>& keys,const std::vector<ValueType>& values);
@@ -30,7 +30,34 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
    double scale_;
 };*/
 
-void plot(bool Norm = false,int rebin = 1){
+// Not very good
+/*TH1F* scaleHisto(TH1F* histo, double scale, int line, int color, int ngroups, double* xbins){
+   if(xbins){
+      scaleHisto(histo,scale,line,color,1);
+
+      std::string hname = histo->GetName();
+      hname += "_rebin";
+      TH1F* histo_new = static_cast<TH1F*>(histo->Rebin(ngroups,hname.c_str(),xbins));
+
+      return histo_new;
+   } else {
+      scaleHisto(histo,scale,line,color,ngroups); 
+      return 0;
+   }
+}*/
+
+TH1F* scaleHisto(TH1F* histo, double scale, int line, int color, int rebinFactor, bool variableBin, std::vector<int> const& groups){
+   if(!variableBin){
+      scaleHisto(histo,scale,line,color,rebinFactor);
+      return 0;
+   } else{ 
+      scaleHisto(histo,scale,line,color,1);
+      TH1F* histo_new = rebinHisto(histo,groups);
+      return histo_new;
+   }
+}
+
+void plot(bool Norm = false, string attribute = "", int rebinFactor = 1, bool variableBin = false, std::vector<int> groups = std::vector<int>(0)){
 
    std::vector<std::string> samples;
    /*samples.push_back("signal");
@@ -45,41 +72,43 @@ void plot(bool Norm = false,int rebin = 1){
    samples.push_back("DPE di-jets");
 
    std::vector<TFile*> files;
-   files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
+   /*files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDPlusDijets_Pt30-FastSim_histos.root")); 
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDMinusDijets_Pt30-FastSim_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_QCD100to250-madgraph-FastSim_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));*/
+   files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_SDPlusDijets_Pt30_histos.root")); 
+   files.push_back(TFile::Open("root/analysisDijets_PAT_SDMinusDijets_Pt30_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_QCD100to250-madgraph_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));
-   /*files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_CEPDijets_M100_histos.root"));
-   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_SDPlusDijets_Pt30_histos.root")); 
-   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_SDMinusDijets_Pt30_histos.root"));
-   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_QCD100to250-madgraph_histos.root"));
-   files.push_back(TFile::Open("~/scratch0/data/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));*/
 
    std::vector<TDirectory*> directories;
    std::vector<TDirectory*> directoriesHLT;
 
    size_t index = 0;
    std::vector<std::string> samplesFastSim;
-   samplesFastSim.push_back("SD-plus di-jets");
-   samplesFastSim.push_back("SD-minus di-jets");
-   samplesFastSim.push_back("QCD non-diffractive");
+   //samplesFastSim.push_back("SD-plus di-jets");
+   //samplesFastSim.push_back("SD-minus di-jets");
+   //samplesFastSim.push_back("QCD non-diffractive");
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file,++index){
       if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()){
-         directories.push_back((*file)->GetDirectory("edmDumpAnalysis_singleVtx"));
+         directories.push_back((*file)->GetDirectory(("edmDumpAnalysis_singleVtx" + attribute).c_str()));
          directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis_hlt"));
       } else{
-         directories.push_back((*file)->GetDirectory("edmDumpAnalysis_filter0PU_singleVertexFilter"));
-         directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis_filter0PU"));
+         directories.push_back((*file)->GetDirectory(("edmDumpAnalysis_singleVertexFilter" + attribute).c_str()));
+         directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis"));
+         //directories.push_back((*file)->GetDirectory("edmDumpAnalysis_filter0PU_singleVertexFilter"));
+         //directoriesHLT.push_back((*file)->GetDirectory("edmDumpAnalysis_filter0PU"));
       }
    }
 
    std::vector<double> sigmas;
-   sigmas.push_back(0.12*1.1*250.);
+   sigmas.push_back(250.);
    sigmas.push_back(0.12*1.1*300000./2);
    sigmas.push_back(0.12*1.1*300000./2);
    sigmas.push_back(0.12*1.1*15000000.);
-   sigmas.push_back(0.12*1.1*4600.);
+   sigmas.push_back(4600.);
 
    std::vector<TFile*> filesEff;
    filesEff.push_back(TFile::Open("root/analysis_histos_CPEDijets.root"));
@@ -122,7 +151,7 @@ void plot(bool Norm = false,int rebin = 1){
    }
 
    std::vector<string> refVar;
-   /*refVar.push_back("leadingJetPt");
+   refVar.push_back("leadingJetPt");
    refVar.push_back("leadingJetEta");
    refVar.push_back("leadingJetPhi");
    refVar.push_back("secondJetPt");
@@ -137,11 +166,11 @@ void plot(bool Norm = false,int rebin = 1){
    refVar.push_back("xiMinus");
    refVar.push_back("massDijets");
    refVar.push_back("missingMassFromXi");
-   refVar.push_back("MxFromJets");*/
-   refVar.push_back("RjjFromJets");
-   refVar.push_back("RjjFromPFCands");
+   refVar.push_back("MxFromJets");
    refVar.push_back("xiPlusAfterSel");
    refVar.push_back("xiMinusAfterSel");
+   refVar.push_back("RjjFromJets");
+   refVar.push_back("RjjFromPFCands");
    refVar.push_back("RjjAfterSel");
    refVar.push_back("RjjFromPFAfterSel");
 
@@ -151,10 +180,11 @@ void plot(bool Norm = false,int rebin = 1){
    stackVars.push_back("RjjAfterSel");
    stackVars.push_back("RjjFromPFAfterSel");
 
-   plot(refVar,stackVars,dirMap,scaleMap,Norm,rebin);
+   //plot(refVar,stackVars,dirMap,scaleMap,Norm,ngroups,xbins);
+   plot(refVar,stackVars,dirMap,scaleMap,Norm,rebinFactor,variableBin,groups);
 }
 
-void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap, bool Norm, int rebin){
+void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std::map<std::string,TDirectory*>& dirMap, std::map<std::string,double>& scaleMap, bool Norm, int rebinFactor, bool variableBin, std::vector<int> const& groups){
    std::map<std::string,TCanvas*> canvasesVar;
    std::map<std::string,TLegend*> legendsVar;
    //for(size_t k = 0; k < canvasesVar.size(); ++k) canvasesVar[k] = new TCanvas(refVar[k].c_str(),refVar[k].c_str());
@@ -180,7 +210,8 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
    for(std::vector<std::string>::const_iterator var = refVar.begin(); var != refVar.end(); ++var){
       const std::string& varName = *var; 
       histos_signal[varName] = getHisto(dirMap["signal"],varName);
-      scaleHisto(histos_signal[varName],scaleMap["signal"],1,kBlack,rebin);
+      TH1F* histo_new = scaleHisto(histos_signal[varName],scaleMap["signal"],1,kBlack,rebinFactor,variableBin,groups);
+      if(histo_new) histos_signal[varName] = histo_new;
       legendsVar[varName]->AddEntry(histos_signal[varName],"CEP di-jets","L");
  
       canvasesVar[varName]->cd();
@@ -191,7 +222,8 @@ void plot(std::vector<string>& refVar, std::vector<std::string>& stackVars, std:
          if(it->first == "signal") continue;
          if(histos_back.find(it->first) == histos_back.end()) histos_back[it->first] = defmap;
          histos_back[it->first][varName] = getHisto(it->second,varName); 
-         scaleHisto(histos_back[it->first][varName],scaleMap[it->first],1,colors[index],rebin);
+         TH1F* histo_new = scaleHisto(histos_back[it->first][varName],scaleMap[it->first],1,colors[index],rebinFactor,variableBin,groups);
+         if(histo_new) histos_back[it->first][varName] = histo_new; 
          histos_back[it->first][varName]->SetFillColor(colors[index]);
          histos_back[it->first][varName]->SetFillStyle(styles[index]);
          legendsVar[varName]->AddEntry(histos_back[it->first][varName],it->first.c_str(),"L"); 
