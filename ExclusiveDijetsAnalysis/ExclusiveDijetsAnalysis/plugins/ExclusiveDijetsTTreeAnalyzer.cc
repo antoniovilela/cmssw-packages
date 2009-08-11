@@ -334,6 +334,9 @@ void ExclusiveDijetsTTreeAnalyzer::analyze(const edm::Event& event, const edm::E
   fillJetInfo(event,setup);
   fillMultiplicities(event,setup);
   fillXiInfo(event,setup);
+
+  // Fill TTree
+  if(saveTTree_) data_->Fill();
 }
 
 void ExclusiveDijetsTTreeAnalyzer::fillPileUpInfo(const edm::Event& event, const edm::EventSetup& setup){
