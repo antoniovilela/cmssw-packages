@@ -8,7 +8,7 @@ class DTTTrigResidualCorr:
         desc += '/Ttrig/Exec'
         self.desc = desc 
 
-        self.common_opts = {'GLOBALTAG':'GR09_31X_V5P::All'}
+        self.common_opts = {'GLOBALTAG':'GR09_P_V1::All'}
 
         self.configs = ['DTTTrigResidualCorrection_cfg.py','DumpDBToFile_ResidCorr_cfg.py']
 

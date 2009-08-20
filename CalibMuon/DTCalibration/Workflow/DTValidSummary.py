@@ -8,7 +8,7 @@ class DTValidSummary:
         desc += '/Ttrig/Exec'
         self.desc = desc 
 
-        self.common_opts = {'GLOBALTAG':'CRAFT_31X::All'}
+        self.common_opts = {'GLOBALTAG':'GR09_P_V1::All'}
 
         self.configs = ['DTkFactValidation_2_cfg.py']
 
