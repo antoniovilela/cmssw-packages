@@ -79,7 +79,7 @@ def summaryServer(self):
     """
     Returns jobs summary
     """
-    self.resynchClientSide()
+    #self.resynchClientSide()
         
     upTask = common._db.getTask()  
     return computeSummary(upTask)

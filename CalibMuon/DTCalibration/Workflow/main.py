@@ -106,6 +106,10 @@ if __name__ == '__main__':
     result_dir += '/Ttrig/Results'
     if not os.path.exists(result_dir): os.makedirs(result_dir)
 
+    log_dir = 'Run%s'%run
+    log_dir += '/Ttrig/Log'
+    if not os.path.exists(log_dir): os.makedirs(log_dir)
+ 
     timeBoxes = os.path.abspath(result_dir + '/' + 'DTTimeBoxes_' + run + '.root')
 
     if not os.path.exists(timeBoxes): runTtrigProd(run,trial,result_dir)
