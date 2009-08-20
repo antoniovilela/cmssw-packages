@@ -65,7 +65,7 @@ def computeSummaryCRAB251(up_task):
 
     return summary
 
-computeSummary = computeSummaryCRAB251
+computeSummary = computeSummaryCRAB260
 
 def summaryStandAlone(self):
     """
@@ -133,7 +133,7 @@ def crabActionCRAB251(options, action = None):
 
     if result: return result
 
-crabAction = crabActionCRAB251
+crabAction = crabActionCRAB260
 
 def crabCreate(dir = '.', crabCfg_name = 'crab.cfg'):
 
@@ -171,7 +171,16 @@ def checkStatus(project, threshold = 95.0):
         print "%s %.2f"%(item,status[item])
 
     finished = False
-    if status.has_key('Done') and status['Done'] > threshold: finished = True
+    #if status.has_key('Done') and status['Done'] > threshold: finished = True
+    if status.has_key('Done') and status['Done'] > 50.0:
+        ignoreStatus = ['Created']
+        sum = 0.0
+        for item in ignoreStatus:
+            if status.has_key(item): sum += status[item]
+
+        # frac(done)' = N*frac(done)/(N - N*frac(ignore)) = frac(done)/(1 - frac(ignore))
+        frac = status['Done']/(1 - sum)
+        if frac > threshold: finished = True 
 
     return finished
 

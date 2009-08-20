@@ -3,6 +3,7 @@ from DTTTrigCorrFirst import DTTTrigCorrFirst
 from DTTTrigValid import DTTTrigValid
 from DTTTrigResidualCorr import DTTTrigResidualCorr
 from DTValidSummary import DTValidSummary
+from CrabWatch import CrabWatch
 from workflow import haddInCastor,crabWatch,getOutput
 import sys,os,time
 
@@ -10,7 +11,7 @@ start = time.time()
 
 run = None
 trial = None
-castor_prefix = None
+castor_prefix = '/castor/cern.ch/cms/store/caf/user/antoniov/'
 for opt in sys.argv:
     if opt[:4] == 'run=':
         run = opt[4:]
@@ -21,16 +22,18 @@ for opt in sys.argv:
 
 if not run: raise ValueError,'Need to set run number'
 if not trial: raise ValueError,'Need to set trial number'
-if not castor_prefix: raise ValueError,'Need to set castor dir'
+#if not castor_prefix: raise ValueError,'Need to set castor dir'
 
 dtTtrigProd = DTTTrigProd(run,trial) 
 project_prod = dtTtrigProd.run()
 
 print "Sent production jobs with project",project_prod
 
-crabWatch(getOutput,project_prod) 
+#crabWatch(getOutput,project_prod) 
+crabProd = CrabWatch(project_prod)
+crabProd.start()
+crabProd.join()
 
-#castor_prefix = '/castor/cern.ch/cms/store/caf/user/antoniov/'
 castor_dir = castor_prefix + dtTtrigProd.crab_opts['USERDIRCAF']
 
 result_dir = 'Run%s'%run
@@ -55,7 +58,10 @@ project_valid_first = dtTtrigValid.run()
 
 print "Sent validation jobs with project",project_valid_first
 
-crabWatch(getOutput,project_valid_first)
+#crabWatch(getOutput,project_valid_first)
+crabValidFirst = CrabWatch(project_valid_first)
+crabValidFirst.start()
+crabValidFirst.join()
 
 result_file = result_dir + '/DTkFactValidation_%s.root'%run
 castor_dir = castor_prefix + dtTtrigValid.crab_opts['USERDIRCAF']
@@ -76,7 +82,10 @@ project_valid_ResidCorr = dtTtrigValid_ResidCorr.run()
 
 print "Sent validation jobs with project",project_valid_ResidCorr
 
-crabWatch(getOutput,project_valid_ResidCorr)
+#crabWatch(getOutput,project_valid_ResidCorr)
+crabValidResidCorr = CrabWatch(project_valid_ResidCorr)
+crabValidResidCorr.start()
+crabValidResidCorr.join()
 
 result_file = result_dir + '/DTkFactValidation_ResidCorr_%s.root'%run
 castor_dir = castor_prefix + dtTtrigValid_ResidCorr.crab_opts['USERDIRCAF']
