@@ -23,7 +23,7 @@ class DTTTrigValid:
         self.pset = replaceTemplate(self.pset_template,**self.pset_opts)
 
         desc = 'Run%s'%run
-        desc += '/Ttrig/Validation/First'
+        desc += '/Ttrig/Validation'
         self.desc = desc 
 
         self.task = CrabTask(self.desc,self.crab_cfg,self.pset,pset_name)

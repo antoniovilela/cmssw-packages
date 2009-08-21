@@ -214,7 +214,7 @@ def haddInCastor(castor_dir,result_file,type = 'root'):
     from subprocess import Popen,PIPE,call
     p1 = Popen(['nsls',castor_dir],stdout=PIPE)
     p2 = Popen(['grep',type],stdin=p1.stdout,stdout=PIPE)
-    files = [castor_dir + "/" + item[:-1] for item in p2.stdout]
+    files = ['rfio:' + castor_dir + "/" + item[:-1] for item in p2.stdout]
     p2.stdout.close()
     cmd = ['hadd',result_file]
     cmd.extend(files)
