@@ -7,6 +7,8 @@ from CrabWatch import CrabWatch
 from workflow import haddInCastor,crabWatch,getOutput
 import sys,os,time
 
+castor_prefix = 'rfio:/castor/cern.ch/cms/store/caf/user/antoniov/' #FIXME
+ 
 def runTtrigProd(run,trial,result_dir):
     dtTtrigProd = DTTTrigProd(run,trial) 
     project_prod = dtTtrigProd.run()
@@ -89,7 +91,7 @@ if __name__ == '__main__':
     
     run = None
     trial = None
-    castor_prefix = '/castor/cern.ch/cms/store/caf/user/antoniov/'
+    #castor_prefix = 'rfio:/castor/cern.ch/cms/store/caf/user/antoniov/'
     for opt in sys.argv:
         if opt[:4] == 'run=':
             run = opt[4:]
