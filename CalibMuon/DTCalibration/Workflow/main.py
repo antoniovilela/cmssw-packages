@@ -9,8 +9,8 @@ import sys,os,time
 
 castor_prefix = '/castor/cern.ch/cms/store/caf/user/antoniov/' #FIXME
  
-def runTtrigProd(run,trial,result_dir):
-    dtTtrigProd = DTTTrigProd(run,trial) 
+def runTtrigProd(run,runselection,trial,result_dir):
+    dtTtrigProd = DTTTrigProd(run,runselection,trial) 
     project_prod = dtTtrigProd.run()
 
     print "Sent production jobs with project",project_prod
@@ -32,12 +32,12 @@ def runTtrigCorrFirst(run,result_dir):
     print "Finished processing:"
     for pset in dtTtrigCorrFirst.configs: print "--->",pset
 
-def runTtrigValid(run,trial,ttrig_second_db,result_dir):
+def runTtrigValid(run,runselection,trial,ttrig_second_db,result_dir):
     #ttrig_second_db = os.path.abspath(result_dir + '/' + 'ttrig_second_' + run + '.db')
 
     opts = {'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial)}
 
-    dtTtrigValid = DTTTrigValid(run,ttrig_second_db,opts,trial) 
+    dtTtrigValid = DTTTrigValid(run,runselection,ttrig_second_db,opts,trial) 
     project_valid_first = dtTtrigValid.run()
 
     print "Sent validation jobs with project",project_valid_first
@@ -58,12 +58,12 @@ def runTtrigResidualCorr(run,result_dir):
     print "Finished processing:"
     for pset in dtTtrigResidualCorr.configs: print "--->",pset
 
-def runTtrigValidResidCorr(run,trial,ttrig_ResidCorr_db,result_dir):
+def runTtrigValidResidCorr(run,runselection,trial,ttrig_ResidCorr_db,result_dir):
     #ttrig_ResidCorr_db = os.path.abspath(result_dir + '/' + 'ttrig_ResidCorr_' + run + '.db')
 
     opts = {'USERDIRCAF':'TTRIGCalibration/Validation/ResidCorr/Run' + str(run) + '/v' + str(trial)}
 
-    dtTtrigValid_ResidCorr = DTTTrigValid(run,ttrig_ResidCorr_db,opts,trial) 
+    dtTtrigValid_ResidCorr = DTTTrigValid(run,runselection,ttrig_ResidCorr_db,opts,trial) 
     project_valid_ResidCorr = dtTtrigValid_ResidCorr.run()
 
     print "Sent validation jobs with project",project_valid_ResidCorr
@@ -90,11 +90,14 @@ if __name__ == '__main__':
     start = time.time()
     
     run = None
+    runselection = None
     trial = None
     #castor_prefix = 'rfio:/castor/cern.ch/cms/store/caf/user/antoniov/'
     for opt in sys.argv:
         if opt[:4] == 'run=':
             run = opt[4:]
+        if opt[:13] == 'runselection=':
+            runselection = opt[13:] 
         if opt[:6] == 'trial=':
             trial = opt[6:]
         if opt[:7] == 'castor=':
@@ -103,6 +106,8 @@ if __name__ == '__main__':
     if not run: raise ValueError,'Need to set run number'
     if not trial: raise ValueError,'Need to set trial number'
     #if not castor_prefix: raise ValueError,'Need to set castor dir'
+
+    if not runselection: runselection = run
 
     result_dir = 'Run%s'%run
     result_dir += '/Ttrig/Results'
@@ -116,6 +121,8 @@ if __name__ == '__main__':
     logOut = file(logFileName)
 
     print "DT Calibration starting for Run",run
+    print "Using runs",runselection
+    print "Results at",result_dir 
     print "Log file at",logFileName
  
     stdout_original = sys.stdout
@@ -123,7 +130,7 @@ if __name__ == '__main__':
 
     timeBoxes = os.path.abspath(result_dir + '/' + 'DTTimeBoxes_' + run + '.root')
 
-    if not os.path.exists(timeBoxes): runTtrigProd(run,trial,result_dir)
+    if not os.path.exists(timeBoxes): runTtrigProd(run,runselection,trial,result_dir)
    
     if not os.path.exists(timeBoxes): raise RuntimeError,'Could not produce %s'%timeBoxes
 
@@ -135,7 +142,7 @@ if __name__ == '__main__':
 
     residualsFirst = os.path.abspath(result_dir + '/' + 'DTkFactValidation_' + run + '.root')
 
-    if not os.path.exists(residualsFirst): runTtrigValid(run,trial,ttrig_second_db,result_dir)
+    if not os.path.exists(residualsFirst): runTtrigValid(run,runselection,trial,ttrig_second_db,result_dir)
 
     if not os.path.exists(residualsFirst): raise RuntimeError,'Could not produce %s'%residualsFirst
 
@@ -147,7 +154,7 @@ if __name__ == '__main__':
 
     residualsResidCorr = os.path.abspath(result_dir + '/' + 'DTkFactValidation_ResidCorr_' + run + '.root')
     
-    if not os.path.exists(residualsResidCorr): runTtrigValidResidCorr(run,trial,ttrig_ResidCorr_db,result_dir)
+    if not os.path.exists(residualsResidCorr): runTtrigValidResidCorr(run,runselection,trial,ttrig_ResidCorr_db,result_dir)
 
     if not os.path.exists(residualsResidCorr): raise RuntimeError,'Could not produce %s'%residualsResidCorr
 

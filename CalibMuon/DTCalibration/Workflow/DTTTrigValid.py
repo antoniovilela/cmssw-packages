@@ -3,13 +3,13 @@ from CrabTask import *
 import os
 
 class DTTTrigValid:
-    def __init__(self,run,input_file,opts,trial=1):
+    def __init__(self,run,runselection,input_file,opts,trial=1):
         pset_name = 'DTkFactValidation_1_cfg.py'
 
         self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_Valid_TEMPL.cfg'
         self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTkFactValidation_1_TEMPL_cfg.py'
         self.crab_opts = {'DATASETPATH':'/StreamExpress/CRAFT09-MuAlCalIsolatedMu-v1/ALCARECO',
-                          'RUNNUMBER':run,
+                          'RUNSELECTION':runselection,
                           'PSET':pset_name, 
                           'INPUTFILE':input_file,
                           'EMAIL':'vilela@to.infn.it'}
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     opts = {'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial)}
 
-    dtTtrigValid = DTTTrigValid(run,ttrig_second_db,opts,trial) 
+    dtTtrigValid = DTTTrigValid(run,run,ttrig_second_db,opts,trial) 
     project = dtTtrigValid.run()
 
     print "Sent validation jobs with project",project

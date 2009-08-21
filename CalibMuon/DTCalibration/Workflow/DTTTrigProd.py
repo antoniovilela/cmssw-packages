@@ -3,14 +3,14 @@ from CrabTask import *
 import os
 
 class DTTTrigProd:
-    def __init__(self,run,trial):
+    def __init__(self,run,runselection,trial):
         pset_name = 'DTTTrigCalibration_cfg.py'
 
         self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_ttrig_prod_TEMPL.cfg'
         self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTTTrigCalibration_TEMPL_cfg.py'
 
         self.crab_opts = {'DATASETPATH':'/StreamExpress/CRAFT09-MuAlCalIsolatedMu-v1/ALCARECO',
-                          'RUNNUMBER':run,
+                          'RUNSELECTION':runselection,
                           'PSET':pset_name, 
                           'USERDIRCAF':'TTRIGCalibration/Production/Run' + str(run) + '/v' + str(trial),
                           'EMAIL':'vilela@to.infn.it'}
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     if not run: raise ValueError,'Need to set run number'
     if not trial: raise ValueError,'Need to set trial number'
 
-    dtTtrigProd = DTTTrigProd(run,trial) 
+    dtTtrigProd = DTTTrigProd(run,run,trial) 
     project = dtTtrigProd.run()
 
     print "Sent production jobs with project",project
