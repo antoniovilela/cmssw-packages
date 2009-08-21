@@ -117,16 +117,16 @@ if __name__ == '__main__':
     log_dir += '/Ttrig/Log'
     if not os.path.exists(log_dir): os.makedirs(log_dir)
  
-    logFileName = os.path.abspath('%s/Run_%s_v%s.log' % (log_dir,run,trial))
-    logOut = open(logFileName,'w',1)
+    #logFileName = os.path.abspath('%s/Run_%s_v%s.log' % (log_dir,run,trial))
+    #logOut = open(logFileName,'w',1)
 
     print "DT Calibration starting for Run",run
     print "Using runs",runselection
     print "Results at",result_dir 
-    print "Log file at",logFileName
+    #print "Log file at",logFileName
  
-    stdout_original = sys.stdout
-    sys.stdout = logOut
+    #stdout_original = sys.stdout
+    #sys.stdout = logOut
 
     timeBoxes = os.path.abspath(result_dir + '/' + 'DTTimeBoxes_' + run + '.root')
 
@@ -164,7 +164,7 @@ if __name__ == '__main__':
 
     if not os.path.exists(summaryResiduals): raise RuntimeError,'Could not produce %s'%summaryResiduals
 
-    sys.stdout = stdout_original
+    #sys.stdout = stdout_original
  
     stop = time.time() 
     print "DT Calibration finished for Run",run
