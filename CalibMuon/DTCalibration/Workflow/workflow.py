@@ -199,7 +199,7 @@ def replaceTemplate(template,**opts):
     for item in opts:
          old = '@@%s@@'%item
          new = str(opts[item])
-         print "Replacing",old,"for",new
+         print "Replacing",old,"to",new
          result = result.replace(old,new)
 
     return result
