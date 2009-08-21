@@ -50,7 +50,7 @@ def runTtrigValid(run,runselection,trial,input_file,result_dir):
     #ttrig_second_db = os.path.abspath(result_dir + '/' + 'ttrig_second_' + run + '.db')
 
     crab_opts = {'RUNSELECTION':runselection,
-                 'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial)
+                 'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial),
                  'INPUTFILE':input_file}
 
     crab_opts.update(def_crab_opts)
@@ -83,7 +83,7 @@ def runTtrigValidResidCorr(run,runselection,trial,input_file,result_dir):
     #ttrig_ResidCorr_db = os.path.abspath(result_dir + '/' + 'ttrig_ResidCorr_' + run + '.db')
 
     crab_opts = {'RUNSELECTION':runselection,
-                 'USERDIRCAF':'TTRIGCalibration/Validation/ResidCorr/Run' + str(run) + '/v' + str(trial)
+                 'USERDIRCAF':'TTRIGCalibration/Validation/ResidCorr/Run' + str(run) + '/v' + str(trial),
                  'INPUTFILE':input_file}
 
     crab_opts.update(def_crab_opts)

@@ -49,7 +49,7 @@ if __name__ == '__main__':
     crab_opts = {'DATASETPATH':'/StreamExpress/CRAFT09-MuAlCalIsolatedMu-v1/ALCARECO',
                  'EMAIL':'vilela@to.infn.it',
                  'RUNSELECTION':run,
-                 'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial)
+                 'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial),
                  'INPUTFILE':ttrig_second_db}
 
     pset_opts = {'GLOBALTAG':'GR09_P_V1::All',
