@@ -118,7 +118,7 @@ if __name__ == '__main__':
     if not os.path.exists(log_dir): os.makedirs(log_dir)
  
     logFileName = os.path.abspath('%s/Run_%s_v%s.log' % (log_dir,run,trial))
-    logOut = open(logFileName,'w')
+    logOut = open(logFileName,'w',1)
 
     print "DT Calibration starting for Run",run
     print "Using runs",runselection
