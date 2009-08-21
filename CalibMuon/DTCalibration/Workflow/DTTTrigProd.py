@@ -3,20 +3,16 @@ from CrabTask import *
 import os
 
 class DTTTrigProd:
-    def __init__(self,run,runselection,trial):
+    def __init__(self,run,crab_opts,pset_opts):
         pset_name = 'DTTTrigCalibration_cfg.py'
 
         self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_ttrig_prod_TEMPL.cfg'
         self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTTTrigCalibration_TEMPL_cfg.py'
 
-        self.crab_opts = {'DATASETPATH':'/StreamExpress/CRAFT09-MuAlCalIsolatedMu-v1/ALCARECO',
-                          'RUNSELECTION':runselection,
-                          'PSET':pset_name, 
-                          'USERDIRCAF':'TTRIGCalibration/Production/Run' + str(run) + '/v' + str(trial),
-                          'EMAIL':'vilela@to.infn.it'}
+        self.crab_opts = crab_opts
+        self.crab_opts['PSET'] = pset_name
 
-        self.pset_opts = {'GLOBALTAG':'GR09_P_V1::All',
-                          'MUDIGILABEL':'muonDTDigis'}
+        self.pset_opts = pset_opts
 
         self.crab_cfg = replaceTemplate(self.crab_template,**self.crab_opts)
         self.pset = replaceTemplate(self.pset_template,**self.pset_opts)
@@ -45,7 +41,15 @@ if __name__ == '__main__':
     if not run: raise ValueError,'Need to set run number'
     if not trial: raise ValueError,'Need to set trial number'
 
-    dtTtrigProd = DTTTrigProd(run,run,trial) 
+    crab_opts = {'DATASETPATH':'/StreamExpress/CRAFT09-MuAlCalIsolatedMu-v1/ALCARECO',
+                 'EMAIL':'vilela@to.infn.it',
+                 'RUNSELECTION':run,
+                 'USERDIRCAF':'TTRIGCalibration/Production/Run' + str(run) + '/v' + str(trial)}
+
+    pset_opts = {'GLOBALTAG':'GR09_P_V1::All',
+                 'MUDIGILABEL':'muonDTDigis'}   
+
+    dtTtrigProd = DTTTrigProd(run,crab_opts,pset_opts) 
     project = dtTtrigProd.run()
 
     print "Sent production jobs with project",project

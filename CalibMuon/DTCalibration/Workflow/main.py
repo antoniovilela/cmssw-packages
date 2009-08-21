@@ -7,10 +7,24 @@ from CrabWatch import CrabWatch
 from workflow import haddInCastor,crabWatch,getOutput
 import sys,os,time
 
-castor_prefix = '/castor/cern.ch/cms/store/caf/user/antoniov/' #FIXME
+#FIXME: This should come from some configuration module
+castor_prefix = '/castor/cern.ch/cms/store/caf/user/antoniov/'
  
+def_crab_opts = {'DATASETPATH':'/StreamExpress/CRAFT09-MuAlCalIsolatedMu-v1/ALCARECO',
+                 'EMAIL':'vilela@to.infn.it'}
+
+def_pset_opts = {'GLOBALTAG':'GR09_P_V1::All'}
+
 def runTtrigProd(run,runselection,trial,result_dir):
-    dtTtrigProd = DTTTrigProd(run,runselection,trial) 
+
+    crab_opts = {'RUNSELECTION':runselection,
+                 'USERDIRCAF':'TTRIGCalibration/Production/Run' + str(run) + '/v' + str(trial)}
+    crab_opts.update(def_crab_opts)
+
+    pset_opts = {'MUDIGILABEL':'muonDTDigis'}
+    pset_opts.update(def_pset_opts)
+
+    dtTtrigProd = DTTTrigProd(run,crab_opts,pset_opts) 
     project_prod = dtTtrigProd.run()
 
     print "Sent production jobs with project",project_prod
@@ -32,12 +46,19 @@ def runTtrigCorrFirst(run,result_dir):
     print "Finished processing:"
     for pset in dtTtrigCorrFirst.configs: print "--->",pset
 
-def runTtrigValid(run,runselection,trial,ttrig_second_db,result_dir):
+def runTtrigValid(run,runselection,trial,input_file,result_dir):
     #ttrig_second_db = os.path.abspath(result_dir + '/' + 'ttrig_second_' + run + '.db')
 
-    opts = {'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial)}
+    crab_opts = {'RUNSELECTION':runselection,
+                 'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial)
+                 'INPUTFILE':input_file}
 
-    dtTtrigValid = DTTTrigValid(run,runselection,ttrig_second_db,opts,trial) 
+    crab_opts.update(def_crab_opts)
+ 
+    pset_opts = {'INPUTFILE':input_file.split('/')[-1]}
+    pset_opts.update(def_pset_opts)
+
+    dtTtrigValid = DTTTrigValid(run,crab_opts,pset_opts) 
     project_valid_first = dtTtrigValid.run()
 
     print "Sent validation jobs with project",project_valid_first
@@ -58,12 +79,19 @@ def runTtrigResidualCorr(run,result_dir):
     print "Finished processing:"
     for pset in dtTtrigResidualCorr.configs: print "--->",pset
 
-def runTtrigValidResidCorr(run,runselection,trial,ttrig_ResidCorr_db,result_dir):
+def runTtrigValidResidCorr(run,runselection,trial,input_file,result_dir):
     #ttrig_ResidCorr_db = os.path.abspath(result_dir + '/' + 'ttrig_ResidCorr_' + run + '.db')
 
-    opts = {'USERDIRCAF':'TTRIGCalibration/Validation/ResidCorr/Run' + str(run) + '/v' + str(trial)}
+    crab_opts = {'RUNSELECTION':runselection,
+                 'USERDIRCAF':'TTRIGCalibration/Validation/ResidCorr/Run' + str(run) + '/v' + str(trial)
+                 'INPUTFILE':input_file}
 
-    dtTtrigValid_ResidCorr = DTTTrigValid(run,runselection,ttrig_ResidCorr_db,opts,trial) 
+    crab_opts.update(def_crab_opts)
+
+    pset_opts = {'INPUTFILE':input_file.split('/')[-1]}
+    pset_opts.update(def_pset_opts)
+
+    dtTtrigValid_ResidCorr = DTTTrigValid(run,crab_opts,pset_opts) 
     project_valid_ResidCorr = dtTtrigValid_ResidCorr.run()
 
     print "Sent validation jobs with project",project_valid_ResidCorr

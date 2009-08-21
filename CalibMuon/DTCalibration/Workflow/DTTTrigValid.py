@@ -3,21 +3,16 @@ from CrabTask import *
 import os
 
 class DTTTrigValid:
-    def __init__(self,run,runselection,input_file,opts,trial=1):
+    def __init__(self,run,crab_opts,pset_opts):
         pset_name = 'DTkFactValidation_1_cfg.py'
 
         self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_Valid_TEMPL.cfg'
         self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTkFactValidation_1_TEMPL_cfg.py'
-        self.crab_opts = {'DATASETPATH':'/StreamExpress/CRAFT09-MuAlCalIsolatedMu-v1/ALCARECO',
-                          'RUNSELECTION':runselection,
-                          'PSET':pset_name, 
-                          'INPUTFILE':input_file,
-                          'EMAIL':'vilela@to.infn.it'}
+ 
+        self.crab_opts = crab_opts
+        self.crab_opts['PSET'] = pset_name
 
-        self.crab_opts.update(opts)
-
-        self.pset_opts = {'GLOBALTAG':'GR09_P_V1::All',
-                          'INPUTFILE':input_file.split('/')[-1]}
+        self.pset_opts = pset_opts 
 
         self.crab_cfg = replaceTemplate(self.crab_template,**self.crab_opts)
         self.pset = replaceTemplate(self.pset_template,**self.pset_opts)
@@ -51,9 +46,16 @@ if __name__ == '__main__':
 
     ttrig_second_db = os.path.abspath(result_dir + '/' + 'ttrig_second_' + run + '.db')
 
-    opts = {'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial)}
+    crab_opts = {'DATASETPATH':'/StreamExpress/CRAFT09-MuAlCalIsolatedMu-v1/ALCARECO',
+                 'EMAIL':'vilela@to.infn.it',
+                 'RUNSELECTION':run,
+                 'USERDIRCAF':'TTRIGCalibration/Validation/First/Run' + str(run) + '/v' + str(trial)
+                 'INPUTFILE':ttrig_second_db}
 
-    dtTtrigValid = DTTTrigValid(run,run,ttrig_second_db,opts,trial) 
+    pset_opts = {'GLOBALTAG':'GR09_P_V1::All',
+                 'INPUTFILE':ttrig_second_db.split('/')[-1]}
+
+    dtTtrigValid = DTTTrigValid(run,crab_opts,pset_opts) 
     project = dtTtrigValid.run()
 
     print "Sent validation jobs with project",project
