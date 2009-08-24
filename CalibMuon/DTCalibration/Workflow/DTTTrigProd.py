@@ -3,11 +3,14 @@ from CrabTask import *
 import os
 
 class DTTTrigProd:
-    def __init__(self,run,crab_opts,pset_opts):
+    def __init__(self,run,crab_opts,pset_opts,template_path):
         pset_name = 'DTTTrigCalibration_cfg.py'
 
-        self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_ttrig_prod_TEMPL.cfg'
-        self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTTTrigCalibration_TEMPL_cfg.py'
+        #self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_ttrig_prod_TEMPL.cfg'
+        #self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTTTrigCalibration_TEMPL_cfg.py'
+        self.crab_template = template_path + '/crab/crab_ttrig_prod_TEMPL.cfg'
+
+        self.pset_template = template_path + 'config/DTTTrigCalibration_TEMPL_cfg.py'
 
         self.crab_opts = crab_opts
         self.crab_opts['PSET'] = pset_name
@@ -49,7 +52,7 @@ if __name__ == '__main__':
     pset_opts = {'GLOBALTAG':'GR09_P_V1::All',
                  'MUDIGILABEL':'muonDTDigis'}   
 
-    dtTtrigProd = DTTTrigProd(run,crab_opts,pset_opts) 
+    dtTtrigProd = DTTTrigProd(run,crab_opts,pset_opts,'templates') 
     project = dtTtrigProd.run()
 
     print "Sent production jobs with project",project
