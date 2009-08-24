@@ -3,12 +3,14 @@ from CrabTask import *
 import os
 
 class DTTTrigValid:
-    def __init__(self,run,crab_opts,pset_opts):
+    def __init__(self,run,crab_opts,pset_opts,template_path):
         pset_name = 'DTkFactValidation_1_cfg.py'
 
-        self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_Valid_TEMPL.cfg'
-        self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTkFactValidation_1_TEMPL_cfg.py'
- 
+        #self.crab_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/crab/crab_Valid_TEMPL.cfg'
+        #self.pset_template = os.environ['CMSSW_BASE'] + '/src/Workflow/' + 'templates/config/DTkFactValidation_1_TEMPL_cfg.py'
+        self.crab_template = template_path + '/crab/crab_Valid_TEMPL.cfg'
+        self.pset_template = template_path + '/config/DTkFactValidation_1_TEMPL_cfg.py'
+
         self.crab_opts = crab_opts
         self.crab_opts['PSET'] = pset_name
 
@@ -55,7 +57,7 @@ if __name__ == '__main__':
     pset_opts = {'GLOBALTAG':'GR09_P_V1::All',
                  'INPUTFILE':ttrig_second_db.split('/')[-1]}
 
-    dtTtrigValid = DTTTrigValid(run,crab_opts,pset_opts) 
+    dtTtrigValid = DTTTrigValid(run,crab_opts,pset_opts,'templates') 
     project = dtTtrigValid.run()
 
     print "Sent validation jobs with project",project

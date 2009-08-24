@@ -26,7 +26,7 @@ def runTtrigProd(run,runselection,trial,config):
     pset_opts = {'MUDIGILABEL':'muonDTDigis'}
     pset_opts.update(config.pset_opts)
 
-    dtTtrigProd = DTTTrigProd(run,crab_opts,pset_opts) 
+    dtTtrigProd = DTTTrigProd(run,crab_opts,pset_opts,config.template_path) 
     project_prod = dtTtrigProd.run()
 
     print "Sent production jobs with project",project_prod
@@ -60,7 +60,7 @@ def runTtrigValid(run,runselection,trial,input_file,config):
     pset_opts = {'INPUTFILE':input_file.split('/')[-1]}
     pset_opts.update(config.pset_opts)
 
-    dtTtrigValid = DTTTrigValid(run,crab_opts,pset_opts) 
+    dtTtrigValid = DTTTrigValid(run,crab_opts,pset_opts,config.template_path) 
     project_valid_first = dtTtrigValid.run()
 
     print "Sent validation jobs with project",project_valid_first
@@ -93,7 +93,7 @@ def runTtrigValidResidCorr(run,runselection,trial,input_file,config):
     pset_opts = {'INPUTFILE':input_file.split('/')[-1]}
     pset_opts.update(config.pset_opts)
 
-    dtTtrigValid_ResidCorr = DTTTrigValid(run,crab_opts,pset_opts) 
+    dtTtrigValid_ResidCorr = DTTTrigValid(run,crab_opts,pset_opts,config.template_path) 
     project_valid_ResidCorr = dtTtrigValid_ResidCorr.run()
 
     print "Sent validation jobs with project",project_valid_ResidCorr
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     if not runselection: runselection = run
 
     config = __import__(config_mod)
-    configFields = ['castor_prefix','crab_opts','pset_opts']
+    configFields = ['castor_prefix','crab_opts','pset_opts','template_path']
     for item in configFields:
         if not hasattr(config,item):
             raise RuntimeError,'Need to set "%s" in %s.py' % (item,config_mod)
