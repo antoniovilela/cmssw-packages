@@ -146,7 +146,7 @@ if __name__ == '__main__':
     config = __import__(config_mod)
     configFields = ['castor_prefix','crab_opts','pset_opts']
     for item in configFields:
-        if not config.hasattr(item):
+        if not hasattr(config,item):
             raise RuntimeError,'Need to set "%s" in %s.py' % (item,config_mod)
      
     result_dir = 'Run%s'%run
