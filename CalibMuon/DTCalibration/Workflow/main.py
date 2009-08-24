@@ -17,7 +17,7 @@ def_crab_opts = {'DATASETPATH':'/StreamExpress/CRAFT09-MuAlCalIsolatedMu-v1/ALCA
 def_pset_opts = {'GLOBALTAG':'GR09_P_V1::All'}
 """
 
-def runTtrigProd(run,runselection,trial,result_dir,config):
+def runTtrigProd(run,runselection,trial,config):
 
     crab_opts = {'RUNSELECTION':runselection,
                  'USERDIRCAF':'TTRIGCalibration/Production/Run' + str(run) + '/v' + str(trial)}
