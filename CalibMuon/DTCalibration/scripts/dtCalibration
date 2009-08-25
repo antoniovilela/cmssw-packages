@@ -179,8 +179,6 @@ if __name__ == '__main__':
     #stdout_original = sys.stdout
     #sys.stdout = logOut
 
-    sys.exit()
-
     timeBoxes = os.path.abspath(result_dir + '/' + 'DTTimeBoxes_' + run + '.root')
 
     if not os.path.exists(timeBoxes): runTtrigProd(run,runselection,trial,config)
