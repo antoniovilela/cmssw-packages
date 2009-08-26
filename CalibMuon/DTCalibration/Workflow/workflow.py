@@ -166,7 +166,7 @@ def checkStatus(project, threshold = 95.0):
         return crab.actions[act].summary()
 
     status = crabAction(options,action)
-    print "Pecentage of jobs per status:"
+    print "Percentage of jobs per status:"
     for item in status:
         print "%s %.2f"%(item,status[item])
 
@@ -179,8 +179,8 @@ def checkStatus(project, threshold = 95.0):
             if status.has_key(item): sum += status[item]
 
         # frac(done)' = N*frac(done)/(N - N*frac(ignore)) = frac(done)/(1 - frac(ignore))
-        frac = status['Done']/(1 - sum)
-        if frac > threshold: finished = True 
+        per_new = 100.0*status['Done']/(100.0 - sum)
+        if per_new > threshold: finished = True 
 
     return finished
 
