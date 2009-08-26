@@ -179,7 +179,7 @@ def checkStatus(project, threshold = 95.0):
             if status.has_key(item): sum += status[item]
 
         # frac(done)' = N*frac(done)/(N - N*frac(ignore)) = frac(done)/(1 - frac(ignore))
-        per_new = status['Done']/(100 - sum)
+        per_new = 100.0*status['Done']/(100.0 - sum)
         if per_new > threshold: finished = True 
 
     return finished
