@@ -3,7 +3,7 @@ from CmsswTask import *
 import os
 
 class DTTTrigResidualCorr:
-    def __init__(self, run, result_dir):
+    def __init__(self, run, result_dir, template_path):
         desc = 'Run%s'%run
         desc += '/Ttrig/Exec'
         self.desc = desc 
@@ -12,10 +12,10 @@ class DTTTrigResidualCorr:
 
         self.configs = ['DTTTrigResidualCorrection_cfg.py','DumpDBToFile_ResidCorr_cfg.py']
 
-        base = os.environ['CMSSW_BASE'] + '/src/' 
+        #base = os.environ['CMSSW_BASE'] + '/src/' 
         self.pset_templates = {}
-        self.pset_templates['DTTTrigResidualCorrection_cfg.py'] = base + 'Workflow/templates/config/DTTTrigResidualCorrection_TEMPL_cfg.py'
-        self.pset_templates['DumpDBToFile_ResidCorr_cfg.py'] = base + 'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py'
+        self.pset_templates['DTTTrigResidualCorrection_cfg.py'] = template_path + '/config/DTTTrigResidualCorrection_TEMPL_cfg.py'
+        self.pset_templates['DumpDBToFile_ResidCorr_cfg.py'] = template_path + '/config/DumpDBToFile_ttrig_TEMPL_cfg.py'
 
         ttrig_second_db = os.path.abspath(result_dir + '/' + 'ttrig_second_' + run + '.db')
         ttrig_ResidCorr = result_dir + '/' + 'ttrig_ResidCorr_' + run
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     result_dir += '/Ttrig/Results'
     if not os.path.exists(result_dir): os.makedirs(result_dir)
 
-    dtTtrigResidualCorr = DTTTrigResidualCorr(run,result_dir)  
+    dtTtrigResidualCorr = DTTTrigResidualCorr(run,result_dir,'templates')  
     dtTtrigResidualCorr.run()
 
     print "Finished processing:"

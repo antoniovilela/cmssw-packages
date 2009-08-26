@@ -3,7 +3,7 @@ from CmsswTask import *
 import os
 
 class DTValidSummary:
-    def __init__(self, run, input_file, result_dir):
+    def __init__(self, run, input_file, result_dir, template_path):
         desc = 'Run%s'%run
         desc += '/Ttrig/Exec'
         self.desc = desc 
@@ -12,9 +12,9 @@ class DTValidSummary:
 
         self.configs = ['DTkFactValidation_2_cfg.py']
 
-        base = os.environ['CMSSW_BASE'] + '/src/' 
+        #base = os.environ['CMSSW_BASE'] + '/src/' 
         self.pset_templates = {}
-        self.pset_templates['DTkFactValidation_2_cfg.py'] = base + 'Workflow/templates/config/DTkFactValidation_2_TEMPL_cfg.py'
+        self.pset_templates['DTkFactValidation_2_cfg.py'] = template_path + '/config/DTkFactValidation_2_TEMPL_cfg.py'
 
         output_file = os.path.abspath(result_dir + '/' + 'SummaryResiduals_' + run + '.root')
 
@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     input_file = os.path.abspath(result_dir + '/' + 'DTkFactValidation_' + run + '.root')
 
-    dtTtrigValidSummary = DTValidSummary(run,input_file,result_dir)  
+    dtTtrigValidSummary = DTValidSummary(run,input_file,result_dir,'templates')  
     dtTtrigValidSummary.run()
 
     print "Finished processing:"

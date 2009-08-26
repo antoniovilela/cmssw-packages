@@ -3,7 +3,7 @@ from CmsswTask import *
 import os
 
 class DTTTrigCorrFirst:
-    def __init__(self, run, result_dir):
+    def __init__(self, run, result_dir, template_path):
         desc = 'Run%s'%run
         desc += '/Ttrig/Exec'
         self.desc = desc 
@@ -12,11 +12,11 @@ class DTTTrigCorrFirst:
 
         self.configs = ['DTTTrigWriter_cfg.py','DumpDBToFile_first_cfg.py','DTTTrigCorrection_cfg.py','DumpDBToFile_second_cfg.py']
 
-        base = os.environ['CMSSW_BASE'] + '/src/' 
-        self.pset_templates = {'DTTTrigWriter_cfg.py':base+'Workflow/templates/config/DTTTrigWriter_TEMPL_cfg.py',
-                               'DumpDBToFile_first_cfg.py':base+'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py',
-                               'DTTTrigCorrection_cfg.py':base+'Workflow/templates/config/DTTTrigCorrection_TEMPL_cfg.py',
-                               'DumpDBToFile_second_cfg.py':base+'Workflow/templates/config/DumpDBToFile_ttrig_TEMPL_cfg.py'}
+        #base = os.environ['CMSSW_BASE'] + '/src/' 
+        self.pset_templates = {'DTTTrigWriter_cfg.py':template_path+'/config/DTTTrigWriter_TEMPL_cfg.py',
+                               'DumpDBToFile_first_cfg.py':template_path+'/config/DumpDBToFile_ttrig_TEMPL_cfg.py',
+                               'DTTTrigCorrection_cfg.py':template_path+'/config/DTTTrigCorrection_TEMPL_cfg.py',
+                               'DumpDBToFile_second_cfg.py':template_path+'/config/DumpDBToFile_ttrig_TEMPL_cfg.py'}
 
         timeBoxes = os.path.abspath(result_dir + '/' + 'DTTimeBoxes_' + run + '.root')
         ttrig_first = result_dir + '/' + 'ttrig_first_' + run
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     result_dir += '/Ttrig/Results'
     if not os.path.exists(result_dir): os.makedirs(result_dir)
 
-    dtTtrigCorrFirst = DTTTrigCorrFirst(run,result_dir)  
+    dtTtrigCorrFirst = DTTTrigCorrFirst(run,result_dir,'templates')  
     dtTtrigCorrFirst.run()
 
     print "Finished processing:"
