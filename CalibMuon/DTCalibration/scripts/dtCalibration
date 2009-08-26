@@ -44,7 +44,7 @@ def runTtrigProd(run,runselection,trial,config):
     haddInCastor(castor_dir,result_file)
 
 def runTtrigCorrFirst(run,config):
-    dtTtrigCorrFirst = DTTTrigCorrFirst(run,config.result_dir,config.template_path)  
+    dtTtrigCorrFirst = DTTTrigCorrFirst(run,config.pset_opts,config.result_dir,config.template_path)  
     dtTtrigCorrFirst.run()
 
     print "Finished processing:"
@@ -77,7 +77,7 @@ def runTtrigValid(run,runselection,trial,input_file,config):
     haddInCastor(castor_dir,result_file,'residuals')
 
 def runTtrigResidualCorr(run,config):
-    dtTtrigResidualCorr = DTTTrigResidualCorr(run,config.result_dir,config.template_path)  
+    dtTtrigResidualCorr = DTTTrigResidualCorr(run,config.pset_opts,config.result_dir,config.template_path)  
     dtTtrigResidualCorr.run()
 
     print "Finished processing:"
@@ -112,7 +112,7 @@ def runTtrigValidResidCorr(run,runselection,trial,input_file,config):
 def runTtrigValidSummary(run,input_file,config):
     #input_file = os.path.abspath(result_file)
 
-    dtTtrigValidSummary = DTValidSummary(run,input_file,config.result_dir,config.template_path)
+    dtTtrigValidSummary = DTValidSummary(run,input_file,config.pset_opts,config.result_dir,config.template_path)
     dtTtrigValidSummary.run()
 
     print "Finished processing:"

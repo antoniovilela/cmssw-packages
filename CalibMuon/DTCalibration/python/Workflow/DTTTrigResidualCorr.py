@@ -3,12 +3,13 @@ from CmsswTask import *
 import os
 
 class DTTTrigResidualCorr:
-    def __init__(self, run, result_dir, template_path):
+    def __init__(self, run, common_opts, result_dir, template_path):
         desc = 'Run%s'%run
         desc += '/Ttrig/Exec'
         self.desc = desc 
 
-        self.common_opts = {'GLOBALTAG':'GR09_P_V1::All'}
+        #self.common_opts = {'GLOBALTAG':'GR09_P_V1::All'}
+        self.common_opts = common_opts 
 
         self.configs = ['DTTTrigResidualCorrection_cfg.py','DumpDBToFile_ResidCorr_cfg.py']
 
@@ -51,7 +52,9 @@ if __name__ == '__main__':
     result_dir += '/Ttrig/Results'
     if not os.path.exists(result_dir): os.makedirs(result_dir)
 
-    dtTtrigResidualCorr = DTTTrigResidualCorr(run,result_dir,'templates')  
+    common_opts = {'GLOBALTAG':'GR09_P_V1::All'}
+
+    dtTtrigResidualCorr = DTTTrigResidualCorr(run,common_opts,result_dir,'templates')  
     dtTtrigResidualCorr.run()
 
     print "Finished processing:"

@@ -3,12 +3,13 @@ from CmsswTask import *
 import os
 
 class DTValidSummary:
-    def __init__(self, run, input_file, result_dir, template_path):
+    def __init__(self, run, input_file, common_opts, result_dir, template_path):
         desc = 'Run%s'%run
         desc += '/Ttrig/Exec'
         self.desc = desc 
 
-        self.common_opts = {'GLOBALTAG':'GR09_P_V1::All'}
+        #self.common_opts = {'GLOBALTAG':'GR09_P_V1::All'}
+        self.common_opts = common_opts
 
         self.configs = ['DTkFactValidation_2_cfg.py']
 
@@ -44,7 +45,9 @@ if __name__ == '__main__':
 
     input_file = os.path.abspath(result_dir + '/' + 'DTkFactValidation_' + run + '.root')
 
-    dtTtrigValidSummary = DTValidSummary(run,input_file,result_dir,'templates')  
+    common_opts = {'GLOBALTAG':'GR09_P_V1::All'}
+
+    dtTtrigValidSummary = DTValidSummary(run,input_file,common_opts,result_dir,'templates')  
     dtTtrigValidSummary.run()
 
     print "Finished processing:"
