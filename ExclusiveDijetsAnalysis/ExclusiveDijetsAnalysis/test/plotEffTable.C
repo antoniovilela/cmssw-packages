@@ -4,13 +4,13 @@
 #include "TH2F.h"
 #include "TTree.h"
 
-//#include "plotTools.h"
 #include "PlottingTools.h"
 
 #include <iostream>
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <functional>
 
 std::map<std::string,std::vector<double> > getEvents(std::vector<string>& vars, std::map<std::string,TDirectory*>& dirMap);
 
@@ -86,7 +86,8 @@ void plot(){
       std::vector<double>& myvec = nEvents[it->first];
       myvec.insert(myvec.begin(),(double)h_leadingJetPt_HLT->GetEntries());
       double nHLT = myvec[0];
-      std::transform(myvec.begin(),myvec.end(),myvec.begin(),Mult<double>(eff_HLT/nHLT));
+      //std::transform(myvec.begin(),myvec.end(),myvec.begin(),Mult<double>(eff_HLT/nHLT));
+      std::transform(myvec.begin(),myvec.end(),myvec.begin(),std::bind1st(std::multiplies<double>(),eff_HLT/nHLT));
    }
 
    std::map<std::string,std::vector<double> >::const_iterator nEvents_end = nEvents.end();

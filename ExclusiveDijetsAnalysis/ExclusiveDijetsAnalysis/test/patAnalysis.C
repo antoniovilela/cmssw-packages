@@ -166,7 +166,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    }
 
    double Ebeam = 5000.;
-   int thresholdHF = 16;// 2.4 GeV
+   int thresholdHF = 14;// 0.2 GeV
 
    bool accessPileUp = true;
    bool selectPileUp = false;
@@ -175,10 +175,12 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    bool accessEdmDump = true;
 
    // Event selection
+   // Prim. vertices
+   bool doVertexSelection = true;
    // Di-jet
    double ptmin = 50.;
    double etamax = 2.5;
-   //B-tag
+   // B-tag
    bool doBTag = false;
    std::string bDiscriminatorName = "jetBProbabilityBJetTags";
    double bDiscMinValue = 3.0;
@@ -228,6 +230,9 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
        h_NPUBx0vsNPrimVtx->Fill(nPileUpBx0,nGoodVertices);
        if(selectPileUp&&(nPileUpBx0 != nEventsPUBx0)) continue;
      }
+
+     // Single-vertex
+     if(doVertexSelection&&(nGoodVertices != 1)) continue;
 
      // Di-jets
      std::vector<fwlite::Handle<std::vector<pat::Jet> > > jetCollections(jetColls.size());

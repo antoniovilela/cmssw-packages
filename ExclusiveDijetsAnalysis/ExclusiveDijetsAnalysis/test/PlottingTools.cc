@@ -89,7 +89,7 @@ void scaleHisto(TH1F* histo, double scale, int line, int color, int rebin){
 }
 
 TH1F* rebinHisto(TH1F const* histo, std::vector<int> const& groups){
-   int nBins = histo->GetNbinsX();
+   //int nBins = histo->GetNbinsX();
    int nBins_new = groups.size(); 
  
    //int sum = std::for_each(groups.begin(),groups.end(),Sum<int>(0)).value();
