@@ -9,6 +9,7 @@ class TDirectory;
 #include <vector>
 #include <string>
 #include <map>
+#include <exception>
 
 class DefaultNorm{
    public:
@@ -41,7 +42,7 @@ class NumberEntriesNorm{
    private:
 };
 
-template <typename T>
+/*template <typename T>
 class Sum{
    public:
       typedef T value_type;
@@ -62,9 +63,22 @@ class Mult{
       T const operator()(T const& x) {return x*val_;}
    private:
       T val_;
-};
+};*/
 
-TH1F* getHisto(TFile*, const std::string&); 
+class RootException: public std::exception{
+   public:
+      RootException(std::string const& msg = ""): message_(msg) {}
+      ~RootException() throw() {}
+
+      virtual char const* what() const throw() {
+         return message_.c_str();
+      }
+
+   private:
+      std::string message_;
+};
+ 
+//TH1F* getHisto(TFile*, const std::string&); 
 TH1F* getHisto(TDirectory*, const std::string&);
 void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int rebin = 1);
 TH1F* rebinHisto(TH1F const* histo, std::vector<int> const& groups);

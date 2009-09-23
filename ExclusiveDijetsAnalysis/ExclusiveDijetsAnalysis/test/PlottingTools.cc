@@ -14,7 +14,7 @@
 #include <map>
 #include <algorithm>
 
-double ConstNorm::normalization = 1.0;
+//double ConstNorm::normalization = 1.0;
 
 void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm){
    std::map<std::string,TCanvas*> canvasesVar;
@@ -59,18 +59,19 @@ std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<st
    return varMap;
 }
 
-TH1F* getHisto(TFile* file, const std::string& refVar){
+/*TH1F* getHisto(TFile* file, const std::string& refVar){
    TH1F* hist = static_cast<TH1F*>(file->Get(refVar.c_str()));
 
-   if(!hist) std::cout << ">>>> Error: histogram " << refVar.c_str() << " not found." << std::endl; 
+   if(!hist) std::cout << ">>>> Error: histogram " << refVar.c_str() << " not found." << std::endl;
 
    return hist;
-} 
+}*/ 
 
 TH1F* getHisto(TDirectory* dir, const std::string& refVar){
    TH1F* hist = static_cast<TH1F*>(dir->Get(refVar.c_str()));
 
-   if(!hist) std::cout << ">>>> Error: histogram " << refVar.c_str() << " not found." << std::endl;
+   //if(!hist) std::cout << ">>>> Error: histogram " << refVar.c_str() << " not found." << std::endl;
+   if(!hist) throw RootException("ERROR: histogram not found: " + refVar);
 
    return hist;
 }
@@ -92,6 +93,7 @@ TH1F* rebinHisto(TH1F const* histo, std::vector<int> const& groups){
    int nBins_new = groups.size(); 
  
    //int sum = std::for_each(groups.begin(),groups.end(),Sum<int>(0)).value();
+   //int sum = std::accumulate(groups.begin(),groups.end(),0);
 
    // Create array with new (variable) binning
    double xbins[400];
