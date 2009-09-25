@@ -69,6 +69,8 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    jetCollsNonCorr.push_back("sisCone5PFJets");
 
    // Book Histograms
+   TH1::SetDefaultSumw2(true);
+
    TH1F* h_NPUBx0 = new TH1F("NPUBx0","NPUBx0",10,0,10);
    TH1F* h_NPrimVtx = new TH1F("NPrimVtx","NPrimVtx",10,0,10);
    TH2F* h_NPUBx0vsNPrimVtx = new TH2F("NPUBx0vsNPrimVtx","NPUBx0vsNPrimVtx",10,0,10,10,0,10);
