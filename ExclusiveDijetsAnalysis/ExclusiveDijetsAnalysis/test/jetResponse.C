@@ -47,9 +47,9 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
    TH1::SetDefaultSumw2(true);
 
    double aux_EtaBoundaries[5] = {0.0,1.4,2.6,3.2,4.7};
-   double aux_PtBoundaries[5] = {10.,30.,50.,100.,200.};
-   std::vector<double> etaBoundaries(aux_EtaBoundaries,aux_EtaBoundaries + 5);
-   std::vector<double> ptBoundaries(aux_PtBoundaries,aux_PtBoundaries + 5);
+   double aux_PtBoundaries[4] = {10.,30.,50.,200.};
+   std::vector<double> etaBoundaries(aux_EtaBoundaries,aux_EtaBoundaries + 4);
+   std::vector<double> ptBoundaries(aux_PtBoundaries,aux_PtBoundaries + 4);
 
    std::map<std::pair<int,int>, std::vector<TH1F*> > histos;
    for(size_t i_eta = 0; i_eta < (etaBoundaries.size() - 1); ++i_eta){
@@ -97,11 +97,11 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
       char title[100];
       sprintf(hname,"meanVsPt_%i",i_eta);
       sprintf(title,"<response> vs p^{GenJet}_{T} - %f < #||{#eta} < %f",etaBoundaries[i_eta],etaBoundaries[i_eta+1]);
-      histosVsPt[i_eta][0] = new TH1F(hname,title,4,aux_PtBoundaries);
+      histosVsPt[i_eta][0] = new TH1F(hname,title,(ptBoundaries.size() - 1),aux_PtBoundaries);
 
       sprintf(hname,"sigmaVsPt_%i",i_eta);
       sprintf(title,"Jet p^{GenJet}_{T} resolution - %f < #||{#eta} < %f",etaBoundaries[i_eta],etaBoundaries[i_eta+1]);
-      histosVsPt[i_eta][1] = new TH1F(hname,title,4,aux_PtBoundaries);
+      histosVsPt[i_eta][1] = new TH1F(hname,title,(ptBoundaries.size() - 1),aux_PtBoundaries);
    }
 
    std::map<int, std::vector<TH1F*> > histosVsEta;
@@ -112,11 +112,11 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
       char title[100];
       sprintf(hname,"meanVsEta_%i",i_pt);
       sprintf(title,"<response> vs #eta^{RecoJet} #in p_{T} #left[%f , %f #right]GeV",ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
-      histosVsEta[i_pt][0] = new TH1F(hname,title,4,aux_EtaBoundaries);
+      histosVsEta[i_pt][0] = new TH1F(hname,title,(etaBoundaries.size() - 1),aux_EtaBoundaries);
 
       sprintf(hname,"sigmaVsEta_%i",i_pt);
       sprintf(title,"Jet p^{GenJet}_{T} resolution #in p_{T} #left[%f , %f #right]GeV",ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
-      histosVsEta[i_pt][1] = new TH1F(hname,title,4,aux_EtaBoundaries);
+      histosVsEta[i_pt][1] = new TH1F(hname,title,(etaBoundaries.size() - 1),aux_EtaBoundaries);
    }
 
    // Loop over TTree
