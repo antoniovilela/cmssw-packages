@@ -13,13 +13,13 @@
 #include <vector>
 #include <map>
 
-void jetResponse(std::string fileName){
+void jetResponse(std::string const& fileName, std::string const& treeName = "jetResponseAnalysis/data"){
    TFile* file = TFile::Open(fileName.c_str(),"read");
 
    // Get TTree
-   TTree* data = dynamic_cast<TTree*>(file->Get("jetResponseAnalysis/data"));
+   TTree* data = dynamic_cast<TTree*>(file->Get(treeName.c_str()));
    if(!data){
-      std::cout << "ERROR: Could not find jetResponseAnalysis/data" <<  std::endl;
+      std::cout << "ERROR: Could not find " << treeName << std::endl;
       file->Close();
       return;
    }
@@ -57,26 +57,30 @@ void jetResponse(std::string fileName){
          std::pair<int,int> index(i_eta,i_pt);
          histos[index] = std::vector<TH1F*>(4); 
     
-         char hname[30];
-         char title[100];
+         char hname[50];
+         char title[200];
          // Ratio of RecoJetpT and GenJetpT
          sprintf(hname,"response_%i_%i",i_eta,i_pt);
-         sprintf(title,"p_{T}(Reco)/p_{T}(Gen) #in %f < #eta < %f and #in p_{T} #left[%f , %f #right]GeV",etaBoundaries[i_eta],etaBoundaries[i_eta+1],ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
+         sprintf(title,"p_{T}(Reco)/p_{T}(Gen) #in %f < #||{#eta} < %f and #in p_{T} #left[%f , %f #right]GeV",etaBoundaries[i_eta],etaBoundaries[i_eta+1],ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
+         std::cout << hname << std::endl;
          histos[index][0] = new TH1F(hname,title,100,0.,2.);
 	
          // RecoJetpT - GenJetpT
          sprintf(hname,"pTdistribution_%i_%i",i_eta,i_pt);
-         sprintf(title,"p_{T}(Reco) - p_{T}(Gen) #in %f < #eta < %f and #in p_{T} #left[%f , %f #right]GeV",etaBoundaries[i_eta],etaBoundaries[i_eta+1],ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
+         sprintf(title,"p_{T}(Reco) - p_{T}(Gen) #in %f < #||{#eta} < %f and #in p_{T} #left[%f , %f #right]GeV",etaBoundaries[i_eta],etaBoundaries[i_eta+1],ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
+         std::cout << hname << std::endl;
          histos[index][1] = new TH1F(hname,title,100,-100.,100.);
 
        	 // RecoJetPhi - GenJetPhi
          sprintf(hname,"phidistribution_%i_%i",i_eta,i_pt);
-         sprintf(title,"#phi_{Reco}-#phi_{Gen} #in %f < #eta < %f and #in p_{T} #left[%f , %f #right]GeV",etaBoundaries[i_eta],etaBoundaries[i_eta+1],ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
+         sprintf(title,"#phi_{Reco}-#phi_{Gen} #in %f < #||{#eta} < %f and #in p_{T} #left[%f , %f #right]GeV",etaBoundaries[i_eta],etaBoundaries[i_eta+1],ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
+         std::cout << hname << std::endl;
          histos[index][2] = new TH1F(hname,title,100,-1.0,1.0);
 
        	 // RecoJetEta - GenJetEta
          sprintf(hname,"etadistribution_%i_%i",i_eta,i_pt);
-         sprintf(title,"#eta_{Reco}-#eta_{Gen} #in %f < #eta < %f and #in p_{T} #left[%f , %f #right]GeV",etaBoundaries[i_eta],etaBoundaries[i_eta+1],ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
+         sprintf(title,"#||{#eta_{Reco}}-#||{#eta_{Gen}} #in %f < #||{#eta} < %f and #in p_{T} #left[%f , %f #right]GeV",etaBoundaries[i_eta],etaBoundaries[i_eta+1],ptBoundaries[i_pt],ptBoundaries[i_pt+1]);
+         std::cout << hname << std::endl;
          histos[index][3] = new TH1F(hname,title,100,-0.5,0.5);
 
          /*// Ratio RecoJetpT/GenJetpT vs pt
@@ -165,14 +169,14 @@ void jetResponse(std::string fileName){
 
          std::vector<TH1F*>& myhistos = it_histos->second;
 
-         canvases[index] = std::vector<TCanvas*>(1);
+         canvases[index] = std::vector<TCanvas*>(4);
  
+         // Draw response histo
          char cname[30];
          sprintf(cname,"c_response_%i_%i",i_eta,i_pt);
          canvases[index][0] = new TCanvas(cname,cname,900,700);
          canvases[index][0]->cd(); 
 
-         // Fit response histo
          TH1F* h_response = myhistos[0];
          h_response->GetXaxis()->SetTitle("p^{RecoJet}_{T}/ p^{GenJet}_{T}");
          h_response->GetYaxis()->SetTitle("Events");
@@ -180,6 +184,7 @@ void jetResponse(std::string fileName){
          h_response->GetXaxis()->SetLabelSize(0.04);
          h_response->Draw();
 
+         // Fit response histo
          double fitMin = h_response->GetMean() - gausswidth*h_response->GetRMS();
          double fitMax = h_response->GetMean() + gausswidth*h_response->GetRMS(); 
          h_response->Fit("gaus","RIE","",fitMin,fitMax);
@@ -202,8 +207,8 @@ void jetResponse(std::string fileName){
 
          TH1F* h_meanVsPt = myhistosVsPt[0];
          TH1F* h_sigmaVsPt = myhistosVsPt[1];  
-         h_sigmaVsPt->SetBinContent(h_sigmaVsPt->GetXaxis()->FindBin(x_binPt),sigma);
-         h_sigmaVsPt->SetBinError(h_sigmaVsPt->GetXaxis()->FindBin(x_binPt),sigmaErr);
+         h_sigmaVsPt->SetBinContent(h_sigmaVsPt->GetXaxis()->FindBin(x_binPt),sigma/mean);
+         h_sigmaVsPt->SetBinError(h_sigmaVsPt->GetXaxis()->FindBin(x_binPt),sigmaErr/mean);
          h_meanVsPt->SetBinContent(h_meanVsPt->GetXaxis()->FindBin(x_binPt),mean);
          h_meanVsPt->SetBinError(h_meanVsPt->GetXaxis()->FindBin(x_binPt),meanErr);
 
@@ -218,10 +223,46 @@ void jetResponse(std::string fileName){
          TH1F* h_meanVsEta = myhistosVsEta[0];
          TH1F* h_sigmaVsEta = myhistosVsEta[1];
 
-         h_sigmaVsEta->SetBinContent(h_sigmaVsEta->GetXaxis()->FindBin(x_binEta),sigma);
-         h_sigmaVsEta->SetBinError(h_sigmaVsEta->GetXaxis()->FindBin(x_binEta),sigmaErr);
+         h_sigmaVsEta->SetBinContent(h_sigmaVsEta->GetXaxis()->FindBin(x_binEta),sigma/mean);
+         h_sigmaVsEta->SetBinError(h_sigmaVsEta->GetXaxis()->FindBin(x_binEta),sigmaErr/mean);
          h_meanVsEta->SetBinContent(h_meanVsEta->GetXaxis()->FindBin(x_binEta),mean);
          h_meanVsEta->SetBinError(h_meanVsEta->GetXaxis()->FindBin(x_binEta),meanErr);
+
+         // Draw ptDiff histo
+         sprintf(cname,"c_pTdistribution_%i_%i",i_eta,i_pt);
+         canvases[index][1] = new TCanvas(cname,cname,900,700);
+         canvases[index][1]->cd();
+
+         TH1F* h_ptDiff = myhistos[1];
+         h_ptDiff->GetXaxis()->SetTitle("p^{RecoJet}_{T} - p^{GenJet}_{T}");
+         h_ptDiff->GetYaxis()->SetTitle("Events");
+         h_ptDiff->GetYaxis()->SetLabelSize(0.04);
+         h_ptDiff->GetXaxis()->SetLabelSize(0.04);
+         h_ptDiff->Draw();
+
+         // Draw phiDiff histo
+         sprintf(cname,"c_phidistribution_%i_%i",i_eta,i_pt);
+         canvases[index][2] = new TCanvas(cname,cname,900,700);
+         canvases[index][2]->cd();
+
+         TH1F* h_phiDiff = myhistos[2];
+         h_phiDiff->GetXaxis()->SetTitle("#phi^{RecoJet} - #phi^{GenJet}");
+         h_phiDiff->GetYaxis()->SetTitle("Events");
+         h_phiDiff->GetYaxis()->SetLabelSize(0.04);
+         h_phiDiff->GetXaxis()->SetLabelSize(0.04);
+         h_phiDiff->Draw();
+
+         // Draw etaDiff histo
+         sprintf(cname,"c_etadistribution_%i_%i",i_eta,i_pt);
+         canvases[index][3] = new TCanvas(cname,cname,900,700);
+         canvases[index][3]->cd();
+
+         TH1F* h_etaDiff = myhistos[3];
+         h_etaDiff->GetXaxis()->SetTitle("#||{#eta^{RecoJet}} - #||{#eta^{GenJet}}");
+         h_etaDiff->GetYaxis()->SetTitle("Events");
+         h_etaDiff->GetYaxis()->SetLabelSize(0.04);
+         h_etaDiff->GetXaxis()->SetLabelSize(0.04);
+         h_etaDiff->Draw();
       }
    }
    
@@ -280,7 +321,7 @@ void jetResponse(std::string fileName){
    }
 
    std::map<int, std::vector<TCanvas*> > canvasesVsEta;
-   std::map<int, TF1*> fitResolutionVsEta;
+   //std::map<int, TF1*> fitResolutionVsEta;
    for(size_t i_pt = 0; i_pt < (ptBoundaries.size() - 1); ++i_pt){
       std::map<int, std::vector<TH1F*> >::iterator it_histosVsEta = histosVsEta.find(i_pt);
       if(it_histosVsEta == histosVsEta.end()){
@@ -313,7 +354,7 @@ void jetResponse(std::string fileName){
       h_sigma->GetXaxis()->SetTitle("#eta^{RecoJet}");
       h_sigma->GetYaxis()->SetTitle("#sigma(#frac{p^{RecoJet}_{T}}{p^{GenJet}_{T}})");
 
-      // Fit on resolution
+      /*// Fit on resolution
       double fitMin = 0.;
       double fitMax = 5.;
       char funcname[30];
@@ -329,7 +370,7 @@ void jetResponse(std::string fileName){
       h_sigma->SetMarkerStyle(21);
       h_sigma->SetMarkerColor(2);
       h_sigma->SetLineColor(2);
-      h_sigma->GetYaxis()->SetLabelSize(0.03);
+      h_sigma->GetYaxis()->SetLabelSize(0.03);*/
       h_sigma->Draw();     
    }
 
