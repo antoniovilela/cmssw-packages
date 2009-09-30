@@ -301,8 +301,8 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
       h_sigma->GetYaxis()->SetTitle("#sigma(#frac{p^{RecoJet}_{T}}{p^{GenJet}_{T}})");
 
       // Fit on resolution
-      double fitMin = 20.;
-      double fitMax = 100.;
+      double fitMin = 0.;
+      double fitMax = 200.;
       char funcname[30];
       char formula[100];
       sprintf(funcname,"fitResolutionVsPt_%i",i_eta);
