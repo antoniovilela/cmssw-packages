@@ -48,7 +48,7 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
 
    double aux_EtaBoundaries[5] = {0.0,1.4,2.6,3.2,4.7};
    double aux_PtBoundaries[4] = {10.,30.,50.,200.};
-   std::vector<double> etaBoundaries(aux_EtaBoundaries,aux_EtaBoundaries + 4);
+   std::vector<double> etaBoundaries(aux_EtaBoundaries,aux_EtaBoundaries + 5);
    std::vector<double> ptBoundaries(aux_PtBoundaries,aux_PtBoundaries + 4);
 
    std::map<std::pair<int,int>, std::vector<TH1F*> > histos;
