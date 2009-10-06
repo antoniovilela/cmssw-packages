@@ -13,7 +13,7 @@
 #include <vector>
 #include <map>
 
-void jetResponse(std::string const& fileName, std::string const& treeName = "jetResponseAnalysis/data"){
+void jetResponse(std::string const& fileName, std::string const& treeName = "jetResponseAnalysis/data", std::string const& outFileName = "analysisJetResponse_histos.root"){
    TFile* file = TFile::Open(fileName.c_str(),"read");
 
    // Get TTree
@@ -41,7 +41,7 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
    data->SetBranchAddress("recJetPhi",&eventData.recJetPhi_);
 
    // Create output file
-   //TFile* hfile = new TFile("analysisJetResponse_histos.root","recreate","data histograms");
+   TFile* hfile = new TFile(outFileName.c_str(),"recreate","data histograms");
 
    // Book histos
    TH1::SetDefaultSumw2(true);
@@ -353,7 +353,7 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
       h_sigma->GetXaxis()->SetRangeUser(10.,200.);
       h_sigma->GetYaxis()->SetRangeUser(0.,0.35);
       h_sigma->GetXaxis()->SetTitle("p^{GenJet}_{T}#left[GeV#right]");
-      h_sigma->GetYaxis()->SetTitle("#sigma(#frac{p^{RecoJet}_{T}}{p^{GenJet}_{T}})");
+      h_sigma->GetYaxis()->SetTitle("#sigma(#frac{p^{RecoJet}_{T}}{p^{GenJet}_{T}})/<#frac{p^{RecoJet}_{T}}{p^{GenJet}_{T}}>");
 
       // Fit on resolution
       double fitMin = 0.;
@@ -452,7 +452,7 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
       h_sigma->GetXaxis()->SetRangeUser(0.,5.);
       h_sigma->GetYaxis()->SetRangeUser(0.,0.35);
       h_sigma->GetXaxis()->SetTitle("#eta^{RecoJet}");
-      h_sigma->GetYaxis()->SetTitle("#sigma(#frac{p^{RecoJet}_{T}}{p^{GenJet}_{T}})");
+      h_sigma->GetYaxis()->SetTitle("#sigma(#frac{p^{RecoJet}_{T}}{p^{GenJet}_{T}})/<#frac{p^{RecoJet}_{T}}{p^{GenJet}_{T}}>");
 
       /*// Fit on resolution
       double fitMin = 0.;
@@ -474,6 +474,6 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
       h_sigma->Draw();     
    }
 
-   //hfile->Write();
+   hfile->Write();
    //hfile->Close();
 }

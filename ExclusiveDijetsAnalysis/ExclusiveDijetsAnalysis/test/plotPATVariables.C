@@ -19,11 +19,11 @@ void plot(){
 
    std::vector<std::string> jetColls;
    jetColls.push_back("selectedLayer1JetsSC7PF");
-   //jetColls.push_back("selectedLayer1JetsSC7Calo");
+   jetColls.push_back("selectedLayer1JetsSC7Calo");
    jetColls.push_back("selectedLayer1JetsSC5PF");
-   //jetColls.push_back("selectedLayer1JetsSC5Calo");
-   //jetColls.push_back("selectedLayer1JetsKT6PF");
-   //jetColls.push_back("selectedLayer1JetsKT6Calo");
+   jetColls.push_back("selectedLayer1JetsSC5Calo");
+   jetColls.push_back("selectedLayer1JetsKT6PF");
+   jetColls.push_back("selectedLayer1JetsKT6Calo");
 
    std::vector<std::string> refVars;
    refVars.push_back("RjjFromJets");

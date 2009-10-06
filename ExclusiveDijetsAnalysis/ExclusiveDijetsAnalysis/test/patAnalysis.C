@@ -58,11 +58,11 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
 
    std::vector<std::string> jetColls;
    jetColls.push_back("selectedLayer1JetsSC7PF");
-   //jetColls.push_back("selectedLayer1JetsSC7Calo");
+   jetColls.push_back("selectedLayer1JetsSC7Calo");
    jetColls.push_back("selectedLayer1JetsSC5PF");
-   //jetColls.push_back("selectedLayer1JetsSC5Calo");
-   //jetColls.push_back("selectedLayer1JetsKT6PF");
-   //jetColls.push_back("selectedLayer1JetsKT6Calo");
+   jetColls.push_back("selectedLayer1JetsSC5Calo");
+   jetColls.push_back("selectedLayer1JetsKT6PF");
+   jetColls.push_back("selectedLayer1JetsKT6Calo");
 
    std::vector<std::string> jetCollsNonCorr;
    jetCollsNonCorr.push_back("sisCone7PFJets");
@@ -170,7 +170,7 @@ void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool ve
    double Ebeam = 5000.;
    int thresholdHF = 14;// 0.2 GeV
 
-   bool accessPileUp = true;
+   bool accessPileUp = false;
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 

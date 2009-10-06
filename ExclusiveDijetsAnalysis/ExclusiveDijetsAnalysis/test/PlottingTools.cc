@@ -85,7 +85,7 @@ void scaleHisto(TH1F* histo, double scale, int line, int color, int rebin){
    histo->SetLineStyle(line);
    histo->SetLineColor(color);
 
-   histo->GetYaxis()->SetTitle("a.u.");
+   //histo->GetYaxis()->SetTitle("a.u.");
 }
 
 TH1F* rebinHisto(TH1F const* histo, std::vector<int> const& groups){

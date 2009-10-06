@@ -31,11 +31,11 @@ import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
 #jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
 
-#jetAlgos = ['KT6','SC5','SC7']
-#jetTypes = ['Calo','PF']
+jetAlgos = ['KT6','SC5','SC7']
+jetTypes = ['Calo','PF']
 
-jetAlgos = ['SC5','SC7']
-jetTypes = ['PF']
+#jetAlgos = ['SC5','SC7']
+#jetTypes = ['PF']
 
 for algo in jetAlgos:
     for type in jetTypes:
