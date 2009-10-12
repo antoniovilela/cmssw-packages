@@ -19,6 +19,6 @@ exclusiveDijetsFilter = cms.EDAnalyzer("ExclusiveDijetsFilter",
     BDiscriminatorName = cms.string("jetBProbabilityBJetTags"),
     BDiscMin = cms.double(3.0), 
     # Misc
-    HFThresholdIndex = cms.uint32(16),
+    HFThresholdIndex = cms.uint32(14),
     UsePAT = cms.untracked.bool(True)
 )

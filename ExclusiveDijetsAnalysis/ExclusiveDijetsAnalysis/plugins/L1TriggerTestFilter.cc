@@ -17,7 +17,7 @@ class L1TriggerTestFilter: public edm::EDFilter
     virtual void endJob();
     virtual bool filter(edm::Event&, const edm::EventSetup&);
   private:
-    int thresholdHFRingEtSum_;
+    unsigned int thresholdHFRingEtSum_;
     bool accessL1GctHFRingEtSums_;
 
     std::vector<std::string> ringNames_;
@@ -49,7 +49,7 @@ class L1TriggerTestFilter: public edm::EDFilter
 typedef std::vector<L1GctHFRingEtSums> L1GctHFRingEtSumsCollection;
 
 L1TriggerTestFilter::L1TriggerTestFilter(const edm::ParameterSet& pset):
-     thresholdHFRingEtSum_(pset.getParameter<int>("HFRingETSumThreshold")),
+     thresholdHFRingEtSum_(pset.getParameter<unsigned int>("HFRingETSumThreshold")),
      accessL1GctHFRingEtSums_(pset.getUntrackedParameter<bool>("AccessL1GctHFRingEtSums",true)),
      l1TriggerNames_(pset.getParameter<std::vector<std::string> >("L1TriggerNames")){}
 

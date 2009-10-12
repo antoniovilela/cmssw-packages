@@ -268,7 +268,7 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
          h_etaDiff->GetXaxis()->SetLabelSize(0.04);
          h_etaDiff->Draw();
  
-         // Fit eta histo
+         /*// Fit eta histo
          fitMin = h_etaDiff->GetMean() - gausswidth*h_etaDiff->GetRMS();
          fitMax = h_etaDiff->GetMean() + gausswidth*h_etaDiff->GetRMS();
          h_etaDiff->Fit("gaus","RIE","",fitMin,fitMax);
@@ -277,15 +277,19 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
          double meanEta = fitEta->GetParameter(1);
          double meanEtaErr = fitEta->GetParError(1);
          double sigmaEta = fitEta->GetParameter(2);
-         double sigmaEtaErr = fitEta->GetParError(2);
+         double sigmaEtaErr = fitEta->GetParError(2);*/
+         double meanEta = h_etaDiff->GetMean();
+         double meanEtaErr = 0.;
+         double sigmaEta = h_etaDiff->GetRMS();
+         double sigmaEtaErr = 0.;
 
          // Fill histos vs pt
          TH1F* h_meanEtaVsPt = myhistosVsPt[2];
          TH1F* h_sigmaEtaVsPt = myhistosVsPt[3];
          h_sigmaEtaVsPt->SetBinContent(h_sigmaEtaVsPt->GetXaxis()->FindBin(x_binPt),sigmaEta);
-         h_sigmaEtaVsPt->SetBinError(h_sigmaEtaVsPt->GetXaxis()->FindBin(x_binPt),sigmaEtaErr);
+         //h_sigmaEtaVsPt->SetBinError(h_sigmaEtaVsPt->GetXaxis()->FindBin(x_binPt),sigmaEtaErr);
          h_meanEtaVsPt->SetBinContent(h_meanEtaVsPt->GetXaxis()->FindBin(x_binPt),meanEta);
-         h_meanEtaVsPt->SetBinError(h_meanEtaVsPt->GetXaxis()->FindBin(x_binPt),meanEtaErr);
+         //h_meanEtaVsPt->SetBinError(h_meanEtaVsPt->GetXaxis()->FindBin(x_binPt),meanEtaErr);
 
          // Draw phiDiff histo
          sprintf(cname,"c_phidistribution_%i_%i",i_eta,i_pt);
@@ -299,7 +303,7 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
          h_phiDiff->GetXaxis()->SetLabelSize(0.04);
          h_phiDiff->Draw();
 
-         // Fit eta histo
+         /*// Fit eta histo
          fitMin = h_phiDiff->GetMean() - gausswidth*h_phiDiff->GetRMS();
          fitMax = h_phiDiff->GetMean() + gausswidth*h_phiDiff->GetRMS();
          h_phiDiff->Fit("gaus","RIE","",fitMin,fitMax);
@@ -308,15 +312,19 @@ void jetResponse(std::string const& fileName, std::string const& treeName = "jet
          double meanPhi = fitPhi->GetParameter(1);
          double meanPhiErr = fitPhi->GetParError(1);
          double sigmaPhi = fitPhi->GetParameter(2);
-         double sigmaPhiErr = fitPhi->GetParError(2);
+         double sigmaPhiErr = fitPhi->GetParError(2);*/
+         double meanPhi = h_phiDiff->GetMean();
+         double meanPhiErr = 0.;
+         double sigmaPhi = h_phiDiff->GetRMS();
+         double sigmaPhiErr = 0.;
 
          // Fill histos vs pt
          TH1F* h_meanPhiVsPt = myhistosVsPt[4];
          TH1F* h_sigmaPhiVsPt = myhistosVsPt[5];
          h_sigmaPhiVsPt->SetBinContent(h_sigmaPhiVsPt->GetXaxis()->FindBin(x_binPt),sigmaPhi);
-         h_sigmaPhiVsPt->SetBinError(h_sigmaPhiVsPt->GetXaxis()->FindBin(x_binPt),sigmaPhiErr);
+         //h_sigmaPhiVsPt->SetBinError(h_sigmaPhiVsPt->GetXaxis()->FindBin(x_binPt),sigmaPhiErr);
          h_meanPhiVsPt->SetBinContent(h_meanPhiVsPt->GetXaxis()->FindBin(x_binPt),meanPhi);
-         h_meanPhiVsPt->SetBinError(h_meanPhiVsPt->GetXaxis()->FindBin(x_binPt),meanPhiErr);
+         //h_meanPhiVsPt->SetBinError(h_meanPhiVsPt->GetXaxis()->FindBin(x_binPt),meanPhiErr);
       }
    }
    

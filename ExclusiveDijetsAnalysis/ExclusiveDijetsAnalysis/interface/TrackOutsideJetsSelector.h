@@ -1,5 +1,5 @@
-#ifndef TrackOutsideJetsSelector_h
-#define TrackOutsideJetsSelector_h
+#ifndef ExclusiveDijetsAnalysis_TrackOutsideJetsSelector_h
+#define ExclusiveDijetsAnalysis_TrackOutsideJetsSelector_h
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"

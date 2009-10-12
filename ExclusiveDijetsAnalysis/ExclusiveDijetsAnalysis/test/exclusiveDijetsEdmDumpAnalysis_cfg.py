@@ -21,7 +21,7 @@ process.source = cms.Source("PoolSource",
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.edmDumpAnalysis_cfi")
 process.edmDumpAnalysis.NHFPlusMax = 0
 process.edmDumpAnalysis.NHFMinusMax = 0
-process.edmDumpAnalysis.HFThresholdIndex = 16
+process.edmDumpAnalysis.HFThresholdIndex = 14
 process.edmDumpAnalysis.UsePAT = True
 process.edmDumpAnalysis.JetTag = "selectedLayer1JetsSC7PF"
 

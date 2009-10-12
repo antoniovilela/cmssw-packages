@@ -21,7 +21,7 @@ edmDumpAnalysis = cms.EDAnalyzer("ExclusiveDijetsEdmDumpAnalyzer",
     BDiscriminatorName = cms.string("jetBProbabilityBJetTags"),
     BDiscMin = cms.double(3.0), 
     # Misc
-    HFThresholdIndex = cms.uint32(16),
+    HFThresholdIndex = cms.uint32(14),
     UseJetCorrection = cms.bool(False),
     JetCorrectionService = cms.string("L2L3JetCorrectorSC7PF"),
     EBeam = cms.untracked.double(5000.),
