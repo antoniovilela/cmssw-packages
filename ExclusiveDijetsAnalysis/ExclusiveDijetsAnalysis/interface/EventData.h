@@ -18,10 +18,10 @@ namespace exclusiveDijetsAnalysis {
      double secondJetBDiscriminator_;
      double thirdJetPt_;
      double thirdJetEta_;
-     double jetsAveEta_;
-     double jetsDeltaEta_;
-     double jetsDeltaPhi_;
-     double jetsDeltaPt_;
+     double jetsAveEta_; //redundant
+     double jetsDeltaEta_; //redundant
+     double jetsDeltaPhi_; //redundant
+     double jetsDeltaPt_; //redundant
      int trackMultiplicity_;
      int multiplicityHFPlus_;
      int multiplicityHFMinus_;

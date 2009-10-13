@@ -5,6 +5,7 @@
 //#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 
 #include <cmath>
+#include <map>
 
 #include "TH1F.h"
 #include "TH2F.h"
@@ -76,6 +77,8 @@ namespace exclusiveDijetsAnalysis {
   void bookHistos(HistoMapTH2F& histos, const Adaptor& adaptor){
      histos["iEtaVsHFCountPlus"] = adaptor.template make<TH2F>("iEtaVsHFCountPlus","iEtaVsHFCountPlus",11,30,41,20,0,20);
      histos["iEtaVsHFCountMinus"] = adaptor.template make<TH2F>("iEtaVsHFCountMinus","iEtaVsHFCountMinus",11,30,41,20,0,20);
+     histos["HFRingCountPlus"] = adaptor.template make<TH2F>("HFRingCountPlus","HFRingCountPlus",13,1,14,20,0,20);
+     histos["HFRingCountMinus"] = adaptor.template make<TH2F>("HFRingCountMinus","HFRingCountMinus",13,1,14,20,0,20);
 
      histos["xiPlusVsxiGenPlus"] = adaptor.template make<TH2F>("xiPlusVsxiGenPlus","xiPlusVsxiGenPlus",100,0.,1.,100,0.,1.);
      histos["xiMinusVsxiGenMinus"] = adaptor.template make<TH2F>("xiMinusVsxiGenMinus","xiMinusVsxiGenMinus",100,0.,1.,100,0.,1.);
