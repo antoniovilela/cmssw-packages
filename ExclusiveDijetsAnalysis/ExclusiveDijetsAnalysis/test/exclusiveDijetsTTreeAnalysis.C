@@ -54,21 +54,6 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const
    HistoMapTH2F histosTH2F; 
    bookHistos(histosTH1F,CreateHisto());
    bookHistos(histosTH2F,CreateHisto());
-   histosTH2F["nPUBx0vsnVtx"] = new TH2F("nPUBx0vsnVtx","nPUBx0vsnVtx",10,0,10,10,0,10);   
-   histosTH2F["RjjFromJetsVsThirdJetPt"] = new TH2F("RjjFromJetsVsThirdJetPt","RjjFromJetsVsThirdJetPt",200,-0.1,1.5,200,0.,80.);
-   histosTH2F["RjjFromPFCandsVsThirdJetPt"] = new TH2F("RjjFromPFCandsVsThirdJetPt","RjjFromPFCandsVsThirdJetPt",200,-0.1,1.5,200,0.,80.);
-   histosTH2F["xiTowerVsxiGenPlus"] = new TH2F("xiTowerVsxiGenPlus","xiTowerVsxiGenPlus",100,0.,1.,100,0.,1.);
-   histosTH2F["xiTowerVsxiGenMinus"] = new TH2F("xiTowerVsxiGenMinus","",100,0.,1.,100,0.,1.);
-   histosTH2F["xiFromJetsVsxiGenPlus"] = new TH2F("xiFromJetsVsxiGenPlus","xiFromJetsVsxiGenPlus",100,0.,1.,100,0.,1.);
-   histosTH2F["xiFromJetsVsxiGenMinus"] = new TH2F("xiFromJetsVsxiGenMinus","xiFromJetsVsxiGenMinus",100,0.,1.,100,0.,1.);
-   histosTH2F["xiFromPFCandsVsxiGenPlus"] = new TH2F("xiFromPFCandsVsxiGenPlus","xiFromPFCandsVsxiGenPlus",100,0.,1.,100,0.,1.);
-   histosTH2F["xiFromPFCandsVsxiGenMinus"] = new TH2F("xiFromPFCandsVsxiGenMinus","xiFromPFCandsVsxiGenMinus",100,0.,1.,100,0.,1.);
-   histosTH1F["xiPlusFromJetsAfterSel"] = new TH1F("xiPlusFromJetsAfterSel","xiPlusFromJetsAfterSel",200,0.,1.);
-   histosTH1F["xiMinusFromJetsAfterSel"] = new TH1F("xiMinusFromJetsAfterSel","xiMinusFromJetsAfterSel",200,0.,1.);
-   histosTH1F["xiPlusFromPFCandsAfterSel"] = new TH1F("xiPlusFromPFCandsAfterSel","xiPlusFromPFCandsAfterSel",200,0.,1.);
-   histosTH1F["xiMinusFromPFCandsAfterSel"] = new TH1F("xiMinusFromPFCandsAfterSel","xiMinusFromPFCandsAfterSel",200,0.,1.);
-   histosTH1F["RjjFromJetsAfterSel"] = new TH1F("RjjFromJetsAfterSel","RjjFromJetsAfterSel",200,-0.1,1.5);
-   histosTH1F["RjjFromPFCandsAfterSel"] = new TH1F("RjjFromPFCandsAfterSel","RjjFromPFCandsAfterSel",200,-0.1,1.5);
 
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;

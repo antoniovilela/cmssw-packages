@@ -41,7 +41,7 @@ double Rjj(JetColl&,PartColl&);
 
 unsigned int nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& mapTreshToiEta, unsigned int thresholdHF, unsigned int ieta);
 
-void patAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool verbose = false) {
+void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,int maxEvents = -1, bool verbose = false) {
    // Create a vector of input files
    //vector<string> fileNames = func();
    if(verbose){
