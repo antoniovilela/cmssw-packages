@@ -84,8 +84,8 @@ namespace exclusiveDijetsAnalysis {
   void bookHistos(HistoMapTH2F& histos, const Adaptor& adaptor){
      histos["nPUBx0vsnVtx"] = adaptor.template make<TH2F>("nPUBx0vsnVtx","nPUBx0vsnVtx",10,0,10,10,0,10);
 
-     histos["iEtaVsHFCountPlus"] = adaptor.template make<TH2F>("iEtaVsHFCountPlus","iEtaVsHFCountPlus",11,30,41,20,0,20);
-     histos["iEtaVsHFCountMinus"] = adaptor.template make<TH2F>("iEtaVsHFCountMinus","iEtaVsHFCountMinus",11,30,41,20,0,20);
+     histos["iEtaVsHFCountPlus"] = adaptor.template make<TH2F>("iEtaVsHFCountPlus","iEtaVsHFCountPlus",13,28,41,20,0,20);
+     histos["iEtaVsHFCountMinus"] = adaptor.template make<TH2F>("iEtaVsHFCountMinus","iEtaVsHFCountMinus",13,28,41,20,0,20);
      histos["HFRingCountPlus"] = adaptor.template make<TH2F>("HFRingCountPlus","HFRingCountPlus",13,1,14,20,0,20);
      histos["HFRingCountMinus"] = adaptor.template make<TH2F>("HFRingCountMinus","HFRingCountMinus",13,1,14,20,0,20);
 

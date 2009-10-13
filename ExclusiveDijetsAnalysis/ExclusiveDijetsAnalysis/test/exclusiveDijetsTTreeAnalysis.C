@@ -8,13 +8,15 @@
 #include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/interface/EventData.h"
 #include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/interface/Histos.h" 
 
+#include "StdAllocatorAdaptor.h"
+
 #include <iostream>
 #include <vector>
 #include <string>
 
 using namespace exclusiveDijetsAnalysis;
 
-class CreateHisto{
+/*class CreateHisto{
   public:
      template <class T, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
      T* make(const Arg1 & a1, const Arg2 & a2, const Arg3 & a3, const Arg4 & a4, const Arg5 & a5) const{
@@ -26,7 +28,7 @@ class CreateHisto{
      T* make(const Arg1 & a1, const Arg2 & a2, const Arg3 & a3, const Arg4 & a4, const Arg5 & a5, const Arg6 & a6, const Arg7 & a7, const Arg8 & a8) const{
         return new T(a1,a2,a3,a4,a5,a6,a7,a8);
      }
-};
+};*/
 
 void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const& treeName, int maxEvents = -1, bool verbose = false){
    if(verbose) std::cout << ">>> Reading file: " << fileName << std::endl;
@@ -52,8 +54,8 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const
 
    HistoMapTH1F histosTH1F;
    HistoMapTH2F histosTH2F; 
-   bookHistos(histosTH1F,CreateHisto());
-   bookHistos(histosTH2F,CreateHisto());
+   bookHistos(histosTH1F,StdAllocatorAdaptor());
+   bookHistos(histosTH2F,StdAllocatorAdaptor());
 
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
@@ -162,7 +164,7 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const
       histosTH1F["xiGenMinus"]->Fill(eventData.xiGenMinus_);
  
       histosTH1F["ResXiTowerPlus"]->Fill((eventData.xiTowerPlus_ - eventData.xiGenPlus_)/eventData.xiGenPlus_);
-      histosTH1F["ResXiTowerMinus"]->Fill((eventData.xiTowerMinus_ - eventData.xiGenPlus_)/eventData.xiGenPlus_);
+      histosTH1F["ResXiTowerMinus"]->Fill((eventData.xiTowerMinus_ - eventData.xiGenMinus_)/eventData.xiGenMinus_);
       histosTH1F["ResXiPlusFromJets"]->Fill((eventData.xiPlusFromJets_ - eventData.xiGenPlus_)/eventData.xiGenPlus_);
       histosTH1F["ResXiMinusFromJets"]->Fill((eventData.xiMinusFromJets_ - eventData.xiGenMinus_)/eventData.xiGenMinus_);
       histosTH1F["ResXiPlusFromPFCands"]->Fill((eventData.xiPlusFromPFCands_ - eventData.xiGenPlus_)/eventData.xiGenPlus_);
