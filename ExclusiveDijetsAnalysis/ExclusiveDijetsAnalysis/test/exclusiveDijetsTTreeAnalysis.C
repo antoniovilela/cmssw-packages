@@ -30,7 +30,10 @@ using namespace exclusiveDijetsAnalysis;
      }
 };*/
 
-void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const& treeName, int maxEvents = -1, bool verbose = false){
+void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const& treeName,
+                                  std::string const& outFileName = "analysisDijetsTTree_histos.root",
+                                  int maxEvents = -1, bool verbose = false){
+
    if(verbose) std::cout << ">>> Reading file: " << fileName << std::endl;
 
    TFile* file = TFile::Open(fileName.c_str(),"read");
@@ -47,7 +50,7 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const
    setTTreeBranches(*data,eventData);
 
    // Create output file
-   TFile* hfile = new TFile("analysisDijetsTTree_histos.root","recreate","data histograms");
+   TFile* hfile = new TFile(outFileName.c_str(),"recreate","data histograms");
 
    // Book Histograms
    TH1::SetDefaultSumw2(true);

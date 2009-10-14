@@ -24,12 +24,12 @@ namespace exclusiveDijetsAnalysis {
      histos["nPileUpBx0"] = adaptor.template make<TH1F>("nPileUpBx0","Nr. of pile-up events in Bx0",10,0,10);
      histos["nVertex"] = adaptor.template make<TH1F>("nVertex","Nr. of offline primary vertexes",10,0,10);
 
-     histos["leadingJetPt"] = adaptor.template make<TH1F>("leadingJetPt","leadingJetPt",100,0.,100.);
+     histos["leadingJetPt"] = adaptor.template make<TH1F>("leadingJetPt","leadingJetPt",100,0.,200.);
      histos["leadingJetEta"] = adaptor.template make<TH1F>("leadingJetEta","leadingJetEta",100,-5.,5.);
      histos["leadingJetPhi"] = adaptor.template make<TH1F>("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);
      histos["leadingJetBDiscriminator"] = adaptor.template make<TH1F>("leadingJetBDiscriminator","leadingJetBDiscriminator",100,-10.,30.);
  
-     histos["secondJetPt"] = adaptor.template make<TH1F>("secondJetPt","secondJetPt",100,0.,100.);
+     histos["secondJetPt"] = adaptor.template make<TH1F>("secondJetPt","secondJetPt",100,0.,200.);
      histos["secondJetEta"] = adaptor.template make<TH1F>("secondJetEta","secondJetEta",100,-5.,5.);
      histos["secondJetPhi"] = adaptor.template make<TH1F>("secondJetPhi","secondJetPhi",100,-1.1*M_PI,1.1*M_PI);
      histos["secondJetBDiscriminator"] = adaptor.template make<TH1F>("secondJetBDiscriminator","secondJetBDiscriminator",100,-10.,30.);
