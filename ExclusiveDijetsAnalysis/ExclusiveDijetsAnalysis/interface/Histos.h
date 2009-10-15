@@ -62,10 +62,10 @@ namespace exclusiveDijetsAnalysis {
      histos["ResXiPlusFromPFCands"] = adaptor.template make<TH1F>("ResXiPlusFromPFCands","ResXiPlusFromPFCands",100,-1.,1.);
      histos["ResXiMinusFromPFCands"] = adaptor.template make<TH1F>("ResXiMinusFromPFCands","ResXiMinusFromPFCands",100,-1.,1.);
 
-     histos["massDijets"] = adaptor.template make<TH1F>("massDijets","massDijets",200,-10.,400.);
-     histos["massDijetsGen"] = adaptor.template make<TH1F>("massDijetsGen","massDijetsGen",200,-10.,400.);
-     histos["missingMassFromXi"] = adaptor.template make<TH1F>("missingMassFromXi","missingMassFromXi",200,-10.,400.);
-     histos["MxFromJets"] = adaptor.template make<TH1F>("MxFromJets","MxFromJets",200,-10.,400.);
+     histos["massDijets"] = adaptor.template make<TH1F>("massDijets","massDijets",200,-10.,800.);
+     histos["massDijetsGen"] = adaptor.template make<TH1F>("massDijetsGen","massDijetsGen",200,-10.,800.);
+     histos["missingMassFromXi"] = adaptor.template make<TH1F>("missingMassFromXi","missingMassFromXi",200,-10.,800.);
+     histos["MxFromJets"] = adaptor.template make<TH1F>("MxFromJets","MxFromJets",200,-10.,800.);
      histos["RjjFromJets"] = adaptor.template make<TH1F>("RjjFromJets","RjjFromJets",200,-0.1,1.5);
      histos["RjjFromPFCands"] = adaptor.template make<TH1F>("RjjFromPFCands","RjjFromPFCands",200,-0.1,1.5);
      histos["ResMassDijets"] = adaptor.template make<TH1F>("ResMassDijets","ResMassDijets",100,-1.,1.);

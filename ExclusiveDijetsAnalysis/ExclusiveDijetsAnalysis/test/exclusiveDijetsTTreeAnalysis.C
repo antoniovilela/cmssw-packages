@@ -30,24 +30,65 @@ using namespace exclusiveDijetsAnalysis;
      }
 };*/
 
-void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const& treeName,
+void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
+                                  std::string const& treeName,
+                                  std::string const& dijetsFilterName,
+                                  std::string const& fileHLTName, 
                                   std::string const& outFileName = "analysisDijetsTTree_histos.root",
                                   int maxEvents = -1, bool verbose = false){
 
    if(verbose) std::cout << ">>> Reading file: " << fileName << std::endl;
 
    TFile* file = TFile::Open(fileName.c_str(),"read");
+   if(!file){
+      std::cout << "ERROR: Could not find " << fileName << std::endl;
+      return;
+   }
 
    // Get TTree
    TTree* data = dynamic_cast<TTree*>(file->Get(treeName.c_str()));
    if(!data){
-      std::cout << "ERROR: Could not find " << treeName << std::endl;
+      std::cout << "ERROR: Could not find " << treeName << " in " << fileName << std::endl;
+      file->Close();
+      return;
+   }
+
+   // For efficiencies
+   TH1F* h_leadingJetPtFilter = dynamic_cast<TH1F*>(file->Get((dijetsFilterName + "/leadingJetPt").c_str()));
+   if(!h_leadingJetPtFilter){
+      std::cout << "ERROR: Could not find reference histo in" << dijetsFilterName << " in " << fileName << std::endl;
       file->Close();
       return;
    }
    
+   TFile* fileHLTEff = TFile::Open(fileHLTName.c_str(),"read");
+   if(!fileHLTEff){
+      std::cout << "ERROR: Could not find " << fileHLTName << std::endl;
+      file->Close(); 
+      return;
+   }
+   
+   std::string treeNameHLT_before = "analysisBeforeSelection/data";
+   std::string treeNameHLT_after = "analysisAfterSelection/data";
+   TTree* dataHLT_before = dynamic_cast<TTree*>(fileHLTEff->Get(treeNameHLT_before.c_str()));
+   if(!dataHLT_before){
+      std::cout << "ERROR: Could not find " << treeNameHLT_before << " in " << fileHLTName << std::endl;
+      fileHLTEff->Close();
+      file->Close();
+      return;
+   }
+
+   TTree* dataHLT_after = dynamic_cast<TTree*>(fileHLTEff->Get(treeNameHLT_after.c_str()));
+   if(!dataHLT_after){
+      std::cout << "ERROR: Could not find " << treeNameHLT_after << " in " << fileHLTName << std::endl;
+      fileHLTEff->Close();
+      file->Close();
+      return;
+   }
+
    EventData eventData;
    setTTreeBranches(*data,eventData);
+   int nEntries = data->GetEntries(); 
 
    // Create output file
    TFile* hfile = new TFile(outFileName.c_str(),"recreate","data histograms");
@@ -59,13 +100,22 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const
    HistoMapTH2F histosTH2F; 
    bookHistos(histosTH1F,StdAllocatorAdaptor());
    bookHistos(histosTH2F,StdAllocatorAdaptor());
+   histosTH1F["SelectionEff"] = new TH1F("SelectionEff","SelectionEff",2,0,2);
+   histosTH1F["SelectionEff"]->GetXaxis()->SetBinLabel(1,"HLT");
+   histosTH1F["SelectionEff"]->GetXaxis()->SetBinLabel(2,"exclusiveDijetsSelection"); 
 
+   // Fill efficiency histo
+   double eff_HLT = (double)dataHLT_after->GetEntries()/(double)dataHLT_before->GetEntries();
+   double eff_dijetsSelection = (double)nEntries/(double)h_leadingJetPtFilter->GetEntries();
+   histosTH1F["SelectionEff"]->SetBinContent(1,eff_HLT);
+   histosTH1F["SelectionEff"]->SetBinContent(2,eff_dijetsSelection);
+   
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 
    // Event selection
    // Prim. vertices
-   bool doVertexSelection = true;
+   bool doVertexSelection = false;
    // Di-jet
    double ptmin = 50.;
    double etamax = 2.5;
@@ -85,7 +135,7 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName, std::string const
    int nHFMinusMax = 0;
 
    // Loop over TTree
-   int nEntries = data->GetEntries();
+   //int nEntries = data->GetEntries();
    for(int ientry = 0; ientry < nEntries; ++ientry){
       if((maxEvents > 0)&&(ientry == maxEvents)) break;
       if(verbose && ientry%2000 == 0) std::cout << ">>> Analysing " << ientry << "th entry" << std::endl;
