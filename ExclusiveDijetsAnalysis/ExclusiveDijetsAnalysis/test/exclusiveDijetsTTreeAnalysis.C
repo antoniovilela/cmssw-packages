@@ -32,6 +32,7 @@ using namespace exclusiveDijetsAnalysis;
 
 void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
                                   std::string const& treeName,
+                                  std::string const& singleVtxFilterName,
                                   std::string const& dijetsFilterName,
                                   std::string const& fileHLTName, 
                                   std::string const& outFileName = "analysisDijetsTTree_histos.root",
@@ -54,9 +55,16 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    }
 
    // For efficiencies
+   TH1F* h_nVertexFilter = dynamic_cast<TH1F*>(file->Get((singleVtxFilterName + "/nVertex").c_str()));
+   if(!h_nVertexFilter){
+      std::cout << "ERROR: Could not find reference histo " << singleVtxFilterName << " in " << fileName << std::endl;
+      file->Close();
+      return;
+   }
+
    TH1F* h_leadingJetPtFilter = dynamic_cast<TH1F*>(file->Get((dijetsFilterName + "/leadingJetPt").c_str()));
    if(!h_leadingJetPtFilter){
-      std::cout << "ERROR: Could not find reference histo in" << dijetsFilterName << " in " << fileName << std::endl;
+      std::cout << "ERROR: Could not find reference histo " << dijetsFilterName << " in " << fileName << std::endl;
       file->Close();
       return;
    }
@@ -100,15 +108,18 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    HistoMapTH2F histosTH2F; 
    bookHistos(histosTH1F,StdAllocatorAdaptor());
    bookHistos(histosTH2F,StdAllocatorAdaptor());
-   histosTH1F["SelectionEff"] = new TH1F("SelectionEff","SelectionEff",2,0,2);
+   histosTH1F["SelectionEff"] = new TH1F("SelectionEff","SelectionEff",3,0,3);
    histosTH1F["SelectionEff"]->GetXaxis()->SetBinLabel(1,"HLT");
-   histosTH1F["SelectionEff"]->GetXaxis()->SetBinLabel(2,"exclusiveDijetsSelection"); 
+   histosTH1F["SelectionEff"]->GetXaxis()->SetBinLabel(2,"Single-vertex");
+   histosTH1F["SelectionEff"]->GetXaxis()->SetBinLabel(3,"Di-jets pre-selection"); 
 
    // Fill efficiency histo
    double eff_HLT = (double)dataHLT_after->GetEntries()/(double)dataHLT_before->GetEntries();
+   double eff_Vtx = (double)h_leadingJetPtFilter->GetEntries()/(double)h_nVertexFilter->GetEntries();
    double eff_dijetsSelection = (double)nEntries/(double)h_leadingJetPtFilter->GetEntries();
    histosTH1F["SelectionEff"]->SetBinContent(1,eff_HLT);
-   histosTH1F["SelectionEff"]->SetBinContent(2,eff_dijetsSelection);
+   histosTH1F["SelectionEff"]->SetBinContent(2,eff_Vtx);
+   histosTH1F["SelectionEff"]->SetBinContent(3,eff_dijetsSelection);
    
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
@@ -131,8 +142,8 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    int nTracksMax = 5;
    // HF-multiplicity
    bool doHFMultiplicitySelection = true; 
-   int nHFPlusMax = 0;
-   int nHFMinusMax = 0;
+   int nHFPlusMax = 2;
+   int nHFMinusMax = 2;
 
    // Loop over TTree
    //int nEntries = data->GetEntries();
