@@ -24,6 +24,8 @@ MyEventContent_tracks_expanded = cms.PSet(
 
 MyEventContent_jets = cms.PSet(
     outputCommands = cms.untracked.vstring(
+          'keep *_sisCone5GenJets_*_*',
+          'keep *_sisCone7GenJets_*_*',
           'keep *_sisCone5PFJets_*_*',
           'keep *_sisCone7PFJets_*_*',
           'keep *_L2L3CorJetSC5PF_*_Analysis',

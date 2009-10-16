@@ -10,6 +10,7 @@
 
 #include "StdAllocatorAdaptor.h"
 
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -108,6 +109,8 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    HistoMapTH2F histosTH2F; 
    bookHistos(histosTH1F,StdAllocatorAdaptor());
    bookHistos(histosTH2F,StdAllocatorAdaptor());
+   histosTH1F["LogRjjFromJetsAfterSel"] = new TH1F("LogRjjFromJetsAfterSel","LogRjjFromJetsAfterSel",200,-4.,0.);
+   histosTH1F["LogRjjFromPFCandsAfterSel"] = new TH1F("LogRjjFromPFCandsAfterSel","LogRjjFromPFCandsAfterSel",200,-4.,0.);
    histosTH1F["SelectionEff"] = new TH1F("SelectionEff","SelectionEff",3,0,3);
    histosTH1F["SelectionEff"]->GetXaxis()->SetBinLabel(1,"HLT");
    histosTH1F["SelectionEff"]->GetXaxis()->SetBinLabel(2,"Single-vertex");
@@ -142,8 +145,8 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    int nTracksMax = 5;
    // HF-multiplicity
    bool doHFMultiplicitySelection = true; 
-   int nHFPlusMax = 2;
-   int nHFMinusMax = 2;
+   int nHFPlusMax = 0;
+   int nHFMinusMax = 0;
 
    // Loop over TTree
    //int nEntries = data->GetEntries();
@@ -273,6 +276,9 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
       histosTH1F["xiMinusFromPFCandsAfterSel"]->Fill(eventData.xiMinusFromPFCands_);
       histosTH1F["RjjFromJetsAfterSel"]->Fill(RjjFromJets);
       histosTH1F["RjjFromPFCandsAfterSel"]->Fill(RjjFromPFCands);
+
+      histosTH1F["LogRjjFromJetsAfterSel"]->Fill(log10(1. - RjjFromJets));
+      histosTH1F["LogRjjFromPFCandsAfterSel"]->Fill(log10(1. - RjjFromPFCands));
    }  // End loop over events
   
    hfile->Write();

@@ -37,11 +37,11 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    samples.push_back("DPE di-jets");
 
    std::vector<TFile*> files;
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30.root")); 
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU.root"));
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU_nHFMax_0.root"));
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_nHFMax_0.root")); 
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_nHFMax_0.root"));
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_nHFMax_0.root"));
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU_nHFMax_0.root"));
 
    std::vector<TDirectory*> directories;
 
@@ -70,8 +70,8 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
       const TH1F* h_leadingJetPt_dijetsSelection = static_cast<const TH1F*>(it->second->Get("leadingJetPt"));
 
       double eff_HLT = h_SelEff->GetBinContent(1);
-      double eff_Vtx = 1.;
-      double eff_dijetsSelection = h_SelEff->GetBinContent(2);
+      double eff_Vtx = h_SelEff->GetBinContent(2);
+      double eff_dijetsSelection = h_SelEff->GetBinContent(3);
 
       std::cout << " Efficiency for HLT selection " << it->first << ": " << eff_HLT << std::endl;
       std::cout << " Efficiency for Vertex selection " << it->first << ": " << eff_Vtx << std::endl;
@@ -107,12 +107,16 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    refVar.push_back("RjjFromPFCands");
    refVar.push_back("RjjFromJetsAfterSel");
    refVar.push_back("RjjFromPFCandsAfterSel");
+   refVar.push_back("LogRjjFromJetsAfterSel");
+   refVar.push_back("LogRjjFromPFCandsAfterSel");
 
    std::vector<std::string> stackVars;
    stackVars.push_back("RjjFromJets");
    stackVars.push_back("RjjFromPFCands");
    stackVars.push_back("RjjFromJetsAfterSel");
    stackVars.push_back("RjjFromPFCandsAfterSel");
+   stackVars.push_back("LogRjjFromJetsAfterSel");
+   stackVars.push_back("LogRjjFromPFCandsAfterSel");
 
    //plot(refVar,stackVars,dirMap,scaleMap,Norm,ngroups,xbins);
    plot(refVar,stackVars,dirMap,scaleMap,Norm,rebinFactor,variableBin,groups);
