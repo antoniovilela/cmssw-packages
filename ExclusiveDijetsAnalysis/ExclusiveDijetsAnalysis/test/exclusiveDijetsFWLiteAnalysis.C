@@ -76,9 +76,9 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    jetCollsNonCorr.push_back("sisCone7PFJets");
    jetCollsNonCorr.push_back("sisCone5PFJets");
 
-   /*std::vector<std::string> genJetColls;
-   jetCollsNonCorr.push_back("sisCone7GenJets");
-   jetCollsNonCorr.push_back("sisCone5GenJets");*/
+   std::vector<std::string> genJetColls;
+   genJetColls.push_back("sisCone7GenJets");
+   genJetColls.push_back("sisCone5GenJets");
  
    // Book Histograms
    TH1::SetDefaultSumw2(true);
@@ -91,29 +91,37 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    histosTH1F["trackMultiplicityOutsideJets"] = new TH1F("trackMultiplicityOutsideJets","trackMultiplicityOutsideJets",20,0,20);
    histosTH1F["trackMultiplicityTransverseRegion"] = new TH1F("trackMultiplicityTransverseRegion","trackMultiplicityTransverseRegion",20,0,20);
    histosTH1F["forwardBackwardAsymmetryHFEnergy"] = new TH1F("forwardBackwardAsymmetryHFEnergy","forwardBackwardAsymmetryHFEnergy",200,-1.1,1.1);
-   double xbins[8] = {0.,0.4,0.7,0.8,0.85,0.9,0.95,1.0};
-   histosTH1F["RjjFromJetsAfterSelCustomBin"] = new TH1F("RjjFromJetsAfterSelCustomBin","RjjFromJetsAfterSelCustomBin",7,xbins);
-   histosTH1F["RjjFromPFCandsAfterSelCustomBin"] = new TH1F("RjjFromPFCandsAfterSelCustomBin","RjjFromPFCandsAfterSelCustomBin",7,xbins);
+   //double xbins[8] = {0.,0.4,0.7,0.8,0.85,0.9,0.95,1.0};
+   /*double xbins[10] = {-0.1,0.40,0.60,0.80,0.84,0.88,0.92,0.96,1.0,1.5};
+   histosTH1F["RjjFromJetsAfterSelCustomBin"] = new TH1F("RjjFromJetsAfterSelCustomBin","RjjFromJetsAfterSelCustomBin",9,xbins);
+   histosTH1F["RjjFromPFCandsAfterSelCustomBin"] = new TH1F("RjjFromPFCandsAfterSelCustomBin","RjjFromPFCandsAfterSelCustomBin",9,xbins);*/
+   histosTH1F["RjjGenMatchFromRec"] = static_cast<TH1F*>(histosTH1F["RjjGen"]->Clone("RjjGenMatchFromRec"));
 
    std::vector<TH1F*> histos_ResMassDijets;
    std::vector<TH1F*> histos_ResXiPlusFromJets;
    std::vector<TH1F*> histos_ResXiMinusFromJets;
    std::vector<TH1F*> histos_RjjFromJets;
+   std::vector<TH1F*> histos_RjjGenMatchFromRec;
+   std::vector<TH1F*> histos_ResRjjFromJets;
    for(std::vector<std::string>::const_iterator it = jetColls.begin(); it != jetColls.end(); ++it){
       std::string hname = "ResMassDijets_" + *it;
-      histos_ResMassDijets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-50.,50.));
+      histos_ResMassDijets.push_back(static_cast<TH1F*>(histosTH1F["ResMassDijets"]->Clone(hname.c_str())));
       hname = "ResXiPlusFromJets_" + *it;
-      histos_ResXiPlusFromJets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-0.1,0.1));
+      histos_ResXiPlusFromJets.push_back(static_cast<TH1F*>(histosTH1F["ResXiPlusFromJets"]->Clone(hname.c_str())));
       hname = "ResXiMinusFromJets_" + *it;
-      histos_ResXiMinusFromJets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-0.1,0.1));
+      histos_ResXiMinusFromJets.push_back(static_cast<TH1F*>(histosTH1F["ResXiMinusFromJets"]->Clone(hname.c_str())));
       hname = "RjjFromJets_" + *it;
-      histos_RjjFromJets.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-0.1,1.5));
+      histos_RjjFromJets.push_back(static_cast<TH1F*>(histosTH1F["RjjFromJets"]->Clone(hname.c_str())));
+      hname = "RjjGenMatchFromRec_" + *it;
+      histos_RjjGenMatchFromRec.push_back(static_cast<TH1F*>(histosTH1F["RjjGen"]->Clone(hname.c_str())));
+      hname = "ResRjjFromJets_" + *it;
+      histos_ResRjjFromJets.push_back(static_cast<TH1F*>(histosTH1F["ResRjjFromJets"]->Clone(hname.c_str())));
    }
 
    std::vector<TH1F*> histos_RjjFromPFCands;
    for(std::vector<std::string>::const_iterator it = jetCollsNonCorr.begin(); it != jetCollsNonCorr.end(); ++it){
       std::string hname = "RjjFromPFCands_" + *it;
-      histos_RjjFromPFCands.push_back(new TH1F(hname.c_str(),hname.c_str(),200,-0.1,1.5));
+      histos_RjjFromPFCands.push_back(static_cast<TH1F*>(histosTH1F["RjjFromPFCands"]->Clone(hname.c_str())));
    }
 
    double Ebeam = 5000.;
@@ -323,10 +331,17 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      // Subtract the two protons' momenta
      allGenParticles -= proton1->p4();
      allGenParticles -= proton2->p4();
+     histosTH1F["MxGen"]->Fill(allGenParticles.M());
+     histosTH1F["ResMxFromJets"]->Fill(allJets.M() - allGenParticles.M());
+     histosTH1F["ResMxFromPFCands"]->Fill(allPFCands.M() - allGenParticles.M());
 
      /*math::XYZTLorentzVector genDijetSystem(0.,0.,0.,0.);
      genDijetSystem += ((*genJetCollection)[0]).p4();
-     genDijetSystem += ((*genJetCollection)[1]).p4();*/
+     genDijetSystem += ((*genJetCollection)[1]).p4();
+     // Rjj gen
+     double RjjGen = genDijetSystem.M()/allGenParticles.M();
+     histosTH1F["RjjGen"]->Fill(RjjGen);*/
+     
 
      const reco::GenJet* genJet1 = jet1.genJet();
      const reco::GenJet* genJet2 = jet2.genJet();
@@ -342,12 +357,12 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
         histosTH1F["ResMassDijets"]->Fill(massDijets - massGen);  
 
         // Rjj gen
-        double RjjGen = massGen/allGenParticles.M();
-        histosTH1F["RjjGen"]->Fill(RjjGen);
+        double RjjGenMatchFromRec = massGen/allGenParticles.M();
+        histosTH1F["RjjGenMatchFromRec"]->Fill(RjjGenMatchFromRec);
         //histosTH1F["ResRjjFromJets"]->Fill((RjjFromJets - RjjGen)/RjjGen);
         //histosTH1F["ResRjjFromPFCands"]->Fill((RjjFromPFCands - RjjGen)/RjjGen);
-        histosTH1F["ResRjjFromJets"]->Fill(RjjFromJets - RjjGen);
-        histosTH1F["ResRjjFromPFCands"]->Fill(RjjFromPFCands - RjjGen);
+        histosTH1F["ResRjjFromJets"]->Fill(RjjFromJets - RjjGenMatchFromRec);
+        histosTH1F["ResRjjFromPFCands"]->Fill(RjjFromPFCands - RjjGenMatchFromRec);
      }
 
      // Xi gen
@@ -382,6 +397,9 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
         dijetSystem += jet1.p4();
         dijetSystem += jet2.p4();
 
+        double RjjFromJets = Rjj(*(jetCollections[k]),*(jetCollections[k]));
+        (histos_RjjFromJets[k])->Fill(RjjFromJets);
+
         const reco::GenJet* genJet1 = jet1.genJet();
         const reco::GenJet* genJet2 = jet2.genJet();
 
@@ -392,15 +410,19 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
           double massGen = dijetGenSystem.M();
           //(histos_ResMassDijets[k])->Fill((dijetSystem.M() - massGen)/massGen);
           (histos_ResMassDijets[k])->Fill(dijetSystem.M() - massGen);
+
+          // Rjj gen
+          double RjjGenMatchFromRec = massGen/allGenParticles.M();
+          histos_RjjGenMatchFromRec[k]->Fill(RjjGenMatchFromRec);
+          histos_ResRjjFromJets[k]->Fill(RjjFromJets - RjjGenMatchFromRec);
         }
 
+        // Xi
         std::pair<double,double> xiFromJets = xi(*(jetCollections[k]),Ebeam);
         //(histos_ResXiPlusFromJets[k])->Fill((xiFromJets.first - xigen_plus)/xigen_plus);
         //(histos_ResXiMinusFromJets[k])->Fill((xiFromJets.second - xigen_minus)/xigen_minus);
         (histos_ResXiPlusFromJets[k])->Fill(xiFromJets.first - xigen_plus);
         (histos_ResXiMinusFromJets[k])->Fill(xiFromJets.second - xigen_minus);
-
-        (histos_RjjFromJets[k])->Fill(Rjj(*(jetCollections[k]),*(jetCollections[k])));
      }
 
      for(size_t k = 0; k < jetCollsNonCorr.size(); ++k){

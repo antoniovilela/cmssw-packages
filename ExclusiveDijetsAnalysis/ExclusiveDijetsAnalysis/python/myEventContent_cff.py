@@ -35,15 +35,23 @@ MyEventContent_jets = cms.PSet(
 
 MyEventContent_jets_expanded = cms.PSet(
     outputCommands = cms.untracked.vstring(
+          'keep *_kt4GenJets_*_*',
+          'keep *_kt6GenJets_*_*',
+          'keep *_sisCone5GenJets_*_*',
+          'keep *_sisCone7GenJets_*_*', 
+          'keep *_kt4CaloJets_*_*',
           'keep *_kt6CaloJets_*_*',
           'keep *_sisCone5CaloJets_*_*',
           'keep *_sisCone7CaloJets_*_*',
+          'keep *_kt4PFJets_*_*',
           'keep *_kt6PFJets_*_*',
           'keep *_sisCone5PFJets_*_*',
           'keep *_sisCone7PFJets_*_*',
+          'keep *_L2L3CorJetKT4Calo_*_Analysis',
           'keep *_L2L3CorJetKT6Calo_*_Analysis',
           'keep *_L2L3CorJetSC5Calo_*_Analysis',
           'keep *_L2L3CorJetSC7Calo_*_Analysis',
+          'keep *_L2L3CorJetKT4PF_*_Analysis',
           'keep *_L2L3CorJetKT6PF_*_Analysis',
           'keep *_L2L3CorJetSC5PF_*_Analysis',
           'keep *_L2L3CorJetSC7PF_*_Analysis'

@@ -7,14 +7,26 @@
 
 void plot(){
    std::vector<TDirectory*> dirs;
+   dirs.push_back(TFile::Open("analysisJetResponse_histos_IC5Calo.root"));
+   dirs.push_back(TFile::Open("analysisJetResponse_histos_KT4Calo.root"));
+   dirs.push_back(TFile::Open("analysisJetResponse_histos_KT6Calo.root"));
    dirs.push_back(TFile::Open("analysisJetResponse_histos_SC5Calo.root"));
    dirs.push_back(TFile::Open("analysisJetResponse_histos_SC7Calo.root"));
+   dirs.push_back(TFile::Open("analysisJetResponse_histos_IC5PF.root"));
+   dirs.push_back(TFile::Open("analysisJetResponse_histos_KT4PF.root"));
+   dirs.push_back(TFile::Open("analysisJetResponse_histos_KT6PF.root"));
    dirs.push_back(TFile::Open("analysisJetResponse_histos_SC5PF.root"));
    dirs.push_back(TFile::Open("analysisJetResponse_histos_SC7PF.root"));
    
    std::vector<std::string> labels;
+   labels.push_back("IC5 Calo");
+   labels.push_back("KT4 Calo");
+   labels.push_back("KT6 Calo");
    labels.push_back("SC5 Calo");
    labels.push_back("SC7 Calo");
+   labels.push_back("IC5 PF");
+   labels.push_back("KT4 PF");
+   labels.push_back("KT6 PF");
    labels.push_back("SC5 PF");
    labels.push_back("SC7 PF");
  
@@ -43,6 +55,14 @@ void plot(){
    variables.push_back("sigmaRespVsEta_0");
    variables.push_back("sigmaRespVsEta_1");
    variables.push_back("sigmaRespVsEta_2");
+   variables.push_back("sigmaEtaVsPt_0");
+   variables.push_back("sigmaEtaVsPt_1");
+   variables.push_back("sigmaEtaVsPt_2");
+   variables.push_back("sigmaEtaVsPt_3");
+   variables.push_back("sigmaPhiVsPt_0");
+   variables.push_back("sigmaPhiVsPt_1");
+   variables.push_back("sigmaPhiVsPt_2");
+   variables.push_back("sigmaPhiVsPt_3");
 
    Plotter<DefaultNorm> plotter;
    plotter.plot(variables,dirsDesc);

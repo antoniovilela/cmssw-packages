@@ -69,6 +69,9 @@ namespace exclusiveDijetsAnalysis {
 
      histos["MxFromJets"] = adaptor.template make<TH1F>("MxFromJets","MxFromJets",200,-10.,800.);
      histos["MxFromPFCands"] = adaptor.template make<TH1F>("MxFromPFCands","MxFromPFCands",200,-10.,800.);
+     histos["MxGen"] = adaptor.template make<TH1F>("MxGen","MxGen",200,-10.,800.);
+     histos["ResMxFromJets"] = adaptor.template make<TH1F>("ResMxFromJets","ResMxFromJets",200,-50.,50.);
+     histos["ResMxFromPFCands"] = adaptor.template make<TH1F>("ResMxFromPFCands","ResMxFromPFCands",200,-50.,50.);
 
      histos["RjjFromJets"] = adaptor.template make<TH1F>("RjjFromJets","RjjFromJets",200,-0.1,1.5);
      histos["RjjFromPFCands"] = adaptor.template make<TH1F>("RjjFromPFCands","RjjFromPFCands",200,-0.1,1.5);
@@ -86,6 +89,9 @@ namespace exclusiveDijetsAnalysis {
      histos["xiMinusFromPFCandsAfterSel"] = adaptor.template make<TH1F>("xiMinusFromPFCandsAfterSel","xiMinusFromPFCandsAfterSel",200,0.,1.);
      histos["RjjFromJetsAfterSel"] = adaptor.template make<TH1F>("RjjFromJetsAfterSel","RjjFromJetsAfterSel",200,-0.1,1.5);
      histos["RjjFromPFCandsAfterSel"] = adaptor.template make<TH1F>("RjjFromPFCandsAfterSel","RjjFromPFCandsAfterSel",200,-0.1,1.5);
+     double xbins[10] = {-0.1,0.40,0.60,0.80,0.84,0.88,0.92,0.96,1.0,1.5};
+     histos["RjjFromJetsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromJetsAfterSelCustomBin","RjjFromJetsAfterSelCustomBin",9,xbins);
+     histos["RjjFromPFCandsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromPFCandsAfterSelCustomBin","RjjFromPFCandsAfterSelCustomBin",9,xbins);
   }
 
   template <class Adaptor>

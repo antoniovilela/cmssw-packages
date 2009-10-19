@@ -31,7 +31,7 @@ import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
 #jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
 
-jetAlgos = ['KT6','SC5','SC7']
+jetAlgos = ['KT4','KT6','SC5','SC7']
 jetTypes = ['Calo','PF']
 
 #jetAlgos = ['SC5','SC7']
@@ -70,7 +70,8 @@ process.pileUpInfo.AccessCrossingFramePlayBack = True
 process.pileUpInfo.BunchCrossings = cms.vint32(0)
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
 
-from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
+#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
+from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_expanded as MyEventContent
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.output.outputCommands = MyEventContent.outputCommands 
 process.output.fileName = 'edmDump_exclusiveDijets.root'
