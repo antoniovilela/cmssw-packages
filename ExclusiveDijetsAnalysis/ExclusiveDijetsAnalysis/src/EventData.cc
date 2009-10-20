@@ -23,7 +23,7 @@ namespace exclusiveDijetsAnalysis {
      data.Branch("trackMultiplicity",&eventData.trackMultiplicity_,"trackMultiplicity/I");
      data.Branch("multiplicityHFPlus",&eventData.multiplicityHFPlus_,"multiplicityHFPlus/I");
      data.Branch("multiplicityHFMinus",&eventData.multiplicityHFMinus_,"multiplicityHFMinus/I");
-     // 1-13 HF rings, 2.866 < |eta| < 5.205
+     // 1-13 HF rings, 2.866 < |eta| < 5.205, 29 <= ieta <= 41
      // FIXME 
      data.Branch("multiplicityHFPlusVsiEta",eventData.multiplicityHFPlusVsiEta_,"multiplicityHFPlusVsiEta[13]/I");
      data.Branch("multiplicityHFMinusVsiEta",eventData.multiplicityHFMinusVsiEta_,"multiplicityHFMinusVsiEta[13]/I");
@@ -35,12 +35,15 @@ namespace exclusiveDijetsAnalysis {
      data.Branch("xiMinusFromJets",&eventData.xiMinusFromJets_,"xiMinusFromJets/D");
      data.Branch("xiPlusFromPFCands",&eventData.xiPlusFromPFCands_,"xiPlusFromPFCands/D");
      data.Branch("xiMinusFromPFCands",&eventData.xiMinusFromPFCands_,"xiMinusFromPFCands/D");
+     data.Branch("missingMassFromXi",&eventData.missingMassFromXi_,"missingMassFromXi/D");
      data.Branch("massDijets",&eventData.massDijets_,"massDijets/D");
      data.Branch("massDijetsGen",&eventData.massDijetsGen_,"massDijetsGen/D");
-     data.Branch("missingMassFromXi",&eventData.missingMassFromXi_,"missingMassFromXi/D");
      data.Branch("MxFromJets",&eventData.MxFromJets_,"MxFromJets/D");
+     data.Branch("MxFromPFCands",&eventData.MxFromPFCands_,"MxFromPFCands/D");
+     data.Branch("MxGen",&eventData.MxGen_,"MxGen/D");
      data.Branch("RjjFromJets",&eventData.RjjFromJets_,"RjjFromJets/D");
      data.Branch("RjjFromPFCands",&eventData.RjjFromPFCands_,"RjjFromPFCands/D");
+     data.Branch("RjjGen",&eventData.RjjGen_,"RjjGen/D");
   }
 
   void setTTreeBranches(TTree& data, EventData& eventData){
@@ -75,11 +78,14 @@ namespace exclusiveDijetsAnalysis {
      data.SetBranchAddress("xiMinusFromJets",&eventData.xiMinusFromJets_);
      data.SetBranchAddress("xiPlusFromPFCands",&eventData.xiPlusFromPFCands_);
      data.SetBranchAddress("xiMinusFromPFCands",&eventData.xiMinusFromPFCands_);
+     data.SetBranchAddress("missingMassFromXi",&eventData.missingMassFromXi_);
      data.SetBranchAddress("massDijets",&eventData.massDijets_);
      data.SetBranchAddress("massDijetsGen",&eventData.massDijetsGen_);
-     data.SetBranchAddress("missingMassFromXi",&eventData.missingMassFromXi_);
      data.SetBranchAddress("MxFromJets",&eventData.MxFromJets_);
+     data.SetBranchAddress("MxFromPFCands",&eventData.MxFromPFCands_);
+     data.SetBranchAddress("MxGen",&eventData.MxGen_);
      data.SetBranchAddress("RjjFromJets",&eventData.RjjFromJets_);
      data.SetBranchAddress("RjjFromPFCands",&eventData.RjjFromPFCands_);
+     data.SetBranchAddress("RjjGen",&eventData.RjjGen_);
   }
 }

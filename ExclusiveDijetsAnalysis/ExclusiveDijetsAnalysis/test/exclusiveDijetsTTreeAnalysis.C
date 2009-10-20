@@ -190,13 +190,19 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
  
       histosTH1F["massDijets"]->Fill(eventData.massDijets_);
       histosTH1F["massDijetsGen"]->Fill(eventData.massDijetsGen_);
-      histosTH1F["ResMassDijets"]->Fill((eventData.massDijets_ - eventData.massDijetsGen_)/eventData.massDijets_);
+      //histosTH1F["ResMassDijets"]->Fill((eventData.massDijets_ - eventData.massDijetsGen_)/eventData.massDijets_);
+      histosTH1F["ResMassDijets"]->Fill(eventData.massDijets_ - eventData.massDijetsGen_); 
 
       histosTH1F["MxFromJets"]->Fill(eventData.MxFromJets_); 
+      histosTH1F["MxFromPFCands"]->Fill(eventData.MxFromPFCands_);
+      histosTH1F["MxGen"]->Fill(eventData.MxGen_);
+      histosTH1F["ResMxFromJets"]->Fill(eventData.MxFromJets_ - eventData.MxGen_);
+      histosTH1F["ResMxFromPFCands"]->Fill(eventData.MxFromPFCands_ - eventData.MxGen_);
 
       // Rjj
       double RjjFromJets = eventData.RjjFromJets_;
       double RjjFromPFCands = eventData.RjjFromPFCands_;
+      double RjjGen = eventData.RjjGen_;
 
       // B-tag
       double bDiscJet1 = eventData.leadingJetBDiscriminator_;
@@ -217,6 +223,9 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
 
       histosTH1F["RjjFromJets"]->Fill(RjjFromJets);
       histosTH1F["RjjFromPFCands"]->Fill(RjjFromPFCands);
+      histosTH1F["RjjGen"]->Fill(RjjGen);  
+      histosTH1F["ResRjjFromJets"]->Fill(RjjFromJets - RjjGen);
+      histosTH1F["ResRjjFromPFCands"]->Fill(RjjFromPFCands - RjjGen); 
 
       histosTH2F["RjjFromJetsVsThirdJetPt"]->Fill(RjjFromJets,eventData.thirdJetPt_);
       histosTH2F["RjjFromPFCandsVsThirdJetPt"]->Fill(RjjFromPFCands,eventData.thirdJetPt_);
@@ -230,12 +239,18 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
       histosTH1F["xiGenPlus"]->Fill(eventData.xiGenPlus_);
       histosTH1F["xiGenMinus"]->Fill(eventData.xiGenMinus_);
  
-      histosTH1F["ResXiTowerPlus"]->Fill((eventData.xiTowerPlus_ - eventData.xiGenPlus_)/eventData.xiGenPlus_);
+      /*histosTH1F["ResXiTowerPlus"]->Fill((eventData.xiTowerPlus_ - eventData.xiGenPlus_)/eventData.xiGenPlus_);
       histosTH1F["ResXiTowerMinus"]->Fill((eventData.xiTowerMinus_ - eventData.xiGenMinus_)/eventData.xiGenMinus_);
       histosTH1F["ResXiPlusFromJets"]->Fill((eventData.xiPlusFromJets_ - eventData.xiGenPlus_)/eventData.xiGenPlus_);
       histosTH1F["ResXiMinusFromJets"]->Fill((eventData.xiMinusFromJets_ - eventData.xiGenMinus_)/eventData.xiGenMinus_);
       histosTH1F["ResXiPlusFromPFCands"]->Fill((eventData.xiPlusFromPFCands_ - eventData.xiGenPlus_)/eventData.xiGenPlus_);
-      histosTH1F["ResXiMinusFromPFCands"]->Fill((eventData.xiMinusFromPFCands_ - eventData.xiGenMinus_)/eventData.xiGenMinus_);
+      histosTH1F["ResXiMinusFromPFCands"]->Fill((eventData.xiMinusFromPFCands_ - eventData.xiGenMinus_)/eventData.xiGenMinus_);*/
+      histosTH1F["ResXiTowerPlus"]->Fill(eventData.xiTowerPlus_ - eventData.xiGenPlus_);
+      histosTH1F["ResXiTowerMinus"]->Fill(eventData.xiTowerMinus_ - eventData.xiGenMinus_);
+      histosTH1F["ResXiPlusFromJets"]->Fill(eventData.xiPlusFromJets_ - eventData.xiGenPlus_);
+      histosTH1F["ResXiMinusFromJets"]->Fill(eventData.xiMinusFromJets_ - eventData.xiGenMinus_);
+      histosTH1F["ResXiPlusFromPFCands"]->Fill(eventData.xiPlusFromPFCands_ - eventData.xiGenPlus_);
+      histosTH1F["ResXiMinusFromPFCands"]->Fill(eventData.xiMinusFromPFCands_ - eventData.xiGenMinus_);
 
       //histosTH2F["xiPlusVsxiGenPlus"]->Fill();
       //histosTH2F["xiMinusVsxiGenMinus"]->Fill();

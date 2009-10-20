@@ -12,8 +12,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.filesCEPGGM100_edmDump_cfi import filesPSet
 
 process.source = cms.Source("PoolSource",
-    fileNames = filesPSet.fileNames
-    #fileNames = cms.untracked.vstring('file:/tmp/antoniov/edmDump_exclusiveDijets.root')
+    #fileNames = filesPSet.fileNames
+    fileNames = cms.untracked.vstring('file:/data1/antoniov/edmDump_exclusiveDijets_CEPDijetsGG_M100_10TeV_StageA156Bx_PU.root')
 )
 
 #process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff")

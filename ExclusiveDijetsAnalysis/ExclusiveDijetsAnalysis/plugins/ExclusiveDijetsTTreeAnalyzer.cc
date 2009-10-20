@@ -90,7 +90,7 @@ void ExclusiveDijetsTTreeAnalyzer::beginJob(const edm::EventSetup& setup){
 }
 
 void ExclusiveDijetsTTreeAnalyzer::beginRun(const edm::Run& run, const edm::EventSetup& setup){
-  exclusiveDijetsAnalysisImpl_.servicesBeginRun(run,setup);
+  exclusiveDijetsAnalysisImpl_.setBeginRun(run,setup);
 }
 
 void ExclusiveDijetsTTreeAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup){
@@ -119,8 +119,11 @@ void ExclusiveDijetsTTreeAnalyzer::analyze(const edm::Event& event, const edm::E
   histosTH1F_["massDijets"]->Fill(eventData_.massDijets_);
   histosTH1F_["massDijetsGen"]->Fill(eventData_.massDijetsGen_);
   histosTH1F_["MxFromJets"]->Fill(eventData_.MxFromJets_);
+  histosTH1F_["MxFromPFCands"]->Fill(eventData_.MxFromPFCands_);
+  histosTH1F_["MxGen"]->Fill(eventData_.MxGen_);
   histosTH1F_["RjjFromJets"]->Fill(eventData_.RjjFromJets_);
   histosTH1F_["RjjFromPFCands"]->Fill(eventData_.RjjFromPFCands_);
+  histosTH1F_["RjjGen"]->Fill(eventData_.RjjGen_);
 
   histosTH1F_["trackMultiplicity"]->Fill(eventData_.trackMultiplicity_);
   histosTH1F_["multiplicityHFPlus"]->Fill(eventData_.multiplicityHFPlus_);
@@ -136,20 +139,37 @@ void ExclusiveDijetsTTreeAnalyzer::analyze(const edm::Event& event, const edm::E
   histosTH1F_["xiMinusFromPFCands"]->Fill(eventData_.xiMinusFromPFCands_);
   histosTH1F_["missingMassFromXi"]->Fill(eventData_.missingMassFromXi_);
 
-  double resMassDijets = (eventData_.massDijets_ - eventData_.massDijetsGen_)/eventData_.massDijetsGen_;
+  //double resMassDijets = (eventData_.massDijets_ - eventData_.massDijetsGen_)/eventData_.massDijetsGen_;
+  double resMassDijets = eventData_.massDijets_ - eventData_.massDijetsGen_;
   histosTH1F_["ResMassDijets"]->Fill(resMassDijets);
 
-  double resXiTowerPlus = (eventData_.xiTowerPlus_ - eventData_.xiGenPlus_)/eventData_.xiGenPlus_;
+  double resMxFromJets = eventData_.MxFromJets_ - eventData_.MxGen_;
+  histosTH1F_["ResMxFromJets"]->Fill(resMxFromJets);
+  double resMxFromPFCands = eventData_.MxFromPFCands_ - eventData_.MxGen_;
+  histosTH1F_["ResMxFromPFCands"]->Fill(resMxFromPFCands);
+  
+  double resRjjFromJets = eventData_.RjjFromJets_ - eventData_.RjjGen_;
+  histosTH1F_["ResRjjFromJets"]->Fill(resRjjFromJets);
+  double resRjjFromPFCands = eventData_.RjjFromPFCands_ - eventData_.RjjGen_;
+  histosTH1F_["ResRjjFromPFCands"]->Fill(resRjjFromPFCands);
+
+  //double resXiTowerPlus = (eventData_.xiTowerPlus_ - eventData_.xiGenPlus_)/eventData_.xiGenPlus_;
+  double resXiTowerPlus = eventData_.xiTowerPlus_ - eventData_.xiGenPlus_;
   histosTH1F_["ResXiTowerPlus"]->Fill(resXiTowerPlus);
-  double resXiTowerMinus = (eventData_.xiTowerMinus_ - eventData_.xiGenMinus_)/eventData_.xiGenMinus_; 
+  //double resXiTowerMinus = (eventData_.xiTowerMinus_ - eventData_.xiGenMinus_)/eventData_.xiGenMinus_; 
+  double resXiTowerMinus = eventData_.xiTowerMinus_ - eventData_.xiGenMinus_;
   histosTH1F_["ResXiTowerMinus"]->Fill(resXiTowerMinus);
-  double resXiPlusFromJets = (eventData_.xiPlusFromJets_ - eventData_.xiGenPlus_)/eventData_.xiGenPlus_;
+  //double resXiPlusFromJets = (eventData_.xiPlusFromJets_ - eventData_.xiGenPlus_)/eventData_.xiGenPlus_;
+  double resXiPlusFromJets = eventData_.xiPlusFromJets_ - eventData_.xiGenPlus_;
   histosTH1F_["ResXiPlusFromJets"]->Fill(resXiPlusFromJets);
-  double resXiMinusFromJets = (eventData_.xiMinusFromJets_ - eventData_.xiGenMinus_)/eventData_.xiGenMinus_;
+  //double resXiMinusFromJets = (eventData_.xiMinusFromJets_ - eventData_.xiGenMinus_)/eventData_.xiGenMinus_;
+  double resXiMinusFromJets = eventData_.xiMinusFromJets_ - eventData_.xiGenMinus_;
   histosTH1F_["ResXiMinusFromJets"]->Fill(resXiMinusFromJets);
-  double resXiPlusFromPFCands = (eventData_.xiPlusFromPFCands_ - eventData_.xiGenPlus_)/eventData_.xiGenPlus_;
+  //double resXiPlusFromPFCands = (eventData_.xiPlusFromPFCands_ - eventData_.xiGenPlus_)/eventData_.xiGenPlus_;
+  double resXiPlusFromPFCands = eventData_.xiPlusFromPFCands_ - eventData_.xiGenPlus_;
   histosTH1F_["ResXiPlusFromPFCands"]->Fill(resXiPlusFromPFCands);
-  double resXiMinusFromPFCands = (eventData_.xiMinusFromPFCands_ - eventData_.xiGenMinus_)/eventData_.xiGenMinus_;
+  //double resXiMinusFromPFCands = (eventData_.xiMinusFromPFCands_ - eventData_.xiGenMinus_)/eventData_.xiGenMinus_;
+  double resXiMinusFromPFCands = eventData_.xiMinusFromPFCands_ - eventData_.xiGenMinus_;
   histosTH1F_["ResXiMinusFromPFCands"]->Fill(resXiMinusFromPFCands);
 
   histosTH2F_["RjjFromJetsVsBDicriminator"]->Fill(eventData_.RjjFromJets_,eventData_.leadingJetBDiscriminator_);

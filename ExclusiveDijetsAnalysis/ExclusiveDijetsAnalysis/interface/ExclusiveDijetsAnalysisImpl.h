@@ -3,6 +3,7 @@
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "DataFormats/Math/interface/LorentzVector.h"
 
 #include <string>
 
@@ -17,7 +18,7 @@ class ExclusiveDijetsAnalysisImpl {
      explicit ExclusiveDijetsAnalysisImpl(const edm::ParameterSet&);
      ~ExclusiveDijetsAnalysisImpl();
 
-     void servicesBeginRun(const edm::Run&, const edm::EventSetup&);
+     void setBeginRun(const edm::Run&, const edm::EventSetup&);
      void fillEventData(EventData&, const edm::Event&, const edm::EventSetup&);
   private:
      template <class Coll>
@@ -27,6 +28,8 @@ class ExclusiveDijetsAnalysisImpl {
      double Rjj(JetColl& jetCollection,PartColl& partCollection);
 
      unsigned int nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& mapTreshToiEta, unsigned int thresholdHF, unsigned int ieta);
+ 
+     void setGenInfo(const edm::Event&, const edm::EventSetup&);
 
      void fillPileUpInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillVertexInfo(EventData&, const edm::Event&, const edm::EventSetup&);
@@ -51,6 +54,10 @@ class ExclusiveDijetsAnalysisImpl {
      bool usePAT_; 
 
      //EventData& eventData_;
+
+     math::XYZTLorentzVector genProtonPlus_;
+     math::XYZTLorentzVector genProtonMinus_;
+     math::XYZTLorentzVector genAllParticles_;
 
      std::string jetCorrectionService_;
      const JetCorrector* corrector_;

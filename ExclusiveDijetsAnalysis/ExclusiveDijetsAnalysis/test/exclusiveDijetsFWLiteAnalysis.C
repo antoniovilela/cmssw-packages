@@ -127,7 +127,7 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    double Ebeam = 5000.;
    int thresholdHF = 14;// 0.2 GeV
 
-   bool accessPileUp = false;
+   bool accessPileUp = true;
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 

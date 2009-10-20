@@ -36,16 +36,21 @@ namespace exclusiveDijetsAnalysis {
      double xiMinusFromJets_;
      double xiPlusFromPFCands_;
      double xiMinusFromPFCands_;
+     double missingMassFromXi_; //redundant
      double massDijets_;
      double massDijetsGen_;
-     double missingMassFromXi_;
      double MxFromJets_;
+     double MxFromPFCands_;
+     double MxGen_;
      double RjjFromJets_;
      double RjjFromPFCands_;
-     double xiPlusAfterSel_;
-     double xiMinusAfterSel_;
-     double RjjAfterSel_;
-     double RjjFromPFAfterSel_;
+     double RjjGen_;
+     /*double xiPlusFromJetsAfterSel_;
+     double xiMinusFromJetsAfterSel_;
+     double xiPlusFromPFCandsAfterSel_;
+     double xiMinusFromPFCandsAfterSel_;
+     double RjjFromJetsAfterSel_;
+     double RjjFromPFCandsAfterSel_;*/
   };
 
   void addTTreeBranches(TTree& data, EventData& eventData);
