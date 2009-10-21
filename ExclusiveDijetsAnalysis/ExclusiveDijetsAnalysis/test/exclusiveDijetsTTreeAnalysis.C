@@ -131,8 +131,12 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    // Prim. vertices
    bool doVertexSelection = false;
    // Di-jet
-   double ptmin = 50.;
-   double etamax = 2.5;
+   double ptMin = 50.;
+   double etaMax = 2.5;
+   
+   double deltaEtaMax = 2.0;
+   double deltaPhiMax = 0.4;
+   double deltaPtMax = 999.;
    // B-tag
    bool doBTag = false;
    bool singleOrDoubleBTag = true; // false --> single, true --> double
@@ -169,25 +173,30 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
       // Di-jets
       histosTH1F["leadingJetPt"]->Fill(eventData.leadingJetPt_);
       histosTH1F["secondJetPt"]->Fill(eventData.secondJetPt_);
-      if(eventData.leadingJetPt_ < ptmin) continue;
-      if(eventData.secondJetPt_ < ptmin) continue;
+      if(eventData.leadingJetPt_ < ptMin) continue;
+      if(eventData.secondJetPt_ < ptMin) continue;
 
       histosTH1F["leadingJetEta"]->Fill(eventData.leadingJetEta_);
       histosTH1F["secondJetEta"]->Fill(eventData.secondJetEta_);
-      if(fabs(eventData.leadingJetEta_) > etamax) continue;
-      if(fabs(eventData.secondJetEta_) > etamax) continue; 
+      if(fabs(eventData.leadingJetEta_) > etaMax) continue;
+      if(fabs(eventData.secondJetEta_) > etaMax) continue; 
 
       histosTH1F["jetsAveEta"]->Fill(eventData.jetsAveEta_);
 
       histosTH1F["leadingJetPhi"]->Fill(eventData.leadingJetPhi_);
       histosTH1F["secondJetPhi"]->Fill(eventData.secondJetPhi_);  
 
+      histosTH1F["jetsDeltaEta"]->Fill(eventData.jetsDeltaEta_);
+      histosTH1F["jetsDeltaPhi"]->Fill(eventData.jetsDeltaPhi_);
+      histosTH1F["jetsDeltaPt"]->Fill(eventData.jetsDeltaPt_);
+ 
+      if(eventData.jetsDeltaEta_ > deltaEtaMax) continue;
+      if(eventData.jetsDeltaPhi_ > deltaPhiMax) continue;
+      if(eventData.jetsDeltaPt_ > deltaPtMax) continue;
+
       histosTH1F["thirdJetPt"]->Fill(eventData.thirdJetPt_);
       histosTH1F["thirdJetEta"]->Fill(eventData.thirdJetEta_);
 
-      histosTH1F["jetsDeltaEta"]->Fill(eventData.jetsDeltaEta_);
-      histosTH1F["jetsDeltaPhi"]->Fill(eventData.jetsDeltaPhi_);
- 
       histosTH1F["massDijets"]->Fill(eventData.massDijets_);
       histosTH1F["massDijetsGen"]->Fill(eventData.massDijetsGen_);
       //histosTH1F["ResMassDijets"]->Fill((eventData.massDijets_ - eventData.massDijetsGen_)/eventData.massDijets_);
@@ -292,6 +301,8 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
       histosTH1F["RjjFromJetsAfterSel"]->Fill(RjjFromJets);
       histosTH1F["RjjFromPFCandsAfterSel"]->Fill(RjjFromPFCands);
 
+      histosTH1F["RjjFromJetsAfterSelCustomBin"]->Fill(RjjFromJets);
+      histosTH1F["RjjFromPFCandsAfterSelCustomBin"]->Fill(RjjFromPFCands);
       histosTH1F["LogRjjFromJetsAfterSel"]->Fill(log10(1. - RjjFromJets));
       histosTH1F["LogRjjFromPFCandsAfterSel"]->Fill(log10(1. - RjjFromPFCands));
    }  // End loop over events

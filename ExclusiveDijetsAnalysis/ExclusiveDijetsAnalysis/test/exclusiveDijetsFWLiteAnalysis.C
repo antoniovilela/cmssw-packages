@@ -127,7 +127,7 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    double Ebeam = 5000.;
    int thresholdHF = 14;// 0.2 GeV
 
-   bool accessPileUp = true;
+   bool accessPileUp = false;
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 
@@ -135,8 +135,12 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    // Prim. vertices
    bool doVertexSelection = true;
    // Di-jet
-   double ptmin = 50.;
-   double etamax = 2.5;
+   double ptMin = 50.;
+   double etaMax = 2.5;
+
+   double deltaEtaMax = 2.0;
+   double deltaPhiMax = 0.4;
+   double deltaPtMax = 999.;
    // B-tag
    bool doBTag = false;
    std::string bDiscriminatorName = "jetBProbabilityBJetTags";
@@ -222,18 +226,26 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
 
      histosTH1F["leadingJetPt"]->Fill(jet1.pt());
      histosTH1F["secondJetPt"]->Fill(jet2.pt());
-     if(jet1.pt() < ptmin) continue;
-     if(jet2.pt() < ptmin) continue;
+     if(jet1.pt() < ptMin) continue;
+     if(jet2.pt() < ptMin) continue;
 
      histosTH1F["leadingJetEta"]->Fill(jet1.eta());
      histosTH1F["secondJetEta"]->Fill(jet2.eta());
-     if(fabs(jet1.eta()) > etamax) continue;
-     if(fabs(jet2.eta()) > etamax) continue; 
+     if(fabs(jet1.eta()) > etaMax) continue;
+     if(fabs(jet2.eta()) > etaMax) continue; 
 
      histosTH1F["jetsAveEta"]->Fill((jet1.eta() + jet2.eta())/2);
      
      histosTH1F["leadingJetPhi"]->Fill(jet1.phi());
      histosTH1F["secondJetPhi"]->Fill(jet2.phi());
+
+     histosTH1F["jetsDeltaEta"]->Fill(jet1.eta() - jet2.eta());
+     histosTH1F["jetsDeltaPhi"]->Fill(M_PI - fabs(jet1.phi() - jet2.phi()));
+     histosTH1F["jetsDeltaPt"]->Fill(fabs(jet1.pt() - jet2.pt()));
+
+     if(fabs(jet1.eta() - jet2.eta()) > deltaEtaMax) continue;
+     if((M_PI - fabs(jet1.phi() - jet2.phi())) > deltaPhiMax) continue;
+     if(fabs(jet1.pt() - jet2.pt()) > deltaPtMax) continue;
 
      if(jetCollection->size() > 2){
         const pat::Jet& jet3 = (*jetCollection)[2];
@@ -241,9 +253,6 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
         histosTH1F["thirdJetEta"]->Fill(jet3.eta());
      }
 
-     histosTH1F["jetsDeltaEta"]->Fill(jet1.eta() - jet2.eta());
-     histosTH1F["jetsDeltaPhi"]->Fill(jet1.phi() - jet2.phi());
- 
      math::XYZTLorentzVector dijetSystem(0.,0.,0.,0.);
      dijetSystem += jet1.p4();
      dijetSystem += jet2.p4();

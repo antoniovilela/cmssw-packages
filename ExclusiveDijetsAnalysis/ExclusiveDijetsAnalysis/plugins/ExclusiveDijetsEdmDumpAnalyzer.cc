@@ -339,12 +339,6 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   histos_.h_leadingJetPhi_->Fill(jet1.phi());
   histos_.h_secondJetPhi_->Fill(jet2.phi());
 
-  if(jetCollectionH->size() > 2){
-     const reco::Jet& jet3 = (*jetCollectionH)[2];
-     histos_.h_thirdJetPt_->Fill(jet3.pt());
-     histos_.h_thirdJetEta_->Fill(jet3.eta());
-  }
-
   histos_.h_jetsAveEta_->Fill((jet1.eta() + jet2.eta())/2);
   histos_.h_jetsDeltaEta_->Fill(jet1.eta() - jet2.eta());
   histos_.h_jetsDeltaPhi_->Fill(M_PI - fabs(jet1.phi() - jet2.phi()));
@@ -353,6 +347,12 @@ void ExclusiveDijetsEdmDumpAnalyzer::analyze(const edm::Event& event, const edm:
   if(fabs(jet1.eta() - jet2.eta()) > deltaEtaMax_) return;
   if((M_PI - fabs(jet1.phi() - jet2.phi())) > deltaPhiMax_) return;
   if(fabs(jet1.pt() - jet2.pt()) > deltaPtMax_) return;
+
+  if(jetCollectionH->size() > 2){
+     const reco::Jet& jet3 = (*jetCollectionH)[2];
+     histos_.h_thirdJetPt_->Fill(jet3.pt());
+     histos_.h_thirdJetEta_->Fill(jet3.eta());
+  }
 
   math::XYZTLorentzVector dijetSystem(0.,0.,0.,0.);
   dijetSystem += jet1.p4();

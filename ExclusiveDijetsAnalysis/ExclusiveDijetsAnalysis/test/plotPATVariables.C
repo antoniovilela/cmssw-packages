@@ -12,8 +12,9 @@
 #include <vector>
 #include <map>
 
-void plot(){
-   TFile* file = TFile::Open("analysisPAT_histos.root");
+void plot(const std::string& fileName){
+   //TFile* file = TFile::Open("analysisPAT_histos.root");
+   TFile* file = TFile::Open(fileName.c_str());
 
    std::map<std::string,std::vector<std::string> > varMap;
 
@@ -21,12 +22,14 @@ void plot(){
    jetColls.push_back("selectedLayer1JetsSC7PF");
    jetColls.push_back("selectedLayer1JetsSC7Calo");
    jetColls.push_back("selectedLayer1JetsSC5PF");
-   jetColls.push_back("selectedLayer1JetsSC5Calo");
-   jetColls.push_back("selectedLayer1JetsKT6PF");
-   jetColls.push_back("selectedLayer1JetsKT6Calo");
+   //jetColls.push_back("selectedLayer1JetsSC5Calo");
+   //jetColls.push_back("selectedLayer1JetsKT6PF");
+   //jetColls.push_back("selectedLayer1JetsKT6Calo");
 
    std::vector<std::string> refVars;
    refVars.push_back("RjjFromJets");
+   refVars.push_back("RjjGenMatchFromRec");
+   refVars.push_back("ResRjjFromJets");
    refVars.push_back("ResXiPlusFromJets");
    refVars.push_back("ResXiMinusFromJets");
    refVars.push_back("ResMassDijets");
@@ -44,18 +47,20 @@ void plot(){
    varMapCands["Rjj"] = def;
    varMapCands["Rjj"].push_back("RjjFromJets");
    varMapCands["Rjj"].push_back("RjjFromPFCands");
+   varMapCands["ResRjj"] = def;
+   varMapCands["ResRjj"].push_back("ResRjjFromJets");
+   varMapCands["ResRjj"].push_back("ResRjjFromPFCands");
    varMapCands["ResXiPlus"] = def;
-   varMapCands["ResXiPlus"].push_back("ResXiPlus");
+   varMapCands["ResXiPlus"].push_back("ResXiTowerPlus");
    varMapCands["ResXiPlus"].push_back("ResXiPlusFromJets");
    varMapCands["ResXiPlus"].push_back("ResXiPlusFromPFCands"); 
    varMapCands["ResXiMinus"] = def;
-   varMapCands["ResXiMinus"].push_back("ResXiMinus");
+   varMapCands["ResXiMinus"].push_back("ResXiTowerMinus");
    varMapCands["ResXiMinus"].push_back("ResXiMinusFromJets");
    varMapCands["ResXiMinus"].push_back("ResXiMinusFromPFCands");
 
    Plotter<DefaultNorm> plotter;
-   plotter.plot(varMap,file); 
-   plotter.plot(varMapCands,file);
-   //plot(varMap,file);
-   //plot(varMapCands,file);
+   //plotter.SetRebin(2);
+   plotter.plot(varMap,file,"HIST"); 
+   plotter.plot(varMapCands,file,"HIST");
 }

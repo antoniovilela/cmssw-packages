@@ -89,9 +89,10 @@ namespace exclusiveDijetsAnalysis {
      histos["xiMinusFromPFCandsAfterSel"] = adaptor.template make<TH1F>("xiMinusFromPFCandsAfterSel","xiMinusFromPFCandsAfterSel",200,0.,1.);
      histos["RjjFromJetsAfterSel"] = adaptor.template make<TH1F>("RjjFromJetsAfterSel","RjjFromJetsAfterSel",200,-0.1,1.5);
      histos["RjjFromPFCandsAfterSel"] = adaptor.template make<TH1F>("RjjFromPFCandsAfterSel","RjjFromPFCandsAfterSel",200,-0.1,1.5);
-     double xbins[11] = {-0.1,0.40,0.60,0.80,0.84,0.88,0.92,0.96,1.0,1.1,1.5};
-     histos["RjjFromJetsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromJetsAfterSelCustomBin","RjjFromJetsAfterSelCustomBin",10,xbins);
-     histos["RjjFromPFCandsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromPFCandsAfterSelCustomBin","RjjFromPFCandsAfterSelCustomBin",10,xbins);
+     //double xbins[11] = {-0.1,0.40,0.60,0.80,0.84,0.88,0.92,0.96,1.0,1.1,1.5};
+     double xbins[10] = {-0.1,0.40,0.60,0.80,0.88,0.92,0.96,1.0,1.1,1.5};
+     histos["RjjFromJetsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromJetsAfterSelCustomBin","RjjFromJetsAfterSelCustomBin",9,xbins);
+     histos["RjjFromPFCandsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromPFCandsAfterSelCustomBin","RjjFromPFCandsAfterSelCustomBin",9,xbins);
   }
 
   template <class Adaptor>

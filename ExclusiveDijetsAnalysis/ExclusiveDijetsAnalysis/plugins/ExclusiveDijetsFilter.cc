@@ -151,12 +151,6 @@ bool ExclusiveDijetsFilter::filter(edm::Event& event, const edm::EventSetup& set
   histos_.h_leadingJetPhi_->Fill(jet1.phi());
   histos_.h_secondJetPhi_->Fill(jet2.phi());
 
-  if(jetCollectionH->size() > 2){
-     const reco::Jet& jet3 = (*jetCollectionH)[2];
-     histos_.h_thirdJetPt_->Fill(jet3.pt());
-     histos_.h_thirdJetEta_->Fill(jet3.eta());
-  }
-
   histos_.h_jetsAveEta_->Fill((jet1.eta() + jet2.eta())/2);
   histos_.h_jetsDeltaEta_->Fill(jet1.eta() - jet2.eta());
   histos_.h_jetsDeltaPhi_->Fill(M_PI - fabs(jet1.phi() - jet2.phi()));
@@ -165,6 +159,12 @@ bool ExclusiveDijetsFilter::filter(edm::Event& event, const edm::EventSetup& set
   if(fabs(jet1.eta() - jet2.eta()) > deltaEtaMax_) return false;
   if((M_PI - fabs(jet1.phi() - jet2.phi())) > deltaPhiMax_) return false;
   if(fabs(jet1.pt() - jet2.pt()) > deltaPtMax_) return false;
+
+  if(jetCollectionH->size() > 2){
+     const reco::Jet& jet3 = (*jetCollectionH)[2];
+     histos_.h_thirdJetPt_->Fill(jet3.pt());
+     histos_.h_thirdJetEta_->Fill(jet3.eta());
+  }
 
   if(usePAT_){
     const pat::Jet* patJet1 = dynamic_cast<const pat::Jet*>(&jet1);

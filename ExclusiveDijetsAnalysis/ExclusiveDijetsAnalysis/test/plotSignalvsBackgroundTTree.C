@@ -93,6 +93,8 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    refVar.push_back("secondJetPhi");
    refVar.push_back("jetsDeltaEta");
    refVar.push_back("jetsDeltaPhi");
+   refVar.push_back("thirdJetPt");
+   refVar.push_back("thirdJetEta");
    refVar.push_back("trackMultiplicity");
    refVar.push_back("multiplicityHFPlus");
    refVar.push_back("multiplicityHFMinus");
@@ -107,6 +109,8 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    refVar.push_back("RjjFromPFCands");
    refVar.push_back("RjjFromJetsAfterSel");
    refVar.push_back("RjjFromPFCandsAfterSel");
+   refVar.push_back("RjjFromJetsAfterSelCustomBin");
+   refVar.push_back("RjjFromPFCandsAfterSelCustomBin");
    refVar.push_back("LogRjjFromJetsAfterSel");
    refVar.push_back("LogRjjFromPFCandsAfterSel");
 
@@ -115,6 +119,8 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    stackVars.push_back("RjjFromPFCands");
    stackVars.push_back("RjjFromJetsAfterSel");
    stackVars.push_back("RjjFromPFCandsAfterSel");
+   stackVars.push_back("RjjFromJetsAfterSelCustomBin");
+   stackVars.push_back("RjjFromPFCandsAfterSelCustomBin");
    stackVars.push_back("LogRjjFromJetsAfterSel");
    stackVars.push_back("LogRjjFromPFCandsAfterSel");
 
