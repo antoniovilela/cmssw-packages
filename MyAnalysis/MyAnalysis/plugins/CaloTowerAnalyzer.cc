@@ -30,8 +30,8 @@ using namespace reco;
  
 CaloTowerAnalyzer::CaloTowerAnalyzer(const edm::ParameterSet& conf)
 {
-  calotowersTag_=conf.getParameter<edm::InputTag>("CaloTowersLabel");
-
+  calotowersTag_ = conf.getParameter<edm::InputTag>("CaloTowersLabel");
+  accessRecHits_ = conf.getUntrackedParameter<bool>("AccessRecHits",true);
   //excludeHotTowers_ = conf.getParameter<bool>("ExcludeHotTowers"); 
   nThresholdIter_ = conf.getParameter<unsigned int>("NumberOfTresholds");
   eThresholdHFMin_ = conf.getParameter<double>("TowerEnergyTresholdHFMin");
@@ -262,11 +262,12 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		histosnhfhigh_[i]->Fill(nhfhigh);
 	}
 
-	edm::Handle<HFRecHitCollection> hfrh;
-	iEvent.getByLabel("hfreco",hfrh);
-	const HFRecHitCollection Hithf = *(hfrh.product());
+        if(accessRecHits_){
+	   edm::Handle<HFRecHitCollection> hfrh;
+	   iEvent.getByLabel("hfreco",hfrh);
+	   const HFRecHitCollection Hithf = *(hfrh.product());
 
-	for(HFRecHitCollection::const_iterator hhit=Hithf.begin(); hhit!=Hithf.end(); hhit++) {
+	   for(HFRecHitCollection::const_iterator hhit=Hithf.begin(); hhit!=Hithf.end(); hhit++) {
 		//std::cout << "rec hit energy,time= " << hhit->energy() << "  " << hhit->time() << std::endl; 
 		if(hhit->energy() > 0.6) histhfenergyvstime_->Fill(hhit->time(),hhit->energy());
 		HcalDetId hcalDetId(hhit->detid());
@@ -282,13 +283,13 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 			if(hcalDetId.zside() > 0) histhfshortenergyplus_->Fill(hhit->energy());
                         else histhfshortenergyminus_->Fill(hhit->energy());
 		}
-	}
+	   }
 
-	/*edm::Handle<HBHEDigiCollection> hbhe_digi; 
-	//iEvent.getByLabel("hcalZeroSuppressedDigis",hbhe_digi);
-	iEvent.getByLabel("hcalDigis",hbhe_digi);
+	   /*edm::Handle<HBHEDigiCollection> hbhe_digi; 
+	   //iEvent.getByLabel("hcalZeroSuppressedDigis",hbhe_digi);
+	   iEvent.getByLabel("hcalDigis",hbhe_digi);
 
-	if(!hbhe_digi.failedToGet()){
+	   if(!hbhe_digi.failedToGet()){
 		int adcs[10] = {};
      
 		//CORRECT:  Timing plot should be done using linearized ADC's!
@@ -306,9 +307,8 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 				if (maxadc > 10) histhbtiming_->Fill(TS,adcs[TS]);
 			}
 		}
-	}*/
-   
-
+	   }*/
+        }
 }
 
 DEFINE_FWK_MODULE(CaloTowerAnalyzer);

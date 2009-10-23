@@ -1,5 +1,5 @@
 <export></export>
-<library name=myAnalysismyAnalysis_plugins file=*.cc>
+<library name=myAnalysismyAnalysis_plugins file=CaloTowerAnalyzer.cc>
   <use name=FWCore/Framework>
   <use name=FWCore/ParameterSet>
   <use name=PhysicsTools/UtilAlgos>

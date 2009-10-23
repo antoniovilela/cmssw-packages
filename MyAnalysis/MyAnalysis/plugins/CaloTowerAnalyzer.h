@@ -54,6 +54,7 @@ class CaloTowerAnalyzer : public edm::EDAnalyzer
   TH1F *histhfenergyvstime_;
 
   edm::InputTag calotowersTag_;
+  bool accessRecHits_;
 
   bool excludeHotTowers_;
   std::vector<double> eThreshold_;
