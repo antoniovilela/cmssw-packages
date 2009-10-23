@@ -90,17 +90,18 @@ namespace exclusiveDijetsAnalysis {
      histos["RjjFromJetsAfterSel"] = adaptor.template make<TH1F>("RjjFromJetsAfterSel","RjjFromJetsAfterSel",200,-0.1,1.5);
      histos["RjjFromPFCandsAfterSel"] = adaptor.template make<TH1F>("RjjFromPFCandsAfterSel","RjjFromPFCandsAfterSel",200,-0.1,1.5);
      //double xbins[11] = {-0.1,0.40,0.60,0.80,0.84,0.88,0.92,0.96,1.0,1.1,1.5};
-     double xbins[10] = {-0.1,0.40,0.60,0.80,0.88,0.92,0.96,1.0,1.1,1.5};
-     histos["RjjFromJetsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromJetsAfterSelCustomBin","RjjFromJetsAfterSelCustomBin",9,xbins);
-     histos["RjjFromPFCandsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromPFCandsAfterSelCustomBin","RjjFromPFCandsAfterSelCustomBin",9,xbins);
+     //double xbins[10] = {-0.1,0.40,0.60,0.80,0.88,0.92,0.96,1.0,1.1,1.5};
+     double xbins[8] = {-0.1,0.40,0.60,0.80,0.90,1.0,1.1,1.5};
+     histos["RjjFromJetsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromJetsAfterSelCustomBin","RjjFromJetsAfterSelCustomBin",7,xbins);
+     histos["RjjFromPFCandsAfterSelCustomBin"] = adaptor.template make<TH1F>("RjjFromPFCandsAfterSelCustomBin","RjjFromPFCandsAfterSelCustomBin",7,xbins);
   }
 
   template <class Adaptor>
   void bookHistos(HistoMapTH2F& histos, const Adaptor& adaptor){
      histos["nPUBx0vsnVtx"] = adaptor.template make<TH2F>("nPUBx0vsnVtx","nPUBx0vsnVtx",10,0,10,10,0,10);
 
-     histos["iEtaVsHFCountPlus"] = adaptor.template make<TH2F>("iEtaVsHFCountPlus","iEtaVsHFCountPlus",13,28,41,20,0,20);
-     histos["iEtaVsHFCountMinus"] = adaptor.template make<TH2F>("iEtaVsHFCountMinus","iEtaVsHFCountMinus",13,28,41,20,0,20);
+     histos["iEtaVsHFCountPlus"] = adaptor.template make<TH2F>("iEtaVsHFCountPlus","iEtaVsHFCountPlus",13,29,42,20,0,20);
+     histos["iEtaVsHFCountMinus"] = adaptor.template make<TH2F>("iEtaVsHFCountMinus","iEtaVsHFCountMinus",13,29,42,20,0,20);
      histos["HFRingCountPlus"] = adaptor.template make<TH2F>("HFRingCountPlus","HFRingCountPlus",13,1,14,20,0,20);
      histos["HFRingCountMinus"] = adaptor.template make<TH2F>("HFRingCountMinus","HFRingCountMinus",13,1,14,20,0,20);
 

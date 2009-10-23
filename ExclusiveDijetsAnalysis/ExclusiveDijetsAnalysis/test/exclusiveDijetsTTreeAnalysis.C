@@ -146,7 +146,7 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    double thirdJetPtMax = 15.; 
    // Track multiplicity
    bool doTrackSelection = true; 
-   int nTracksMax = 5;
+   int nTracksMax = 3;
    // HF-multiplicity
    bool doHFMultiplicitySelection = true; 
    int nHFPlusMax = 0;
@@ -161,7 +161,9 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
       data->GetEntry(ientry);
 
       // Pile-up
-      int nPileUpBx0 = eventData.nPileUpBx0_; 
+      int nPileUpBx0 = eventData.nPileUpBx0_;
+      if(nPileUpBx0 < 0) nPileUpBx0 = 0;
+ 
       histosTH1F["nPileUpBx0"]->Fill(nPileUpBx0);
       histosTH2F["nPUBx0vsnVtx"]->Fill(nPileUpBx0,eventData.nVertex_);
       if(selectPileUp&&(eventData.nPileUpBx0_ != nEventsPUBx0)) continue;
@@ -194,19 +196,10 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
       if(eventData.jetsDeltaPhi_ > deltaPhiMax) continue;
       if(eventData.jetsDeltaPt_ > deltaPtMax) continue;
 
-      histosTH1F["thirdJetPt"]->Fill(eventData.thirdJetPt_);
-      histosTH1F["thirdJetEta"]->Fill(eventData.thirdJetEta_);
-
       histosTH1F["massDijets"]->Fill(eventData.massDijets_);
       histosTH1F["massDijetsGen"]->Fill(eventData.massDijetsGen_);
       //histosTH1F["ResMassDijets"]->Fill((eventData.massDijets_ - eventData.massDijetsGen_)/eventData.massDijets_);
       histosTH1F["ResMassDijets"]->Fill(eventData.massDijets_ - eventData.massDijetsGen_); 
-
-      histosTH1F["MxFromJets"]->Fill(eventData.MxFromJets_); 
-      histosTH1F["MxFromPFCands"]->Fill(eventData.MxFromPFCands_);
-      histosTH1F["MxGen"]->Fill(eventData.MxGen_);
-      histosTH1F["ResMxFromJets"]->Fill(eventData.MxFromJets_ - eventData.MxGen_);
-      histosTH1F["ResMxFromPFCands"]->Fill(eventData.MxFromPFCands_ - eventData.MxGen_);
 
       // Rjj
       double RjjFromJets = eventData.RjjFromJets_;
@@ -230,14 +223,17 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
          if(singleOrDoubleBTag && !doubleBTag) continue;
       }
 
+      histosTH1F["MxFromJets"]->Fill(eventData.MxFromJets_);
+      histosTH1F["MxFromPFCands"]->Fill(eventData.MxFromPFCands_);
+      histosTH1F["MxGen"]->Fill(eventData.MxGen_);
+      histosTH1F["ResMxFromJets"]->Fill(eventData.MxFromJets_ - eventData.MxGen_);
+      histosTH1F["ResMxFromPFCands"]->Fill(eventData.MxFromPFCands_ - eventData.MxGen_);
+
       histosTH1F["RjjFromJets"]->Fill(RjjFromJets);
       histosTH1F["RjjFromPFCands"]->Fill(RjjFromPFCands);
       histosTH1F["RjjGen"]->Fill(RjjGen);  
       histosTH1F["ResRjjFromJets"]->Fill(RjjFromJets - RjjGen);
       histosTH1F["ResRjjFromPFCands"]->Fill(RjjFromPFCands - RjjGen); 
-
-      histosTH2F["RjjFromJetsVsThirdJetPt"]->Fill(RjjFromJets,eventData.thirdJetPt_);
-      histosTH2F["RjjFromPFCandsVsThirdJetPt"]->Fill(RjjFromPFCands,eventData.thirdJetPt_);
 
       histosTH1F["xiTowerPlus"]->Fill(eventData.xiTowerPlus_);
       histosTH1F["xiTowerMinus"]->Fill(eventData.xiTowerMinus_);
@@ -272,28 +268,41 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
  
       histosTH1F["missingMassFromXi"]->Fill(eventData.missingMassFromXi_);
 
-      // Access multiplicities
+      // Exclusivity
+      double thirdJetPt = (eventData.thirdJetPt_ > 0.) ? eventData.thirdJetPt_ : 0.;
+
       int nTracks = eventData.trackMultiplicity_;
       int nHF_plus = eventData.multiplicityHFPlus_;
       int nHF_minus = eventData.multiplicityHFMinus_;
  
+      histosTH1F["thirdJetPt"]->Fill(thirdJetPt);
+      if(eventData.thirdJetPt_ > 0.) histosTH1F["thirdJetEta"]->Fill(eventData.thirdJetEta_);
+      histosTH2F["RjjFromJetsVsThirdJetPt"]->Fill(RjjFromJets,thirdJetPt);
+      histosTH2F["RjjFromPFCandsVsThirdJetPt"]->Fill(RjjFromPFCands,thirdJetPt);
+
       histosTH1F["trackMultiplicity"]->Fill(nTracks);
       histosTH1F["multiplicityHFPlus"]->Fill(nHF_plus);
       histosTH1F["multiplicityHFMinus"]->Fill(nHF_minus);
 
       //histos["iEtaVsHFCountPlus"]  
-      //histos["iEtaVsHFCountPlus"]
+      //histos["iEtaVsHFCountMinus"]
       for(int iring = 0; iring < 13; ++iring){
-         histosTH2F["HFRingCountPlus"]->Fill(iring + 1, eventData.multiplicityHFPlusVsiEta_[iring]);
-         histosTH2F["HFRingCountMinus"]->Fill(iring + 1, eventData.multiplicityHFMinusVsiEta_[iring]);
+         int multiplicityHFPlus = eventData.multiplicityHFPlusVsiEta_[iring];
+         int multiplicityHFMinus = eventData.multiplicityHFMinusVsiEta_[iring];   
+         histosTH2F["HFRingCountPlus"]->Fill(iring + 1, multiplicityHFPlus);
+         histosTH2F["HFRingCountMinus"]->Fill(iring + 1, multiplicityHFMinus);
+         histosTH2F["iEtaVsHFCountPlus"]->Fill(29 + iring, multiplicityHFPlus);
+         histosTH2F["iEtaVsHFCountMinus"]->Fill(29 + iring, multiplicityHFMinus);
       }
 
       // Selection
-      if(doThirdJetSelection&&(eventData.thirdJetPt_ > thirdJetPtMax)) continue;
+      if(doThirdJetSelection&&(thirdJetPt > thirdJetPtMax)) continue;
       if(doTrackSelection&&(nTracks > nTracksMax)) continue;
       if(doHFMultiplicitySelection&&(nHF_plus > nHFPlusMax)) continue;
       if(doHFMultiplicitySelection&&(nHF_minus > nHFMinusMax)) continue; 
 
+      histosTH1F["xiGenPlusAfterSel"]->Fill(eventData.xiGenPlus_);
+      histosTH1F["xiGenMinusAfterSel"]->Fill(eventData.xiGenMinus_);
       histosTH1F["xiPlusFromJetsAfterSel"]->Fill(eventData.xiPlusFromJets_);
       histosTH1F["xiMinusFromJetsAfterSel"]->Fill(eventData.xiMinusFromJets_);
       histosTH1F["xiPlusFromPFCandsAfterSel"]->Fill(eventData.xiPlusFromPFCands_);

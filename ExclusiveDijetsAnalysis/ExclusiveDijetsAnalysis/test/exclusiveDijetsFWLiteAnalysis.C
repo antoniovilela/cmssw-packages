@@ -39,6 +39,9 @@
 
 using namespace exclusiveDijetsAnalysis;
 
+template <class PartColl>
+double MassColl(PartColl&);
+
 template <class Coll>
 std::pair<double,double> xi(Coll&,double);
 
@@ -125,7 +128,7 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    }
 
    double Ebeam = 5000.;
-   int thresholdHF = 14;// 0.2 GeV
+   int thresholdHF = 14;// 0.2 GeV/bin
 
    bool accessPileUp = false;
    bool selectPileUp = false;
@@ -151,7 +154,7 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    double thirdJetPtMax = 15.; 
    // Track multiplicity
    bool doTrackSelection = true; 
-   int nTracksMax = 5;
+   int nTracksMax = 3;
    // HF-multiplicity
    bool doHFMultiplicitySelection = true; 
    int nHFPlusMax = 0;
@@ -215,6 +218,9 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      const fwlite::Handle<std::vector<pat::Jet> >& jetCollection = jetCollections[0];
      const fwlite::Handle<std::vector<reco::PFJet> >& jetCollectionNonCorr = jetCollectionsNonCorr[0];  
      //const fwlite::Handle<std::vector<reco::GenJet> >& genJetCollection = genJetCollections[0];
+     // PF candidates
+     fwlite::Handle<std::vector<reco::PFCandidate> > pfCandCollection;
+     pfCandCollection.getByLabel(ev,"particleFlow");
 
      const pat::Jet& jet1 = (*jetCollection)[0];// they come out ordered right?
      const pat::Jet& jet2 = (*jetCollection)[1];
@@ -247,34 +253,11 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      if((M_PI - fabs(jet1.phi() - jet2.phi())) > deltaPhiMax) continue;
      if(fabs(jet1.pt() - jet2.pt()) > deltaPtMax) continue;
 
-     if(jetCollection->size() > 2){
-        const pat::Jet& jet3 = (*jetCollection)[2];
-        histosTH1F["thirdJetPt"]->Fill(jet3.pt());
-        histosTH1F["thirdJetEta"]->Fill(jet3.eta());
-     }
-
      math::XYZTLorentzVector dijetSystem(0.,0.,0.,0.);
      dijetSystem += jet1.p4();
      dijetSystem += jet2.p4();
      double massDijets = dijetSystem.M();
      histosTH1F["massDijets"]->Fill(massDijets);
-
-     math::XYZTLorentzVector allJets(0.,0.,0.,0.);
-     for(std::vector<pat::Jet>::const_iterator jet = jetCollection->begin();
-                                               jet != jetCollection->end(); ++jet) allJets += jet->p4();
-
-     histosTH1F["MxFromJets"]->Fill(allJets.M());
-
-     // PF candidates
-     fwlite::Handle<std::vector<reco::PFCandidate> > pfCandCollection;
-     pfCandCollection.getByLabel(ev,"particleFlow");
-
-     math::XYZTLorentzVector allPFCands(0.,0.,0.,0.);
-     for(std::vector<reco::PFCandidate>::const_iterator pfCand = pfCandCollection->begin();
-                                                        pfCand != pfCandCollection->end();
-                                                        ++pfCand) allPFCands += pfCand->p4();
-
-     histosTH1F["MxFromPFCands"] ->Fill(allPFCands.M());
 
      // Compute Rjj
      double RjjFromJets = Rjj(*jetCollection,*jetCollection);
@@ -299,21 +282,14 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
         if(singleOrDoubleBTag && !doubleBTag) continue;
      }
 
+     // Compute Mx
+     double MxFromJets = MassColl(*jetCollection);
+     double MxFromPFCands = MassColl(*pfCandCollection);
+     
+     histosTH1F["MxFromJets"]->Fill(MxFromJets);
+     histosTH1F["MxFromPFCands"] ->Fill(MxFromPFCands);
      histosTH1F["RjjFromJets"]->Fill(RjjFromJets);
      histosTH1F["RjjFromPFCands"]->Fill(RjjFromPFCands);
-
-     double thirdJetPt = (jetCollection->size() > 2)?(*jetCollection)[2].pt():0.;
-
-     histosTH2F["RjjFromJetsVsThirdJetPt"]->Fill(RjjFromJets,thirdJetPt);
-     histosTH2F["RjjFromPFCandsVsThirdJetPt"]->Fill(RjjFromPFCands,thirdJetPt);
-
-     std::pair<double,double> xiFromJets = xi(*jetCollection,Ebeam);
-     histosTH1F["xiPlusFromJets"]->Fill(xiFromJets.first);
-     histosTH1F["xiMinusFromJets"]->Fill(xiFromJets.second);
-
-     std::pair<double,double> xiFromPFCands = xi(*pfCandCollection,Ebeam);
-     histosTH1F["xiPlusFromPFCands"]->Fill(xiFromPFCands.first);
-     histosTH1F["xiMinusFromPFCands"]->Fill(xiFromPFCands.second);
 
      // Gen particles
      fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
@@ -341,8 +317,8 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      allGenParticles -= proton1->p4();
      allGenParticles -= proton2->p4();
      histosTH1F["MxGen"]->Fill(allGenParticles.M());
-     histosTH1F["ResMxFromJets"]->Fill(allJets.M() - allGenParticles.M());
-     histosTH1F["ResMxFromPFCands"]->Fill(allPFCands.M() - allGenParticles.M());
+     histosTH1F["ResMxFromJets"]->Fill(MxFromJets - allGenParticles.M());
+     histosTH1F["ResMxFromPFCands"]->Fill(MxFromPFCands - allGenParticles.M());
 
      /*math::XYZTLorentzVector genDijetSystem(0.,0.,0.,0.);
      genDijetSystem += ((*genJetCollection)[0]).p4();
@@ -351,28 +327,14 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      double RjjGen = genDijetSystem.M()/allGenParticles.M();
      histosTH1F["RjjGen"]->Fill(RjjGen);*/
      
+     // Xi info
+     std::pair<double,double> xiFromJets = xi(*jetCollection,Ebeam);
+     histosTH1F["xiPlusFromJets"]->Fill(xiFromJets.first);
+     histosTH1F["xiMinusFromJets"]->Fill(xiFromJets.second);
 
-     const reco::GenJet* genJet1 = jet1.genJet();
-     const reco::GenJet* genJet2 = jet2.genJet();
-
-     if(genJet1 && genJet2){
-        math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
-        dijetGenSystem += genJet1->p4();
-        dijetGenSystem += genJet2->p4();
-        double massGen = dijetGenSystem.M();
-
-        histosTH1F["massDijetsGen"]->Fill(massGen);
-        //histosTH1F["ResMassDijets"]->Fill((massDijets - massGen)/massGen);
-        histosTH1F["ResMassDijets"]->Fill(massDijets - massGen);  
-
-        // Rjj gen
-        double RjjGenMatchFromRec = massGen/allGenParticles.M();
-        histosTH1F["RjjGenMatchFromRec"]->Fill(RjjGenMatchFromRec);
-        //histosTH1F["ResRjjFromJets"]->Fill((RjjFromJets - RjjGen)/RjjGen);
-        //histosTH1F["ResRjjFromPFCands"]->Fill((RjjFromPFCands - RjjGen)/RjjGen);
-        histosTH1F["ResRjjFromJets"]->Fill(RjjFromJets - RjjGenMatchFromRec);
-        histosTH1F["ResRjjFromPFCands"]->Fill(RjjFromPFCands - RjjGenMatchFromRec);
-     }
+     std::pair<double,double> xiFromPFCands = xi(*pfCandCollection,Ebeam);
+     histosTH1F["xiPlusFromPFCands"]->Fill(xiFromPFCands.first);
+     histosTH1F["xiMinusFromPFCands"]->Fill(xiFromPFCands.second);
 
      // Xi gen
      double xigen_plus = 1 - proton1->pz()/Ebeam;
@@ -396,6 +358,29 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      //histosTH1F["ResXiMinusFromPFCands"]->Fill((xiFromPFCands.second - xigen_minus)/xigen_minus);
      histosTH1F["ResXiPlusFromPFCands"]->Fill(xiFromPFCands.first - xigen_plus);
      histosTH1F["ResXiMinusFromPFCands"]->Fill(xiFromPFCands.second - xigen_minus);
+
+     // Gen jets
+     const reco::GenJet* genJet1 = jet1.genJet();
+     const reco::GenJet* genJet2 = jet2.genJet();
+
+     if(genJet1 && genJet2){
+        math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
+        dijetGenSystem += genJet1->p4();
+        dijetGenSystem += genJet2->p4();
+        double massGen = dijetGenSystem.M();
+
+        histosTH1F["massDijetsGen"]->Fill(massGen);
+        //histosTH1F["ResMassDijets"]->Fill((massDijets - massGen)/massGen);
+        histosTH1F["ResMassDijets"]->Fill(massDijets - massGen);
+
+        // Rjj gen
+        double RjjGenMatchFromRec = massGen/allGenParticles.M();
+        histosTH1F["RjjGenMatchFromRec"]->Fill(RjjGenMatchFromRec);
+        //histosTH1F["ResRjjFromJets"]->Fill((RjjFromJets - RjjGen)/RjjGen);
+        //histosTH1F["ResRjjFromPFCands"]->Fill((RjjFromPFCands - RjjGen)/RjjGen);
+        histosTH1F["ResRjjFromJets"]->Fill(RjjFromJets - RjjGenMatchFromRec);
+        histosTH1F["ResRjjFromPFCands"]->Fill(RjjFromPFCands - RjjGenMatchFromRec);
+     }
 
      // Access all jet collections
      for(size_t k = 0; k < jetColls.size(); ++k){
@@ -472,6 +457,14 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      fwlite::Handle<double> xiTowerMinus;
      xiTowerMinus.getByLabel(ev,"xiTower","xiTowerminus");
 
+     double thirdJetPt = 0.;
+     if(jetCollection->size() > 2){
+        const pat::Jet& jet3 = (*jetCollection)[2];
+        thirdJetPt = jet3.pt();
+        histosTH1F["thirdJetEta"]->Fill(jet3.eta());
+     }
+     //double thirdJetPt = (jetCollection->size() > 2)?(*jetCollection)[2].pt():0.;
+
      unsigned int nTracksAssociatedToPV = *trackMultiplicityAssociatedToPV;
      unsigned int nTracksOutsideJets = *trackMultiplicityOutsideJets;
      unsigned int nTracksTransverseRegion = *trackMultiplicityTransverseRegion; 
@@ -482,6 +475,10 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      double xiTower_plus = *xiTowerPlus;
      double xiTower_minus = *xiTowerMinus;
  
+     histosTH1F["thirdJetPt"]->Fill(thirdJetPt);
+     histosTH2F["RjjFromJetsVsThirdJetPt"]->Fill(RjjFromJets,thirdJetPt);
+     histosTH2F["RjjFromPFCandsVsThirdJetPt"]->Fill(RjjFromPFCands,thirdJetPt);
+
      histosTH1F["trackMultiplicityAssociatedToPV"]->Fill(nTracksAssociatedToPV);
      histosTH1F["trackMultiplicityOutsideJets"]->Fill(nTracksOutsideJets);
      histosTH1F["trackMultiplicityTransverseRegion"]->Fill(nTracksTransverseRegion);
@@ -489,7 +486,7 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      histosTH1F["multiplicityHFPlus"]->Fill(nHF_plus);
      histosTH1F["multiplicityHFMinus"]->Fill(nHF_minus);     
 
-     for(unsigned int ieta = 28; ieta <= 41; ++ieta){
+     for(unsigned int ieta = 29; ieta <= 41; ++ieta){
         //const std::map<unsigned int, std::vector<unsigned int> >& mapThreshToiEta_plus = *mapThreshToiEtaPlus;
         unsigned int nHFPlus_ieta = nHFSlice(*mapThreshToiEtaPlus,thresholdHF,ieta);
         histosTH2F["iEtaVsHFCountPlus"]->Fill(ieta,nHFPlus_ieta);
@@ -557,6 +554,15 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    hfile->Close();
 }
 
+template <class PartColl>
+double MassColl(PartColl& partCollection){
+   math::XYZTLorentzVector allCands(0.,0.,0.,0.);
+   for(typename PartColl::const_iterator part = partCollection.begin();
+                                         part != partCollection.end(); ++part) allCands += part->p4();
+
+   return allCands.M();
+}
+
 template <class Coll>
 std::pair<double,double> xi(Coll& partCollection, double Ebeam){
 
@@ -580,11 +586,9 @@ double Rjj(JetColl& jetCollection,PartColl& partCollection){
    dijetSystem += (jetCollection[0]).p4();
    dijetSystem += (jetCollection[1]).p4(); 
 
-   math::XYZTLorentzVector allCands(0.,0.,0.,0.);
-   for(typename PartColl::const_iterator part = partCollection.begin();
-                                         part != partCollection.end(); ++part) allCands += part->p4();
+   double Mx = MassColl(partCollection);
 
-   return (dijetSystem.M()/allCands.M());
+   return (dijetSystem.M()/Mx);
 }
 
 unsigned int nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& mapTreshToiEta, unsigned int thresholdHF, unsigned int ieta){
