@@ -3,6 +3,8 @@
 
 #include "TDirectory.h"
 
+#include "PlottingTools.h"
+
 #include <vector>
 #include <map>
 
