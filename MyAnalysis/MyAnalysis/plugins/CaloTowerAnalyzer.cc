@@ -32,6 +32,7 @@ CaloTowerAnalyzer::CaloTowerAnalyzer(const edm::ParameterSet& conf)
 {
   calotowersTag_ = conf.getParameter<edm::InputTag>("CaloTowersLabel");
   accessRecHits_ = conf.getUntrackedParameter<bool>("AccessRecHits",true);
+  if(accessRecHits_) hfRecHitsTag_ = conf.getUntrackedParameter<edm::InputTag>("HFRecHitsLabel",edm::InputTag("hfreco"));
   //excludeHotTowers_ = conf.getParameter<bool>("ExcludeHotTowers"); 
   nThresholdIter_ = conf.getParameter<unsigned int>("NumberOfTresholds");
   eThresholdHFMin_ = conf.getParameter<double>("TowerEnergyTresholdHFMin");
@@ -264,7 +265,7 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
         if(accessRecHits_){
 	   edm::Handle<HFRecHitCollection> hfrh;
-	   iEvent.getByLabel("hfreco",hfrh);
+	   iEvent.getByLabel(hfRecHitsTag_,hfrh);
 	   const HFRecHitCollection Hithf = *(hfrh.product());
 
 	   for(HFRecHitCollection::const_iterator hhit=Hithf.begin(); hhit!=Hithf.end(); hhit++) {

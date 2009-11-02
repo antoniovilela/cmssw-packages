@@ -54,6 +54,7 @@ class CaloTowerAnalyzer : public edm::EDAnalyzer
   TH1F *histhfenergyvstime_;
 
   edm::InputTag calotowersTag_;
+  edm::InputTag hfRecHitsTag_;
   bool accessRecHits_;
 
   bool excludeHotTowers_;
