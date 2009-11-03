@@ -30,11 +30,14 @@ process.TFileService = cms.Service("TFileService",
 
 process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
     CaloTowersLabel = cms.InputTag("towerMaker"),
-    #AccessRecHits = cms.untracked.bool(False),
+    AccessRecHits = cms.untracked.bool(True),
+    HFRecHitsLabel = cms.untracked.InputTag("hfreco"),
     NBinsHF = cms.untracked.int32(100),
     NumberOfTresholds = cms.uint32(100),
     TowerEnergyTresholdHFMin = cms.double(0.0),
-    TowerEnergyTresholdHFMax = cms.double(10.0) 
+    TowerEnergyTresholdHFMax = cms.double(10.0),
+    ReweightHFTower = cms.bool(False)
+    #ReweightHistoName = cms.vstring("","") 
 )
 
 process.analysis = cms.Path(process.calotwranalysis)

@@ -151,7 +151,9 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 	std::vector<int> nhf_plus(nThresholdIter_,0);
         std::vector<int> nhf_minus(nThresholdIter_,0);
- 
+        std::vector<double> sumw_hf_plus(nThresholdIter_,0.);
+        std::vector<double> sumw_hf_minus(nThresholdIter_,0.); 
+
 	/*CandidateCollection::const_iterator cand = calotowercands->begin();
 	CaloTowerRef towerRef = cand->get<CaloTowerRef>();
 			
@@ -254,8 +256,14 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		for(unsigned int i = 0; i < nThresholdIter_; ++i){
 			bool ethreshHF = (energy >= eThreshold_[i]);
 			if(ethreshHF&&(hasHF&&(!hasHE))){
-				if(zside > 0) nhf_plus[i]++;
-				else nhf_minus[i]++;
+				if(zside > 0){
+                                   nhf_plus[i]++;
+                                   sumw_hf_plus[i] += weight;
+                                } 
+				else{
+                                   nhf_minus[i]++;
+                                   sumw_hf_minus[i] += weight; 
+                                }
 				histenergyvsetaHF_->Fill(eta,energy*weight); 
 				histetavsphiHF_->Fill(eta,phi,weight);
 				histetavsphiHFweighted_->Fill(eta,phi,energy*weight);
@@ -279,12 +287,18 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	}
 
 	for(unsigned int i = 0; i < nThresholdIter_; ++i){	
-		histosnhfplus_[i]->Fill(nhf_plus[i]);
+		/*histosnhfplus_[i]->Fill(nhf_plus[i]);
                 histosnhfminus_[i]->Fill(nhf_minus[i]);
 		int nhflow = (nhf_minus < nhf_plus)?nhf_minus[i]:nhf_plus[i];
 		int nhfhigh = nhf_minus[i] + nhf_plus[i] - nhflow;
 		histosnhflow_[i]->Fill(nhflow);
-		histosnhfhigh_[i]->Fill(nhfhigh);
+		histosnhfhigh_[i]->Fill(nhfhigh);*/
+                histosnhfplus_[i]->Fill(sumw_hf_plus[i]);
+                histosnhfminus_[i]->Fill(sumw_hf_minus[i]);
+                double sumw_hf_low = (sumw_hf_minus < sumw_hf_plus)?sumw_hf_minus[i]:sumw_hf_plus[i];
+                double sumw_hf_high = sumw_hf_minus[i] + sumw_hf_plus[i] - sumw_hf_low;
+                histosnhflow_[i]->Fill(sumw_hf_low);
+                histosnhfhigh_[i]->Fill(sumw_hf_high);
 	}
 
         if(accessRecHits_){

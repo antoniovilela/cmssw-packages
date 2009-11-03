@@ -3,9 +3,9 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Analysis")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append('Analysis')
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+#rocess.MessageLogger.cerr.threshold = 'INFO'
+#rocess.MessageLogger.categories.append('Analysis')
 #process.MessageLogger.cerr.INFO = cms.untracked.PSet(
 #    default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
 #    Analysis = cms.untracked.PSet( limit = cms.untracked.int32(-1))
@@ -36,7 +36,7 @@ process.TFileService = cms.Service("TFileService",
 
 process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
     CaloTowersLabel = cms.InputTag("towerMaker"),
-    AccessRecHits = cms.untracked.bool(True),
+    AccessRecHits = cms.untracked.bool(False),
     HFRecHitsLabel = cms.untracked.InputTag("caloRecHits"),
     NBinsHF = cms.untracked.int32(100),
     NumberOfTresholds = cms.uint32(100),
