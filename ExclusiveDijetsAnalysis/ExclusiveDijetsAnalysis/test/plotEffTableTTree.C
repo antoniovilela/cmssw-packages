@@ -14,9 +14,29 @@
 
 std::map<std::string,std::vector<double> > getEvents(std::vector<string>& vars, std::map<std::string,TDirectory*>& dirMap);
 
+std::vector<std::pair<std::string,TFile*> > getAllSamples(){
+   std::vector<std::pair<std::string,TFile*> > files;
+   files.push_back(std::make_pair("CEP di-jets",TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU_nHFMax_0.root")));
+   files.push_back(std::make_pair("SD-plus di-jets",TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_nHFMax_0.root")));
+   files.push_back(std::make_pair("SD-minus di-jets",TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_nHFMax_0.root")));
+   files.push_back(std::make_pair("QCD non-diffractive",TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_nHFMax_0.root")));
+   files.push_back(std::make_pair("DPE di-jets",TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU_nHFMax_0.root")));
+
+   return files;
+}
+
+std::vector<std::pair<std::string,TFile*> > getSystSamples(){
+   std::vector<std::pair<std::string,TFile*> > files;
+   files.push_back(std::make_pair("Ref",TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_PU_ref.root")));
+   files.push_back(std::make_pair("JES +10%",TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_PU_scaledJES1pt1.root")));
+   files.push_back(std::make_pair("JES -10%",TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_PU_scaledJES0pt9.root")));
+
+   return files;
+}
+
 void plot(){
 
-   std::vector<std::string> samples;
+   /*std::vector<std::string> samples;
    samples.push_back("signal");
    samples.push_back("SD-plus di-jets");
    samples.push_back("SD-minus di-jets");
@@ -36,7 +56,15 @@ void plot(){
       directories.push_back(static_cast<TDirectory*>(*file));
    }
 
-   std::map<std::string,TDirectory*> dirMap = makeMap(samples,directories);
+   std::map<std::string,TDirectory*> dirMap = makeMap(samples,directories);*/
+ 
+   std::vector<std::pair<std::string,TFile*> > files = getAllSamples();
+   //std::vector<std::pair<std::string,TFile*> > files = getSystSamples();
+
+   std::map<std::string,TDirectory*> dirMap;
+   for(std::vector<std::pair<std::string,TFile*> >::const_iterator it = files.begin(); it != files.end(); ++it){
+      dirMap[it->first] = static_cast<TDirectory*>(it->second);
+   }
  
    std::vector<string> variablesForEff;
    variablesForEff.push_back("leadingJetPt");
