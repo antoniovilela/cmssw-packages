@@ -39,6 +39,20 @@ CaloTowerAnalyzer::CaloTowerAnalyzer(const edm::ParameterSet& conf)
   eThresholdHFMax_ = conf.getParameter<double>("TowerEnergyTresholdHFMax");
 
   nBinsHF_ = conf.getUntrackedParameter<int>("NBinsHF",20);	
+
+  reweightHFTower_ = conf.getParameter<bool>("ReweightHFTower");
+  // reweightHistoName_[0] --> file name
+  // reweightHistoName_[1] --> histo path in file
+  if(reweightHFTower_){
+     reweightHistoName_ = conf.getParameter<std::vector<std::string> >("ReweightHistoName");
+
+     // Access and close file; keep hard copy of histo
+     edm::LogVerbatim("Analysis") << "Accessing file " << reweightHistoName_[0] << " histo " << reweightHistoName_[1];
+     TFile file(reweightHistoName_[0].c_str(),"read");
+     TH1F* histo = static_cast<TH1F*>(file.Get(reweightHistoName_[1].c_str())); 
+     reweightHisto_ = *histo;
+  }
+  
 }  
   
 CaloTowerAnalyzer::~CaloTowerAnalyzer()
@@ -57,7 +71,7 @@ void CaloTowerAnalyzer::beginJob(edm::EventSetup const&iSetup){
   char hname[50];
   for(unsigned int i = 0; i < nThresholdIter_; ++i){
 	eThreshold_.push_back(eThresholdHFMin_ + i*((eThresholdHFMax_ - eThresholdHFMin_)/((double)nThresholdIter_)));
-	std::cout << "Threshold " << i << ": " << eThreshold_[i] << std::endl;
+	edm::LogVerbatim("Analysis") << "Threshold " << i << ": " << eThreshold_[i];
 	sprintf(hname,"nhfplus_%d",i);	
 	histosnhfplus_.push_back(fs->make<TH1F>(hname,"Towers mult. HF plus",nBinsHF_,0,nBinsHF_));
 	sprintf(hname,"nhfminus_%d",i);
@@ -130,8 +144,8 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 	int sizeCaloTowers = towerCollection->size();
 
-        edm::LogInfo("")<< "\n\n =================> Treating event " << iEvent.id()
-                        << " Number of Calo Towers " << sizeCaloTowers;
+        edm::LogVerbatim("Analysis") << " =================> Treating event " << iEvent.id()
+                                     << " Number of Calo Towers " << sizeCaloTowers;
 
 	if(sizeCaloTowers == 0) return;
 
@@ -224,28 +238,34 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		double eta = calotower->eta();
 		double phi = calotower->phi();
 		double energy = calotower->energy();
-		
-		histenergyvseta_->Fill(eta,energy);
-		histetavsphi_->Fill(eta,phi);
-		histietavsiphi_->Fill(ieta,iphi);
-		histetavsphiweighted_->Fill(eta,phi,energy);
-		histietavsiphiweighted_->Fill(ieta,iphi,energy);
+                double weight = 1.0;
+		if(reweightHFTower_){
+                	int xbin = reweightHisto_.GetXaxis()->FindBin(energy);
+                        int nBins = reweightHisto_.GetNbinsX(); // 1 <= xbin <= nBins
+			weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : reweightHisto_.GetBinContent(nBins);
+                }
+
+		histenergyvseta_->Fill(eta,energy*weight);
+		histetavsphi_->Fill(eta,phi,weight);
+		histietavsiphi_->Fill(ieta,iphi,weight);
+		histetavsphiweighted_->Fill(eta,phi,energy*weight);
+		histietavsiphiweighted_->Fill(ieta,iphi,energy*weight);
 	
 		for(unsigned int i = 0; i < nThresholdIter_; ++i){
 			bool ethreshHF = (energy >= eThreshold_[i]);
 			if(ethreshHF&&(hasHF&&(!hasHE))){
 				if(zside > 0) nhf_plus[i]++;
 				else nhf_minus[i]++;
-				histenergyvsetaHF_->Fill(eta,energy); 
-				histetavsphiHF_->Fill(eta,phi);
-				histetavsphiHFweighted_->Fill(eta,phi,energy);
+				histenergyvsetaHF_->Fill(eta,energy*weight); 
+				histetavsphiHF_->Fill(eta,phi,weight);
+				histetavsphiHFweighted_->Fill(eta,phi,energy*weight);
 			}
 		}
 
 		if(hasHF&&(!hasHE)){
-			histenergyHF_->Fill(energy);
-			if(zside > 0) histenergyHFplus_->Fill(energy);
-			else histenergyHFminus_->Fill(energy);
+			histenergyHF_->Fill(energy,weight);
+			if(zside > 0) histenergyHFplus_->Fill(energy,weight);
+			else histenergyHFminus_->Fill(energy,weight);
 			if(energy > calotwrMaxEnergy){
 				calotwrMaxEnergy = energy;
 				calotwrMax = calotower;

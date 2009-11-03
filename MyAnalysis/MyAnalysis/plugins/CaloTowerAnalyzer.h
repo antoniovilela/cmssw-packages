@@ -6,8 +6,11 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include <vector>
- 
-class TH1F;
+#include <string> 
+
+#include "TH1F.h"
+
+//class TH1F;
 class TH2F;
 
 class CaloTowerAnalyzer : public edm::EDAnalyzer
@@ -66,6 +69,10 @@ class CaloTowerAnalyzer : public edm::EDAnalyzer
 
   int nBinsHF_;
 
+  bool reweightHFTower_;
+  std::vector<std::string> reweightHistoName_;
+  TH1F reweightHisto_;
+ 
   std::vector<std::pair<int,int> > excludeList_;
 };
   

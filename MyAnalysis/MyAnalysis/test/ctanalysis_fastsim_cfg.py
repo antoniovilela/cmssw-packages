@@ -3,7 +3,13 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Analysis")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000 
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.categories.append('Analysis')
+#process.MessageLogger.cerr.INFO = cms.untracked.PSet(
+#    default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
+#    Analysis = cms.untracked.PSet( limit = cms.untracked.int32(-1))
+#)
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
@@ -30,12 +36,14 @@ process.TFileService = cms.Service("TFileService",
 
 process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
     CaloTowersLabel = cms.InputTag("towerMaker"),
-    AccessRecHits = cms.untracked.bool(False),
-    #HFRecHitsLabel = cms.untracked.InputTag("caloRecHits"),
+    AccessRecHits = cms.untracked.bool(True),
+    HFRecHitsLabel = cms.untracked.InputTag("caloRecHits"),
     NBinsHF = cms.untracked.int32(100),
     NumberOfTresholds = cms.uint32(100),
     TowerEnergyTresholdHFMin = cms.double(0.0),
-    TowerEnergyTresholdHFMax = cms.double(10.0) 
+    TowerEnergyTresholdHFMax = cms.double(10.0),
+    ReweightHFTower = cms.bool(True),
+    ReweightHistoName = cms.vstring("reweightHisto.root","energyHFplusRatio")  
 )
 
 process.analysis = cms.Path(process.calotwranalysis)
