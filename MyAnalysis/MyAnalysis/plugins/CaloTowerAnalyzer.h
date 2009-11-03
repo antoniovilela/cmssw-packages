@@ -28,6 +28,7 @@ class CaloTowerAnalyzer : public edm::EDAnalyzer
   std::vector<TH1F*> histosnhflow_;
   std::vector<TH1F*> histosnhfhigh_;
 
+  TH1F *histNEvents_;
   TH1F *histenergyHF_;
   TH1F *histenergyHFplus_;
   TH1F *histenergyHFminus_;	

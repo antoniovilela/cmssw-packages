@@ -52,6 +52,8 @@ void CaloTowerAnalyzer::beginJob(edm::EventSetup const&iSetup){
 
   edm::Service<TFileService> fs;
 
+  histNEvents_ = fs->make<TH1F>("NEvents","NEvents",1,0,1);
+
   char hname[50];
   for(unsigned int i = 0; i < nThresholdIter_; ++i){
 	eThreshold_.push_back(eThresholdHFMin_ + i*((eThresholdHFMax_ - eThresholdHFMin_)/((double)nThresholdIter_)));
@@ -123,6 +125,8 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 	edm::Handle<CaloTowerCollection> towerCollection;  
         iEvent.getByLabel(calotowersTag_,towerCollection);
+
+        histNEvents_->Fill(0.);
 
 	int sizeCaloTowers = towerCollection->size();
 
