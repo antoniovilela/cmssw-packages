@@ -18,6 +18,12 @@ process.source = cms.Source("PoolSource",
 
 #process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff")
 
+from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.scaledPATJets_cfi import scaledPATJets 
+scaledPATJets.src = "selectedLayer1JetsSC7PF"
+process.scaledPATJets1pt1 = scaledPATJets.clone(scale = 1.10)
+process.scaledPATJets0pt9 = scaledPATJets.clone(scale = 0.90)
+process.scaledJets_step = cms.Path(process.scaledPATJets1pt1+process.scaledPATJets0pt9)
+
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsFilter_cfi")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsTTreeAnalysis_cfi")
 
@@ -35,9 +41,12 @@ for i in range(5):
 filters = [] 
 filters.extend(filtersPU)
 """
+filters = []
+attributes = [{'JetTag':'scaledPATJets1pt1'},
+              {'JetTag':'scaledPATJets0pt9'}]
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
-makeAnalysis(process,'exclusiveDijetsTTreeAnalysis','exclusiveDijetsSelection')
+makeAnalysis(process,'exclusiveDijetsTTreeAnalysis','exclusiveDijetsSelection',attributes,filters)
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisDijets_TTree.root")
