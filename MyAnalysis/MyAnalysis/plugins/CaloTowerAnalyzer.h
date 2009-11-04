@@ -7,8 +7,13 @@
 
 #include <vector>
 #include <string> 
+#include <memory>
 
 #include "TH1F.h"
+
+namespace CLHEP{
+ class RandGaussQ;
+}
 
 //class TH1F;
 class TH2F;
@@ -56,6 +61,8 @@ class CaloTowerAnalyzer : public edm::EDAnalyzer
   TH1F *histhflongenergyminus_;
   TH1F *histhfshortenergyminus_;
   TH1F *histhfenergyvstime_;
+  TH1F *histhflongenergyFromTwr_;
+  TH1F *histhfshortenergyFromTwr_;
 
   edm::InputTag calotowersTag_;
   edm::InputTag hfRecHitsTag_;
@@ -73,6 +80,11 @@ class CaloTowerAnalyzer : public edm::EDAnalyzer
   std::vector<std::string> reweightHistoName_;
   TH1F reweightHisto_;
  
+  bool applyEnergyOffset_;
+  std::auto_ptr<CLHEP::RandGaussQ> gauss_;
+  double sigmaShort_;
+  double sigmaLong_;
+
   std::vector<std::pair<int,int> > excludeList_;
 };
   

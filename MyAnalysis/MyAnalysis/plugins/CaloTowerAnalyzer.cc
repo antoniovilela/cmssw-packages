@@ -19,6 +19,8 @@
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "FWCore/Utilities/interface/RandomNumberGenerator.h"
+#include "CLHEP/Random/RandGaussQ.h"
 
 #include <iostream>
 #include "TFile.h"
@@ -28,19 +30,19 @@
 
 using namespace reco;
  
-CaloTowerAnalyzer::CaloTowerAnalyzer(const edm::ParameterSet& conf)
-{
-  calotowersTag_ = conf.getParameter<edm::InputTag>("CaloTowersLabel");
-  accessRecHits_ = conf.getUntrackedParameter<bool>("AccessRecHits",true);
+CaloTowerAnalyzer::CaloTowerAnalyzer(const edm::ParameterSet& conf):
+  calotowersTag_(conf.getParameter<edm::InputTag>("CaloTowersLabel")),
+  accessRecHits_(conf.getUntrackedParameter<bool>("AccessRecHits",true)),
+  //excludeHotTowers_(conf.getParameter<bool>("ExcludeHotTowers")), 
+  nThresholdIter_(conf.getParameter<unsigned int>("NumberOfTresholds")),
+  eThresholdHFMin_(conf.getParameter<double>("TowerEnergyTresholdHFMin")),
+  eThresholdHFMax_(conf.getParameter<double>("TowerEnergyTresholdHFMax")),
+  nBinsHF_(conf.getUntrackedParameter<int>("NBinsHF",20)),	
+  reweightHFTower_(conf.getParameter<bool>("ReweightHFTower")),
+  applyEnergyOffset_(conf.getParameter<bool>("ApplyEnergyOffset")) {
+
   if(accessRecHits_) hfRecHitsTag_ = conf.getUntrackedParameter<edm::InputTag>("HFRecHitsLabel",edm::InputTag("hfreco"));
-  //excludeHotTowers_ = conf.getParameter<bool>("ExcludeHotTowers"); 
-  nThresholdIter_ = conf.getParameter<unsigned int>("NumberOfTresholds");
-  eThresholdHFMin_ = conf.getParameter<double>("TowerEnergyTresholdHFMin");
-  eThresholdHFMax_ = conf.getParameter<double>("TowerEnergyTresholdHFMax");
 
-  nBinsHF_ = conf.getUntrackedParameter<int>("NBinsHF",20);	
-
-  reweightHFTower_ = conf.getParameter<bool>("ReweightHFTower");
   // reweightHistoName_[0] --> file name
   // reweightHistoName_[1] --> histo path in file
   if(reweightHFTower_){
@@ -52,7 +54,18 @@ CaloTowerAnalyzer::CaloTowerAnalyzer(const edm::ParameterSet& conf)
      TH1F* histo = static_cast<TH1F*>(file.Get(reweightHistoName_[1].c_str())); 
      reweightHisto_ = *histo;
   }
-  
+ 
+  if(applyEnergyOffset_){
+     edm::Service<edm::RandomNumberGenerator> rng;
+     CLHEP::HepRandomEngine& engine = rng->getEngine();
+     gauss_ = std::auto_ptr<CLHEP::RandGaussQ>(new CLHEP::RandGaussQ(engine));
+     edm::ParameterSet energyOffsetPSet = conf.getParameter<edm::ParameterSet>("EnergyOffsetParameters");
+     sigmaShort_ = energyOffsetPSet.getParameter<double>("sigmaShort");
+     sigmaLong_ = energyOffsetPSet.getParameter<double>("sigmaLong");
+     edm::LogVerbatim("Analysis") << "Using \n"
+                                  << "  sigmaShort= " << sigmaShort_
+                                  << "  sigmaLong=  " << sigmaLong_; 
+  }  
 }  
   
 CaloTowerAnalyzer::~CaloTowerAnalyzer()
@@ -70,16 +83,16 @@ void CaloTowerAnalyzer::beginJob(edm::EventSetup const&iSetup){
 
   char hname[50];
   for(unsigned int i = 0; i < nThresholdIter_; ++i){
-	eThreshold_.push_back(eThresholdHFMin_ + i*((eThresholdHFMax_ - eThresholdHFMin_)/((double)nThresholdIter_)));
-	edm::LogVerbatim("Analysis") << "Threshold " << i << ": " << eThreshold_[i];
-	sprintf(hname,"nhfplus_%d",i);	
-	histosnhfplus_.push_back(fs->make<TH1F>(hname,"Towers mult. HF plus",nBinsHF_,0,nBinsHF_));
-	sprintf(hname,"nhfminus_%d",i);
-	histosnhfminus_.push_back(fs->make<TH1F>(hname,"Towers mult. HF minus",nBinsHF_,0,nBinsHF_));	
-	sprintf(hname,"nhflow_%d",i);
-	histosnhflow_.push_back(fs->make<TH1F>(hname,"Towers mult. HF low",nBinsHF_,0,nBinsHF_));
-	sprintf(hname,"nhfhigh_%d",i);
-	histosnhfhigh_.push_back(fs->make<TH1F>(hname,"Towers mult. HF high",nBinsHF_,0,nBinsHF_));
+     eThreshold_.push_back(eThresholdHFMin_ + i*((eThresholdHFMax_ - eThresholdHFMin_)/((double)nThresholdIter_)));
+     edm::LogVerbatim("Analysis") << "Threshold " << i << ": " << eThreshold_[i];
+     sprintf(hname,"nhfplus_%d",i);	
+     histosnhfplus_.push_back(fs->make<TH1F>(hname,"Towers mult. HF plus",nBinsHF_,0,nBinsHF_));
+     sprintf(hname,"nhfminus_%d",i);
+     histosnhfminus_.push_back(fs->make<TH1F>(hname,"Towers mult. HF minus",nBinsHF_,0,nBinsHF_));	
+     sprintf(hname,"nhflow_%d",i);
+     histosnhflow_.push_back(fs->make<TH1F>(hname,"Towers mult. HF low",nBinsHF_,0,nBinsHF_));
+     sprintf(hname,"nhfhigh_%d",i);
+     histosnhfhigh_.push_back(fs->make<TH1F>(hname,"Towers mult. HF high",nBinsHF_,0,nBinsHF_));
   }
   histenergyHF_ = fs->make<TH1F>("energyHF","Tower Energy HF",100,0.,15.0);
   histenergyHFplus_ = fs->make<TH1F>("energyHFplus","Tower Energy HF-plus",100,0.,15.0);
@@ -109,6 +122,8 @@ void CaloTowerAnalyzer::beginJob(edm::EventSetup const&iSetup){
   histhfshortenergyminus_ = fs->make<TH1F>("hfshortenergyminus","HF RecHit Short Fiber energy",100,-2.,20.);
   histhfenergyvstime_ = fs->make<TH1F>("hfenergyvstime","HF time",100,-100.,150.);
 
+  histhflongenergyFromTwr_ = fs->make<TH1F>("hflongenergyFromTwr","HF RecHit Long Fiber energy",100,-2.,20.);
+  histhfshortenergyFromTwr_ = fs->make<TH1F>("hfshortenergyFromTwr","HF RecHit Short Fiber energy",100,-2.,20.);
   // Exclude list
   //(40,63): 0.245
   //>>>>>>> Tower with very high activity
@@ -126,228 +141,227 @@ void CaloTowerAnalyzer::beginJob(edm::EventSetup const&iSetup){
 }     
 
 void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-	//Calo Towers
-	/*edm::Handle<CaloTowerCollection> calotowercands;  
-	iEvent.getByLabel(calotowersLabel_,calotowercands);
+  //Calo Towers
+  edm::Handle<CaloTowerCollection> towerCollection;  
+  iEvent.getByLabel(calotowersTag_,towerCollection);
 
-	edm::LogInfo("")<<"\n\n =================> Treating event "<<iEvent.id()
-			<<" Number of Calo Towers "<<calotowercands.product()->size();
+  histNEvents_->Fill(0.);
 
-	//if(calotowercands->size() == 0) {LogTrace("") << ">>> Calo tower collection has zero size";return;}
+  int sizeCaloTowers = towerCollection->size();
 
-	int sizeCaloTowers = calotowercands->size();*/
+  edm::LogVerbatim("Analysis") << " =================> Treating event " << iEvent.id()
+                               << " Number of Calo Towers " << sizeCaloTowers;
 
-	edm::Handle<CaloTowerCollection> towerCollection;  
-        iEvent.getByLabel(calotowersTag_,towerCollection);
+  if(sizeCaloTowers == 0) return;
 
-        histNEvents_->Fill(0.);
+  std::vector<int> nhf_plus(nThresholdIter_,0);
+  std::vector<int> nhf_minus(nThresholdIter_,0);
+  std::vector<double> sumw_hf_plus(nThresholdIter_,0.);
+  std::vector<double> sumw_hf_minus(nThresholdIter_,0.); 
 
-	int sizeCaloTowers = towerCollection->size();
-
-        edm::LogVerbatim("Analysis") << " =================> Treating event " << iEvent.id()
-                                     << " Number of Calo Towers " << sizeCaloTowers;
-
-	if(sizeCaloTowers == 0) return;
-
-	std::vector<int> nhf_plus(nThresholdIter_,0);
-        std::vector<int> nhf_minus(nThresholdIter_,0);
-        std::vector<double> sumw_hf_plus(nThresholdIter_,0.);
-        std::vector<double> sumw_hf_minus(nThresholdIter_,0.); 
-
-	/*CandidateCollection::const_iterator cand = calotowercands->begin();
-	CaloTowerRef towerRef = cand->get<CaloTowerRef>();
-			
-	const CaloTowerCollection *towerCollection = towerRef.product();*/
-
-	double calotwrMaxEnergy = 0.;
-	//int calotwrMaxIdx = -1;
-	CaloTowerCollection::const_iterator calotwrMax = towerCollection->end();
-	//for(size_t idx = 0; idx < towerCollection->size(); ++idx){
-	for(CaloTowerCollection::const_iterator calotower = towerCollection->begin(); calotower != towerCollection->end(); ++calotower){
-		//const CaloTower* calotower = &(*towerCollection)[idx];
-		/*std::cout << "Eta: " << calotower->eta() << std::endl
-                          << "Phi: " << calotower->phi() << std::endl
-                          << "Et: " << calotower->et() << std::endl
-			  << "Energy: " << calotower->energy() << std::endl
-			  << "EM energy: " << calotower->emEnergy() << std::endl
-			  << "HAD energy: " << calotower->hadEnergy() << std::endl
-			  << "iEta: " << calotower->id().ieta() << std::endl	
-			  << "iPhi: " << calotower->id().iphi() << std::endl
-			  << "Detector: " << calotower->id().det() << std::endl
-			  << "Sub Det Id: " << calotower->id().subdetId() << std::endl
-			  << "Raw Id: " << calotower->id().rawId() << std::endl
-			  << "Constituents: " << std::endl;*/
-		int ieta = calotower->id().ieta();
-		int iphi = calotower->id().iphi();
-		bool hotTower = false;
-		/*for(std::vector<std::pair<int,int> >::const_iterator it = excludeList.begin(); it != excludeList.end(); ++it){
-			if((ieta == it->first)&&(iphi == it->second)) hotTower = true;
-  		}*/
-
-		//if(excludeHotTowers_&&hotTower) continue;
+  /*CandidateCollection::const_iterator cand = calotowercands->begin();
+  CaloTowerRef towerRef = cand->get<CaloTowerRef>();
 		
-		bool hasHF = false;
-		bool hasHE = false;
-		bool hasHO = false;
-		bool hasHB = false;
-		bool hasECAL = false; 
-		for(size_t iconst = 0; iconst < calotower->constituentsSize(); iconst++){
-			/*std::cout << "    " << iconst << ":  " << std::endl
-					    << "    Detector: " << calotower->constituent(iconst).det() << std::endl
-					    << "    Sub Det Id: " << calotower->constituent(iconst).subdetId() << std::endl	     					 << "    Raw Id: " << calotower->constituent(iconst).rawId() << std::endl;*/
-			DetId detId = calotower->constituent(iconst);
-			//std::cout << "    " << iconst << ":  " << std::endl;
-			if(detId.det()==DetId::Hcal){
-				HcalDetId hcalDetId(detId);
-				if(hcalDetId.subdet()==HcalForward){  
-					  /*std::cout << "     HF constituent" << std::endl			
-						    << "     iEta: " << hcalDetId.ieta() << std::endl
-						    << "     iPhi: " << hcalDetId.iphi() << std::endl
-						    << "     Depth: " << hcalDetId.depth() << std::endl;*/
-					 hasHF = true;		
-				} else if(hcalDetId.subdet()==HcalOuter){
-					  /*std::cout << "     HO constituent" << std::endl
-                                                    << "     iEta: " << hcalDetId.ieta() << std::endl
-                                                    << "     iPhi: " << hcalDetId.iphi() << std::endl
-                                                    << "     Depth: " << hcalDetId.depth() << std::endl;*/
-					 hasHO = true;
-                                } else if(hcalDetId.subdet()==HcalEndcap){
-					  /*std::cout << "     HE constituent" << std::endl
-                                                    << "     iEta: " << hcalDetId.ieta() << std::endl
-                                                    << "     iPhi: " << hcalDetId.iphi() << std::endl
-                                                    << "     Depth: " << hcalDetId.depth() << std::endl;*/
-					 hasHE = true;
-				} else if(hcalDetId.subdet()==HcalBarrel){
-                                          /*std::cout << "     HB constituent" << std::endl
-                                                    << "     iEta: " << hcalDetId.ieta() << std::endl
-                                                    << "     iPhi: " << hcalDetId.iphi() << std::endl
-                                                    << "     Depth: " << hcalDetId.depth() << std::endl;*/
-					 hasHB = true;
-                                } else{
-					  /*std::cout << "     HcalSubdetector: " << hcalDetId.subdet() << std::endl
-                                                    << "     iEta: " << hcalDetId.ieta() << std::endl
-                                                    << "     iPhi: " << hcalDetId.iphi() << std::endl
-                                                    << "     Depth: " << hcalDetId.depth() << std::endl;*/
-				} 
-			} else if(detId.det()==DetId::Ecal){
-				//std::cout << "     ECAL constituent" << std::endl;
-				hasECAL = true;
-			}	 	  
-		}
+  const CaloTowerCollection *towerCollection = towerRef.product();*/
+
+  double calotwrMaxEnergy = 0.;
+  CaloTowerCollection::const_iterator calotwrMax = towerCollection->end();
+  for(CaloTowerCollection::const_iterator calotower = towerCollection->begin(); calotower != towerCollection->end(); ++calotower){
+     //const CaloTower* calotower = &(*towerCollection)[idx];
+     /*std::cout << "Eta: " << calotower->eta() << std::endl
+                 << "Phi: " << calotower->phi() << std::endl
+                 << "Et: " << calotower->et() << std::endl
+                 << "Energy: " << calotower->energy() << std::endl
+	         << "EM energy: " << calotower->emEnergy() << std::endl
+	         << "HAD energy: " << calotower->hadEnergy() << std::endl
+	         << "iEta: " << calotower->id().ieta() << std::endl	
+	         << "iPhi: " << calotower->id().iphi() << std::endl
+	         << "Detector: " << calotower->id().det() << std::endl
+	         << "Sub Det Id: " << calotower->id().subdetId() << std::endl
+	         << "Raw Id: " << calotower->id().rawId() << std::endl
+		 << "Constituents: " << std::endl;*/
+     int ieta = calotower->id().ieta();
+     int iphi = calotower->id().iphi();
+     bool hotTower = false;
+     /*for(std::vector<std::pair<int,int> >::const_iterator it = excludeList.begin(); it != excludeList.end(); ++it){
+        if((ieta == it->first)&&(iphi == it->second)) hotTower = true;
+     }*/
+     //if(excludeHotTowers_&&hotTower) continue;
+		
+     bool hasHF = false;
+     bool hasHE = false;
+     bool hasHO = false;
+     bool hasHB = false;
+     bool hasECAL = false; 
+     for(size_t iconst = 0; iconst < calotower->constituentsSize(); iconst++){
+        /*std::cout << "    " << iconst << ":  " << std::endl
+		    << "    Detector: " << calotower->constituent(iconst).det() << std::endl
+		    << "    Sub Det Id: " << calotower->constituent(iconst).subdetId() << std::endl
+                    << "    Raw Id: " << calotower->constituent(iconst).rawId() << std::endl;*/
+	DetId detId = calotower->constituent(iconst);
+	//std::cout << "    " << iconst << ":  " << std::endl;
+	if(detId.det()==DetId::Hcal){
+	   HcalDetId hcalDetId(detId);
+	   if(hcalDetId.subdet()==HcalForward){  
+	      /*std::cout << "     HF constituent" << std::endl			
+	                  << "     iEta: " << hcalDetId.ieta() << std::endl
+		          << "     iPhi: " << hcalDetId.iphi() << std::endl
+			  << "     Depth: " << hcalDetId.depth() << std::endl;*/
+	      hasHF = true;		
+	   } else if(hcalDetId.subdet()==HcalOuter){
+	      /*std::cout << "     HO constituent" << std::endl
+                          << "     iEta: " << hcalDetId.ieta() << std::endl
+                          << "     iPhi: " << hcalDetId.iphi() << std::endl
+                          << "     Depth: " << hcalDetId.depth() << std::endl;*/
+	      hasHO = true;
+           } else if(hcalDetId.subdet()==HcalEndcap){
+	      /*std::cout << "     HE constituent" << std::endl
+                          << "     iEta: " << hcalDetId.ieta() << std::endl
+                          << "     iPhi: " << hcalDetId.iphi() << std::endl
+                          << "     Depth: " << hcalDetId.depth() << std::endl;*/
+	      hasHE = true;
+	   } else if(hcalDetId.subdet()==HcalBarrel){
+              /*std::cout << "     HB constituent" << std::endl
+                          << "     iEta: " << hcalDetId.ieta() << std::endl
+                          << "     iPhi: " << hcalDetId.iphi() << std::endl
+                          << "     Depth: " << hcalDetId.depth() << std::endl;*/
+	      hasHB = true;
+           } else{
+	      /*std::cout << "     HcalSubdetector: " << hcalDetId.subdet() << std::endl
+                          << "     iEta: " << hcalDetId.ieta() << std::endl
+                          << "     iPhi: " << hcalDetId.iphi() << std::endl
+                          << "     Depth: " << hcalDetId.depth() << std::endl;*/
+	   } 
+        } else if(detId.det()==DetId::Ecal){
+	   //std::cout << "     ECAL constituent" << std::endl;
+	   hasECAL = true;
+	}	 	  
+      }
 				 	
-			  	
-		int zside = calotower->id().zside();
-		double eta = calotower->eta();
-		double phi = calotower->phi();
-		double energy = calotower->energy();
-                double weight = 1.0;
-		if(reweightHFTower_){
-                	int xbin = reweightHisto_.GetXaxis()->FindBin(energy);
-                        int nBins = reweightHisto_.GetNbinsX(); // 1 <= xbin <= nBins
-			weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : reweightHisto_.GetBinContent(nBins);
-                }
+     int zside = calotower->id().zside();
+     double eta = calotower->eta();
+     double phi = calotower->phi();
 
-		histenergyvseta_->Fill(eta,energy*weight);
-		histetavsphi_->Fill(eta,phi,weight);
-		histietavsiphi_->Fill(ieta,iphi,weight);
-		histetavsphiweighted_->Fill(eta,phi,energy*weight);
-		histietavsiphiweighted_->Fill(ieta,iphi,energy*weight);
+     double energy = calotower->energy();
+     //Valid for HF emEnergy = E(L) - E(S); hadEnergy = 2*E(S)
+     double energyShort = calotower->hadEnergy()/2.;
+     double energyLong = calotower->emEnergy() + energyShort;
+     if(applyEnergyOffset_){
+        energyShort += gauss_->fire(0.,sigmaShort_);
+        energyLong += gauss_->fire(0.,sigmaLong_);
+        energy = energyShort + energyLong; 
+     }
+
+     double weight = 1.0;
+     if(reweightHFTower_){
+        int xbin = reweightHisto_.GetXaxis()->FindBin(energy);
+        int nBins = reweightHisto_.GetNbinsX(); // 1 <= xbin <= nBins
+        weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : reweightHisto_.GetBinContent(nBins);
+     }
+
+     histhflongenergyFromTwr_->Fill(energyLong,weight);
+     histhfshortenergyFromTwr_->Fill(energyShort,weight);
+
+     histenergyvseta_->Fill(eta,energy*weight);
+     histetavsphi_->Fill(eta,phi,weight);
+     histietavsiphi_->Fill(ieta,iphi,weight);
+     histetavsphiweighted_->Fill(eta,phi,energy*weight);
+     histietavsiphiweighted_->Fill(ieta,iphi,energy*weight);
 	
-		for(unsigned int i = 0; i < nThresholdIter_; ++i){
-			bool ethreshHF = (energy >= eThreshold_[i]);
-			if(ethreshHF&&(hasHF&&(!hasHE))){
-				if(zside > 0){
-                                   nhf_plus[i]++;
-                                   sumw_hf_plus[i] += weight;
-                                } 
-				else{
-                                   nhf_minus[i]++;
-                                   sumw_hf_minus[i] += weight; 
-                                }
-				histenergyvsetaHF_->Fill(eta,energy*weight); 
-				histetavsphiHF_->Fill(eta,phi,weight);
-				histetavsphiHFweighted_->Fill(eta,phi,energy*weight);
-			}
-		}
-
-		if(hasHF&&(!hasHE)){
-			histenergyHF_->Fill(energy,weight);
-			if(zside > 0) histenergyHFplus_->Fill(energy,weight);
-			else histenergyHFminus_->Fill(energy,weight);
-			if(energy > calotwrMaxEnergy){
-				calotwrMaxEnergy = energy;
-				calotwrMax = calotower;
-			}
-		}
+     for(unsigned int i = 0; i < nThresholdIter_; ++i){
+        bool ethreshHF = (energy >= eThreshold_[i]);
+	if(ethreshHF&&(hasHF&&(!hasHE))){
+	   if(zside > 0){
+              nhf_plus[i]++;
+              sumw_hf_plus[i] += weight;
+           } else{
+              nhf_minus[i]++;
+              sumw_hf_minus[i] += weight; 
+           }
+	   histenergyvsetaHF_->Fill(eta,energy*weight); 
+	   histetavsphiHF_->Fill(eta,phi,weight);
+	   histetavsphiHFweighted_->Fill(eta,phi,energy*weight);
 	}
+     }
 
-	if(calotwrMax != towerCollection->end()){
-		histenergyvsetaHFMax_->Fill(calotwrMax->eta(),calotwrMax->energy());
-		histetavsphiHFMax_->Fill(calotwrMax->eta(),calotwrMax->phi(),calotwrMax->energy());
+     if(hasHF&&(!hasHE)){
+        histenergyHF_->Fill(energy,weight);
+	if(zside > 0) histenergyHFplus_->Fill(energy,weight);
+	else histenergyHFminus_->Fill(energy,weight);
+	if(energy > calotwrMaxEnergy){
+	   calotwrMaxEnergy = energy;
+	   calotwrMax = calotower;
 	}
+     }
+  }
 
-	for(unsigned int i = 0; i < nThresholdIter_; ++i){	
-		/*histosnhfplus_[i]->Fill(nhf_plus[i]);
-                histosnhfminus_[i]->Fill(nhf_minus[i]);
-		int nhflow = (nhf_minus < nhf_plus)?nhf_minus[i]:nhf_plus[i];
-		int nhfhigh = nhf_minus[i] + nhf_plus[i] - nhflow;
-		histosnhflow_[i]->Fill(nhflow);
-		histosnhfhigh_[i]->Fill(nhfhigh);*/
-                histosnhfplus_[i]->Fill(sumw_hf_plus[i]);
-                histosnhfminus_[i]->Fill(sumw_hf_minus[i]);
-                double sumw_hf_low = (sumw_hf_minus < sumw_hf_plus)?sumw_hf_minus[i]:sumw_hf_plus[i];
-                double sumw_hf_high = sumw_hf_minus[i] + sumw_hf_plus[i] - sumw_hf_low;
-                histosnhflow_[i]->Fill(sumw_hf_low);
-                histosnhfhigh_[i]->Fill(sumw_hf_high);
+  if(calotwrMax != towerCollection->end()){
+     histenergyvsetaHFMax_->Fill(calotwrMax->eta(),calotwrMax->energy());
+     histetavsphiHFMax_->Fill(calotwrMax->eta(),calotwrMax->phi(),calotwrMax->energy());
+  }
+
+  for(unsigned int i = 0; i < nThresholdIter_; ++i){	
+     /*histosnhfplus_[i]->Fill(nhf_plus[i]);
+     histosnhfminus_[i]->Fill(nhf_minus[i]);
+     int nhflow = (nhf_minus < nhf_plus)?nhf_minus[i]:nhf_plus[i];
+     int nhfhigh = nhf_minus[i] + nhf_plus[i] - nhflow;
+     histosnhflow_[i]->Fill(nhflow);
+     histosnhfhigh_[i]->Fill(nhfhigh);*/
+     histosnhfplus_[i]->Fill(sumw_hf_plus[i]);
+     histosnhfminus_[i]->Fill(sumw_hf_minus[i]);
+     double sumw_hf_low = (sumw_hf_minus < sumw_hf_plus)?sumw_hf_minus[i]:sumw_hf_plus[i];
+     double sumw_hf_high = sumw_hf_minus[i] + sumw_hf_plus[i] - sumw_hf_low;
+     histosnhflow_[i]->Fill(sumw_hf_low);
+     histosnhfhigh_[i]->Fill(sumw_hf_high);
+  }
+
+  if(accessRecHits_){
+     edm::Handle<HFRecHitCollection> hfrh;
+     iEvent.getByLabel(hfRecHitsTag_,hfrh);
+     const HFRecHitCollection Hithf = *(hfrh.product());
+
+     for(HFRecHitCollection::const_iterator hhit=Hithf.begin(); hhit!=Hithf.end(); hhit++) {
+        //std::cout << "rec hit energy,time= " << hhit->energy() << "  " << hhit->time() << std::endl; 
+	if(hhit->energy() > 0.6) histhfenergyvstime_->Fill(hhit->time(),hhit->energy());
+        HcalDetId hcalDetId(hhit->detid());
+	histhfhitenergy_->Fill(hhit->energy());
+	if(hcalDetId.zside() > 0) histhfhitenergyplus_->Fill(hhit->energy());
+	else histhfhitenergyminus_->Fill(hhit->energy());
+	if(hcalDetId.depth() == 1){
+	   histhflongenergy_->Fill(hhit->energy());
+	   if(hcalDetId.zside() > 0) histhflongenergyplus_->Fill(hhit->energy());
+	   else histhflongenergyminus_->Fill(hhit->energy());
+	} else{
+	   histhfshortenergy_->Fill(hhit->energy());
+	   if(hcalDetId.zside() > 0) histhfshortenergyplus_->Fill(hhit->energy());
+           else histhfshortenergyminus_->Fill(hhit->energy());
 	}
+     }
 
-        if(accessRecHits_){
-	   edm::Handle<HFRecHitCollection> hfrh;
-	   iEvent.getByLabel(hfRecHitsTag_,hfrh);
-	   const HFRecHitCollection Hithf = *(hfrh.product());
+     /*edm::Handle<HBHEDigiCollection> hbhe_digi; 
+     //iEvent.getByLabel("hcalZeroSuppressedDigis",hbhe_digi);
+     iEvent.getByLabel("hcalDigis",hbhe_digi);
 
-	   for(HFRecHitCollection::const_iterator hhit=Hithf.begin(); hhit!=Hithf.end(); hhit++) {
-		//std::cout << "rec hit energy,time= " << hhit->energy() << "  " << hhit->time() << std::endl; 
-		if(hhit->energy() > 0.6) histhfenergyvstime_->Fill(hhit->time(),hhit->energy());
-		HcalDetId hcalDetId(hhit->detid());
-		histhfhitenergy_->Fill(hhit->energy());
-		if(hcalDetId.zside() > 0) histhfhitenergyplus_->Fill(hhit->energy());
-		else histhfhitenergyminus_->Fill(hhit->energy());
-		if(hcalDetId.depth() == 1){
-			histhflongenergy_->Fill(hhit->energy());
-			if(hcalDetId.zside() > 0) histhflongenergyplus_->Fill(hhit->energy());
-			else histhflongenergyminus_->Fill(hhit->energy());
-		} else{
-			histhfshortenergy_->Fill(hhit->energy());
-			if(hcalDetId.zside() > 0) histhfshortenergyplus_->Fill(hhit->energy());
-                        else histhfshortenergyminus_->Fill(hhit->energy());
-		}
-	   }
-
-	   /*edm::Handle<HBHEDigiCollection> hbhe_digi; 
-	   //iEvent.getByLabel("hcalZeroSuppressedDigis",hbhe_digi);
-	   iEvent.getByLabel("hcalDigis",hbhe_digi);
-
-	   if(!hbhe_digi.failedToGet()){
-		int adcs[10] = {};
+     if(!hbhe_digi.failedToGet()){
+        int adcs[10] = {};
      
-		//CORRECT:  Timing plot should be done using linearized ADC's!
-		for (HBHEDigiCollection::const_iterator j=hbhe_digi->begin(); j!=hbhe_digi->end(); j++){
-			const HBHEDataFrame digi = (const HBHEDataFrame)(*j);
-			HcalDetId id = digi.id();
-			if (id.subdet() != 1) continue; 
-			int maxadc = 0;
-			for (int TS = 0; TS < 10 && TS < digi.size(); ++TS){     
-				adcs[TS] = digi[TS].adc();
-				if (digi[TS].adc() > maxadc) maxadc = digi[TS].adc();
-			}
-			std::cout << "maxadc= " << maxadc << std::endl;
-			for (int TS = 0; TS < 10 && TS < digi.size(); ++TS){     
-				if (maxadc > 10) histhbtiming_->Fill(TS,adcs[TS]);
-			}
-		}
-	   }*/
+        //CORRECT:  Timing plot should be done using linearized ADC's!
+        for (HBHEDigiCollection::const_iterator j=hbhe_digi->begin(); j!=hbhe_digi->end(); j++){
+           const HBHEDataFrame digi = (const HBHEDataFrame)(*j);
+	   HcalDetId id = digi.id();
+	   if (id.subdet() != 1) continue; 
+	   int maxadc = 0;
+	   for (int TS = 0; TS < 10 && TS < digi.size(); ++TS){     
+	      adcs[TS] = digi[TS].adc();
+	      if (digi[TS].adc() > maxadc) maxadc = digi[TS].adc();
+	   }
+	   std::cout << "maxadc= " << maxadc << std::endl;
+	   for (int TS = 0; TS < 10 && TS < digi.size(); ++TS){     
+	      if (maxadc > 10) histhbtiming_->Fill(TS,adcs[TS]);
+	   }
         }
+     }*/
+  }
 }
 
 DEFINE_FWK_MODULE(CaloTowerAnalyzer);

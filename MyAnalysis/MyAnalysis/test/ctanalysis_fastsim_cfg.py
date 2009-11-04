@@ -3,9 +3,9 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Analysis")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-#rocess.MessageLogger.cerr.threshold = 'INFO'
-#rocess.MessageLogger.categories.append('Analysis')
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.categories.append('Analysis')
 #process.MessageLogger.cerr.INFO = cms.untracked.PSet(
 #    default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
 #    Analysis = cms.untracked.PSet( limit = cms.untracked.int32(-1))
@@ -34,6 +34,13 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string('analysisHistos_FastSim.root')
 )
 
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+    calotwranalysis = cms.PSet(
+        initialSeed = cms.untracked.uint32(12345),
+        engineName = cms.untracked.string('HepJamesRandom')
+    )
+)
+
 process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
     CaloTowersLabel = cms.InputTag("towerMaker"),
     AccessRecHits = cms.untracked.bool(False),
@@ -42,7 +49,12 @@ process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
     NumberOfTresholds = cms.uint32(100),
     TowerEnergyTresholdHFMin = cms.double(0.0),
     TowerEnergyTresholdHFMax = cms.double(10.0),
-    ReweightHFTower = cms.bool(True),
+    ApplyEnergyOffset = cms.bool(True),
+    EnergyOffsetParameters = cms.PSet(
+        sigmaShort = cms.double(0.39),
+        sigmaLong = cms.double(0.29)
+    ),
+    ReweightHFTower = cms.bool(False),
     ReweightHistoName = cms.vstring("reweightHisto.root","energyHFplusRatio")  
 )
 
