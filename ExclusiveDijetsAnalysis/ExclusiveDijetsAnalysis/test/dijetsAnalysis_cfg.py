@@ -3,14 +3,6 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.MessageLogger.debugModules = cms.untracked.vstring('')
-process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append('PATSummaryTables')
-process.MessageLogger.cerr.INFO = cms.untracked.PSet(
-    default          = cms.untracked.PSet( limit = cms.untracked.int32(0)  ),
-    PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) )
-)
-
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -22,7 +14,7 @@ process.source = cms.Source("PoolSource",
 process.load('Configuration/StandardSequences/GeometryPilot2_cff')
 process.load('Configuration/StandardSequences/MagneticField_38T_cff')
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = 'IDEAL_V12::All'
+process.GlobalTag.globaltag = 'MC_31X_V3::All'
 
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
@@ -31,11 +23,11 @@ import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
 #jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
 
-jetAlgos = ['KT6','SC5','SC7']
-jetTypes = ['Calo','PF']
+#jetAlgos = ['KT6','SC5','SC7']
+#jetTypes = ['Calo','PF']
 
-#jetAlgos = ['SC5','SC7']
-#jetTypes = ['PF']
+jetAlgos = ['SC5','SC7']
+jetTypes = ['PF']
 
 for algo in jetAlgos:
     for type in jetTypes:
@@ -46,9 +38,8 @@ for algo in jetAlgos:
         jetTools.addJetCollection(process,cms.InputTag(coll),label,
                                   doJTA=True,doBTagging=True,
                                   jetCorrLabel=(algo,type),
-                                  doType1MET=False,doL1Counters=False,
-                                  genJetCollection=cms.InputTag(genColl),
-                                  doTrigMatch=False)
+                                  doType1MET=False,doL1Cleaning=False,doL1Counters=False,
+                                  genJetCollection=cms.InputTag(genColl))
 
 jetTools.switchJetCollection(process,
                              cms.InputTag("sisCone7PFJets"),
@@ -58,12 +49,18 @@ jetTools.switchJetCollection(process,
                              doType1MET=False,
                              genJetCollection=cms.InputTag("sisCone7GenJets"))
 
+from PhysicsTools.PatAlgos.patTemplate_cfg import process as processPATtemplate
+process.out = processPATtemplate.out
 objs = ['Muons','Electrons','Taus','Photons']
-for item in objs: coreTools.removeSpecificPATObject(process,item)
-
+coreTools.removeSpecificPATObjects(process,objs)
 coreTools.removeCleaning(process)
 
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
+#process.exclusiveDijetsHLTFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT8E29")
+process.exclusiveDijetsHLTFilter.HLTPaths = ['HLT_DiJetAve15U_1E31']
+#process.exclusiveDijetsHLTFilter.HLTPaths = ['HLT_DiJetAve30U_1E31']
+#process.exclusiveDijetsHLTFilter.HLTPaths = ['HLT_DiJetAve30U_8E29']
+#process.exclusiveDijetsHLTFilter.HLTPaths = ['HLT_Jet30U']
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_cfi")
 process.pileUpInfo.AccessCrossingFramePlayBack = True
