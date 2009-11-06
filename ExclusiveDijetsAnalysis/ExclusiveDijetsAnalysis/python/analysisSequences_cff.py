@@ -38,7 +38,10 @@ trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksT
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.hfTower_cfi import *
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
+#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import * 
 xiTower.UseMETInfo = False
+#xiFromCaloTowers.ParticlesTag = cms.InputTag("")
+#xiFromCaloTowers.UseMETInfo = False
 
 #from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.BTagging_cff import *
 
