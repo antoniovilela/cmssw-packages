@@ -92,6 +92,10 @@ void CaloTowerAnalyzer::beginJob(edm::EventSetup const&iSetup){
      histosnhfplus_.push_back(fs->make<TH1F>(hname,"Towers mult. HF plus",nBinsHF_,0,nBinsHF_));
      sprintf(hname,"nhfminus_%d",i);
      histosnhfminus_.push_back(fs->make<TH1F>(hname,"Towers mult. HF minus",nBinsHF_,0,nBinsHF_));	
+     sprintf(hname,"sumEHFplus_%d",i);     
+     histosSumEHFplus_.push_back(fs->make<TH1F>(hname,"Energy sum HF plus",100,0.,200.));   
+     sprintf(hname,"sumEHFminus_%d",i);
+     histosSumEHFminus_.push_back(fs->make<TH1F>(hname,"Energy sum HF minus",100,0.,200.));
      sprintf(hname,"nhflow_%d",i);
      histosnhflow_.push_back(fs->make<TH1F>(hname,"Towers mult. HF low",nBinsHF_,0,nBinsHF_));
      sprintf(hname,"nhfhigh_%d",i);
@@ -161,6 +165,10 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   std::vector<int> nhf_minus(nThresholdIter_,0);
   std::vector<double> sumw_hf_plus(nThresholdIter_,0.);
   std::vector<double> sumw_hf_minus(nThresholdIter_,0.); 
+  std::vector<double> sume_hf_plus(nThresholdIter_,0.);
+  std::vector<double> sume_hf_minus(nThresholdIter_,0.);
+  std::vector<double> sumew_hf_plus(nThresholdIter_,0.);
+  std::vector<double> sumew_hf_minus(nThresholdIter_,0.); 
 
   /*CandidateCollection::const_iterator cand = calotowercands->begin();
   CaloTowerRef towerRef = cand->get<CaloTowerRef>();
@@ -286,9 +294,13 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	   if(zside > 0){
               nhf_plus[i]++;
               sumw_hf_plus[i] += weight;
+              sume_hf_plus[i] += energy;
+              sumew_hf_plus[i] += energy*weight;
            } else{
               nhf_minus[i]++;
-              sumw_hf_minus[i] += weight; 
+              sumw_hf_minus[i] += weight;
+              sume_hf_minus[i] += energy;
+              sumew_hf_minus[i] += energy*weight;  
            }
 	   histenergyvsetaHF_->Fill(eta,energy*weight); 
 	   histetavsphiHF_->Fill(eta,phi,weight);
@@ -325,6 +337,9 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
      double sumw_hf_high = sumw_hf_minus[i] + sumw_hf_plus[i] - sumw_hf_low;
      histosnhflow_[i]->Fill(sumw_hf_low);
      histosnhfhigh_[i]->Fill(sumw_hf_high);
+
+     histosSumEHFplus_[i]->Fill(sumew_hf_plus[i]);
+     histosSumEHFminus_[i]->Fill(sumew_hf_minus[i]);
   }
 
   if(accessRecHits_){

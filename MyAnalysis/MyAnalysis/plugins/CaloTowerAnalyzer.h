@@ -32,7 +32,9 @@ class CaloTowerAnalyzer : public edm::EDAnalyzer
  private:
 
   std::vector<TH1F*> histosnhfplus_;
-  std::vector<TH1F*> histosnhfminus_; 	 
+  std::vector<TH1F*> histosnhfminus_;
+  std::vector<TH1F*> histosSumEHFplus_;
+  std::vector<TH1F*> histosSumEHFminus_;
   std::vector<TH1F*> histosnhflow_;
   std::vector<TH1F*> histosnhfhigh_;
 

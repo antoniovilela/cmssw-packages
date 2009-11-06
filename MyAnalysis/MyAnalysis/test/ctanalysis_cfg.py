@@ -22,11 +22,12 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     #fileNames = cms.untracked.vstring('file:/data1/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_CMSSW22X_cff_py_RAW2DIGI_RECO.root')
-    fileNames = cms.untracked.vstring('file:/data1/antoniov/QCD100to250-madgraph_IDEAL_V11_redigi_v1_GEN-SIM-RECO_383EB3A2-3A0A-DE11-82D9-001731A28BE1.root')
+    #fileNames = cms.untracked.vstring('file:/data1/antoniov/QCD100to250-madgraph_IDEAL_V11_redigi_v1_GEN-SIM-RECO_383EB3A2-3A0A-DE11-82D9-001731A28BE1.root')
+    fileNames = cms.untracked.vstring('file:/data1/antoniov/MinBias_Summer08_IDEAL_V11_redigi_v1_GEN-SIM-RECO_FE5226D6-F9CE-DD11-9000-001BFCDBD15E.root')
 )
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('analysisHistos_QCD.root')
+    fileName = cms.string('analysisHistos_MinBias.root')
 )
 
 process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
