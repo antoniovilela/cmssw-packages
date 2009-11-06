@@ -28,10 +28,12 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('file:/data1/antoniov/POMWIG_SingleDiffractiveDijetsPlus_10TeV_Pt_30_cff_py_GEN_FASTSIM.root')
+    #fileNames = cms.untracked.vstring('file:/data1/antoniov/QCD100to250-madgraph_IDEAL_V12_FastSim_GEN-SIM-DIGI-RECO_FCE6F1F2-FE1C-DE11-9095-0019B9CB01A7.root')
 )
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('analysisHistos_FastSim.root')
+    #fileName = cms.string('analysisHistos_QCD_FastSim_offset_reweighted.root')
+    fileName = cms.string('analysisHistos_SDPlusDijets_FastSim_raw_reweighted.root')
 )
 
 process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
@@ -49,13 +51,13 @@ process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
     NumberOfTresholds = cms.uint32(100),
     TowerEnergyTresholdHFMin = cms.double(0.0),
     TowerEnergyTresholdHFMax = cms.double(10.0),
-    ApplyEnergyOffset = cms.bool(True),
+    ApplyEnergyOffset = cms.bool(False),
     EnergyOffsetParameters = cms.PSet(
-        sigmaShort = cms.double(0.39),
-        sigmaLong = cms.double(0.29)
+        meanHFEnergy = cms.double(0.60),
+        sigmaHFEnergy = cms.double(0.30)
     ),
-    ReweightHFTower = cms.bool(False),
-    ReweightHistoName = cms.vstring("reweightHisto.root","energyHFplusRatio")  
+    ReweightHFTower = cms.bool(True),
+    ReweightHistoName = cms.vstring("reweightHisto_QCD_raw.root","energyHFplusRatio")  
 )
 
 process.analysis = cms.Path(process.calotwranalysis)

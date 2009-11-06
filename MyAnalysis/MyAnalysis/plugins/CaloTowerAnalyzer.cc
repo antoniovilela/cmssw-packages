@@ -60,11 +60,14 @@ CaloTowerAnalyzer::CaloTowerAnalyzer(const edm::ParameterSet& conf):
      CLHEP::HepRandomEngine& engine = rng->getEngine();
      gauss_ = std::auto_ptr<CLHEP::RandGaussQ>(new CLHEP::RandGaussQ(engine));
      edm::ParameterSet energyOffsetPSet = conf.getParameter<edm::ParameterSet>("EnergyOffsetParameters");
-     sigmaShort_ = energyOffsetPSet.getParameter<double>("sigmaShort");
+     /*sigmaShort_ = energyOffsetPSet.getParameter<double>("sigmaShort");
      sigmaLong_ = energyOffsetPSet.getParameter<double>("sigmaLong");
+     nIncrements_ = energyOffsetPSet.getParameter<int>("nIncrements");*/
+     meanHFEnergy_ = energyOffsetPSet.getParameter<double>("meanHFEnergy");
+     sigmaHFEnergy_ = energyOffsetPSet.getParameter<double>("sigmaHFEnergy");
      edm::LogVerbatim("Analysis") << "Using \n"
-                                  << "  sigmaShort= " << sigmaShort_
-                                  << "  sigmaLong=  " << sigmaLong_; 
+                                  << "  meanHFEnergy=    " << meanHFEnergy_
+                                  << "\n  sigmaHFEnergy=   " << sigmaHFEnergy_;
   }  
 }  
   
@@ -149,8 +152,8 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   int sizeCaloTowers = towerCollection->size();
 
-  edm::LogVerbatim("Analysis") << " =================> Treating event " << iEvent.id()
-                               << " Number of Calo Towers " << sizeCaloTowers;
+  LogTrace("Analysis") << " =================> Treating event " << iEvent.id()
+                       << " Number of Calo Towers " << sizeCaloTowers;
 
   if(sizeCaloTowers == 0) return;
 
@@ -247,16 +250,25 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
      double energyShort = calotower->hadEnergy()/2.;
      double energyLong = calotower->emEnergy() + energyShort;
      if(applyEnergyOffset_){
-        energyShort += gauss_->fire(0.,sigmaShort_);
+        /*energyShort += gauss_->fire(0.,sigmaShort_);
         energyLong += gauss_->fire(0.,sigmaLong_);
-        energy = energyShort + energyLong; 
+        energy = energyShort + energyLong;*/
+        //energy += nIncrements_*sigmaLong_; 
+        /*double deltaEShort = std::max(gauss_->fire(0.,sigmaShort_),0.);
+        double deltaELong = std::max(gauss_->fire(0.,sigmaLong_),0.);
+        energyShort += deltaEShort;
+        energyLong += deltaELong; 
+        energy = energyShort + energyLong;*/
+        double deltaEnergy = std::max(gauss_->fire(meanHFEnergy_,sigmaHFEnergy_),0.);
+        energy += deltaEnergy;
      }
 
      double weight = 1.0;
      if(reweightHFTower_){
         int xbin = reweightHisto_.GetXaxis()->FindBin(energy);
         int nBins = reweightHisto_.GetNbinsX(); // 1 <= xbin <= nBins
-        weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : reweightHisto_.GetBinContent(nBins);
+        //weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : reweightHisto_.GetBinContent(nBins);
+        weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : 1.;
      }
 
      histhflongenergyFromTwr_->Fill(energyLong,weight);

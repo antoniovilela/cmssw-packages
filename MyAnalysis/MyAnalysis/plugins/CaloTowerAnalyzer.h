@@ -82,13 +82,13 @@ class CaloTowerAnalyzer : public edm::EDAnalyzer
  
   bool applyEnergyOffset_;
   std::auto_ptr<CLHEP::RandGaussQ> gauss_;
-  double sigmaShort_;
+  /*double sigmaShort_;
   double sigmaLong_;
+  int nIncrements_;*/
+  double meanHFEnergy_;
+  double sigmaHFEnergy_; 
 
   std::vector<std::pair<int,int> > excludeList_;
 };
   
 #endif
- 
-
-
