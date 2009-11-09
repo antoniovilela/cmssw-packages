@@ -69,11 +69,11 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    std::vector<std::string> jetColls;
    jetColls.push_back("selectedLayer1JetsSC7PF");
-   jetColls.push_back("selectedLayer1JetsSC7Calo");
+   //jetColls.push_back("selectedLayer1JetsSC7Calo");
    jetColls.push_back("selectedLayer1JetsSC5PF");
-   jetColls.push_back("selectedLayer1JetsSC5Calo");
-   jetColls.push_back("selectedLayer1JetsKT6PF");
-   jetColls.push_back("selectedLayer1JetsKT6Calo");
+   //jetColls.push_back("selectedLayer1JetsSC5Calo");
+   //jetColls.push_back("selectedLayer1JetsKT6PF");
+   //jetColls.push_back("selectedLayer1JetsKT6Calo");
 
    std::vector<std::string> jetCollsNonCorr;
    jetCollsNonCorr.push_back("sisCone7PFJets");
@@ -128,11 +128,13 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    }
 
    double Ebeam = 5000.;
-   int thresholdHF = 14;// 0.2 GeV/bin
+   int thresholdHF = 15;// 0.2 GeV/bin
 
    bool accessPileUp = false;
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
+
+   bool useHFTowerWeighted = false;
 
    // Event selection
    // Prim. vertices
@@ -314,8 +316,8 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
        std::cout << "Proton (z-minus): " << proton2->pt() << "  " << proton2->eta() << "  " << proton2->phi() << std::endl;
      }
      // Subtract the two protons' momenta
-     allGenParticles -= proton1->p4();
-     allGenParticles -= proton2->p4();
+     if(proton1 != genParticles.end()) allGenParticles -= proton1->p4();
+     if(proton2 != genParticles.end()) allGenParticles -= proton2->p4();
      histosTH1F["MxGen"]->Fill(allGenParticles.M());
      histosTH1F["ResMxFromJets"]->Fill(MxFromJets - allGenParticles.M());
      histosTH1F["ResMxFromPFCands"]->Fill(MxFromPFCands - allGenParticles.M());
@@ -439,6 +441,13 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      fwlite::Handle<std::vector<unsigned int> > nHFMinus;
      nHFMinus.getByLabel(ev,"hfTower","nHFminus");
 
+     fwlite::Handle<std::vector<double> > sumWeightsHFplus;
+     fwlite::Handle<std::vector<double> > sumWeightsHFminus;
+     if(useHFTowerWeighted){
+        sumWeightsHFplus.getByLabel(ev,"hfTower","sumWeightsHFplus");
+        sumWeightsHFminus.getByLabel(ev,"hfTower","sumWeightsHFminus");
+     }
+
      fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaPlus;
      mapThreshToiEtaPlus.getByLabel(ev,"hfTower","mapTreshToiEtaplus");
 
@@ -469,8 +478,10 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      unsigned int nTracksOutsideJets = *trackMultiplicityOutsideJets;
      unsigned int nTracksTransverseRegion = *trackMultiplicityTransverseRegion; 
 
-     unsigned int nHF_plus = (*nHFPlus)[thresholdHF];
-     unsigned int nHF_minus = (*nHFMinus)[thresholdHF];
+     //unsigned int nHF_plus = (*nHFPlus)[thresholdHF];
+     //unsigned int nHF_minus = (*nHFMinus)[thresholdHF];
+     double nHF_plus = useHFTowerWeighted ? (*sumWeightsHFplus)[thresholdHF] : (*nHFPlus)[thresholdHF];
+     double nHF_minus = useHFTowerWeighted ? (*sumWeightsHFminus)[thresholdHF] : (*nHFMinus)[thresholdHF];
  
      double xiTower_plus = *xiTowerPlus;
      double xiTower_minus = *xiTowerMinus;

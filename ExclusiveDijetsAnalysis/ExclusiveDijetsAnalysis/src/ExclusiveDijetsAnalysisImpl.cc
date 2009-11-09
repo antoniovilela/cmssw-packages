@@ -234,6 +234,12 @@ void ExclusiveDijetsAnalysisImpl::fillMultiplicities(EventData& eventData, const
   edm::Handle<std::vector<unsigned int> > nHFMinus;
   event.getByLabel("hfTower","nHFminus",nHFMinus);
 
+  /*edm::Handle<std::vector<double> > sumWeightsHFplus;
+  event.getByLabel("hfTower","sumWeightsHFplus",sumWeightsHFplus);
+
+  edm::Handle<std::vector<double> > sumWeightsHFminus;
+  event.getByLabel("hfTower","sumWeightsHFminus",sumWeightsHFminus);*/
+
   edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaPlus;
   event.getByLabel("hfTower","mapTreshToiEtaplus",mapThreshToiEtaPlus);
 
@@ -244,6 +250,8 @@ void ExclusiveDijetsAnalysisImpl::fillMultiplicities(EventData& eventData, const
 
   unsigned int nHF_plus = (*nHFPlus)[thresholdHF_];
   unsigned int nHF_minus = (*nHFMinus)[thresholdHF_];
+  //double nHF_plus = useWeightsHFTower_ ? (*sumWeightsHFplus)[thresholdHF_] : (*nHFPlus)[thresholdHF_];
+  //double nHF_minus = useWeightsHFTower_ ? (*sumWeightsHFminus)[thresholdHF_] : (*nHFMinus)[thresholdHF_];
 
   eventData.trackMultiplicity_ = nTracks;
   eventData.multiplicityHFPlus_ = nHF_plus;
