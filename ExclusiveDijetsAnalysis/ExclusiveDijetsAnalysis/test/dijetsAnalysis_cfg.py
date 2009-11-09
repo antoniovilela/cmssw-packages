@@ -1,5 +1,31 @@
 import FWCore.ParameterSet.Config as cms
+import sys
 
+inputFields = ('accessPileUpInfo','fileout')
+
+class input: pass
+for item in sys.argv:
+    option = item.split('=')[0]
+    if option in inputFields:
+        value = item.split('=')[1]
+        if option == 'accessPileUpInfo':
+            if value in ('true','True','yes','Yes'): input.accessPileUpInfo = True
+            else: input.accessPileUpInfo = False
+        else: 
+            setattr(input,option,value)
+
+        print option,'=',getattr(input,option)
+
+requiredFields = ()
+for item in requiredFields:
+    if not hasattr(input,item):
+        raise RuntimeError,'Need to set "%s"' % item
+
+# Treat default cases 
+if not hasattr(input,'accessPileUpInfo'): input.accessPileUpInfo = False
+if not hasattr(input,'fileout'): input.fileout = 'edmDump_exclusiveDijets.root'
+
+# Build cms.Process
 process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
@@ -24,6 +50,7 @@ process.load('Configuration/StandardSequences/MagneticField_38T_cff')
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'IDEAL_V12::All'
 
+# PAT
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 import PhysicsTools.PatAlgos.tools.coreTools as coreTools
@@ -31,11 +58,11 @@ import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
 #jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
 
-jetAlgos = ['KT4','KT6','SC5','SC7']
-jetTypes = ['Calo','PF']
+#jetAlgos = ['KT4','KT6','SC5','SC7']
+#jetTypes = ['Calo','PF']
 
-#jetAlgos = ['SC5','SC7']
-#jetTypes = ['PF']
+jetAlgos = ['SC5','SC7']
+jetTypes = ['PF']
 
 for algo in jetAlgos:
     for type in jetTypes:
@@ -63,18 +90,20 @@ for item in objs: coreTools.removeSpecificPATObject(process,item)
 
 coreTools.removeCleaning(process)
 
+# Other analysis sequences
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
 
-process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_cfi")
-process.pileUpInfo.AccessCrossingFramePlayBack = True
-process.pileUpInfo.BunchCrossings = cms.vint32(0)
-process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
+if input.accessPileUpInfo:
+    process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_cfi")
+    process.pileUpInfo.AccessCrossingFramePlayBack = True
+    process.pileUpInfo.BunchCrossings = cms.vint32(0)
+    #process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
 
 #from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_expanded as MyEventContent
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.output.outputCommands = MyEventContent.outputCommands 
-process.output.fileName = 'edmDump_exclusiveDijets.root'
+process.output.fileName = input.fileout
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 
 process.TFileService = cms.Service("TFileService",
@@ -82,7 +111,8 @@ process.TFileService = cms.Service("TFileService",
 )
 
 #process.recoSequence = cms.Sequence(process.jets*process.btagging*process.tracks*process.edmDump+process.pileUpInfo)
-process.recoSequence = cms.Sequence(process.jets*process.tracks*process.edmDump+process.pileUpInfo)
+if input.accessPileUpInfo: process.recoSequence = cms.Sequence(process.jets*process.tracks*process.edmDump+process.pileUpInfo)
+else: process.recoSequence = cms.Sequence(process.jets*process.tracks*process.edmDump)
 
 process.selection_step = cms.Path(process.hlt)
 process.reco_step = cms.Path(process.hlt+process.recoSequence)
