@@ -1,29 +1,48 @@
 import FWCore.ParameterSet.Config as cms
 import sys
 
-inputFields = ('accessPileUpInfo','fileout')
+print sys.argv
+
+inputFields = ('fileIn','fileOut','accessPileUpInfo','reweightHFTower','reweightFileName','reweightHistoName')
 
 class input: pass
 for item in sys.argv:
     option = item.split('=')[0]
     if option in inputFields:
         value = item.split('=')[1]
-        if option == 'accessPileUpInfo':
-            if value in ('true','True','yes','Yes'): input.accessPileUpInfo = True
-            else: input.accessPileUpInfo = False
-        else: 
-            setattr(input,option,value)
-
-        print option,'=',getattr(input,option)
+        if value in ('true','True','yes','Yes'): value = True
+        elif value in ('false','False','no','No'): value = False
+        
+        setattr(input,option,value)
+        #print "Setting",option,"=",getattr(input,option)
 
 requiredFields = ()
 for item in requiredFields:
     if not hasattr(input,item):
         raise RuntimeError,'Need to set "%s"' % item
 
-# Treat default cases 
+# Treat default case
+if not hasattr(input,'fileIn'):
+    input.fileIn = 'file:pool.root'
+else:
+    if input.fileIn.find(':') == -1: input.fileIn = 'file:' + input.fileIn
+
+if not hasattr(input,'fileOut'): input.fileOut = 'edmDump_exclusiveDijets.root'
 if not hasattr(input,'accessPileUpInfo'): input.accessPileUpInfo = False
-if not hasattr(input,'fileout'): input.fileout = 'edmDump_exclusiveDijets.root'
+if not hasattr(input,'reweightHFTower'): input.reweightHFTower = False
+if not hasattr(input,'reweightFileName'): input.reweightFileName = 'reweightHistos.root'
+if not hasattr(input,'reweightHistoName'): input.reweightHistoName = 'energyHFplusRatio'
+
+# Print parameters
+#for attr in input.__dict__:
+#    print "Using %s = %s" % (attr,input.__dict__[attr])
+for item in inputFields:
+    print "Using %s = %s" % (item,getattr(input,item))
+
+#jetAlgos = ['KT4','KT6','SC5','SC7']
+#jetTypes = ['Calo','PF']
+jetAlgos = ['SC5','SC7']
+jetTypes = ['PF']
 
 # Build cms.Process
 process = cms.Process("Analysis")
@@ -42,7 +61,7 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/tmp/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_cff_py_RAW2DIGI_RECO.root')
+    fileNames = cms.untracked.vstring(input.fileIn)
 )
 
 process.load('Configuration/StandardSequences/GeometryPilot2_cff')
@@ -57,12 +76,6 @@ import PhysicsTools.PatAlgos.tools.coreTools as coreTools
 import PhysicsTools.PatAlgos.tools.jetTools as jetTools
 
 #jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
-
-#jetAlgos = ['KT4','KT6','SC5','SC7']
-#jetTypes = ['Calo','PF']
-
-jetAlgos = ['SC5','SC7']
-jetTypes = ['PF']
 
 for algo in jetAlgos:
     for type in jetTypes:
@@ -99,11 +112,15 @@ if input.accessPileUpInfo:
     process.pileUpInfo.BunchCrossings = cms.vint32(0)
     #process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
 
+if input.reweightHFTower:
+    process.hfTower.ReweightHFTower = True
+    process.hfTower.ReweightHistoName = cms.vstring(input.reweightFileName,input.reweightHistoName)
+
 #from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_expanded as MyEventContent
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.output.outputCommands = MyEventContent.outputCommands 
-process.output.fileName = input.fileout
+process.output.fileName = input.fileOut
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 
 process.TFileService = cms.Service("TFileService",

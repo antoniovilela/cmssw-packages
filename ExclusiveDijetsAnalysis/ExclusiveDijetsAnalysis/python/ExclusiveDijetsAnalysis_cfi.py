@@ -10,11 +10,11 @@ ExclusiveDijetsAnalysis = cms.PSet(
     DoBTag = cms.bool(True),
     BDiscriminatorName = cms.string("jetBProbabilityBJetTags"),
     # Misc
-    HFThresholdIndex = cms.uint32(14),
+    HFThresholdIndex = cms.uint32(15),
     UseJetCorrection = cms.bool(False),
     JetCorrectionService = cms.string("L2L3JetCorrectorSC7PF"),
     # If accessing the pile-up info
-    AccessPileUpInfo = cms.bool(True),
+    AccessPileUpInfo = cms.bool(False),
     EBeam = cms.untracked.double(5000.),
     UsePAT = cms.untracked.bool(True)
 )

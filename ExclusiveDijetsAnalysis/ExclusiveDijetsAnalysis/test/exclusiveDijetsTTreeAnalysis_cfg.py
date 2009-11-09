@@ -1,5 +1,25 @@
 import FWCore.ParameterSet.Config as cms
+from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisTools import parseInput
+ 
+inputFields = ('fileIn','fileAnalysisOut','accessPileUpInfo')
+requiredFields = ()
 
+input = parseInput(inputFields,requiredFields)
+
+# Treat default case
+if not hasattr(input,'fileIn'):
+    input.fileIn = 'file:pool.root'
+else:
+    if input.fileIn.find(':') == -1: input.fileIn = 'file:' + input.fileIn
+
+if not hasattr(input,'fileAnalysisOut'): input.fileAnalysisOut = 'analysisDijets_TTree.root'
+if not hasattr(input,'accessPileUpInfo'): input.accessPileUpInfo = False
+
+# Print parameters
+for item in inputFields:
+    print "Using %s = %s" % (item,getattr(input,item))
+
+# Build cms.Process
 process = cms.Process("EdmDumpAnalysis")
 
 process.load('ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.messageLogger_cfi')
@@ -9,11 +29,8 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
-from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.filesCEPGGM100_edmDump_cfi import filesPSet
-
 process.source = cms.Source("PoolSource",
-    #fileNames = filesPSet.fileNames
-    fileNames = cms.untracked.vstring('file:/data1/antoniov/edmDump_exclusiveDijets_CEPDijetsGG_M100_10TeV_StageA156Bx_PU.root')
+    fileNames = cms.untracked.vstring(input.fileIn)
 )
 
 #process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff")
@@ -26,21 +43,11 @@ process.scaledJets_step = cms.Path(process.scaledPATJets1pt1+process.scaledPATJe
 
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsFilter_cfi")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsTTreeAnalysis_cfi")
+process.exclusiveDijetsTTreeAnalysis.AccessPileUpInfo = input.accessPileUpInfo
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
 process.exclusiveDijetsSelection = cms.Sequence(process.singleVertexFilter+process.exclusiveDijetsFilter)
 
-"""
-from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi import pileUpNumberFilter
-filtersPU = []
-for i in range(5):
-    filtersPU.append('filter%dPU'%i)
-    setattr(process,'filter%dPU'%i,pileUpNumberFilter.clone(NumberOfPileUpEvents = i))
-
-#filters = ['singleVertexFilter']
-filters = [] 
-filters.extend(filtersPU)
-"""
 filters = []
 attributes = [{'JetTag':'scaledPATJets1pt1'},
               {'JetTag':'scaledPATJets0pt9'}]
@@ -49,5 +56,5 @@ from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import 
 makeAnalysis(process,'exclusiveDijetsTTreeAnalysis','exclusiveDijetsSelection',attributes,filters)
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("analysisDijets_TTree.root")
+                                   fileName = cms.string(input.fileAnalysisOut)
 )

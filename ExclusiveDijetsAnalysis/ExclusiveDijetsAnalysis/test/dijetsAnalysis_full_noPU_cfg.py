@@ -1,12 +1,15 @@
 import FWCore.ParameterSet.Config as cms
 
+# Skim sequences
 from dijetsAnalysis_noPU_cfg import process
 if hasattr(process,'output'): del process.output
 if hasattr(process,'out_step'): del process.out_step
 if hasattr(process,'analysis_step'): del process.analysis_step
 
-process.source.fileNames = cms.untracked.vstring('file:/tmp/antoniov/QCDpt30_Summer08_IDEAL_V11_redigi_v1_RECO_345194AC-4EE3-DD11-9EF6-001D0967D634.root')
+process.MessageLogger.cerr.threshold = 'INFO'
+process.source.fileNames = cms.untracked.vstring('file:/data1/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_CMSSW22X_cff_py_RAW2DIGI_RECO.root')
 
+# Analysis sequences
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
 process.singleVtx = cms.Sequence(process.hlt+process.singleVertexFilter)
 

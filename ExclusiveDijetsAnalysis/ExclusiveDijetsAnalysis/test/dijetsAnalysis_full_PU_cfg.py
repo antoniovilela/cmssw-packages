@@ -1,12 +1,15 @@
 import FWCore.ParameterSet.Config as cms
 
-from dijetsAnalysis_cfg import process
+# Skim sequences
+from dijetsAnalysis_PU_cfg import process
 if hasattr(process,'output'): del process.output
 if hasattr(process,'out_step'): del process.out_step
 if hasattr(process,'analysis_step'): del process.analysis_step
 
-#process.source.fileNames = cms.untracked.vstring('file:')
+process.MessageLogger.cerr.threshold = 'INFO'
+process.source.fileNames = cms.untracked.vstring('file:/data1/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_cff_py_RAW2DIGI_RECO_StageA156Bx_PU.root')
 
+# Analysis sequences
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
 process.singleVtx = cms.Sequence(process.hlt+process.singleVertexFilter)
 
@@ -26,4 +29,4 @@ from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import 
 makeAnalysis(process,'edmDumpAnalysis','hlt',attributes,filters)
 makeAnalysis(process,'edmDumpAnalysis','singleVtx',attributes,filters)
 
-process.TFileService.fileName = cms.string("analysisDijets_histos.root")
+process.TFileService.fileName = cms.string("analysisDijets_histos_PU.root")
