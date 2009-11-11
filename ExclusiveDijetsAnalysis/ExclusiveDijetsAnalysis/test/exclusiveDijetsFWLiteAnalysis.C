@@ -84,7 +84,7 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    genJetColls.push_back("sisCone5GenJets");
  
    // Book Histograms
-   TH1::SetDefaultSumw2(true);
+   //TH1::SetDefaultSumw2(true);
 
    HistoMapTH1F histosTH1F;
    HistoMapTH2F histosTH2F; 
@@ -312,8 +312,10 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
        else if((proton2 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz < -0.75*Ebeam)) proton2 = genpart;
      }
      if(verbose){
-       std::cout << "Proton (z-plus): " << proton1->pt() << "  " << proton1->eta() << "  " << proton1->phi() << std::endl;
-       std::cout << "Proton (z-minus): " << proton2->pt() << "  " << proton2->eta() << "  " << proton2->phi() << std::endl;
+       if(proton1 != genParticles.end()) std::cout << "Proton (z-plus): " << proton1->pt() << "  "
+                                                   << proton1->eta() << "  " << proton1->phi() << std::endl;
+       if(proton2 != genParticles.end()) std::cout << "Proton (z-minus): " << proton2->pt() << "  "
+                                                   << proton2->eta() << "  " << proton2->phi() << std::endl;
      }
      // Subtract the two protons' momenta
      if(proton1 != genParticles.end()) allGenParticles -= proton1->p4();
@@ -339,8 +341,8 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      histosTH1F["xiMinusFromPFCands"]->Fill(xiFromPFCands.second);
 
      // Xi gen
-     double xigen_plus = 1 - proton1->pz()/Ebeam;
-     double xigen_minus = 1 + proton2->pz()/Ebeam;
+     double xigen_plus = (proton1 != genParticles.end()) ? (1 - proton1->pz()/Ebeam) : 1.;
+     double xigen_minus = (proton2 != genParticles.end()) ? (1 + proton2->pz()/Ebeam) : 1.;
 
      histosTH1F["xiGenPlus"]->Fill(xigen_plus);
      histosTH1F["xiGenMinus"]->Fill(xigen_minus); 
@@ -460,6 +462,19 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > iEtaHFMultiplicityMinus;
      iEtaHFMultiplicityMinus.getByLabel(ev,"hfTower","iEtaHFMultiplicityMinus");
 
+     fwlite::Handle<std::vector<double> > sumEHFplus;
+     sumEHFplus.getByLabel(ev,"hfTower","sumEHFplus");
+
+     fwlite::Handle<std::vector<double> > sumEHFminus;
+     sumEHFminus.getByLabel(ev,"hfTower","sumEHFminus");
+
+     fwlite::Handle<std::vector<double> > sumEWeightedHFplus;
+     fwlite::Handle<std::vector<double> > sumEWeightedHFminus; 
+     if(useHFTowerWeighted){
+        sumEWeightedHFplus.getByLabel(ev,"hfTower","sumEWeightedHFplus");
+        sumEWeightedHFminus.getByLabel(ev,"hfTower","sumEWeightedHFminus");
+     }
+
      fwlite::Handle<double> xiTowerPlus;
      xiTowerPlus.getByLabel(ev,"xiTower","xiTowerplus");
 
@@ -482,7 +497,12 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      //unsigned int nHF_minus = (*nHFMinus)[thresholdHF];
      double nHF_plus = useHFTowerWeighted ? (*sumWeightsHFplus)[thresholdHF] : (*nHFPlus)[thresholdHF];
      double nHF_minus = useHFTowerWeighted ? (*sumWeightsHFminus)[thresholdHF] : (*nHFMinus)[thresholdHF];
- 
+
+     //double sumE_plus = (*sumEHFplus)[thresholdHF];
+     //double sumE_minus = (*sumEHFminus)[thresholdHF]; 
+     double sumE_plus = useHFTowerWeighted ? (*sumEWeightedHFplus)[thresholdHF] : (*sumEHFplus)[thresholdHF];
+     double sumE_minus = useHFTowerWeighted ? (*sumEWeightedHFminus)[thresholdHF] : (*sumEHFminus)[thresholdHF];
+
      double xiTower_plus = *xiTowerPlus;
      double xiTower_minus = *xiTowerMinus;
  
@@ -496,6 +516,9 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
 
      histosTH1F["multiplicityHFPlus"]->Fill(nHF_plus);
      histosTH1F["multiplicityHFMinus"]->Fill(nHF_minus);     
+
+     histosTH1F["sumEnergyHFPlus"]->Fill(sumE_plus);
+     histosTH1F["sumEnergyHFMinus"]->Fill(sumE_minus);
 
      for(unsigned int ieta = 29; ieta <= 41; ++ieta){
         //const std::map<unsigned int, std::vector<unsigned int> >& mapThreshToiEta_plus = *mapThreshToiEtaPlus;
@@ -546,15 +569,6 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      histosTH1F["RjjFromJetsAfterSelCustomBin"]->Fill(RjjFromJets);
      histosTH1F["RjjFromPFCandsAfterSelCustomBin"]->Fill(RjjFromPFCands);
  
-     fwlite::Handle<std::vector<double> > sumEHFplus;
-     sumEHFplus.getByLabel(ev,"hfTower","sumEHFplus");
-   
-     fwlite::Handle<std::vector<double> > sumEHFminus;
-     sumEHFminus.getByLabel(ev,"hfTower","sumEHFminus");
-
-     double sumE_plus = (*sumEHFplus)[thresholdHF];
-     double sumE_minus = (*sumEHFminus)[thresholdHF];
-
      double fbAsymmetryEnergy = ((sumE_plus + sumE_minus) > 0.)?((sumE_plus - sumE_minus)/(sumE_plus + sumE_minus)):0.;
 
      histosTH1F["forwardBackwardAsymmetryHFEnergy"]->Fill(fbAsymmetryEnergy);
