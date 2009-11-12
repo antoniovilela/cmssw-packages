@@ -29,6 +29,7 @@ ExclusiveDijetsAnalysisImpl::ExclusiveDijetsAnalysisImpl(const edm::ParameterSet
   accessPileUpInfo_(pset.getParameter<bool>("AccessPileUpInfo")),
   Ebeam_(pset.getUntrackedParameter<double>("EBeam",5000.)),
   usePAT_(pset.getUntrackedParameter<bool>("UsePAT",true)),
+  useHFTowerWeighted_(pset.getUntrackedParameter<bool>("UseHFTowerWeighted",false)),
   genProtonPlus_(0.,0.,0.,0.),
   genProtonMinus_(0.,0.,0.,0.),
   genAllParticles_(0.,0.,0.,0.)  
@@ -234,11 +235,12 @@ void ExclusiveDijetsAnalysisImpl::fillMultiplicities(EventData& eventData, const
   edm::Handle<std::vector<unsigned int> > nHFMinus;
   event.getByLabel("hfTower","nHFminus",nHFMinus);
 
-  /*edm::Handle<std::vector<double> > sumWeightsHFplus;
-  event.getByLabel("hfTower","sumWeightsHFplus",sumWeightsHFplus);
-
+  edm::Handle<std::vector<double> > sumWeightsHFplus;
   edm::Handle<std::vector<double> > sumWeightsHFminus;
-  event.getByLabel("hfTower","sumWeightsHFminus",sumWeightsHFminus);*/
+  if(useHFTowerWeighted_){
+     event.getByLabel("hfTower","sumWeightsHFplus",sumWeightsHFplus);
+     event.getByLabel("hfTower","sumWeightsHFminus",sumWeightsHFminus);
+  }
 
   edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaPlus;
   event.getByLabel("hfTower","mapTreshToiEtaplus",mapThreshToiEtaPlus);
@@ -246,17 +248,45 @@ void ExclusiveDijetsAnalysisImpl::fillMultiplicities(EventData& eventData, const
   edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaMinus;
   event.getByLabel("hfTower","mapTreshToiEtaminus",mapThreshToiEtaMinus);
 
+  edm::Handle<std::vector<double> > sumEHFplus;
+  event.getByLabel("hfTower","sumEHFplus",sumEHFplus);
+
+  edm::Handle<std::vector<double> > sumEHFminus;
+  event.getByLabel("hfTower","sumEHFminus",sumEHFminus);
+
+  edm::Handle<std::vector<double> > sumEWeightedHFplus;
+  edm::Handle<std::vector<double> > sumEWeightedHFminus; 
+  if(useHFTowerWeighted_){
+     event.getByLabel("hfTower","sumEWeightedHFplus",sumEWeightedHFplus);
+     event.getByLabel("hfTower","sumEWeightedHFminus",sumEWeightedHFminus);
+  }
+
   unsigned int nTracks = *trackMultiplicity;
 
   unsigned int nHF_plus = (*nHFPlus)[thresholdHF_];
   unsigned int nHF_minus = (*nHFMinus)[thresholdHF_];
-  //double nHF_plus = useWeightsHFTower_ ? (*sumWeightsHFplus)[thresholdHF_] : (*nHFPlus)[thresholdHF_];
-  //double nHF_minus = useWeightsHFTower_ ? (*sumWeightsHFminus)[thresholdHF_] : (*nHFMinus)[thresholdHF_];
+  //double nHF_plus = useHFTowerWeighted_ ? (*sumWeightsHFplus)[thresholdHF_] : (*nHFPlus)[thresholdHF_];
+  //double nHF_minus = useHFTowerWeighted_ ? (*sumWeightsHFminus)[thresholdHF_] : (*nHFMinus)[thresholdHF_];
+  double sumWeights_plus = useHFTowerWeighted_ ? (*sumWeightsHFplus)[thresholdHF_] : -1.;
+  double sumWeights_minus = useHFTowerWeighted_ ? (*sumWeightsHFminus)[thresholdHF_] : -1.;
+
+  double sumE_plus = (*sumEHFplus)[thresholdHF_];
+  double sumE_minus = (*sumEHFminus)[thresholdHF_];
+  //double sumE_plus = useHFTowerWeighted_ ? (*sumEWeightedHFplus)[thresholdHF_] : (*sumEHFplus)[thresholdHF_];
+  //double sumE_minus = useHFTowerWeighted_ ? (*sumEWeightedHFminus)[thresholdHF_] : (*sumEHFminus)[thresholdHF_];
+  double sumEWeighted_plus = useHFTowerWeighted_ ? (*sumEWeightedHFplus)[thresholdHF_] : -1.;
+  double sumEWeighted_minus = useHFTowerWeighted_ ? (*sumEWeightedHFminus)[thresholdHF_] : -1.;
 
   eventData.trackMultiplicity_ = nTracks;
   eventData.multiplicityHFPlus_ = nHF_plus;
   eventData.multiplicityHFMinus_ = nHF_minus;
-
+  eventData.sumWeightsHFPlus_ = sumWeights_plus;
+  eventData.sumWeightsHFMinus_ = sumWeights_minus;
+  eventData.sumEnergyHFPlus_ = sumE_plus;
+  eventData.sumEnergyHFMinus_ = sumE_minus;
+  eventData.sumEnergyWeightedHFPlus_ = sumEWeighted_plus;
+  eventData.sumEnergyWeightedHFMinus_ = sumEWeighted_minus;
+  
   for(unsigned int ieta = 29, index = 0; ieta <= 41; ++ieta,++index){
      unsigned int nHFPlus_ieta = nHFSlice(*mapThreshToiEtaPlus,thresholdHF_,ieta);
      eventData.multiplicityHFPlusVsiEta_[index] = nHFPlus_ieta;

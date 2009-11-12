@@ -52,7 +52,7 @@ class ExclusiveDijetsAnalysisImpl {
      bool accessPileUpInfo_;
      double Ebeam_;
      bool usePAT_; 
-
+     bool useHFTowerWeighted_;
      //EventData& eventData_;
 
      math::XYZTLorentzVector genProtonPlus_;

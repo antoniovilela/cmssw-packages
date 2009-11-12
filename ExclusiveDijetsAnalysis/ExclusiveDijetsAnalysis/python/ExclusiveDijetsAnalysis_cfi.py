@@ -16,5 +16,6 @@ ExclusiveDijetsAnalysis = cms.PSet(
     # If accessing the pile-up info
     AccessPileUpInfo = cms.bool(False),
     EBeam = cms.untracked.double(5000.),
-    UsePAT = cms.untracked.bool(True)
+    UsePAT = cms.untracked.bool(True),
+    UseHFTowerWeighted = cms.untracked.bool(False)
 )

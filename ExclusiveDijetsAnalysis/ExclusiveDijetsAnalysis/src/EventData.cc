@@ -23,6 +23,12 @@ namespace exclusiveDijetsAnalysis {
      data.Branch("trackMultiplicity",&eventData.trackMultiplicity_,"trackMultiplicity/I");
      data.Branch("multiplicityHFPlus",&eventData.multiplicityHFPlus_,"multiplicityHFPlus/I");
      data.Branch("multiplicityHFMinus",&eventData.multiplicityHFMinus_,"multiplicityHFMinus/I");
+     data.Branch("sumWeightsHFPlus",&eventData.sumWeightsHFPlus_,"sumWeightsHFPlus/D");
+     data.Branch("sumWeightsHFMinus",&eventData.sumWeightsHFMinus_,"sumWeightsHFMinus/D");
+     data.Branch("sumEnergyHFPlus",&eventData.sumEnergyHFPlus_,"sumEnergyHFPlus/D");
+     data.Branch("sumEnergyHFMinus",&eventData.sumEnergyHFMinus_,"sumEnergyHFMinus/D");
+     data.Branch("sumEnergyWeightedHFPlus",&eventData.sumEnergyWeightedHFPlus_,"sumEnergyWeightedHFPlus/D");
+     data.Branch("sumEnergyWeightedHFMinus",&eventData.sumEnergyWeightedHFMinus_,"sumEnergyWeightedHFMinus/D");
      // 1-13 HF rings, 2.866 < |eta| < 5.205, 29 <= ieta <= 41
      // FIXME 
      data.Branch("multiplicityHFPlusVsiEta",eventData.multiplicityHFPlusVsiEta_,"multiplicityHFPlusVsiEta[13]/I");
@@ -66,6 +72,12 @@ namespace exclusiveDijetsAnalysis {
      data.SetBranchAddress("trackMultiplicity",&eventData.trackMultiplicity_);
      data.SetBranchAddress("multiplicityHFPlus",&eventData.multiplicityHFPlus_);
      data.SetBranchAddress("multiplicityHFMinus",&eventData.multiplicityHFMinus_);
+     data.SetBranchAddress("sumWeightsHFPlus",&eventData.sumWeightsHFPlus_);
+     data.SetBranchAddress("sumWeightsHFMinus",&eventData.sumWeightsHFMinus_);
+     data.SetBranchAddress("sumEnergyHFPlus",&eventData.sumEnergyHFPlus_);
+     data.SetBranchAddress("sumEnergyHFMinus",&eventData.sumEnergyHFMinus_);
+     data.SetBranchAddress("sumEnergyWeightedHFPlus",&eventData.sumEnergyWeightedHFPlus_);
+     data.SetBranchAddress("sumEnergyWeightedHFMinus",&eventData.sumEnergyWeightedHFMinus_);
      // 1-13 HF rings, 2.866 < |eta| < 5.205
      // FIXME 
      data.SetBranchAddress("multiplicityHFPlusVsiEta",eventData.multiplicityHFPlusVsiEta_);

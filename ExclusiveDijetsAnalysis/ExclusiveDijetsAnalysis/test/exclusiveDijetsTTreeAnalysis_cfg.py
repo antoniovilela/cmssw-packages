@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisTools import parseInput
  
-inputFields = ('fileIn','fileAnalysisOut','accessPileUpInfo')
+inputFields = ('fileIn','fileAnalysisOut','accessPileUpInfo','useHFTowerWeighted')
 requiredFields = ()
 
 input = parseInput(inputFields,requiredFields)
@@ -14,6 +14,7 @@ else:
 
 if not hasattr(input,'fileAnalysisOut'): input.fileAnalysisOut = 'analysisDijets_TTree.root'
 if not hasattr(input,'accessPileUpInfo'): input.accessPileUpInfo = False
+if not hasattr(input,'useHFTowerWeighted'): input.useHFTowerWeighted = False
 
 # Print parameters
 for item in inputFields:
@@ -44,6 +45,7 @@ process.scaledJets_step = cms.Path(process.scaledPATJets1pt1+process.scaledPATJe
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsFilter_cfi")
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsTTreeAnalysis_cfi")
 process.exclusiveDijetsTTreeAnalysis.AccessPileUpInfo = input.accessPileUpInfo
+process.exclusiveDijetsTTreeAnalysis.UseHFTowerWeighted = input.useHFTowerWeighted
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.singleVertexFilter_cfi")
 process.exclusiveDijetsSelection = cms.Sequence(process.singleVertexFilter+process.exclusiveDijetsFilter)
