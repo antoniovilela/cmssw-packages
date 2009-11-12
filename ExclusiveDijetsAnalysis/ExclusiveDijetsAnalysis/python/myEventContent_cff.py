@@ -98,8 +98,15 @@ MyEventContent_edmDump = cms.PSet(
 
 MyEventContent_extra = cms.PSet(
     outputCommands = cms.untracked.vstring(
+          'keep *_EventAuxilary_*_*',
+          'keep edmTriggerResults_TriggerResults_*_*',
+          'keep *_hltTriggerSummaryAOD_*_*',
+          'keep L1GlobalTriggerObjectMapRecord_*_*_*',
+          'keep L1GlobalTriggerReadoutRecord_*_*_*',
+          'keep *_hcalnoise_*_*',
           'keep *_genParticles_*_*',
           'keep recoTracks_generalTracks_*_*',
+          'keep *_pixelVertices_*_*',
           'keep *_offlinePrimaryVertices_*_*',
           'keep *_particleFlow_*_*' 
     )
