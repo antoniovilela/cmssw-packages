@@ -10,7 +10,8 @@ process.recoSequence_new = cms.Sequence(process.sisCone5PFJets+process.sisCone7P
 process.reco_step.replace(process.recoSequence,process.recoSequence_new) 
 
 process.hfTower.ReweightHFTower = True
-process.hfTower.ReweightHistoName = cms.vstring("reweightHistos_MinBias_raw.root","energyHFplusRatio")
+#process.hfTower.ReweightHistoName = cms.vstring("reweightHistos_MinBias_raw.root","energyHFplusRatio")
+process.hfTower.ReweightHistoName = cms.vstring("reweightHistos_MinBias_raw.root","energyHFRatioAverage")
 
 process.source.fileNames = cms.untracked.vstring('file:/data1/antoniov/QCD100to250-madgraph_IDEAL_V12_FastSim_GEN-SIM-DIGI-RECO_FCE6F1F2-FE1C-DE11-9095-0019B9CB01A7.root')
-process.output.fileName = 'edmDump_exclusiveDijets_FastSim.root'
+process.output.fileName = 'exclusiveDijets_FastSim.root'

@@ -10,4 +10,4 @@ process.MessageLogger.cerr.threshold = 'INFO'
 #process.hfTower.ReweightHistoName = cms.vstring("reweightHistos_MinBias_raw.root","energyHFplusRatio")
 
 process.source.fileNames = cms.untracked.vstring('file:/data1/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_CMSSW22X_cff_py_RAW2DIGI_RECO.root')
-process.output.fileName = 'edmDump_exclusiveDijets.root'
+process.output.fileName = 'exclusiveDijets.root'

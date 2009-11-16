@@ -27,7 +27,7 @@ if not hasattr(input,'fileIn'):
 else:
     if input.fileIn.find(':') == -1: input.fileIn = 'file:' + input.fileIn
 
-if not hasattr(input,'fileOut'): input.fileOut = 'edmDump_exclusiveDijets.root'
+if not hasattr(input,'fileOut'): input.fileOut = 'exclusiveDijets.root'
 if not hasattr(input,'accessPileUpInfo'): input.accessPileUpInfo = False
 if not hasattr(input,'reweightHFTower'): input.reweightHFTower = False
 if not hasattr(input,'reweightFileName'): input.reweightFileName = 'reweightHistos.root'

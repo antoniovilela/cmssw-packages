@@ -134,7 +134,7 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 
-   bool useHFTowerWeighted = false;
+   bool useHFTowerWeighted = true;
 
    // Event selection
    // Prim. vertices
