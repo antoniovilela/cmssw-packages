@@ -14,7 +14,7 @@ else:
 
 if not hasattr(input,'fileAnalysisOut'): input.fileAnalysisOut = 'analysisDijets_TTree.root'
 if not hasattr(input,'accessPileUpInfo'): input.accessPileUpInfo = False
-if not hasattr(input,'useHFTowerWeighted'): input.useHFTowerWeighted = False
+if not hasattr(input,'useHFTowerWeighted'): input.useHFTowerWeighted = True
 
 # Print parameters
 for item in inputFields:

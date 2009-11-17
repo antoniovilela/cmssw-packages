@@ -17,6 +17,8 @@ process.source = cms.Source("PoolSource",
 from exclusiveDijetsTTreeAnalysis_cfg import process as processTTreeAnalysis
 process.exclusiveDijetsTTreeAnalysis = processTTreeAnalysis.exclusiveDijetsTTreeAnalysis
 process.exclusiveDijetsTTreeAnalysis.AccessPileUpInfo = True
+process.singleVertexFilter = processTTreeAnalysis.singleVertexFilter
+process.exclusiveDijetsFilter = processTTreeAnalysis.exclusiveDijetsFilter
 process.exclusiveDijetsSelection = processTTreeAnalysis.exclusiveDijetsSelection
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *

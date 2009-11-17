@@ -116,8 +116,8 @@ if input.reweightHFTower:
     process.hfTower.ReweightHFTower = True
     process.hfTower.ReweightHistoName = cms.vstring(input.reweightFileName,input.reweightHistoName)
 
-#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
-from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_expanded as MyEventContent
+from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
+#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_expanded as MyEventContent
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.output.outputCommands = MyEventContent.outputCommands 
 process.output.fileName = input.fileOut
