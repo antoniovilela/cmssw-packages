@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("EdmDumpAnalysis")
+process = cms.Process("ExclusiveDijetsAnalysis")
 
 process.load('ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.messageLogger_cfi')
 process.MessageLogger.cerr.threshold = 'INFO'

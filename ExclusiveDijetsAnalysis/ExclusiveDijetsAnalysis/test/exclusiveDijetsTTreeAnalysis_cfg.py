@@ -21,7 +21,7 @@ for item in inputFields:
     print "Using %s = %s" % (item,getattr(input,item))
 
 # Build cms.Process
-process = cms.Process("EdmDumpAnalysis")
+process = cms.Process("ExclusiveDijetsAnalysis")
 
 process.load('ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.messageLogger_cfi')
 process.MessageLogger.cerr.threshold = 'INFO'
