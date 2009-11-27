@@ -1,4 +1,5 @@
-from workflow import replaceTemplate,crabCreate,crabSubmit,crabWatch,getOutput
+from crabWrap import crabCreate,crabSubmit,crabWatch,getOutput
+from tools import replaceTemplate
 import os
 #from threading import Thread
 

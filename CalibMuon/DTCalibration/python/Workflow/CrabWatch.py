@@ -1,5 +1,5 @@
 #from CrabTask import CrabTask
-from workflow import checkStatus,getOutput
+from crabWrap import checkStatus,getOutput
 import os,time
 from threading import Thread,Lock,Event
 
