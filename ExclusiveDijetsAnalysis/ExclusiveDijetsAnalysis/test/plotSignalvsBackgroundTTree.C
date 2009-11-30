@@ -33,15 +33,22 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    samples.push_back("signal");
    samples.push_back("SD-plus di-jets");
    samples.push_back("SD-minus di-jets");
-   samples.push_back("QCD non-diffractive");
    samples.push_back("DPE di-jets");
+   samples.push_back("QCD non-diffractive");
 
    std::vector<TFile*> files;
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU_nHFMax_0.root"));
+   /*files.push_back(TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU_nHFMax_0.root"));
    files.push_back(TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_nHFMax_0.root")); 
    files.push_back(TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_nHFMax_0.root"));
    files.push_back(TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_nHFMax_0.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU_nHFMax_0.root"));
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU_nHFMax_0.root"));*/
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU.root"));
+   //files.push_back(TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_noPU.root")); 
+   //files.push_back(TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_noPU.root"));
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_FastSim.root")); 
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_FastSim.root"));
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU.root"));
+   files.push_back(TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_noPU_AOD.root"));
 
    std::vector<TDirectory*> directories;
 
@@ -54,8 +61,8 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    sigmas.push_back(250.);
    sigmas.push_back(300000./2);
    sigmas.push_back(300000./2);
-   sigmas.push_back(15000000.);
    sigmas.push_back(4600.);
+   sigmas.push_back(15000000.);
 
    std::map<std::string,TDirectory*> dirMap = makeMap(samples,directories);
    std::map<std::string,double> sigmaMap = makeMap(samples,sigmas);

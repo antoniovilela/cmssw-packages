@@ -261,9 +261,19 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      double massDijets = dijetSystem.M();
      histosTH1F["massDijets"]->Fill(massDijets);
 
+     double rapidityDijets = dijetSystem.Rapidity();
+     double relativeEta = jet1.eta() - rapidityDijets;
+
+     // Compute Mx
+     double MxFromJets = MassColl(*jetCollection);
+     double MxFromPFCands = MassColl(*pfCandCollection);
+
      // Compute Rjj
      double RjjFromJets = Rjj(*jetCollection,*jetCollection);
      double RjjFromPFCands = Rjj(*jetCollectionNonCorr,*pfCandCollection);
+
+     double RjFromJets = 2*jet1.pt()*cosh(relativeEta)/MxFromJets;
+     double RjFromPFCands = 2*jet1.pt()*cosh(relativeEta)/MxFromPFCands;
 
      // B-tag
      double bDiscJet1 = jet1.bDiscriminator(bDiscriminatorName);
@@ -284,10 +294,6 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
         if(singleOrDoubleBTag && !doubleBTag) continue;
      }
 
-     // Compute Mx
-     double MxFromJets = MassColl(*jetCollection);
-     double MxFromPFCands = MassColl(*pfCandCollection);
-     
      histosTH1F["MxFromJets"]->Fill(MxFromJets);
      histosTH1F["MxFromPFCands"] ->Fill(MxFromPFCands);
      histosTH1F["RjjFromJets"]->Fill(RjjFromJets);

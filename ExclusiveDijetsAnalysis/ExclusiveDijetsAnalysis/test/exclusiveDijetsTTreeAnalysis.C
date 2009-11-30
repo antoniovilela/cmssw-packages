@@ -151,8 +151,8 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    int nTracksMax = 3;
    // HF-multiplicity
    bool doHFMultiplicitySelection = true; 
-   int nHFPlusMax = 0;
-   int nHFMinusMax = 0;
+   int nHFPlusMax = 2;
+   int nHFMinusMax = 2;
 
    // Loop over TTree
    //int nEntries = data->GetEntries();

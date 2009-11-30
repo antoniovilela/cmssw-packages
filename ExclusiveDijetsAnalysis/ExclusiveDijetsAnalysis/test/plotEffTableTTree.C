@@ -16,11 +16,16 @@ std::map<std::string,std::vector<double> > getEvents(std::vector<string>& vars, 
 
 std::vector<std::pair<std::string,TFile*> > getAllSamples(){
    std::vector<std::pair<std::string,TFile*> > files;
-   files.push_back(std::make_pair("CEP di-jets",TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU_nHFMax_0.root")));
+   /*files.push_back(std::make_pair("CEP di-jets",TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU_nHFMax_0.root")));
    files.push_back(std::make_pair("SD-plus di-jets",TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_nHFMax_0.root")));
    files.push_back(std::make_pair("SD-minus di-jets",TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_nHFMax_0.root")));
    files.push_back(std::make_pair("QCD non-diffractive",TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_nHFMax_0.root")));
-   files.push_back(std::make_pair("DPE di-jets",TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU_nHFMax_0.root")));
+   files.push_back(std::make_pair("DPE di-jets",TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU_nHFMax_0.root")));*/
+   files.push_back(std::make_pair("CEP di-jets",TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU.root"))); 
+   files.push_back(std::make_pair("SD-plus di-jets",TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_noPU.root")));
+   files.push_back(std::make_pair("SD-minus di-jets",TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_noPU.root"))); 
+   files.push_back(std::make_pair("DPE di-jets",TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU.root")));
+   files.push_back(std::make_pair("QCD non-diffractive",TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_noPU_AOD.root")));
 
    return files;
 }
