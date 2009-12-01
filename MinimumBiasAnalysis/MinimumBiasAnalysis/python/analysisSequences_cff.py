@@ -24,8 +24,8 @@ leadingJets.src = "sisCone7CaloJets"
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import *
 #selectTracksAssociatedToPV.src = "selectGoodTracks"
-selectTracksAssociatedToPV.src = cms.InputTag("generalTracks","","RETRACK")
-selectTracksAssociatedToPV.VertexTag = cms.InputTag("offlinePrimaryVertices","","REVERTEX")
+#selectTracksAssociatedToPV.src = cms.InputTag("generalTracks","","RETRACK")
+#selectTracksAssociatedToPV.VertexTag = cms.InputTag("offlinePrimaryVertices","","REVERTEX")
 selectTracksAssociatedToPV.MaxDistanceFromVertex = 10.0
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
@@ -39,7 +39,7 @@ tracksTransverseRegion.JetTag = "leadingJets"
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.trackMultiplicity_cfi import * 
 #trackMultiplicity.TracksTag = "selectGoodTracks"
-trackMultiplicity.TracksTag = cms.InputTag("generalTracks","","RETRACK")
+#trackMultiplicity.TracksTag = cms.InputTag("generalTracks","","RETRACK")
 trackMultiplicityAssociatedToPV = trackMultiplicity.clone(TracksTag = "selectTracksAssociatedToPV")
 trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
 trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
