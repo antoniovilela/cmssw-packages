@@ -1,0 +1,6 @@
+<export></export>
+<flags EDM_PLUGIN=1>
+<library name=MinimumBiasAnalysis_plugins file=*.cc>
+  <use name=FWCore/Framework>
+  <use name=FWCore/ParameterSet>
+</library>
