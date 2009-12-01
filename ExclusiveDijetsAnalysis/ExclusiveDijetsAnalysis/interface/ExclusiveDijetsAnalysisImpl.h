@@ -38,6 +38,7 @@ class ExclusiveDijetsAnalysisImpl {
      edm::InputTag jetNonCorrTag_;
      edm::InputTag particleFlowTag_;
      edm::InputTag vertexTag_;
+     edm::InputTag trackMultiplicityTag_;
 
      bool doBtag_;
      std::string bTagMode_;
@@ -49,6 +50,7 @@ class ExclusiveDijetsAnalysisImpl {
      bool accessPileUpInfo_;
      double Ebeam_;
      bool usePAT_; 
+     bool runOnData_;
 
      //EventData& eventData_;
 

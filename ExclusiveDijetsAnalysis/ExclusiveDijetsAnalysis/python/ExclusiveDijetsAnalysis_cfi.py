@@ -6,6 +6,7 @@ ExclusiveDijetsAnalysis = cms.PSet(
     JetNonCorrTag = cms.InputTag("sisCone7PFJets"),
     ParticleFlowTag = cms.InputTag("particleFlow"),
     VertexTag = cms.InputTag("offlinePrimaryVertices"),
+    TrackMultiplicityTag = cms.InputTag("trackMultiplicityTransverseRegion","trackMultiplicity"),
     # B-tagging
     DoBTag = cms.bool(True),
     BDiscriminatorName = cms.string("jetBProbabilityBJetTags"),
@@ -16,5 +17,6 @@ ExclusiveDijetsAnalysis = cms.PSet(
     # If accessing the pile-up info
     AccessPileUpInfo = cms.bool(True),
     EBeam = cms.untracked.double(5000.),
-    UsePAT = cms.untracked.bool(True)
+    UsePAT = cms.untracked.bool(True),
+    RunOnData = cms.untracked.bool(False)
 )

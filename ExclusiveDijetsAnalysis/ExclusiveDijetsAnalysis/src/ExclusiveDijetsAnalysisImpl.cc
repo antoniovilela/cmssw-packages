@@ -23,12 +23,14 @@ ExclusiveDijetsAnalysisImpl::ExclusiveDijetsAnalysisImpl(const edm::ParameterSet
   jetNonCorrTag_(pset.getParameter<edm::InputTag>("JetNonCorrTag")), 
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
   vertexTag_(pset.getParameter<edm::InputTag>("VertexTag")),
+  trackMultiplicityTag_(pset.getParameter<edm::InputTag>("TrackMultiplicityTag")),
   doBtag_(pset.getParameter<bool>("DoBTag")),
   thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
   useJetCorrection_(pset.getParameter<bool>("UseJetCorrection")),
   accessPileUpInfo_(pset.getParameter<bool>("AccessPileUpInfo")),
   Ebeam_(pset.getUntrackedParameter<double>("EBeam",5000.)),
-  usePAT_(pset.getUntrackedParameter<bool>("UsePAT",true))
+  usePAT_(pset.getUntrackedParameter<bool>("UsePAT",true)),
+  runOnData_(pset.getUntrackedParameter<bool>("RunOnData",false))
 {
   if(useJetCorrection_) jetCorrectionService_ = pset.getParameter<std::string>("JetCorrectionService");
   if(doBtag_){
@@ -43,7 +45,7 @@ void ExclusiveDijetsAnalysisImpl::servicesBeginRun(const edm::Run& run, const ed
 }
 
 void ExclusiveDijetsAnalysisImpl::fillEventData(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
-  if(accessPileUpInfo_){
+  if(!runOnData_ && accessPileUpInfo_){
      fillPileUpInfo(eventData,event,setup);
   } else {
      eventData.nPileUpBx0_ = -1;
@@ -140,14 +142,18 @@ void ExclusiveDijetsAnalysisImpl::fillJetInfo(EventData& eventData, const edm::E
      const pat::Jet* patJet2 = dynamic_cast<const pat::Jet*>(&jet2);
      if(!patJet1 || !patJet2) throw edm::Exception(edm::errors::Configuration) << "Expecting PATJet's as input";
 
-     const reco::GenJet* genJet1 = patJet1->genJet();
-     const reco::GenJet* genJet2 = patJet2->genJet();
-     if(genJet1&&genJet2){
-        math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
-        dijetGenSystem += genJet1->p4();
-        dijetGenSystem += genJet2->p4();
-        double massGen = dijetGenSystem.M();
-        eventData.massDijetsGen_ = massGen;
+     if(!runOnData_){
+        const reco::GenJet* genJet1 = patJet1->genJet();
+        const reco::GenJet* genJet2 = patJet2->genJet();
+        if(genJet1&&genJet2){
+           math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
+           dijetGenSystem += genJet1->p4();
+           dijetGenSystem += genJet2->p4();
+           double massGen = dijetGenSystem.M();
+           eventData.massDijetsGen_ = massGen;
+        }
+     } else{
+        eventData.massDijetsGen_ = -999.;
      }
 
      // B-tagging
@@ -169,7 +175,8 @@ void ExclusiveDijetsAnalysisImpl::fillJetInfo(EventData& eventData, const edm::E
 void ExclusiveDijetsAnalysisImpl::fillMultiplicities(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   // Access multiplicities
   edm::Handle<unsigned int> trackMultiplicity; 
-  event.getByLabel("trackMultiplicityTransverseRegion","trackMultiplicity",trackMultiplicity);
+  //event.getByLabel("trackMultiplicityTransverseRegion","trackMultiplicity",trackMultiplicity);
+  event.getByLabel(trackMultiplicityTag_,trackMultiplicity); 
 
   edm::Handle<std::vector<unsigned int> > nHFPlus;
   event.getByLabel("hfTower","nHFplus",nHFPlus);
@@ -202,30 +209,35 @@ void ExclusiveDijetsAnalysisImpl::fillMultiplicities(EventData& eventData, const
 }
 
 void ExclusiveDijetsAnalysisImpl::fillXiInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
-  // Gen particles
-  edm::Handle<edm::View<reco::GenParticle> > genParticlesCollectionH;
-  event.getByLabel("genParticles",genParticlesCollectionH);
+  if(!runOnData_){
+     // Gen particles
+     edm::Handle<edm::View<reco::GenParticle> > genParticlesCollectionH;
+     event.getByLabel("genParticles",genParticlesCollectionH);
    
-  edm::View<reco::GenParticle>::const_iterator proton1 = genParticlesCollectionH->end();
-  edm::View<reco::GenParticle>::const_iterator proton2 = genParticlesCollectionH->end();
-  for(edm::View<reco::GenParticle>::const_iterator genpart = genParticlesCollectionH->begin();
+     edm::View<reco::GenParticle>::const_iterator proton1 = genParticlesCollectionH->end();
+     edm::View<reco::GenParticle>::const_iterator proton2 = genParticlesCollectionH->end();
+     for(edm::View<reco::GenParticle>::const_iterator genpart = genParticlesCollectionH->begin();
                                                    genpart != genParticlesCollectionH->end(); ++genpart){
-     if(genpart->status() != 1) continue;
-     double pz = genpart->pz();
-     if((proton1 == genParticlesCollectionH->end())&&(genpart->pdgId() == 2212)&&(pz > 0.75*Ebeam_)) proton1 = genpart;
-     else if((proton2 == genParticlesCollectionH->end())&&(genpart->pdgId() == 2212)&&(pz < -0.75*Ebeam_)) proton2 = genpart;
-  }
+        if(genpart->status() != 1) continue;
+        double pz = genpart->pz();
+        if((proton1 == genParticlesCollectionH->end())&&(genpart->pdgId() == 2212)&&(pz > 0.75*Ebeam_)) proton1 = genpart;
+        else if((proton2 == genParticlesCollectionH->end())&&(genpart->pdgId() == 2212)&&(pz < -0.75*Ebeam_)) proton2 = genpart;
+     }
 
-  double xigen_plus = -1;
-  double xigen_minus = -1;
-  if((proton1 != genParticlesCollectionH->end())&&(proton2 != genParticlesCollectionH->end())){
-     LogTrace("Analysis") << "Proton (z-plus): " << proton1->pt() << "  " << proton1->eta() << "  " << proton1->phi() << std::endl;
-     LogTrace("Analysis") << "Proton (z-minus): " << proton2->pt() << "  " << proton2->eta() << "  " << proton2->phi() << std::endl;
-     xigen_plus = 1 - proton1->pz()/Ebeam_;
-     xigen_minus = 1 + proton2->pz()/Ebeam_;
+     double xigen_plus = -1.;
+     double xigen_minus = -1.;
+     if((proton1 != genParticlesCollectionH->end())&&(proton2 != genParticlesCollectionH->end())){
+        LogTrace("Analysis") << "Proton (z-plus): " << proton1->pt() << "  " << proton1->eta() << "  " << proton1->phi() << std::endl;
+        LogTrace("Analysis") << "Proton (z-minus): " << proton2->pt() << "  " << proton2->eta() << "  " << proton2->phi() << std::endl;
+        xigen_plus = 1 - proton1->pz()/Ebeam_;
+        xigen_minus = 1 + proton2->pz()/Ebeam_;
+     }
+     eventData.xiGenPlus_ = xigen_plus;
+     eventData.xiGenMinus_ = xigen_minus;
+  } else{
+     eventData.xiGenPlus_ = -1.;
+     eventData.xiGenMinus_ = -1.;
   }
-  eventData.xiGenPlus_ = xigen_plus;
-  eventData.xiGenMinus_ = xigen_minus;
 
   edm::Handle<double> xiTowerPlus;
   event.getByLabel("xiTower","xiTowerplus",xiTowerPlus);
