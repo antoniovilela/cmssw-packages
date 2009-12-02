@@ -13,6 +13,10 @@ MyEventContent_tracks = cms.PSet(
     )
 )
 
+MyEventContent_tracks_reduced = cms.PSet(
+    outputCommands = cms.untracked.vstring()
+)
+
 MyEventContent_tracks_expanded = cms.PSet(
     outputCommands = cms.untracked.vstring(
           'keep *_selectGoodTracks_*_Analysis',
@@ -30,6 +34,13 @@ MyEventContent_jets = cms.PSet(
           'keep *_sisCone7PFJets_*_*',
           'keep *_L2L3CorJetSC5PF_*_Analysis',
           'keep *_L2L3CorJetSC7PF_*_Analysis'
+    )
+)
+
+MyEventContent_jets_reduced = cms.PSet(
+    outputCommands = cms.untracked.vstring(
+          'keep *_sisCone7GenJets_*_*',
+          'keep *_sisCone7PFJets_*_*'
     )
 )
 
@@ -67,6 +78,13 @@ MyEventContent_btag = cms.PSet(
     )
 )
 
+MyEventContent_btag_reduced = cms.PSet(
+    outputCommands = cms.untracked.vstring(
+          'keep *_jetBProbabilityBJetTagsSC7PF_*_*',
+          'keep *_jetProbabilityBJetTagsSC7PF_*_*'
+    )
+)
+
 MyEventContent_btag_expanded = cms.PSet(
     outputCommands = cms.untracked.vstring(
           'keep *_trackCountingHighEffBJetTagsSC5PF_*_*',
@@ -92,7 +110,8 @@ MyEventContent_edmDump = cms.PSet(
           'keep *_trackMultiplicityTransverseRegion_*_Analysis',
           'keep *_pileUpInfo_*_Analysis',
           'keep *_hfTower_*_Analysis',
-          'keep *_xiTower_*_Analysis' 
+          'keep *_xiTower_*_Analysis',
+          'keep *_xiFromCaloTowers_*_Analysis'
     )
 )
 
@@ -120,23 +139,24 @@ MyEventContent.outputCommands.extend(MyEventContent_jets.outputCommands)
 MyEventContent.outputCommands.extend(MyEventContent_btag.outputCommands)
 MyEventContent.outputCommands.extend(MyEventContent_edmDump.outputCommands)
 MyEventContent.outputCommands.extend(MyEventContent_extra.outputCommands)
+MyEventContent.outputCommands.extend(PatEventContent.outputCommands)
 
-MyEventContent_PAT = cms.PSet(
+MyEventContent_reduced = cms.PSet(
         outputCommands = cms.untracked.vstring('drop *')
 )
-MyEventContent_PAT.outputCommands.extend(MyEventContent_tracks.outputCommands)
-MyEventContent_PAT.outputCommands.extend(MyEventContent_jets.outputCommands)
-MyEventContent_PAT.outputCommands.extend(MyEventContent_btag.outputCommands)
-MyEventContent_PAT.outputCommands.extend(MyEventContent_edmDump.outputCommands)
-MyEventContent_PAT.outputCommands.extend(MyEventContent_extra.outputCommands)
-MyEventContent_PAT.outputCommands.extend(PatEventContent.outputCommands)
+MyEventContent_reduced.outputCommands.extend(MyEventContent_tracks_reduced.outputCommands)
+MyEventContent_reduced.outputCommands.extend(MyEventContent_jets_reduced.outputCommands)
+MyEventContent_reduced.outputCommands.extend(MyEventContent_btag_reduced.outputCommands)
+MyEventContent_reduced.outputCommands.extend(MyEventContent_edmDump.outputCommands)
+MyEventContent_reduced.outputCommands.extend(MyEventContent_extra.outputCommands)
+MyEventContent_reduced.outputCommands.extend(PatEventContent.outputCommands)
 
 MyEventContent_expanded = cms.PSet(
         outputCommands = cms.untracked.vstring('drop *')
 )
 MyEventContent_expanded.outputCommands.extend(MyEventContent_tracks_expanded.outputCommands)
 MyEventContent_expanded.outputCommands.extend(MyEventContent_jets_expanded.outputCommands)
-MyEventContent_expanded.outputCommands.extend(MyEventContent_btag.outputCommands)
+MyEventContent_expanded.outputCommands.extend(MyEventContent_btag_expanded.outputCommands)
 MyEventContent_expanded.outputCommands.extend(MyEventContent_edmDump.outputCommands)
 MyEventContent_expanded.outputCommands.extend(MyEventContent_extra.outputCommands)
 MyEventContent_expanded.outputCommands.extend(PatEventContent.outputCommands)

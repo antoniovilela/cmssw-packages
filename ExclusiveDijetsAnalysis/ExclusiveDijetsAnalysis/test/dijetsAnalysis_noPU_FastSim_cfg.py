@@ -6,7 +6,8 @@ process.MessageLogger.cerr.threshold = 'INFO'
 
 process.load("RecoJets.Configuration.RecoPFJets_cff")
 #process.recoSequence_new = cms.Sequence(process.jets*process.btagging*process.tracks*process.edmDump)
-process.recoSequence_new = cms.Sequence(process.sisCone5PFJets+process.sisCone7PFJets*process.jets*process.tracks*process.edmDump)
+#process.recoSequence_new = cms.Sequence(process.sisCone5PFJets+process.sisCone7PFJets*process.jets*process.tracks*process.edmDump)
+process.recoSequence_new = cms.Sequence(process.sisCone7PFJets*process.leadingJets*process.tracks*process.edmDump)
 process.reco_step.replace(process.recoSequence,process.recoSequence_new) 
 
 process.hfTower.ReweightHFTower = True

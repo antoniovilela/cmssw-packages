@@ -31,6 +31,8 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/CaloTowers/interface/CaloTower.h"
+#include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 #endif
@@ -60,7 +62,10 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    HistoMapTH1F histosTH1F;
    HistoMapTH2F histosTH2F;
-   histosTH1F["nVertex"] = new TH1F("nVertex","Nr. of offline primary vertexes",10,0,10); 
+   histosTH1F["nVertex"] = new TH1F("nVertex","Nr. of offline primary vertexes",10,0,10);
+   histosTH1F["posXPrimVtx"] = new TH1F("posXPrimVtx","x position of primary vertexes",100,-15.,15.);
+   histosTH1F["posYPrimVtx"] = new TH1F("posYPrimVtx","y position of primary vertexes",100,-15.,15.); 
+   histosTH1F["posZPrimVtx"] = new TH1F("posZPrimVtx","z position of primary vertexes",100,-30.,30.);
    histosTH1F["leadingJetPt"] = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
    histosTH1F["leadingJetEta"] = new TH1F("leadingJetEta","leadingJetEta",100,-5.,5.);
    histosTH1F["leadingJetPhi"] = new TH1F("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);
@@ -83,10 +88,20 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    histosTH1F["MxFromPFCands"] = new TH1F("MxFromPFCands","MxFromPFCands",200,-10.,400.);
    histosTH2F["iEtaVsHFCountPlus"] = new TH2F("iEtaVsHFCountPlus","iEtaVsHFCountPlus",13,29,42,20,0,20);
    histosTH2F["iEtaVsHFCountMinus"] = new TH2F("iEtaVsHFCountMinus","iEtaVsHFCountMinus",13,29,42,20,0,20);
-
+   int absiEtaMax = 42;
+   int absiEtaMaxLim = absiEtaMax + 1; 
+   histosTH2F["ecalTimeVsiEta"] = new TH2F("ecalTimeVsiEta","ecalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
+   histosTH2F["hcalTimeVsiEta"] = new TH2F("hcalTimeVsiEta","hcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
+   histosTH2F["avgEcalTimeVsiEta"] = new TH2F("avgEcalTimeVsiEta","avgEcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
+   histosTH2F["avgHcalTimeVsiEta"] = new TH2F("avgHcalTimeVsiEta","avgHcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
+  
    double Ebeam = 450.;
    int thresholdHF = 10;// 0.2 GeV
 
+   bool selectEventsInRuns = false;
+   std::vector<int> selectedRuns;
+   selectedRuns.push_back(122314);
+ 
    /*// Event selection
    // Prim. vertices
    bool doVertexSelection = true;
@@ -107,6 +122,16 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      ++nEvts;
      if(verbose) std::cout << ">>> Event number: " << nEvts << endl;
  
+     int eventNumber = ev.id().event();
+     int runNumber = ev.id().run();
+     int lumiSection = ev.luminosityBlock();
+     if(verbose){
+        std::cout << "  Event number: " << eventNumber << std::endl
+                  << "  Run number: " << runNumber << std::endl
+                  << "  Lumi section: " << lumiSection << std::endl;
+     }
+     if(selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
+
      // Hcal noise
      fwlite::Handle<HcalNoiseSummary> noiseSummary;
      noiseSummary.getByLabel(ev,"hcalnoise");   
@@ -149,9 +174,54 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                   << "   Tight Halo id: " << beamHaloTightId << std::endl;
      }
 
+     // Timing from Calo Towers
+     fwlite::Handle<CaloTowerCollection> caloTowerCollection;
+     caloTowerCollection.getByLabel(ev,"towerMaker");
+
+     if(!caloTowerCollection.isValid()) {std::cout << ">>> ERROR: Calo tower collection cout not be accessed" << std::endl;continue;}
+
+     std::map<int,float> avgEcalTimePeriEta;
+     std::map<int,float> avgHcalTimePeriEta;
+     std::map<int,float> sumETowersPeriEta; 
+     for(int k = -absiEtaMax; k <= absiEtaMax; ++k){
+        avgEcalTimePeriEta[k] = 0.;
+        avgHcalTimePeriEta[k] = 0.;
+        sumETowersPeriEta[k] = 0.;
+     }
+
+     std::vector<CaloTower>::const_iterator caloTower = caloTowerCollection->begin();
+     std::vector<CaloTower>::const_iterator caloTower_end = caloTowerCollection->end();
+     for(; caloTower != caloTower_end; ++caloTower){
+        double energy = caloTower->energy();
+        if(energy < 2.0) continue;
+ 
+        int ieta = caloTower->id().ieta();
+        float ecalTime = caloTower->ecalTime();
+        float hcalTime = caloTower->hcalTime();
+ 
+        histosTH2F["ecalTimeVsiEta"]->Fill(ieta,ecalTime);
+        histosTH2F["hcalTimeVsiEta"]->Fill(ieta,hcalTime);
+   
+        avgEcalTimePeriEta[ieta] += caloTower->energy()*ecalTime;
+        avgHcalTimePeriEta[ieta] += caloTower->energy()*hcalTime;
+        sumETowersPeriEta[ieta] += caloTower->energy(); 
+     }
+     for(std::map<int,float>::const_iterator it_ieta = sumETowersPeriEta.begin(); it_ieta != sumETowersPeriEta.end(); ++it_ieta){
+        int ieta = it_ieta->first;
+        float sumE = it_ieta->second;
+        if(sumE > 0.){
+           avgEcalTimePeriEta[ieta] /= sumE;
+           avgHcalTimePeriEta[ieta] /= sumE;
+        }
+        histosTH2F["avgEcalTimeVsiEta"]->Fill(ieta,avgEcalTimePeriEta[ieta]);
+        histosTH2F["avgHcalTimeVsiEta"]->Fill(ieta,avgHcalTimePeriEta[ieta]);
+     }
+
      // Vertex Info
      fwlite::Handle<std::vector<reco::Vertex> > vertexCollection;
      vertexCollection.getByLabel(ev,"offlinePrimaryVertices");
+
+     if(!vertexCollection.isValid()) {std::cout << ">>> ERROR: Vertex collection cout not be accessed" << std::endl;continue;}
 
      int nGoodVertices = 0;
      std::vector<reco::Vertex>::const_iterator vtx = vertexCollection->begin();
@@ -165,6 +235,13 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      // Single-vertex
      histosTH1F["nVertex"]->Fill(nGoodVertices);
      //if(doVertexSelection&&(nGoodVertices != 1)) continue;
+
+     const reco::Vertex& primVertex = (*vertexCollection)[0];
+     if(primVertex.isValid() && !primVertex.isFake()){
+        histosTH1F["posXPrimVtx"]->Fill(primVertex.x());
+        histosTH1F["posYPrimVtx"]->Fill(primVertex.y());
+        histosTH1F["posZPrimVtx"]->Fill(primVertex.z());
+     }
 
      // Jets
      fwlite::Handle<std::vector<reco::CaloJet> > jetCollection;

@@ -38,10 +38,10 @@ trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksT
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.hfTower_cfi import *
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
-#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import * 
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import * 
 xiTower.UseMETInfo = False
-#xiFromCaloTowers.ParticlesTag = cms.InputTag("")
-#xiFromCaloTowers.UseMETInfo = False
+xiFromCaloTowers.ParticlesTag = cms.InputTag("towerMaker")
+xiFromCaloTowers.UseMETInfo = False
 
 #from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.BTagging_cff import *
 
@@ -61,6 +61,6 @@ edmDump = cms.Sequence(trackMultiplicity+
                        trackMultiplicityOutsideJets+
                        trackMultiplicityTransverseRegion+
                        hfTower+
-                       xiTower)
+                       xiTower+xiFromCaloTowers)
 analysisBefore = cms.Sequence(analysisBeforeSelection)
 analysisAfter = cms.Sequence(hlt*analysisAfterSelection)

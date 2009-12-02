@@ -41,8 +41,10 @@ for item in inputFields:
 
 #jetAlgos = ['KT4','KT6','SC5','SC7']
 #jetTypes = ['Calo','PF']
-jetAlgos = ['SC5','SC7']
-jetTypes = ['PF']
+#jetAlgos = ['SC5','SC7']
+#jetTypes = ['PF']
+jetAlgos = []
+jetTypes = []
 
 # Build cms.Process
 process = cms.Process("Analysis")
@@ -116,7 +118,8 @@ if input.reweightHFTower:
     process.hfTower.ReweightHFTower = True
     process.hfTower.ReweightHistoName = cms.vstring(input.reweightFileName,input.reweightHistoName)
 
-from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
+from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent
+#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_reduced as MyEventContent
 #from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_expanded as MyEventContent
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
 process.output.outputCommands = MyEventContent.outputCommands 
