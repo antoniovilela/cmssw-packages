@@ -58,8 +58,9 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap){
 
          scaleHisto(histo,1,1,(index + 1));
 
-         legendsVar[catName]->AddEntry(histo,desc.c_str(),"L"); 
-         histo->DrawNormalized("same",NormPolicy::GetNorm(histo));
+         legendsVar[catName]->AddEntry(histo,desc.c_str(),"L");
+         if(var == vars.begin()) histo->DrawNormalized("",NormPolicy::GetNorm(histo));   
+         else histo->DrawNormalized("same",NormPolicy::GetNorm(histo));
       }
       legendsVar[catName]->SetFillColor(0);
       legendsVar[catName]->Draw("same");

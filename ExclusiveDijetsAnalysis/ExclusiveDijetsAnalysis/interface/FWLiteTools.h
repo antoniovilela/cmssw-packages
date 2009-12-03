@@ -4,6 +4,8 @@
 #include <map>
 #include <algorithm>
 
+namespace exclusiveDijetsAnalysis {
+
 template <class PartColl>
 double MassColl(PartColl& partCollection){
    math::XYZTLorentzVector allCands(0.,0.,0.,0.);
@@ -50,4 +52,5 @@ unsigned int nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& 
    return count_ieta;
 }
 
+}
 #endif
