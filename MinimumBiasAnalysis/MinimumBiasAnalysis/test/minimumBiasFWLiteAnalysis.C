@@ -35,12 +35,18 @@
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
+#include "DataFormats/FWLite/interface/TriggerNames.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
 #endif
 
 #include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/interface/FWLiteTools.h"
 
+using namespace exclusiveDijetsAnalysis;
+
 typedef std::map<std::string,TH1F*> HistoMapTH1F;
 typedef std::map<std::string,TH2F*> HistoMapTH2F;
+
+void bookHistosTH1F(HistoMapTH1F&);
 
 void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                                std::string const& outFileName = "analysisMinBiasFWLite_histos.root",
@@ -61,33 +67,12 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    TH1::SetDefaultSumw2(true);
 
    HistoMapTH1F histosTH1F;
+   bookHistosTH1F(histosTH1F);
+
    HistoMapTH2F histosTH2F;
-   histosTH1F["nVertex"] = new TH1F("nVertex","Nr. of offline primary vertexes",10,0,10);
-   histosTH1F["posXPrimVtx"] = new TH1F("posXPrimVtx","x position of primary vertexes",100,-15.,15.);
-   histosTH1F["posYPrimVtx"] = new TH1F("posYPrimVtx","y position of primary vertexes",100,-15.,15.); 
-   histosTH1F["posZPrimVtx"] = new TH1F("posZPrimVtx","z position of primary vertexes",100,-30.,30.);
-   histosTH1F["leadingJetPt"] = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
-   histosTH1F["leadingJetEta"] = new TH1F("leadingJetEta","leadingJetEta",100,-5.,5.);
-   histosTH1F["leadingJetPhi"] = new TH1F("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);
-   histosTH1F["trackMultiplicity"] = new TH1F("trackMultiplicity","trackMultiplicity",20,0,20);
-   histosTH1F["trackMultiplicityAssociatedToPV"] = new TH1F("trackMultiplicityAssociatedToPV","trackMultiplicityAssociatedToPV",20,0,20);
-   histosTH1F["multiplicityHFPlus"] = new TH1F("multiplicityHFPlus","multiplicityHFPlus",20,0,20);
-   histosTH1F["multiplicityHFMinus"] = new TH1F("multiplicityHFMinus","multiplicityHFMinus",20,0,20);
-   histosTH1F["sumEnergyHFPlus"] = new TH1F("sumEnergyHFPlus","sumEnergyHFPlus",100,0.,100.);
-   histosTH1F["sumEnergyHFMinus"] = new TH1F("sumEnergyHFMinus","sumEnergyHFMinus",100,0.,100.);
-   histosTH1F["xiTowerPlus"] = new TH1F("xiTowerPlus","xiTowerPlus",200,0.,1.);
-   histosTH1F["xiTowerMinus"] = new TH1F("xiTowerMinus","xiTowerMinus",200,0.,1.);
-   histosTH1F["xiPlusFromJets"] = new TH1F("xiPlusFromJets","xiPlusFromJets",200,0.,1.);
-   histosTH1F["xiMinusFromJets"] = new TH1F("xiMinusFromJets","xiMinusFromJets",200,0.,1.);
-   histosTH1F["xiPlusFromPFCands"] = new TH1F("xiPlusFromPFCands","xiPlusFromPFCands",200,0.,1.);
-   histosTH1F["xiMinusFromPFCands"] = new TH1F("xiMinusFromPFCands","xiMinusFromPFCands",200,0.,1.);
-   histosTH1F["missingMassFromXiTower"] = new TH1F("missingMassFromXiTower","missingMassFromXiTower",200,-10.,800.);
-   histosTH1F["missingMassFromXiFromJets"] = new TH1F("missingMassFromXiFromJets","missingMassFromXiFromJets",200,-10.,800.);
-   histosTH1F["missingMassFromXiFromPFCands"] = new TH1F("missingMassFromXiFromPFCands","missingMassFromXiFromPFCands",200,-10.,800.);
-   histosTH1F["MxFromJets"] = new TH1F("MxFromJets","MxFromJets",200,-10.,400.);
-   histosTH1F["MxFromPFCands"] = new TH1F("MxFromPFCands","MxFromPFCands",200,-10.,400.);
    histosTH2F["iEtaVsHFCountPlus"] = new TH2F("iEtaVsHFCountPlus","iEtaVsHFCountPlus",13,29,42,20,0,20);
    histosTH2F["iEtaVsHFCountMinus"] = new TH2F("iEtaVsHFCountMinus","iEtaVsHFCountMinus",13,29,42,20,0,20);
+ 
    int absiEtaMax = 42;
    int absiEtaMaxLim = absiEtaMax + 1; 
    histosTH2F["ecalTimeVsiEta"] = new TH2F("ecalTimeVsiEta","ecalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
@@ -98,10 +83,14 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    double Ebeam = 450.;
    int thresholdHF = 10;// 0.2 GeV
 
-   bool selectEventsInRuns = false;
+   bool selectEventsInRuns = true;
    std::vector<int> selectedRuns;
    selectedRuns.push_back(122314);
  
+   bool doTriggerSelection = false;
+   std::vector<std::string> hltPaths;
+   //hltPaths.push_back("");
+
    /*// Event selection
    // Prim. vertices
    bool doVertexSelection = true;
@@ -132,12 +121,35 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      }
      if(selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
 
+     if(doTriggerSelection){
+        fwlite::Handle<edm::TriggerResults> triggerResults;
+        triggerResults.getByLabel(ev,"TriggerResults","","HLT");
+ 
+        if(!triggerResults.isValid()) {std::cout << ">>> ERROR: Trigger results product could not be accessed" << std::endl;continue;}
+
+        fwlite::TriggerNames const & triggerNames = ev.triggerNames(*triggerResults);
+  
+        bool accept = false;
+        for(std::vector<std::string>::const_iterator path = hltPaths.begin(); path != hltPaths.end(); ++path){
+           std::string const& pathName = *path;
+           unsigned int idx = triggerNames.triggerIndex(pathName);
+           if(triggerResults->accept(idx)){
+              if(verbose) std::cout << "  Passed trigger " << pathName << std::endl; 
+              accept = true;
+           } 
+        } 
+        if(!accept) continue;
+     }
+
      // Hcal noise
      fwlite::Handle<HcalNoiseSummary> noiseSummary;
      noiseSummary.getByLabel(ev,"hcalnoise");   
 
      bool passLoose = noiseSummary->passLooseNoiseFilter();
      bool passTight = noiseSummary->passTightNoiseFilter();
+
+     if(passLoose) histosTH1F["HcalNoiseId"]->Fill(0);
+     if(passTight) histosTH1F["HcalNoiseId"]->Fill(1); 
 
      if(verbose){
         std::cout << " =============== Hcal Noise =============== " << std::endl
@@ -159,7 +171,18 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      bool globalTightHaloId = beamHaloSummary->GlobalTightHaloId();
      bool beamHaloLooseId = beamHaloSummary->LooseId(); 
      bool beamHaloTightId = beamHaloSummary->TightId();
-    
+     
+     if(cscLooseHaloId) histosTH1F["BeamHaloId"]->Fill(0);
+     if(cscTightHaloId) histosTH1F["BeamHaloId"]->Fill(1);
+     if(ecalLooseHaloId) histosTH1F["BeamHaloId"]->Fill(2);
+     if(ecalTightHaloId) histosTH1F["BeamHaloId"]->Fill(3);
+     if(hcalLooseHaloId) histosTH1F["BeamHaloId"]->Fill(4);
+     if(hcalTightHaloId) histosTH1F["BeamHaloId"]->Fill(5);
+     if(globalLooseHaloId) histosTH1F["BeamHaloId"]->Fill(6);
+     if(globalTightHaloId) histosTH1F["BeamHaloId"]->Fill(7);
+     if(beamHaloLooseId) histosTH1F["BeamHaloId"]->Fill(8);
+     if(beamHaloTightId) histosTH1F["BeamHaloId"]->Fill(9);
+
      if(verbose){
         std::cout << " =============== Beam Halo Id =============== " << std::endl
                   << "   CSC loose Halo id: " << cscLooseHaloId << std::endl
@@ -191,6 +214,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
      std::vector<CaloTower>::const_iterator caloTower = caloTowerCollection->begin();
      std::vector<CaloTower>::const_iterator caloTower_end = caloTowerCollection->end();
+     float timeMin = -200.;
+     float timeMax = 200.;
      for(; caloTower != caloTower_end; ++caloTower){
         double energy = caloTower->energy();
         if(energy < 2.0) continue;
@@ -199,9 +224,14 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         float ecalTime = caloTower->ecalTime();
         float hcalTime = caloTower->hcalTime();
  
+        histosTH1F["towerEcalTime"]->Fill(ecalTime);
+        histosTH1F["towerHcalTime"]->Fill(hcalTime);
         histosTH2F["ecalTimeVsiEta"]->Fill(ieta,ecalTime);
         histosTH2F["hcalTimeVsiEta"]->Fill(ieta,hcalTime);
    
+        if((ecalTime < timeMin)||(ecalTime > timeMax)) continue;
+        if((hcalTime < timeMin)||(hcalTime > timeMax)) continue;
+
         avgEcalTimePeriEta[ieta] += caloTower->energy()*ecalTime;
         avgHcalTimePeriEta[ieta] += caloTower->energy()*hcalTime;
         sumETowersPeriEta[ieta] += caloTower->energy(); 
@@ -368,4 +398,49 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
   
    hfile->Write();
    hfile->Close();
+}
+
+void bookHistosTH1F(HistoMapTH1F& histosTH1F){
+   histosTH1F["nVertex"] = new TH1F("nVertex","Nr. of offline primary vertexes",10,0,10);
+   histosTH1F["posXPrimVtx"] = new TH1F("posXPrimVtx","x position of primary vertexes",100,-15.,15.);
+   histosTH1F["posYPrimVtx"] = new TH1F("posYPrimVtx","y position of primary vertexes",100,-15.,15.);
+   histosTH1F["posZPrimVtx"] = new TH1F("posZPrimVtx","z position of primary vertexes",100,-30.,30.);
+   histosTH1F["leadingJetPt"] = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
+   histosTH1F["leadingJetEta"] = new TH1F("leadingJetEta","leadingJetEta",100,-5.,5.);
+   histosTH1F["leadingJetPhi"] = new TH1F("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);
+   histosTH1F["trackMultiplicity"] = new TH1F("trackMultiplicity","trackMultiplicity",20,0,20);
+   histosTH1F["trackMultiplicityAssociatedToPV"] = new TH1F("trackMultiplicityAssociatedToPV","trackMultiplicityAssociatedToPV",20,0,20);
+   histosTH1F["multiplicityHFPlus"] = new TH1F("multiplicityHFPlus","multiplicityHFPlus",20,0,20);
+   histosTH1F["multiplicityHFMinus"] = new TH1F("multiplicityHFMinus","multiplicityHFMinus",20,0,20);
+   histosTH1F["sumEnergyHFPlus"] = new TH1F("sumEnergyHFPlus","sumEnergyHFPlus",100,0.,100.);
+   histosTH1F["sumEnergyHFMinus"] = new TH1F("sumEnergyHFMinus","sumEnergyHFMinus",100,0.,100.);
+   histosTH1F["xiTowerPlus"] = new TH1F("xiTowerPlus","xiTowerPlus",200,0.,1.);
+   histosTH1F["xiTowerMinus"] = new TH1F("xiTowerMinus","xiTowerMinus",200,0.,1.);
+   histosTH1F["xiPlusFromJets"] = new TH1F("xiPlusFromJets","xiPlusFromJets",200,0.,1.);
+   histosTH1F["xiMinusFromJets"] = new TH1F("xiMinusFromJets","xiMinusFromJets",200,0.,1.);
+   histosTH1F["xiPlusFromPFCands"] = new TH1F("xiPlusFromPFCands","xiPlusFromPFCands",200,0.,1.);
+   histosTH1F["xiMinusFromPFCands"] = new TH1F("xiMinusFromPFCands","xiMinusFromPFCands",200,0.,1.);
+   histosTH1F["missingMassFromXiTower"] = new TH1F("missingMassFromXiTower","missingMassFromXiTower",200,-10.,800.);
+   histosTH1F["missingMassFromXiFromJets"] = new TH1F("missingMassFromXiFromJets","missingMassFromXiFromJets",200,-10.,800.);
+   histosTH1F["missingMassFromXiFromPFCands"] = new TH1F("missingMassFromXiFromPFCands","missingMassFromXiFromPFCands",200,-10.,800.);
+   histosTH1F["MxFromJets"] = new TH1F("MxFromJets","MxFromJets",200,-10.,400.);
+   histosTH1F["MxFromPFCands"] = new TH1F("MxFromPFCands","MxFromPFCands",200,-10.,400.);
+   histosTH1F["towerEcalTime"] = new TH1F("towerEcalTime","towerEcalTime",200,-100.,100.);
+   histosTH1F["towerHcalTime"] = new TH1F("towerHcalTime","towerHcalTime",200,-100.,100.);
+
+   histosTH1F["BeamHaloId"] = new TH1F("BeamHaloId","BeamHaloId",10,0,10);
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(1,"CSCLooseHaloId");
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(2,"CSCTightHaloId");
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(3,"EcalLooseHaloId");
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(4,"EcalTightHaloId");
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(5,"HcalLooseHaloId");
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(6,"HcalTightHaloId");
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(7,"GlobalLooseHaloId");
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(8,"GlobalTightHaloId");
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(9,"BeamHaloLooseId");
+   histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(10,"BeamHaloTightId");
+
+   histosTH1F["HcalNoiseId"] = new TH1F("HcalNoiseId","HcalNoiseId",2,0,2);
+   histosTH1F["HcalNoiseId"]->GetXaxis()->SetBinLabel(1,"LooseNoiseFilter");
+   histosTH1F["HcalNoiseId"]->GetXaxis()->SetBinLabel(2,"TightNoiseFilter");
 }
