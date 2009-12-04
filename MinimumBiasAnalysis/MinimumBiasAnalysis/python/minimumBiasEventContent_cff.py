@@ -46,3 +46,7 @@ MinimumBiasEventContent = cms.PSet(
         'keep *_towerMaker_*_*' 
     )    
 )
+
+from GeneratorInterface.Configuration.GeneratorInterface_EventContent_cff import GeneratorInterfaceRECO
+
+MinimumBiasEventContent.outputCommands.extend(GeneratorInterfaceRECO.outputCommands)

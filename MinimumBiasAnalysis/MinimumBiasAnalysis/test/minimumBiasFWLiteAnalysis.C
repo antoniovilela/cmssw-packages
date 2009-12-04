@@ -37,6 +37,7 @@
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 #include "DataFormats/FWLite/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #endif
 
 #include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/interface/FWLiteTools.h"
@@ -47,9 +48,12 @@ typedef std::map<std::string,TH1F*> HistoMapTH1F;
 typedef std::map<std::string,TH2F*> HistoMapTH2F;
 
 void bookHistosTH1F(HistoMapTH1F&);
+void getProcessIds(std::vector<int>&, std::vector<std::string>&);
 
 void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                                std::string const& outFileName = "analysisMinBiasFWLite_histos.root",
+                               bool accessMCInfo = false,
+                               bool selectEventsInRuns = false, 
                                int maxEvents = -1, bool verbose = false) {
    if(verbose){
      std::cout << ">>> Reading files: " << std::endl;
@@ -79,11 +83,29 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    histosTH2F["hcalTimeVsiEta"] = new TH2F("hcalTimeVsiEta","hcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
    histosTH2F["avgEcalTimeVsiEta"] = new TH2F("avgEcalTimeVsiEta","avgEcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
    histosTH2F["avgHcalTimeVsiEta"] = new TH2F("avgHcalTimeVsiEta","avgHcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
-  
+ 
+   std::vector<int> processIDs;
+   std::vector<std::string> processNames; 
+   getProcessIds(processIDs,processNames);
+   histosTH1F["ProcessId"] = new TH1F("ProcessId","ProcessId",processIDs.size(),0,processIDs.size());
+   for(size_t iprocess = 0; iprocess < processIDs.size(); ++iprocess) histosTH1F["ProcessId"] ->GetXaxis()->SetBinLabel(iprocess + 1,processNames[iprocess].c_str());
+
    double Ebeam = 450.;
    int thresholdHF = 10;// 0.2 GeV
 
-   bool selectEventsInRuns = true;
+   bool selectProcessIDs = true;
+   std::vector<int> selectedProcIDs;
+   selectedProcIDs.push_back(11); //f_i f_j -> f_i f_j (QCD)
+   selectedProcIDs.push_back(12); //f_i f_ibar -> f_k f_kbar
+   selectedProcIDs.push_back(13); //f_i f_ibar -> g g
+   selectedProcIDs.push_back(28); //f_i g -> f_i g
+   selectedProcIDs.push_back(53); //g g -> f_k f_kbar
+   selectedProcIDs.push_back(68); //g g -> g g
+   /*selectedProcIDs.push_back(92); //SD AB->XB
+   selectedProcIDs.push_back(93); //SD AB->AX
+   selectedProcIDs.push_back(94); //DD*/ 
+
+   //bool selectEventsInRuns = true;
    std::vector<int> selectedRuns;
    selectedRuns.push_back(122314);
  
@@ -91,10 +113,11 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    std::vector<std::string> hltPaths;
    //hltPaths.push_back("");
 
-   /*// Event selection
+   // Event selection
    // Prim. vertices
    bool doVertexSelection = true;
-   // Jets
+   double primVtxZMax = 10.0;
+   /*// Jets
    double ptmin = 10.;
    double etamax = 5.0;
    // HF-multiplicity
@@ -111,6 +134,22 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      ++nEvts;
      if(verbose) std::cout << ">>> Event number: " << nEvts << endl;
  
+     if(accessMCInfo){
+        fwlite::Handle<GenEventInfoProduct> genEventInfo;
+        genEventInfo.getByLabel(ev,"generator");
+ 
+        if(!genEventInfo.isValid()) {std::cout << ">>> ERROR: Gen event info could not be accessed" << std::endl;continue;}
+
+        unsigned int processId = genEventInfo->signalProcessID();
+        std::vector<int>::const_iterator it_processId = find(processIDs.begin(),processIDs.end(),processId);
+        if(it_processId != processIDs.end()){
+           int idx_processId = it_processId - processIDs.begin();
+           histosTH1F["ProcessId"]->Fill(idx_processId);
+        }  
+ 
+        if(selectProcessIDs && find(selectedProcIDs.begin(),selectedProcIDs.end(),processId) == selectedProcIDs.end()) continue;
+     }
+
      int eventNumber = ev.id().event();
      int runNumber = ev.id().run();
      int lumiSection = ev.luminosityBlock();
@@ -119,7 +158,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                   << "  Run number: " << runNumber << std::endl
                   << "  Lumi section: " << lumiSection << std::endl;
      }
-     if(selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
+     if(!accessMCInfo && selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
 
      if(doTriggerSelection){
         fwlite::Handle<edm::TriggerResults> triggerResults;
@@ -197,6 +236,33 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                   << "   Tight Halo id: " << beamHaloTightId << std::endl;
      }
 
+     // Vertex Info
+     fwlite::Handle<std::vector<reco::Vertex> > vertexCollection;
+     vertexCollection.getByLabel(ev,"offlinePrimaryVertices");
+
+     if(!vertexCollection.isValid()) {std::cout << ">>> ERROR: Vertex collection cout not be accessed" << std::endl;continue;}
+
+     int nGoodVertices = 0;
+     std::vector<reco::Vertex>::const_iterator vtx = vertexCollection->begin();
+     std::vector<reco::Vertex>::const_iterator vtx_end = vertexCollection->end();
+     for(; vtx != vtx_end; ++vtx){
+        if(!vtx->isValid()) continue; // skip non-valid vertices
+        if(vtx->isFake()) continue; // skip vertex from beam spot
+        ++nGoodVertices;
+     }
+
+     histosTH1F["nVertex"]->Fill(nGoodVertices);
+     if(doVertexSelection && (nGoodVertices < 1)) continue;
+
+     const reco::Vertex& primVertex = (*vertexCollection)[0];
+     if(primVertex.isValid() && !primVertex.isFake()){
+        histosTH1F["posXPrimVtx"]->Fill(primVertex.x());
+        histosTH1F["posYPrimVtx"]->Fill(primVertex.y());
+        histosTH1F["posZPrimVtx"]->Fill(primVertex.z());
+
+        if(doVertexSelection && (fabs(primVertex.z()) > primVtxZMax)) continue;
+     }
+
      // Timing from Calo Towers
      fwlite::Handle<CaloTowerCollection> caloTowerCollection;
      caloTowerCollection.getByLabel(ev,"towerMaker");
@@ -218,7 +284,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      float timeMax = 200.;
      for(; caloTower != caloTower_end; ++caloTower){
         double energy = caloTower->energy();
-        if(energy < 2.0) continue;
+        if(energy < 1.0) continue;
  
         int ieta = caloTower->id().ieta();
         float ecalTime = caloTower->ecalTime();
@@ -232,6 +298,9 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         if((ecalTime < timeMin)||(ecalTime > timeMax)) continue;
         if((hcalTime < timeMin)||(hcalTime > timeMax)) continue;
 
+        histosTH1F["energySumVsEcalTime"]->Fill(ecalTime,energy);
+        histosTH1F["energySumVsHcalTime"]->Fill(hcalTime,energy);
+ 
         avgEcalTimePeriEta[ieta] += caloTower->energy()*ecalTime;
         avgHcalTimePeriEta[ieta] += caloTower->energy()*hcalTime;
         sumETowersPeriEta[ieta] += caloTower->energy(); 
@@ -245,32 +314,6 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         }
         histosTH2F["avgEcalTimeVsiEta"]->Fill(ieta,avgEcalTimePeriEta[ieta]);
         histosTH2F["avgHcalTimeVsiEta"]->Fill(ieta,avgHcalTimePeriEta[ieta]);
-     }
-
-     // Vertex Info
-     fwlite::Handle<std::vector<reco::Vertex> > vertexCollection;
-     vertexCollection.getByLabel(ev,"offlinePrimaryVertices");
-
-     if(!vertexCollection.isValid()) {std::cout << ">>> ERROR: Vertex collection cout not be accessed" << std::endl;continue;}
-
-     int nGoodVertices = 0;
-     std::vector<reco::Vertex>::const_iterator vtx = vertexCollection->begin();
-     std::vector<reco::Vertex>::const_iterator vtx_end = vertexCollection->end();
-     for(; vtx != vtx_end; ++vtx){
-        if(!vtx->isValid()) continue; // skip non-valid vertices
-        if(vtx->isFake()) continue; // skip vertex from beam spot
-        ++nGoodVertices;
-     }
-
-     // Single-vertex
-     histosTH1F["nVertex"]->Fill(nGoodVertices);
-     //if(doVertexSelection&&(nGoodVertices != 1)) continue;
-
-     const reco::Vertex& primVertex = (*vertexCollection)[0];
-     if(primVertex.isValid() && !primVertex.isFake()){
-        histosTH1F["posXPrimVtx"]->Fill(primVertex.x());
-        histosTH1F["posYPrimVtx"]->Fill(primVertex.y());
-        histosTH1F["posZPrimVtx"]->Fill(primVertex.z());
      }
 
      // Jets
@@ -427,6 +470,8 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["MxFromPFCands"] = new TH1F("MxFromPFCands","MxFromPFCands",200,-10.,400.);
    histosTH1F["towerEcalTime"] = new TH1F("towerEcalTime","towerEcalTime",200,-100.,100.);
    histosTH1F["towerHcalTime"] = new TH1F("towerHcalTime","towerHcalTime",200,-100.,100.);
+   histosTH1F["energySumVsEcalTime"] = new TH1F("energySumVsEcalTime","energySumVsEcalTime",200,-100.,100.);
+   histosTH1F["energySumVsHcalTime"] = new TH1F("energySumVsHcalTime","energySumVsHcalTime",200,-100.,100.);
 
    histosTH1F["BeamHaloId"] = new TH1F("BeamHaloId","BeamHaloId",10,0,10);
    histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(1,"CSCLooseHaloId");
@@ -443,4 +488,28 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["HcalNoiseId"] = new TH1F("HcalNoiseId","HcalNoiseId",2,0,2);
    histosTH1F["HcalNoiseId"]->GetXaxis()->SetBinLabel(1,"LooseNoiseFilter");
    histosTH1F["HcalNoiseId"]->GetXaxis()->SetBinLabel(2,"TightNoiseFilter");
+}
+
+void getProcessIds(std::vector<int>& processIDs, std::vector<std::string>& processNames){
+   processIDs.push_back(11); //f_i f_j -> f_i f_j (QCD)
+   processNames.push_back("f_{i} f_{j} #rightarrow f_{i} f_{j}");
+   processIDs.push_back(12); //f_i f_ibar -> f_k f_kbar
+   processNames.push_back("f_{i} #bar{f_{i}} #rightarrow f_{k} #bar{f_{k}}");
+   processIDs.push_back(13); //f_i f_ibar -> g g
+   processNames.push_back("f_{i} #bar{f_{i}} #rightarrow g g");
+   processIDs.push_back(28); //f_i g -> f_i g
+   processNames.push_back("f_{i} g #rightarrow f_{i} g");
+   processIDs.push_back(53); //g g -> f_k f_kbar
+   processNames.push_back("g g #rightarrow f_{k} #bar{f_{k}}");
+   processIDs.push_back(68); //g g -> g g
+   processNames.push_back("g g #rightarrow g g");
+   processIDs.push_back(92); //SD AB->XB
+   processNames.push_back("SD AB #rightarrow XB");
+   processIDs.push_back(93); //SD AB->AX
+   processNames.push_back("SD AB #rightarrow AX");
+   processIDs.push_back(94); //DD 
+   processNames.push_back("DD");
+   processIDs.push_back(95); //low-p_T production 
+   processNames.push_back("low-p_{T}");
+
 }
