@@ -39,6 +39,8 @@ MinimumBiasEventContent = cms.PSet(
         'keep *_GlobalHaloData_*_*',
         'keep *_BeamHaloSummary_*_*',
         'keep recoTracks_generalTracks_*_*',
+        'keep recoTracks_ctfPixelLess_*_*',
+        'keep recoTracks_pixelTracks_*_*',
         'keep *_pixelVertices_*_*',
         'keep *_offlinePrimaryVertices_*_*',
         'keep *_particleFlow_*_*',
@@ -48,5 +50,7 @@ MinimumBiasEventContent = cms.PSet(
 )
 
 from GeneratorInterface.Configuration.GeneratorInterface_EventContent_cff import GeneratorInterfaceRECO
-
 MinimumBiasEventContent.outputCommands.extend(GeneratorInterfaceRECO.outputCommands)
+
+from RecoMET.Configuration.RecoMET_EventContent_cff import RecoMETRECO
+MinimumBiasEventContent.outputCommands.extend(RecoMETRECO.outputCommands)

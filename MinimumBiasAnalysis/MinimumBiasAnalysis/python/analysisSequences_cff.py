@@ -26,7 +26,7 @@ from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociate
 #selectTracksAssociatedToPV.src = "selectGoodTracks"
 #selectTracksAssociatedToPV.src = cms.InputTag("generalTracks","","RETRACK")
 #selectTracksAssociatedToPV.VertexTag = cms.InputTag("offlinePrimaryVertices","","REVERTEX")
-selectTracksAssociatedToPV.MaxDistanceFromVertex = 10.0
+selectTracksAssociatedToPV.MaxDistanceFromVertex = 1.0
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
 tracksOutsideJets.src = "selectTracksAssociatedToPV" 
@@ -57,7 +57,8 @@ xiFromJets.comEnergy = 900.0
 
 #hlt = cms.Sequence(lumiSectionSel+bsc)
 #hlt = cms.Sequence(lumiSectionSel+minimumBiasHLTFilter)
-hlt = cms.Sequence(lumiSectionSel)
+#hlt = cms.Sequence(lumiSectionSel)
+hlt = cms.Sequence(minimumBiasHLTFilter)
 #jets = cms.Sequence(L2L3CorJetSC5PF+L2L3CorJetSC7PF*leadingJets)
 #tracks = cms.Sequence(selectGoodTracks*
 #                      selectTracksAssociatedToPV*

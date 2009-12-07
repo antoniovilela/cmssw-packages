@@ -90,6 +90,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    histosTH1F["ProcessId"] = new TH1F("ProcessId","ProcessId",processIDs.size(),0,processIDs.size());
    for(size_t iprocess = 0; iprocess < processIDs.size(); ++iprocess) histosTH1F["ProcessId"] ->GetXaxis()->SetBinLabel(iprocess + 1,processNames[iprocess].c_str());
 
+   //bool accessEdmNtupleVariables = false;
+
    double Ebeam = 450.;
    int thresholdHF = 10;// 0.2 GeV
 
@@ -107,7 +109,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    //bool selectEventsInRuns = true;
    std::vector<int> selectedRuns;
-   selectedRuns.push_back(122314);
+   selectedRuns.push_back(123592); 
+   selectedRuns.push_back(123596);
  
    bool doTriggerSelection = false;
    std::vector<std::string> hltPaths;
@@ -117,14 +120,15 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    // Prim. vertices
    bool doVertexSelection = true;
    double primVtxZMax = 10.0;
-   /*// Jets
-   double ptmin = 10.;
-   double etamax = 5.0;
-   // HF-multiplicity
-   bool doHFMultiplicitySelection = false; 
-   int nHFPlusMax = 0;
-   int nHFMinusMax = 0;*/
+   // Exclusivity
+   //bool doTrackSelection = false;
+   bool doHFSelection = true; 
+   double sumEnergyHFMax = 10.; // from either side
+   bool doMxSelection = true;
+   double MxMin = 100.;
+   double MxMax = 999.;
 
+   std::vector<std::pair<int,int> > selectedEvents;
    // Loop over the events
    int nEvts = 0;
    for( ev.toBegin(); ! ev.atEnd(); ++ev) {
@@ -342,6 +346,9 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      histosTH1F["MxFromJets"]->Fill(MxFromJets);
      histosTH1F["MxFromPFCands"]->Fill(MxFromPFCands);
 
+     if(doMxSelection && ((MxFromPFCands < MxMin)||MxFromPFCands > MxMax)) continue;
+
+     // Compute xi
      std::pair<double,double> xiFromJets = xi(*jetCollection,Ebeam);
      histosTH1F["xiPlusFromJets"]->Fill(xiFromJets.first);
      histosTH1F["xiMinusFromJets"]->Fill(xiFromJets.second);
@@ -437,8 +444,24 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      histosTH1F["sumEnergyHFPlus"]->Fill(sumE_plus);
      histosTH1F["sumEnergyHFMinus"]->Fill(sumE_minus);
 
+     // Selection
+     bool energySumHFSelection = (sumE_plus < sumEnergyHFMax)||(sumE_minus < sumEnergyHFMax);
+     if(doHFSelection && !energySumHFSelection) continue;
+
+     selectedEvents.push_back(std::make_pair(runNumber,eventNumber));
+     std::cout << "======== Selected event ========" << std::endl
+               << "  Event number: " << eventNumber << std::endl
+               << "  Run number: " << runNumber << std::endl
+               << "  Lumi section: " << lumiSection << std::endl
+               << "================================" << std::endl;
    }  // End loop over events
-  
+
+   std::cout << "======== List of selected events ========" << std::endl 
+             << " Total number of events: " << selectedEvents.size() << std::endl;
+   for(std::vector<std::pair<int,int> >::const_iterator it = selectedEvents.begin(); it != selectedEvents.end(); ++it){
+      std::cout << " Run " << it->first << " Event " << it->second << std::endl;
+   }
+
    hfile->Write();
    hfile->Close();
 }
