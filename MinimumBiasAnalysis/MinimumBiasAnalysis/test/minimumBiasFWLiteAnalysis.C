@@ -33,6 +33,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
+#include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 #include "DataFormats/FWLite/interface/TriggerNames.h"
@@ -95,7 +96,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    double Ebeam = 450.;
    int thresholdHF = 10;// 0.2 GeV
 
-   bool selectProcessIDs = true;
+   bool selectProcessIDs = false;
    std::vector<int> selectedProcIDs;
    selectedProcIDs.push_back(11); //f_i f_j -> f_i f_j (QCD)
    selectedProcIDs.push_back(12); //f_i f_ibar -> f_k f_kbar
@@ -120,13 +121,16 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    // Prim. vertices
    bool doVertexSelection = true;
    double primVtxZMax = 10.0;
+   bool doSumETSelection = false;
+   double sumETMin = 20.;
    // Exclusivity
    //bool doTrackSelection = false;
-   bool doHFSelection = true; 
-   double sumEnergyHFMax = 10.; // from either side
-   bool doMxSelection = true;
+   bool doMxSelection = false;
    double MxMin = 100.;
    double MxMax = 999.;
+   bool doHFSelection = true; 
+   double sumEnergyHFMax = 10.; // from either side
+
 
    std::vector<std::pair<int,int> > selectedEvents;
    // Loop over the events
@@ -266,6 +270,20 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
         if(doVertexSelection && (fabs(primVertex.z()) > primVtxZMax)) continue;
      }
+
+     // MET - SumET
+     fwlite::Handle<std::vector<reco::CaloMET> > metCollection;
+     metCollection.getByLabel(ev,"met");
+
+     if(!metCollection.isValid()) {std::cout << ">>> ERROR: MET collection cout not be accessed" << 
+std::endl;continue;}
+
+     const reco::CaloMET& met = (*metCollection)[0];
+     double sumET = met.sumEt();
+
+     histosTH1F["sumET"]->Fill(sumET);
+
+     if(doSumETSelection && (sumET < sumETMin)) continue;
 
      // Timing from Calo Towers
      fwlite::Handle<CaloTowerCollection> caloTowerCollection;
@@ -495,7 +513,8 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["towerHcalTime"] = new TH1F("towerHcalTime","towerHcalTime",200,-100.,100.);
    histosTH1F["energySumVsEcalTime"] = new TH1F("energySumVsEcalTime","energySumVsEcalTime",200,-100.,100.);
    histosTH1F["energySumVsHcalTime"] = new TH1F("energySumVsHcalTime","energySumVsHcalTime",200,-100.,100.);
-
+   histosTH1F["sumET"] = new TH1F("sumET","sumET",200,0.,400.);
+  
    histosTH1F["BeamHaloId"] = new TH1F("BeamHaloId","BeamHaloId",10,0,10);
    histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(1,"CSCLooseHaloId");
    histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(2,"CSCTightHaloId");
