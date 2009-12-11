@@ -1,13 +1,14 @@
 /*
- *  $Date: $
- *  $Revision: $
+ *  $Date: 2008/10/08 16:28:30 $
+ *  $Revision: 1.1 $
  *  
  */
 
 
 #include "GeneratorInterface/PhojetInterface/interface/PhojetSource.h"
-#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-#include "SimDataFormats/HepMCProduct/interface/GenInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenRunInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/Run.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -20,7 +21,6 @@
 
 using namespace edm;
 using namespace std;
-
 
 #include "HepMC/PythiaWrapper6_2.h"
 #include "HepMC/IO_HEPEVT.h"
@@ -201,7 +201,7 @@ PhojetSource::PhojetSource( const ParameterSet & pset,
   //********                                      
   
   produces<HepMCProduct>();
-  produces<GenInfoProduct, edm::InRun>();
+  produces<GenRunInfoProduct, edm::InRun>();
 }
 
 
@@ -216,164 +216,109 @@ void PhojetSource::clear() {
 
 void PhojetSource::endRun(Run & r) {
  
- /*double cs = pypars.pari[0]; // cross section in mb
- auto_ptr<GenInfoProduct> giprod (new GenInfoProduct());
- giprod->set_cross_section(cs);
- giprod->set_external_cross_section(extCrossSect);
- giprod->set_filter_efficiency(extFilterEff);
- r.put(giprod);*/
+  /*double cs = pypars.pari[0]; // cross section in mb
+  auto_ptr<GenInfoProduct> giprod (new GenInfoProduct());
+  giprod->set_cross_section(cs);
+  giprod->set_external_cross_section(extCrossSect);
+  giprod->set_filter_efficiency(extFilterEff);
+  r.put(giprod);*/
 
- auto_ptr<GenInfoProduct> giprod (new GenInfoProduct());
- giprod->set_cross_section(sigmaMax);
- giprod->set_external_cross_section(extCrossSect);
- giprod->set_filter_efficiency(extFilterEff);
- r.put(giprod);
+  auto_ptr<GenRunInfoProduct> giprod (new GenRunInfoProduct());
+  giprod->setInternalXSec(sigmaMax);
+  giprod->setExternalXSecLO(extCrossSect);
+  giprod->setFilterEfficiency(extFilterEff);
+  r.put(giprod);
 
 }
 
 bool PhojetSource::produce(Event & e) {
 
-    auto_ptr<HepMCProduct> bare_product(new HepMCProduct());  
+  auto_ptr<HepMCProduct> bare_product(new HepMCProduct());  
 
-    /*call_pyevnt();      // generate one event with Pythia
+  /*call_pyevnt();      // generate one event with Pythia
 
-    // convert to stdhep format
-    //
-    call_pyhepc( 1 );*/
+  // convert to stdhep format
+  //
+  call_pyhepc( 1 );*/
     
-    //Call Phojet PHO_EVENT here
-    double pmass1 = 0.938;
-    double pmass2 = 0.938;
+  //Call Phojet PHO_EVENT here
+  double pmass1 = 0.938;
+  double pmass2 = 0.938;
 
-    double e1 = comenergy/2.;
-    double pp1 = sqrt(e1*e1 - pmass1*pmass1);
-    double e2 = comenergy/2.;
-    double pp2 = sqrt(e2*e2 - pmass2*pmass2);
+  double e1 = comenergy/2.;
+  double pp1 = sqrt(e1*e1 - pmass1*pmass1);
+  double e2 = comenergy/2.;
+  double pp2 = sqrt(e2*e2 - pmass2*pmass2);
 
-    double p1[4] = {0.,0.,pp1,e1};
-    double p2[4] = {0.,0.,-pp2,e2};    
+  double p1[4] = {0.,0.,pp1,e1};
+  double p2[4] = {0.,0.,-pp2,e2};    
 
-    int mode = 1;
-    int irej;
-    double sigcur; 	
-    pho_event(mode,p1,p2,sigcur,irej);
-    if(irej != 0){
-	LogWarning("") << "   Problem in event generation...skipping.\n";
-	return true;
-    }
+  int mode = 1;
+  int irej;
+  double sigcur; 	
+  pho_event(mode,p1,p2,sigcur,irej);
+  if(irej != 0){
+     LogWarning("") << "   Problem in event generation...skipping.\n";
+     return true;
+  }
 
-    //cout << "Sigcur = " << sigcur << endl;		
+  //cout << "Sigcur = " << sigcur << endl;		
 
-    call_pyhepc( 1 );
+  call_pyhepc( 1 );
 
-    // convert stdhep (hepevt) to hepmc
-    //
-    //HepMC::GenEvent* evt = conv.getGenEventfromHEPEVT();
-    HepMC::GenEvent* evt = conv.read_next_event();
+  // convert stdhep (hepevt) to hepmc
+  //
+  //HepMC::GenEvent* evt = conv.getGenEventfromHEPEVT();
+  HepMC::GenEvent* evt = conv.read_next_event();
 
-    /*evt->set_signal_process_id(pypars.msti[0]);
-    evt->set_event_scale(pypars.pari[16]);
-    evt->set_event_number(numberEventsInRun() - remainingEvents() - 1);*/
+  /*evt->set_signal_process_id(pypars.msti[0]);
+  evt->set_event_scale(pypars.pari[16]);
+  evt->set_event_number(numberEventsInRun() - remainingEvents() - 1);*/
 
-    /*// int id1 = pypars.msti[14];
-    // int id2 = pypars.msti[15];
-    int id1 = pyint1.mint[14];
-    int id2 = pyint1.mint[15];
-    if ( id1 == 21 ) id1 = 0;
-    if ( id2 == 21 ) id2 = 0; 
-    double x1 = pyint1.vint[40];
-    double x2 = pyint1.vint[41];  
-    double Q  = pyint1.vint[50];
-    double pdf1 = pyint1.vint[38];
-    pdf1 /= x1 ;
-    double pdf2 = pyint1.vint[39];
-    pdf2 /= x2 ;
-    evt->set_pdf_info( HepMC::PdfInfo(id1,id2,x1,x2,Q,pdf1,pdf2) ) ;
+  /*// int id1 = pypars.msti[14];
+  // int id2 = pypars.msti[15];
+  int id1 = pyint1.mint[14];
+  int id2 = pyint1.mint[15];
+  if ( id1 == 21 ) id1 = 0;
+  if ( id2 == 21 ) id2 = 0; 
+  double x1 = pyint1.vint[40];
+  double x2 = pyint1.vint[41];  
+  double Q  = pyint1.vint[50];
+  double pdf1 = pyint1.vint[38];
+  pdf1 /= x1 ;
+  double pdf2 = pyint1.vint[39];
+  pdf2 /= x2 ;
+  evt->set_pdf_info( HepMC::PdfInfo(id1,id2,x1,x2,Q,pdf1,pdf2) ) ;
     
-    evt->weights().push_back( pyint1.vint[96] );*/
+  evt->weights().push_back( pyint1.vint[96] );*/
 
-    evt->set_signal_process_id(pypars.msti[0]);
-    evt->set_event_scale(pypars.pari[16]);
-    evt->set_event_number(numberEventsInRun() - remainingEvents() - 1);
+  evt->set_signal_process_id(pypars.msti[0]);
+  evt->set_event_scale(pypars.pari[16]);
+  evt->set_event_number(numberEventsInRun() - remainingEvents() - 1);
     
-    //******** Verbosity ********
+  //******** Verbosity ********
     
-    if(event() <= maxEventsToPrint_ &&
-       (pythiaPylistVerbosity_ || pythiaHepMCVerbosity_)) {
+  if(event() <= maxEventsToPrint_ &&
+     (pythiaPylistVerbosity_ || pythiaHepMCVerbosity_)) {
 
-      // Prints PYLIST info
-      //
-      if(pythiaPylistVerbosity_) {
-	call_pylist(pythiaPylistVerbosity_);
-      }
+     // Prints PYLIST info
+     //
+     if(pythiaPylistVerbosity_) {
+        call_pylist(pythiaPylistVerbosity_);
+     }
       
-      // Prints HepMC event
-      //
-      if(pythiaHepMCVerbosity_) {
-	cout << "Event process = " << pypars.msti[0] << endl 
-	<< "----------------------" << endl;	
-	evt->print();
-      }
-    }
+     // Prints HepMC event
+     //
+     if(pythiaHepMCVerbosity_) {
+        cout << "Event process = " << pypars.msti[0] << endl 
+             << "----------------------" << endl;	
+        evt->print();
+     }
+  }
     
-    
-    //evt = reader_->fillCurrentEventData(); 
-    //********                                      
+  if(evt) bare_product->addHepMCData( evt );
 
-    if(evt)  bare_product->addHepMCData(evt );
+  e.put(bare_product);
 
-    e.put(bare_product);
-
-    return true;
+  return true;
 }
-
-/*bool PhojetSource::phogive(const std::string& ParameterString) {
-  bool accepted = 1;
-
-  if(!strncmp(ParameterString.c_str(),"PARMDL(36)",10)) {
-        pomdls.PARMDL[35] = atof(&ParameterString[strcspn(ParameterString.c_str(),"=")+1]);
-  }
-  else if(!strncmp(ParameterString.c_str(),"PARMDL(37)",10)){
-        pomdls.PARMDL[36] = atof(&ParameterString[strcspn(ParameterString.c_str(),"=")+1]);
-  }
-  else if(!strncmp(ParameterString.c_str(),"PARMDL(38)",10)){
-        pomdls.PARMDL[37] = atof(&ParameterString[strcspn(ParameterString.c_str(),"=")+1]);
-  }
-  else if(!strncmp(ParameterString.c_str(),"PARMDL(39)",10)){
-        pomdls.PARMDL[38] = atof(&ParameterString[strcspn(ParameterString.c_str(),"=")+1]);
-  }
-  else if(!strncmp(ParameterString.c_str(),"PROCESS",7)){
-        poprcs.IPRON[0][0] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+1]);
-        poprcs.IPRON[0][1] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+3]);
-        poprcs.IPRON[0][2] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+5]);
-1;5B
-1;5B
-        poprcs.IPRON[0][3] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+7]);
-        poprcs.IPRON[0][4] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+8]);
-        poprcs.IPRON[0][5] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+9]);
-        poprcs.IPRON[0][6] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+11]);
-        poprcs.IPRON[0][7] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+13]);
-  }
-  else if(!strncmp(ParameterString.c_str(),"DIFF-PROC",9)){
-        int itmp[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
-        itmp[0] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+1]);
-        itmp[1] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+3]);
-        itmp[2] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+5]);
-        itmp[3] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+7]);
-        itmp[4] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+9]);
-        itmp[5] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+11]);
-        itmp[6] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+13]);
-        itmp[7] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+15]);
-        itmp[8] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+17]);
-        itmp[9] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+19]);
-        itmp[10] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+21]);
-        itmp[11] = atoi(&ParameterString[strcspn(ParameterString.c_str(),"=")+23]);
-        for(int i = 0; i < 8; i++){
-                poprcs.IPRON[itmp[0]][i] = itmp[i+1];
-        }
-  }
-  
-  else accepted = 0;
-
-  return accepted;
-}*/
