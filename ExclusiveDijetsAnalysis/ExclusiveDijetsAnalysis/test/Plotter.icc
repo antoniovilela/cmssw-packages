@@ -47,8 +47,10 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
          scaleHisto(histo,1,1,(index + 1),rebin_); 
 
          legendsVar[catName]->AddEntry(histo,desc.c_str(),"L"); 
-         if(var == vars.begin()) histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor);
-         else histo->DrawNormalized((option + "SAME").c_str(),NormPolicy::GetNorm(histo)*normFactor);
+         if(var == vars.begin()){
+            histo->GetXaxis()->SetRangeUser(0.00000001,1.5*histo->GetMaximum());
+            histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor);
+         } else histo->DrawNormalized((option + "SAME").c_str(),NormPolicy::GetNorm(histo)*normFactor);
          //histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo));
       }
       legendsVar[catName]->SetFillColor(0);
