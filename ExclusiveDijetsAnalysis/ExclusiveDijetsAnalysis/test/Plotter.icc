@@ -30,10 +30,14 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
          /*const std::string& name = var->first;
          const std::string& desc = var->second.first;
          TDirectory* dir = var->second.second;*/
-         const std::string& name = var->first;
+         /*const std::string& name = var->first;
          TDirectory* dir = var->second.first;
          const std::string& desc = var->second.second.first;
-         double normFactor = var->second.second.second; 
+         double normFactor = var->second.second.second;*/
+         const std::string& name = var->name();
+         TDirectory* dir = var->dir();
+         const std::string& desc = var->label();
+         double normFactor = var->norm(); 
  
          if(verbose_) std::cout << " Accessing " << name << " in " << dir->GetName() << std::endl;
   
@@ -60,7 +64,9 @@ void Plotter<NormPolicy>::plot(std::vector<std::string>& variables, std::vector<
       size_t idx = 0;
       for(std::vector<std::pair<std::string,TDirectory*> >::const_iterator dir = directories.begin(); dir != directories.end(); ++dir,++idx){
          //varVector.push_back(std::make_pair(*var,*dir));
-         varVector.push_back(std::make_pair(*var,std::make_pair(dir->second,std::make_pair(dir->first,normFactors[idx]))));
+         //varVector.push_back(std::make_pair(*var,std::make_pair(dir->second,std::make_pair(dir->first,normFactors[idx]))));
+         varVector.push_back(VarDesc(*var,dir->second,dir->first,normFactors[idx]));
+         
       }
       variablesMap[*var] = varVector;
    }   
@@ -81,7 +87,8 @@ void Plotter<NormPolicy>::plot(std::map<std::string,std::vector<std::string> >& 
       std::vector<VarDesc> varVector;
       for(std::vector<std::string>::const_iterator var_name = var->second.begin(); var_name != var->second.end(); ++var_name){
          //varVector.push_back(std::make_pair(*var_name,std::make_pair(*var_name,dir)));
-         varVector.push_back(std::make_pair(*var_name,std::make_pair(dir,std::make_pair(*var_name,1.0)))); 
+         //varVector.push_back(std::make_pair(*var_name,std::make_pair(dir,std::make_pair(*var_name,1.0)))); 
+         varVector.push_back(VarDesc(*var_name,dir,*var_name,1.0));
       }
       variablesMap[var->first] = varVector;
    }

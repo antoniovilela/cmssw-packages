@@ -8,11 +8,25 @@
 #include <vector>
 #include <map>
 
+class VarDesc{
+   public:
+      VarDesc(const std::string& name, TDirectory* dir, const std::string& label, double norm): name_(name),dir_(dir),label_(label),norm_(norm) {}
+      const std::string& name() const {return name_;}
+      TDirectory* dir() const {return dir_;}
+      const std::string& label() const {return label_;}
+      double norm() const {return norm_;}
+   private:
+      std::string name_;
+      TDirectory* dir_;
+      std::string label_;
+      double norm_;
+};
+
 template <class NormPolicy=DefaultNorm>
 class Plotter{
    public:
       //typedef std::pair<std::string,std::pair<std::string,TDirectory*> > VarDesc;
-      typedef std::pair<std::string,std::pair<TDirectory*,std::pair<std::string,double> > > VarDesc;
+      //typedef std::pair<std::string,std::pair<TDirectory*,std::pair<std::string,double> > > VarDesc;
       typedef std::map<std::string, std::vector<VarDesc> > VarMap;
 
       Plotter(): verbose_(false),rebin_(1) {}
