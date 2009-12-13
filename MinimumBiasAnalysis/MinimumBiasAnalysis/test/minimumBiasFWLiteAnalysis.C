@@ -48,6 +48,8 @@ using namespace exclusiveDijetsAnalysis;
 typedef std::map<std::string,TH1F*> HistoMapTH1F;
 typedef std::map<std::string,TH2F*> HistoMapTH2F;
 
+//enum gen = {PYTHIA,PHOJET}
+
 void bookHistosTH1F(HistoMapTH1F&);
 void getProcessIds(std::vector<int>&, std::vector<std::string>&);
 
@@ -110,8 +112,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    //bool selectEventsInRuns = true;
    std::vector<int> selectedRuns;
-   selectedRuns.push_back(123592); 
-   selectedRuns.push_back(123596);
+   //selectedRuns.push_back(123592); 
+   //selectedRuns.push_back(123596);
  
    bool doTriggerSelection = false;
    std::vector<std::string> hltPaths;
@@ -130,7 +132,6 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    double MxMax = 999.;
    bool doHFSelection = true; 
    double sumEnergyHFMax = 10.; // from either side
-
 
    std::vector<std::pair<int,int> > selectedEvents;
    // Loop over the events
@@ -467,11 +468,13 @@ std::endl;continue;}
      if(doHFSelection && !energySumHFSelection) continue;
 
      selectedEvents.push_back(std::make_pair(runNumber,eventNumber));
-     std::cout << "======== Selected event ========" << std::endl
-               << "  Event number: " << eventNumber << std::endl
-               << "  Run number: " << runNumber << std::endl
-               << "  Lumi section: " << lumiSection << std::endl
-               << "================================" << std::endl;
+     if(verbose){
+        std::cout << "======== Selected event ========" << std::endl
+                  << "  Event number: " << eventNumber << std::endl
+                  << "  Run number: " << runNumber << std::endl
+                  << "  Lumi section: " << lumiSection << std::endl
+                  << "================================" << std::endl;
+     }
    }  // End loop over events
 
    std::cout << "======== List of selected events ========" << std::endl 
@@ -553,5 +556,4 @@ void getProcessIds(std::vector<int>& processIDs, std::vector<std::string>& proce
    processNames.push_back("DD");
    processIDs.push_back(95); //low-p_T production 
    processNames.push_back("low-p_{T}");
-
 }

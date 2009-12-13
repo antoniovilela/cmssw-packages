@@ -10,8 +10,24 @@ lumiSectionSel = cms.EDFilter("LumiSectionSelection",
 from L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff import *
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import *
 hltLevel1GTSeed.L1TechTriggerSeeding = cms.bool(True)
-hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('32 OR 33 OR 34 OR 35 OR 36 OR 37 OR 38 OR 39 OR 40 OR 41 OR 42 OR 43')
-bsc = cms.Sequence(hltLevel1GTSeed)
+#hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('32 OR 33 OR 34 OR 35 OR 36 OR 37 OR 38 OR 39 OR 40 OR 41 OR 42 OR 43')
+hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0')
+l1tech = cms.Sequence(hltLevel1GTSeed)
+
+primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
+    vertexCollection = cms.InputTag('offlinePrimaryVertices'),
+    minimumNumberOfTracks = cms.uint32(3),
+    maxAbsZ = cms.double(15),	
+    maxd0 = cms.double(2)	
+)
+
+filterScraping = cms.EDFilter("FilterOutScraping",
+    applyfilter = cms.untracked.bool(True),
+    debugOn = cms.untracked.bool(True),
+    numtrack = cms.untracked.uint32(10),
+    thresh = cms.untracked.double(0.2)
+)
+
 
 from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasHLTPaths_cfi import *
 
@@ -58,7 +74,8 @@ xiFromJets.comEnergy = 900.0
 #hlt = cms.Sequence(lumiSectionSel+bsc)
 #hlt = cms.Sequence(lumiSectionSel+minimumBiasHLTFilter)
 #hlt = cms.Sequence(lumiSectionSel)
-hlt = cms.Sequence(minimumBiasHLTFilter)
+hlt = cms.Sequence(l1tech)
+eventSelection = cms.Sequence(hlt+primaryVertexFilter+filterScraping)
 #jets = cms.Sequence(L2L3CorJetSC5PF+L2L3CorJetSC7PF*leadingJets)
 #tracks = cms.Sequence(selectGoodTracks*
 #                      selectTracksAssociatedToPV*
