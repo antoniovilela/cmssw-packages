@@ -1,5 +1,5 @@
-#ifndef Phojet_Source_h
-#define Phojet_Source_h
+#ifndef PhojetInterface_PhojetSource_h
+#define PhojetInterface_PhojetSource_h
 
 /** \class PhojetSource
  *

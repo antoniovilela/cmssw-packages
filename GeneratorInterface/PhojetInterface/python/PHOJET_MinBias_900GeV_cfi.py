@@ -12,3 +12,7 @@ source = cms.Source("PhojetSource",
         )
     )
 )
+
+emptyeventfilter = cms.EDFilter("EmptyEventFilter")
+
+ProductionFilterSequence = cms.Sequence(emptyeventfilter)
