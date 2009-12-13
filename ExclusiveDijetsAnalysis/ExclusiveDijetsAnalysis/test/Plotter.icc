@@ -16,6 +16,7 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
    std::string option = std::string(drawOption);
    std::map<std::string,TCanvas*> canvasesVar;
    std::map<std::string,TLegend*> legendsVar;
+   std::map<std::string,std::vector<TH1F*> > histosVar;
    for(VarMap::iterator cat = variablesMap.begin(); cat != variablesMap.end(); ++cat){
       const std::string& catName = cat->first;
       canvasesVar[catName] = new TCanvas(catName.c_str(),catName.c_str());
@@ -23,7 +24,10 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
 
       legendsVar[catName] = new TLegend(0.4,0.7,0.95,0.8);
     
+      histosVar[catName] = std::vector<TH1F*>();
+
       std::vector<VarDesc>& vars = cat->second;
+      //double maxVal = 0.;
       size_t index = 0;
       for(std::vector<VarDesc>::iterator var = vars.begin(); var != vars.end(); ++var,++index){
 
@@ -47,14 +51,19 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
          scaleHisto(histo,1,1,(index + 1),rebin_); 
 
          legendsVar[catName]->AddEntry(histo,desc.c_str(),"L"); 
-         if(var == vars.begin()){
-            histo->GetXaxis()->SetRangeUser(0.00000001,1.5*histo->GetMaximum());
-            histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor);
-         } else histo->DrawNormalized((option + "SAME").c_str(),NormPolicy::GetNorm(histo)*normFactor);
+         if(var == vars.begin()) histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor);
+         else histo->DrawNormalized((option + "SAME").c_str(),NormPolicy::GetNorm(histo)*normFactor);
          //histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo));
+
+         /*if(var == vars.begin()) maxVal = histo->GetMaximum();
+         else {
+            if(histo->GetMaximum() > maxVal) maxVal = histo->GetMaximum();
+         }*/  
+         histosVar[catName].push_back(histo);
       }
       legendsVar[catName]->SetFillColor(0);
       legendsVar[catName]->Draw(option.c_str());
+      //histosVar[catName].back()->GetYaxis()->SetRangeUser(0.00000001,1.5*maxVal);
    }
 }
 
