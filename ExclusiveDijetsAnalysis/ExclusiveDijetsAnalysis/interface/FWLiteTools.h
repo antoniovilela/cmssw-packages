@@ -4,7 +4,53 @@
 #include <map>
 #include <algorithm>
 
+#if !defined(__CINT__) && !defined(__MAKECINT__)
+//Headers for the data items
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#endif
+
 namespace exclusiveDijetsAnalysis {
+
+template <class VertexColl>
+bool goodVertexFilter(const VertexColl& vertexCollection, unsigned int minNumTracks = 2, double maxAbsZ = -1., double maxd0 = -1.){
+   bool accept = false; 
+   for(typename VertexColl::const_iterator it = vertexCollection.begin();
+                                           it != vertexCollection.end(); ++it){
+      if(it->tracksSize() > minNumTracks && 
+        ( (maxAbsZ <= 0. ) || fabs(it->z()) <= maxAbsZ ) &&
+        ( (maxd0 <= 0. ) || fabs(it->position().rho()) <= maxd0 ) ) {accept = true;break;}
+   }
+
+   return accept;
+
+}
+
+template <class TrackColl>
+bool highPurityTracksFilter(const TrackColl& trackCollection, double thresh, unsigned int numtrack){
+
+   int numhighpurity = 0;
+   float fraction = 0.;
+
+   reco::TrackBase::TrackQuality trkQuality = reco::TrackBase::qualityByName("highPurity");
+
+   bool accept = false;
+   if(trackCollection.size() > numtrack){ 
+      typename TrackColl::const_iterator itk = trackCollection.begin();
+      typename TrackColl::const_iterator itk_end = trackCollection.end();
+      for(; itk != itk_end; ++itk){
+         // std::cout << "HighPurity?  " << itk->quality(_trackQuality) << std::endl;
+         if(itk->quality(trkQuality)) ++numhighpurity;
+      }
+      fraction = (float)numhighpurity/(float)trackCollection.size();
+      if(fraction > thresh) accept = true;
+  } else{
+    //if less than 10 Tracks accept the event anyway    
+    accept = true;
+  }
+  
+  return accept;
+}
 
 template <class PartColl>
 double MassColl(PartColl& partCollection){
