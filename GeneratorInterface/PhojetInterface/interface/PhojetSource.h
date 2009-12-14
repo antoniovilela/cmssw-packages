@@ -45,6 +45,7 @@ namespace edm
     
     virtual bool produce(Event & e);
     void clear();
+    void getProtonKinematics(double* p1, double* p2);
     
     HepMC::GenEvent  *evt;
  

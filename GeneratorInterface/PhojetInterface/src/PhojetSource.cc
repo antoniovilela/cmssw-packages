@@ -1,6 +1,6 @@
 /*
- *  $Date: 2008/10/08 16:28:30 $
- *  $Revision: 1.1 $
+ *  $Date: 2009/12/11 19:41:50 $
+ *  $Revision: 1.2 $
  *  
  */
 
@@ -166,8 +166,8 @@ PhojetSource::PhojetSource( const ParameterSet & pset,
   if(irej != 0) throw edm::Exception(edm::errors::Configuration,"PhojetError") 
                         <<" Error initializing Phojet.";
 
-  double pmass1 = 0.938;
-  double pmass2 = 0.938;
+  /*double pmass1 = 0.938;
+  double pmass2 = 0.938;*/
   /*double ecm = comenergy; 
   double pcm;
   double ee;
@@ -183,13 +183,17 @@ PhojetSource::PhojetSource( const ParameterSet & pset,
   cout << "PCM= " << pcm << endl;
   cout << "EE= " << ee << endl;*/
 
-  double e1 = comenergy/2.;
+  /*double e1 = comenergy/2.;
   double pp1 = sqrt(e1*e1 - pmass1*pmass1);
   double e2 = comenergy/2.;
   double pp2 = sqrt(e2*e2 - pmass2*pmass2);
 
   double p1[4] = {0.,0.,pp1,e1};
-  double p2[4] = {0.,0.,-pp2,e2};
+  double p2[4] = {0.,0.,-pp2,e2};*/
+
+  double p1[4] = {0.,0.,0.,0.};
+  double p2[4] = {0.,0.,0.,0.};
+  getProtonKinematics(p1,p2);
 
   double sigmax;
   int mode = -1; 
@@ -223,6 +227,15 @@ void PhojetSource::endRun(Run & r) {
   giprod->set_filter_efficiency(extFilterEff);
   r.put(giprod);*/
 
+  double p1[4] = {0.,0.,0.,0.};
+  double p2[4] = {0.,0.,0.,0.};
+  getProtonKinematics(p1,p2);
+
+  int mode = -2;
+  int irej;
+  double sigcur;
+  pho_event(mode,p1,p2,sigcur,irej);
+
   auto_ptr<GenRunInfoProduct> giprod (new GenRunInfoProduct());
   giprod->setInternalXSec(sigmaMax);
   giprod->setExternalXSecLO(extCrossSect);
@@ -242,7 +255,7 @@ bool PhojetSource::produce(Event & e) {
   call_pyhepc( 1 );*/
     
   //Call Phojet PHO_EVENT here
-  double pmass1 = 0.938;
+  /*double pmass1 = 0.938;
   double pmass2 = 0.938;
 
   double e1 = comenergy/2.;
@@ -251,7 +264,11 @@ bool PhojetSource::produce(Event & e) {
   double pp2 = sqrt(e2*e2 - pmass2*pmass2);
 
   double p1[4] = {0.,0.,pp1,e1};
-  double p2[4] = {0.,0.,-pp2,e2};    
+  double p2[4] = {0.,0.,-pp2,e2};*/
+
+  double p1[4] = {0.,0.,0.,0.};
+  double p2[4] = {0.,0.,0.,0.};
+  getProtonKinematics(p1,p2);
 
   int mode = 1;
   int irej;
@@ -321,4 +338,22 @@ bool PhojetSource::produce(Event & e) {
   e.put(bare_product);
 
   return true;
+}
+
+void PhojetSource::getProtonKinematics(double* p1, double* p2){
+  double pmass1 = 0.938;
+  double pmass2 = 0.938;
+
+  double e1 = comenergy/2.;
+  double pp1 = sqrt(e1*e1 - pmass1*pmass1);
+  double e2 = comenergy/2.;
+  double pp2 = sqrt(e2*e2 - pmass2*pmass2);
+
+  double p1_new[4] = {0.,0.,pp1,e1};
+  double p2_new[4] = {0.,0.,-pp2,e2};
+
+  for(int k = 0; k < 4; ++k){
+     p1[k] = p1_new[k];
+     p2[k] = p2_new[k];
+  }
 }

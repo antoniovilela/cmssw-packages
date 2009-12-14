@@ -31,6 +31,7 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
@@ -119,6 +120,9 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    std::vector<std::string> hltPaths;
    //hltPaths.push_back("");
 
+   // Pre-selection
+   bool doGoodVertexSelection = true;
+   bool doHighQualityTracksSelection = true; 
    // Event selection
    // Prim. vertices
    bool doVertexSelection = true;
@@ -167,6 +171,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                   << "  Run number: " << runNumber << std::endl
                   << "  Lumi section: " << lumiSection << std::endl;
      }
+     if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with processed event " << nEvts << "...skipping" << std::endl;continue;}
+
      if(!accessMCInfo && selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
 
      if(doTriggerSelection){
@@ -245,11 +251,26 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                   << "   Tight Halo id: " << beamHaloTightId << std::endl;
      }
 
-     // Vertex Info
+     // Pre-selection
      fwlite::Handle<std::vector<reco::Vertex> > vertexCollection;
      vertexCollection.getByLabel(ev,"offlinePrimaryVertices");
 
      if(!vertexCollection.isValid()) {std::cout << ">>> ERROR: Vertex collection cout not be accessed" << std::endl;continue;}
+
+     if(doGoodVertexSelection && !goodVertexFilter(*vertexCollection, 3, 15.0, 2.0)) continue;
+
+     fwlite::Handle<std::vector<reco::Track> > trackCollection;
+     trackCollection.getByLabel(ev,"generalTracks");
+ 
+      if(!trackCollection.isValid()) {std::cout << ">>> ERROR: Track collection cout not be accessed" << std::endl;continue;}
+
+     if(doHighQualityTracksSelection && !highPurityTracksFilter(*trackCollection,0.2,10)) continue;
+
+     // Vertex Info
+     /*fwlite::Handle<std::vector<reco::Vertex> > vertexCollection;
+     vertexCollection.getByLabel(ev,"offlinePrimaryVertices");*/
+
+     //if(!vertexCollection.isValid()) {std::cout << ">>> ERROR: Vertex collection cout not be accessed" << std::endl;continue;}
 
      int nGoodVertices = 0;
      std::vector<reco::Vertex>::const_iterator vtx = vertexCollection->begin();
