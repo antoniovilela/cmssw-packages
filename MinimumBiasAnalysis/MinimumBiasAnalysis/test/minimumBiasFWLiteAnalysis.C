@@ -147,6 +147,18 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      ++nEvts;
      if(verbose) std::cout << ">>> Event number: " << nEvts << endl;
  
+     int eventNumber = ev.id().event();
+     int runNumber = ev.id().run();
+     int lumiSection = ev.luminosityBlock();
+     if(verbose){
+        std::cout << "  Event number: " << eventNumber << std::endl
+                  << "  Run number: " << runNumber << std::endl
+                  << "  Lumi section: " << lumiSection << std::endl;
+     }
+     if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with processed event " << nEvts << "...skipping" << std::endl;continue;}
+
+     histosTH1F["EventSelection"]->Fill(0);
+
      if(accessMCInfo){
         fwlite::Handle<GenEventInfoProduct> genEventInfo;
         genEventInfo.getByLabel(ev,"generator");
@@ -163,17 +175,9 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         if(selectProcessIDs && find(selectedProcIDs.begin(),selectedProcIDs.end(),processId) == selectedProcIDs.end()) continue;
      }
 
-     int eventNumber = ev.id().event();
-     int runNumber = ev.id().run();
-     int lumiSection = ev.luminosityBlock();
-     if(verbose){
-        std::cout << "  Event number: " << eventNumber << std::endl
-                  << "  Run number: " << runNumber << std::endl
-                  << "  Lumi section: " << lumiSection << std::endl;
-     }
-     if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with processed event " << nEvts << "...skipping" << std::endl;continue;}
-
      if(!accessMCInfo && selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
+
+     histosTH1F["EventSelection"]->Fill(1);
 
      if(doTriggerSelection){
         fwlite::Handle<edm::TriggerResults> triggerResults;
@@ -195,6 +199,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         if(!accept) continue;
      }
 
+     histosTH1F["EventSelection"]->Fill(2);
+
      // Hcal noise
      fwlite::Handle<HcalNoiseSummary> noiseSummary;
      noiseSummary.getByLabel(ev,"hcalnoise");   
@@ -210,6 +216,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                   << "   Loose noise filter accept: " << passLoose << std::endl
                   << "   Tight noise filter accept: " << passTight << std::endl;
      }
+
+     histosTH1F["EventSelection"]->Fill(3);
 
      // Beam Halo summary
      fwlite::Handle<reco::BeamHaloSummary> beamHaloSummary;
@@ -251,6 +259,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                   << "   Tight Halo id: " << beamHaloTightId << std::endl;
      }
 
+     histosTH1F["EventSelection"]->Fill(4);
+ 
      // Pre-selection
      fwlite::Handle<std::vector<reco::Vertex> > vertexCollection;
      vertexCollection.getByLabel(ev,"offlinePrimaryVertices");
@@ -259,6 +269,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
      if(doGoodVertexSelection && !goodVertexFilter(*vertexCollection, 3, 15.0, 2.0)) continue;
 
+     histosTH1F["EventSelection"]->Fill(5);
+
      fwlite::Handle<std::vector<reco::Track> > trackCollection;
      trackCollection.getByLabel(ev,"generalTracks");
  
@@ -266,6 +278,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
      if(doHighQualityTracksSelection && !highPurityTracksFilter(*trackCollection,0.2,10)) continue;
 
+     histosTH1F["EventSelection"]->Fill(6);
+ 
      // Vertex Info
      /*fwlite::Handle<std::vector<reco::Vertex> > vertexCollection;
      vertexCollection.getByLabel(ev,"offlinePrimaryVertices");*/
@@ -293,6 +307,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         if(doVertexSelection && (fabs(primVertex.z()) > primVtxZMax)) continue;
      }
 
+     histosTH1F["EventSelection"]->Fill(7);
+
      // MET - SumET
      fwlite::Handle<std::vector<reco::CaloMET> > metCollection;
      metCollection.getByLabel(ev,"met");
@@ -306,6 +322,8 @@ std::endl;continue;}
      histosTH1F["sumET"]->Fill(sumET);
 
      if(doSumETSelection && (sumET < sumETMin)) continue;
+
+     histosTH1F["EventSelection"]->Fill(8);
 
      // Timing from Calo Towers
      fwlite::Handle<CaloTowerCollection> caloTowerCollection;
@@ -360,6 +378,8 @@ std::endl;continue;}
         histosTH2F["avgHcalTimeVsiEta"]->Fill(ieta,avgHcalTimePeriEta[ieta]);
      }
 
+     histosTH1F["EventSelection"]->Fill(9);
+
      // Jets
      fwlite::Handle<std::vector<reco::CaloJet> > jetCollection;
      //fwlite::Handle<edm::View<reco::Jet> > jetCollection;
@@ -388,6 +408,8 @@ std::endl;continue;}
 
      if(doMxSelection && ((MxFromPFCands < MxMin)||MxFromPFCands > MxMax)) continue;
 
+     histosTH1F["EventSelection"]->Fill(10);
+
      // Compute xi
      std::pair<double,double> xiFromJets = xi(*jetCollection,Ebeam);
      histosTH1F["xiPlusFromJets"]->Fill(xiFromJets.first);
@@ -396,6 +418,14 @@ std::endl;continue;}
      std::pair<double,double> xiFromPFCands = xi(*pfCandCollection,Ebeam);
      histosTH1F["xiPlusFromPFCands"]->Fill(xiFromPFCands.first);
      histosTH1F["xiMinusFromPFCands"]->Fill(xiFromPFCands.second);
+ 
+     std::pair<double,double> EPlusPzFromTowers = EPlusPz(*caloTowerCollection);
+     histosTH1F["EPlusPzFromTowers"]->Fill(EPlusPzFromTowers.first);
+     histosTH1F["EMinusPzFromTowers"]->Fill(EPlusPzFromTowers.second);
+
+     std::pair<double,double> EPlusPzFromPFCands = EPlusPz(*pfCandCollection);
+     histosTH1F["EPlusPzFromPFCands"]->Fill(EPlusPzFromPFCands.first);
+     histosTH1F["EMinusPzFromPFCands"]->Fill(EPlusPzFromPFCands.second);
 
      // Access multiplicities
      fwlite::Handle<unsigned int> trackMultiplicity; 
@@ -488,6 +518,8 @@ std::endl;continue;}
      bool energySumHFSelection = (sumE_plus < sumEnergyHFMax)||(sumE_minus < sumEnergyHFMax);
      if(doHFSelection && !energySumHFSelection) continue;
 
+     histosTH1F["EventSelection"]->Fill(11);
+
      selectedEvents.push_back(std::make_pair(runNumber,eventNumber));
      if(verbose){
         std::cout << "======== Selected event ========" << std::endl
@@ -538,7 +570,11 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["energySumVsEcalTime"] = new TH1F("energySumVsEcalTime","energySumVsEcalTime",200,-100.,100.);
    histosTH1F["energySumVsHcalTime"] = new TH1F("energySumVsHcalTime","energySumVsHcalTime",200,-100.,100.);
    histosTH1F["sumET"] = new TH1F("sumET","sumET",200,0.,400.);
-  
+   histosTH1F["EPlusPzFromTowers"] = new TH1F("EPlusPzFromTowers","EPlusPzFromTowers",200,0.,600.);  
+   histosTH1F["EMinusPzFromTowers"] = new TH1F("EMinusPzFromTowers","EMinusPzFromTowers",200,0.,600.);
+   histosTH1F["EPlusPzFromPFCands"] = new TH1F("EPlusPzFromPFCands","EPlusPzFromPFCands",200,0.,600.);
+   histosTH1F["EMinusPzFromPFCands"] = new TH1F("EMinusPzFromPFCands","EMinusPzFromPFCands",200,0.,600.);
+
    histosTH1F["BeamHaloId"] = new TH1F("BeamHaloId","BeamHaloId",10,0,10);
    histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(1,"CSCLooseHaloId");
    histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(2,"CSCTightHaloId");
@@ -554,6 +590,21 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["HcalNoiseId"] = new TH1F("HcalNoiseId","HcalNoiseId",2,0,2);
    histosTH1F["HcalNoiseId"]->GetXaxis()->SetBinLabel(1,"LooseNoiseFilter");
    histosTH1F["HcalNoiseId"]->GetXaxis()->SetBinLabel(2,"TightNoiseFilter");
+
+   histosTH1F["EventSelection"] = new TH1F("EventSelection","EventSelection",12,0,12);
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(1,"All");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(2,"ProcessIdOrRunSelection");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(3,"TriggerSelection");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(4,"HcalNoise");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(5,"BeamHaloId");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(6,"GoodVertexFilter");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(7,"HighQualityTracks");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(8,"VertexSelection");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(9,"SumETSelection");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(10,"HcalTimingSelection");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(11,"MxSelection");
+   histosTH1F["EventSelection"]->GetXaxis()->SetBinLabel(12,"HFSelection");
+   
 }
 
 void getProcessIds(std::vector<int>& processIDs, std::vector<std::string>& processNames){
