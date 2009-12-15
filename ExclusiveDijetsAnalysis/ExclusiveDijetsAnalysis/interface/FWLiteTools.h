@@ -78,6 +78,20 @@ std::pair<double,double> xi(Coll& partCollection, double Ebeam){
    return std::make_pair(xi_towers_plus,xi_towers_minus);
 }
 
+template <class Coll>
+std::pair<double,double> EPlusPz(Coll& partCollection){
+   double e_plus_pz = 0.;
+   double e_minus_pz = 0.;
+   typename Coll::const_iterator part = partCollection.begin();
+   typename Coll::const_iterator part_end = partCollection.end();
+   for(; part != part_end; ++part){
+      e_plus_pz += part->energy() + part->pz(); 
+      e_minus_pz += part->energy() - part->pz();
+   }
+
+   return std::make_pair(e_plus_pz,e_minus_pz);
+}
+
 template <class JetColl,class PartColl>
 double Rjj(JetColl& jetCollection,PartColl& partCollection){
    math::XYZTLorentzVector dijetSystem(0.,0.,0.,0.);
