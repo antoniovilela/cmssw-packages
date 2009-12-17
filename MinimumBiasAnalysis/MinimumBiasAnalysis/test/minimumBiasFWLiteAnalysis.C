@@ -107,22 +107,24 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    selectedProcIDs.push_back(28); //f_i g -> f_i g
    selectedProcIDs.push_back(53); //g g -> f_k f_kbar
    selectedProcIDs.push_back(68); //g g -> g g
+   selectedProcIDs.push_back(95); //low-p_T production
    /*selectedProcIDs.push_back(92); //SD AB->XB
    selectedProcIDs.push_back(93); //SD AB->AX
    selectedProcIDs.push_back(94); //DD*/ 
 
-   //bool selectEventsInRuns = true;
    std::vector<int> selectedRuns;
-   //selectedRuns.push_back(123592); 
-   //selectedRuns.push_back(123596);
+   selectedRuns.push_back(124020); 
+   selectedRuns.push_back(124025);
+   selectedRuns.push_back(124027);
+   selectedRuns.push_back(124030);
  
-   bool doTriggerSelection = false;
+   bool doTriggerSelection = true;
    std::vector<std::string> hltPaths;
-   //hltPaths.push_back("");
-
+   hltPaths.push_back("HLT_PhysicsDeclared");
+   bool doHcalNoiseSelection = true;
    // Pre-selection
    bool doGoodVertexSelection = true;
-   bool doHighQualityTracksSelection = true; 
+   bool doHighQualityTracksSelection = true;
    // Event selection
    // Prim. vertices
    bool doVertexSelection = true;
@@ -205,17 +207,19 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      fwlite::Handle<HcalNoiseSummary> noiseSummary;
      noiseSummary.getByLabel(ev,"hcalnoise");   
 
-     bool passLoose = noiseSummary->passLooseNoiseFilter();
-     bool passTight = noiseSummary->passTightNoiseFilter();
+     bool passNoiseLoose = noiseSummary->passLooseNoiseFilter();
+     bool passNoiseTight = noiseSummary->passTightNoiseFilter();
 
-     if(passLoose) histosTH1F["HcalNoiseId"]->Fill(0);
-     if(passTight) histosTH1F["HcalNoiseId"]->Fill(1); 
+     if(passNoiseLoose) histosTH1F["HcalNoiseId"]->Fill(0);
+     if(passNoiseTight) histosTH1F["HcalNoiseId"]->Fill(1); 
 
      if(verbose){
         std::cout << " =============== Hcal Noise =============== " << std::endl
-                  << "   Loose noise filter accept: " << passLoose << std::endl
-                  << "   Tight noise filter accept: " << passTight << std::endl;
+                  << "   Loose noise filter accept: " << passNoiseLoose << std::endl
+                  << "   Tight noise filter accept: " << passNoiseTight << std::endl;
      }
+
+     if(doHcalNoiseSelection && !passNoiseTight) continue;
 
      histosTH1F["EventSelection"]->Fill(3);
 
@@ -400,7 +404,7 @@ std::endl;continue;}
      pfCandCollection.getByLabel(ev,"particleFlow");
 
      // Compute Mx
-     double MxFromJets = MassColl(*jetCollection);
+     double MxFromJets = MassColl(*jetCollection,10.);
      double MxFromPFCands = MassColl(*pfCandCollection);
 
      histosTH1F["MxFromJets"]->Fill(MxFromJets);
@@ -411,7 +415,7 @@ std::endl;continue;}
      histosTH1F["EventSelection"]->Fill(10);
 
      // Compute xi
-     std::pair<double,double> xiFromJets = xi(*jetCollection,Ebeam);
+     std::pair<double,double> xiFromJets = xi(*jetCollection,Ebeam,10.);
      histosTH1F["xiPlusFromJets"]->Fill(xiFromJets.first);
      histosTH1F["xiMinusFromJets"]->Fill(xiFromJets.second);
 
