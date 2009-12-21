@@ -45,7 +45,8 @@ MinimumBiasEventContent = cms.PSet(
         'keep *_offlinePrimaryVertices_*_*',
         'keep *_particleFlow_*_*',
         'keep *_caloTowers_*_*', 
-        'keep *_towerMaker_*_*' 
+        'keep *_towerMaker_*_*',
+        'keep *_siPixelRecHits_*_*'
     )    
 )
 
@@ -54,3 +55,6 @@ MinimumBiasEventContent.outputCommands.extend(GeneratorInterfaceRECO.outputComma
 
 from RecoMET.Configuration.RecoMET_EventContent_cff import RecoMETRECO
 MinimumBiasEventContent.outputCommands.extend(RecoMETRECO.outputCommands)
+
+from RecoLocalTracker.Configuration.RecoLocalTracker_EventContent_cff import RecoLocalTrackerRECO
+MinimumBiasEventContent.outputCommands.extend(RecoLocalTrackerRECO.outputCommands)

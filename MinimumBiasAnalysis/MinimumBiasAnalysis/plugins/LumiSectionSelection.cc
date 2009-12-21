@@ -51,7 +51,7 @@ bool LumiSectionSelection::filter( edm::Event& iEvent, const edm::EventSetup& iS
 {
   bool accepted = false;
 
-  unsigned int ievt = iEvent.id().event();
+  //unsigned int ievt = iEvent.id().event();
   unsigned int irun = iEvent.id().run();
   unsigned int ils = iEvent.luminosityBlock();
   /*if (irun==122294)

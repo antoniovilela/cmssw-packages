@@ -3,4 +3,8 @@
 <library name=MinimumBiasAnalysis_plugins file=*.cc>
   <use name=FWCore/Framework>
   <use name=FWCore/ParameterSet>
+  <use name=Geometry/Records>
+  <use name=Geometry/TrackerGeometryBuilder>
+  <use name=DataFormats/TrackerRecHit2D> 
+  <use name=PhysicsTools/UtilAlgos>
 </library>
