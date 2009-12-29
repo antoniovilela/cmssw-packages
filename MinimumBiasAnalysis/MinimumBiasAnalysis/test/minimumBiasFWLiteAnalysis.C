@@ -96,7 +96,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    //bool accessEdmNtupleVariables = false;
 
-   double Ebeam = 450.;
+   //double Ebeam = 450.;
+   double Ebeam = 1180.;
    int thresholdHF = 10;// 0.2 GeV
 
    bool selectProcessIDs = false;

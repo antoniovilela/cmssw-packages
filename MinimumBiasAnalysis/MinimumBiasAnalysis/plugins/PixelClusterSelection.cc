@@ -3,6 +3,7 @@
 
 #include <map>
 
+class TH1F;
 class TH2F;
 class TrackerGeometry;
 
@@ -23,8 +24,16 @@ private:
   const TrackerGeometry* trackerGeom_;
 
   struct {
+      TH1F* h_clusterSize_;
       TH2F* h_clusterSizeVsPosZ_;
       TH2F* h_clusterSizeVsPosZRange_;
+
+      TH1F* h_nCompatibleClusters_;
+      TH1F* h_nValidClusters_;
+      TH2F* h_nCompatibleClustersVsnValidClusters_;
+
+      TH1F* h_compatRatio_;
+      TH2F* h_compatRatioVsnValidClusters_;
   } histos_;
 
 };
@@ -53,6 +62,7 @@ private:
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
 
+#include "TH1F.h"
 #include "TH2F.h"
 
 //using namespace reco;
@@ -67,8 +77,16 @@ PixelClusterSelection::~PixelClusterSelection() {}
 void PixelClusterSelection::beginJob(){
   edm::Service<TFileService> fs;
 
+  histos_.h_clusterSize_ = fs->make<TH1F>("clusterSize","clusterSize",20,0,20);
   histos_.h_clusterSizeVsPosZ_ = fs->make<TH2F>("clusterSizeVsPosZ","clusterSizeVsPosZ",200,-30.,30.,20,0,20);
   histos_.h_clusterSizeVsPosZRange_ = fs->make<TH2F>("clusterSizeVsPosZRange","clusterSizeVsPosZRange",200,-30.,30.,20,0,20);
+
+  histos_.h_nCompatibleClusters_ = fs->make<TH1F>("nCompatibleClusters","nCompatibleClusters",200,0,400);
+  histos_.h_nValidClusters_ = fs->make<TH1F>("nValidClusters","nValidClusters",200,0,400);
+  histos_.h_nCompatibleClustersVsnValidClusters_ = fs->make<TH2F>("nCompatibleClustersVsnValidClusters","nCompatibleClustersVsnValidClusters",200,0,400,200,0,400);
+  
+  histos_.h_compatRatio_ = fs->make<TH1F>("compatRatio","compatRatio",200,0.,1.);
+  histos_.h_compatRatioVsnValidClusters_ = fs->make<TH2F>("compatRatioVsnValidClusters","compatRatioVsnValidClusters",200,0,400,200,0.,1.);
 }
 
 bool PixelClusterSelection::beginRun(edm::Run& run, edm::EventSetup const& setup){
@@ -101,6 +119,8 @@ bool PixelClusterSelection::filter(edm::Event& event, const edm::EventSetup& set
 
   if(!goodPrimaryVertex) return false;
 
+  float nCompatibleClusters = 0.;
+  float nValidClusters = 0.; 
   if(pixelHits.size() > 0)
   {
      for(SiPixelRecHitCollection::DataContainer::const_iterator
@@ -142,12 +162,25 @@ bool PixelClusterSelection::filter(edm::Event& event, const edm::EventSetup& set
 
               float extrapolatedWidthY = 2*fabs(hitPosZ - primaryVertex.position().z())/hitPosR + 0.5;
 
+              histos_.h_clusterSize_->Fill(hitClusterSizeY);
               histos_.h_clusterSizeVsPosZ_->Fill(hitPosZ,hitClusterSizeY);
-              if(fabs(extrapolatedWidthY - hitClusterSizeY) <= 1.0) histos_.h_clusterSizeVsPosZRange_->Fill(hitPosZ,hitClusterSizeY);
+              if(fabs(extrapolatedWidthY - hitClusterSizeY) <= 1.0){
+                 ++nCompatibleClusters;
+                 histos_.h_clusterSizeVsPosZRange_->Fill(hitPosZ,hitClusterSizeY);
+              }
+              ++nValidClusters;
            }
         }
      }
   }
+
+  histos_.h_nCompatibleClusters_->Fill(nCompatibleClusters);
+  histos_.h_nValidClusters_->Fill(nValidClusters);
+  histos_.h_nCompatibleClustersVsnValidClusters_->Fill(nValidClusters,nCompatibleClusters);
+
+  float compatRatio = nCompatibleClusters/nValidClusters;
+  histos_.h_compatRatio_->Fill(compatRatio);
+  histos_.h_compatRatioVsnValidClusters_->Fill(nValidClusters,compatRatio);
 
   // Selection criteria
   accept = true;
