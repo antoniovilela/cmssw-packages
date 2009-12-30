@@ -1,6 +1,6 @@
 /*
- *  $Date: 2009/12/11 19:41:50 $
- *  $Revision: 1.2 $
+ *  $Date: 2009/12/14 16:51:52 $
+ *  $Revision: 1.3 $
  *  
  */
 
@@ -31,10 +31,16 @@ extern"C" {
   void pho_pecms_(int&,double&,double&,double&,double&,double&);
   void initphojet_(int&,int&);
 }
-
 #define pho_event pho_event_
 #define pho_pecms pho_pecms_
 #define initphojet initphojet_
+
+extern "C" {
+  extern struct {
+     int IPROCE,IDNODF,IDIFR1,IDIFR2,IDDPOM,IPRON[4][15];
+  } poprcs_;
+}
+#define poprcs poprcs_
 
 HepMC::IO_HEPEVT conv;
 
@@ -309,7 +315,8 @@ bool PhojetSource::produce(Event & e) {
     
   evt->weights().push_back( pyint1.vint[96] );*/
 
-  evt->set_signal_process_id(pypars.msti[0]);
+  //evt->set_signal_process_id(pypars.msti[0]);
+  evt->set_signal_process_id(poprcs.IPROCE);
   evt->set_event_scale(pypars.pari[16]);
   evt->set_event_number(numberEventsInRun() - remainingEvents() - 1);
     
