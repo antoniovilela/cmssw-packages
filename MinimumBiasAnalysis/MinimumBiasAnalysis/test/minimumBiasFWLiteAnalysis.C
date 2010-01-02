@@ -98,7 +98,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    //double Ebeam = 450.;
    double Ebeam = 1180.;
-   int thresholdHF = 10;// 0.2 GeV
+   int thresholdHF = 16;// 0.2 GeV
 
    bool selectProcessIDs = false;
    std::vector<int> selectedProcIDs;
@@ -119,13 +119,13 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    selectedRuns.push_back(124027);
    selectedRuns.push_back(124030);
  
-   bool doTriggerSelection = true;
+   bool doTriggerSelection = false;
    std::vector<std::string> hltPaths;
    hltPaths.push_back("HLT_PhysicsDeclared");
    bool doHcalNoiseSelection = true;
    // Pre-selection
-   bool doGoodVertexSelection = true;
-   bool doHighQualityTracksSelection = true;
+   bool doGoodVertexSelection = false;
+   bool doHighQualityTracksSelection = false;
    // Event selection
    // Prim. vertices
    bool doVertexSelection = true;

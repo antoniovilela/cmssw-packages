@@ -35,6 +35,10 @@ process.load("Configuration/StandardSequences/FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = 'GR09_R_V5::All'
 
 process.load("MinimumBiasAnalysis.MinimumBiasAnalysis.analysisSequences_cff")
+process.xiTower.comEnergy = 2360.0
+process.xiFromCaloTowers.comEnergy = 2360.0
+process.xiFromJets.comEnergy = 2360.0
+
 process.load("RecoMET.Configuration.RecoMET_BeamHaloId_cff")
 
 process.load("RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff")
