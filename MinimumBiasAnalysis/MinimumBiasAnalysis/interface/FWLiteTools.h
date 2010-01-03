@@ -18,15 +18,15 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    for(reco::GenParticleCollection::const_iterator genpart = genParticles.begin(); genpart != genParticles.end(); ++genpart){
       if(genpart->status() != 1) continue;
       //histosTH1F["EnergyVsEta"]->Fill(genpart->eta(),genpart->energy());      
-      allGenParticles += genpart->p4();
+      if(fabs(genpart->eta()) < 5.0) allGenParticles += genpart->p4();
 
       double pz = genpart->pz();
       if((proton1 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz > 0.75*Ebeam)) proton1 = genpart;
       else if((proton2 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz < -0.75*Ebeam)) proton2 = genpart;
    }
-   // Subtract the two protons' momenta
+   /*// Subtract the two protons' momenta
    if(proton1 != genParticles.end()) allGenParticles -= proton1->p4();
-   if(proton2 != genParticles.end()) allGenParticles -= proton2->p4();
+   if(proton2 != genParticles.end()) allGenParticles -= proton2->p4();*/
 
    // Commit
    genAllParticles.SetPxPyPzE(allGenParticles.px(),allGenParticles.py(),
