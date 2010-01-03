@@ -3,8 +3,6 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
-namespace minimumBiasAnalysis {
-
 void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                                  math::XYZTLorentzVector& genAllParticles,
                                                                  math::XYZTLorentzVector& genProtonPlus,
@@ -37,7 +35,5 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                               proton1->pz(),proton1->energy());
    if(proton2 != genParticles.end()) genProtonMinus.SetPxPyPzE(proton2->px(),proton2->py(),
                                                                proton2->pz(),proton2->energy());
-}
-
 }
 #endif

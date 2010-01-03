@@ -39,10 +39,14 @@
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 #include "DataFormats/FWLite/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #endif
 
 #include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/interface/FWLiteTools.h"
+#if !defined(__CINT__) && !defined(__MAKECINT__)
+#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/FWLiteTools.h"
+#endif
 
 using namespace exclusiveDijetsAnalysis;
 
@@ -53,6 +57,7 @@ typedef std::map<std::string,TH2F*> HistoMapTH2F;
 
 void bookHistosTH1F(HistoMapTH1F&);
 void getProcessIds(std::vector<int>&, std::vector<std::string>&);
+//void setGenInfo(reco::GenParticleCollection const&, double, math::XYZTLorentzVector&, math::XYZTLorentzVector&, math::XYZTLorentzVector&);
 
 void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                                std::string const& outFileName = "analysisMinBiasFWLite_histos.root",
@@ -96,8 +101,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    //bool accessEdmNtupleVariables = false;
 
-   //double Ebeam = 450.;
-   double Ebeam = 1180.;
+   double Ebeam = 450.;
+   //double Ebeam = 1180.;
    int thresholdHF = 16;// 0.2 GeV
 
    bool selectProcessIDs = false;
@@ -121,7 +126,9 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
  
    bool doTriggerSelection = false;
    std::vector<std::string> hltPaths;
-   hltPaths.push_back("HLT_PhysicsDeclared");
+   //hltPaths.push_back("HLT_PhysicsDeclared");
+   //hltPaths.push_back("HLT_L1_BscMinBiasOR_BptxPlusORMinus");
+   //hltPaths.push_back("HLT_MinBiasBSC_OR");
    bool doHcalNoiseSelection = true;
    // Pre-selection
    bool doGoodVertexSelection = false;
@@ -163,19 +170,41 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      histosTH1F["EventSelection"]->Fill(0);
 
      if(accessMCInfo){
+        
         fwlite::Handle<GenEventInfoProduct> genEventInfo;
         genEventInfo.getByLabel(ev,"generator");
  
-        if(!genEventInfo.isValid()) {std::cout << ">>> ERROR: Gen event info could not be accessed" << std::endl;continue;}
+        //if(!genEventInfo.isValid()) {std::cout << ">>> ERROR: Gen event info could not be accessed" << std::endl;continue;}
 
-        unsigned int processId = genEventInfo->signalProcessID();
-        std::vector<int>::const_iterator it_processId = find(processIDs.begin(),processIDs.end(),processId);
-        if(it_processId != processIDs.end()){
-           int idx_processId = it_processId - processIDs.begin();
-           histosTH1F["ProcessId"]->Fill(idx_processId);
-        }  
+        if(genEventInfo.isValid()){
+           unsigned int processId = genEventInfo->signalProcessID();
+           std::vector<int>::const_iterator it_processId = find(processIDs.begin(),processIDs.end(),processId);
+           if(it_processId != processIDs.end()){
+              int idx_processId = it_processId - processIDs.begin();
+              histosTH1F["ProcessId"]->Fill(idx_processId);
+           }  
  
-        if(selectProcessIDs && find(selectedProcIDs.begin(),selectedProcIDs.end(),processId) == selectedProcIDs.end()) continue;
+           if(selectProcessIDs && find(selectedProcIDs.begin(),selectedProcIDs.end(),processId) == selectedProcIDs.end()) continue;
+        }
+
+        fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
+        genParticlesCollection.getByLabel(ev,"genParticles");
+
+        if(!genParticlesCollection.isValid()) {std::cout << ">>> ERROR: Gen particles collection could not be accessed" << std::endl;continue;}
+
+        const reco::GenParticleCollection& genParticles = *genParticlesCollection;
+        math::XYZTLorentzVector genAllParticles(0.,0.,0.,0.);
+        math::XYZTLorentzVector genProtonPlus(0.,0.,0.,0.);
+        math::XYZTLorentzVector genProtonMinus(0.,0.,0.,0.);
+        setGenInfo(genParticles,Ebeam,genAllParticles,genProtonPlus,genProtonMinus);
+        histosTH1F["MxGen"]->Fill(genAllParticles.M());
+        double xigen_plus = -1.;
+        double xigen_minus = -1.;
+        if(genProtonPlus.pz() > 0.75*Ebeam) xigen_plus = 1 - genProtonPlus.pz()/Ebeam;
+        if(genProtonMinus.pz() < -0.75*Ebeam) xigen_minus = 1 + genProtonMinus.pz()/Ebeam;
+        histosTH1F["xiGenPlus"]->Fill(xigen_plus);
+        histosTH1F["xiGenMinus"]->Fill(xigen_minus);
+
      }
 
      if(!accessMCInfo && selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
@@ -579,6 +608,10 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["EMinusPzFromTowers"] = new TH1F("EMinusPzFromTowers","EMinusPzFromTowers",200,0.,600.);
    histosTH1F["EPlusPzFromPFCands"] = new TH1F("EPlusPzFromPFCands","EPlusPzFromPFCands",200,0.,600.);
    histosTH1F["EMinusPzFromPFCands"] = new TH1F("EMinusPzFromPFCands","EMinusPzFromPFCands",200,0.,600.);
+
+   histosTH1F["MxGen"] = new TH1F("MxGen","MxGen",200,-10.,400.);
+   histosTH1F["xiGenPlus"] = new TH1F("xiGenPlus","xiGenPlus",200,0.,1.);
+   histosTH1F["xiGenMinus"] = new TH1F("xiGenMinus","xiGenMinus",200,0.,1.);
 
    histosTH1F["BeamHaloId"] = new TH1F("BeamHaloId","BeamHaloId",10,0,10);
    histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(1,"CSCLooseHaloId");
