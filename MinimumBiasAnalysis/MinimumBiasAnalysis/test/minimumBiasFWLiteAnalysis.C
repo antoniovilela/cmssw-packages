@@ -107,16 +107,16 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    bool selectProcessIDs = false;
    std::vector<int> selectedProcIDs;
-   selectedProcIDs.push_back(11); //f_i f_j -> f_i f_j (QCD)
+   /*selectedProcIDs.push_back(11); //f_i f_j -> f_i f_j (QCD)
    selectedProcIDs.push_back(12); //f_i f_ibar -> f_k f_kbar
    selectedProcIDs.push_back(13); //f_i f_ibar -> g g
    selectedProcIDs.push_back(28); //f_i g -> f_i g
    selectedProcIDs.push_back(53); //g g -> f_k f_kbar
    selectedProcIDs.push_back(68); //g g -> g g
-   selectedProcIDs.push_back(95); //low-p_T production
-   /*selectedProcIDs.push_back(92); //SD AB->XB
+   selectedProcIDs.push_back(95); //low-p_T production*/
+   selectedProcIDs.push_back(92); //SD AB->XB
    selectedProcIDs.push_back(93); //SD AB->AX
-   selectedProcIDs.push_back(94); //DD*/ 
+   selectedProcIDs.push_back(94); //DD 
 
    std::vector<int> selectedRuns;
    selectedRuns.push_back(124020); 
@@ -124,27 +124,27 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    selectedRuns.push_back(124027);
    selectedRuns.push_back(124030);
  
-   bool doTriggerSelection = false;
+   bool doTriggerSelection = true;
    std::vector<std::string> hltPaths;
    //hltPaths.push_back("HLT_PhysicsDeclared");
    //hltPaths.push_back("HLT_L1_BscMinBiasOR_BptxPlusORMinus");
-   //hltPaths.push_back("HLT_MinBiasBSC_OR");
+   hltPaths.push_back("HLT_MinBiasBSC_OR");
    bool doHcalNoiseSelection = true;
    // Pre-selection
-   bool doGoodVertexSelection = false;
-   bool doHighQualityTracksSelection = false;
+   bool doGoodVertexSelection = true;
+   bool doHighQualityTracksSelection = true;
    // Event selection
    // Prim. vertices
    bool doVertexSelection = true;
    double primVtxZMax = 10.0;
    bool doSumETSelection = false;
-   double sumETMin = 20.;
+   double sumETMin = 40.;
    // Exclusivity
    //bool doTrackSelection = false;
    bool doMxSelection = false;
    double MxMin = 100.;
    double MxMax = 999.;
-   bool doHFSelection = true; 
+   bool doHFSelection = false; 
    double sumEnergyHFMax = 10.; // from either side
 
    std::vector<std::pair<int,int> > selectedEvents;
@@ -169,8 +169,10 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
      histosTH1F["EventSelection"]->Fill(0);
 
+     math::XYZTLorentzVector genAllParticles(0.,0.,0.,0.);
+     math::XYZTLorentzVector genProtonPlus(0.,0.,0.,0.);
+     math::XYZTLorentzVector genProtonMinus(0.,0.,0.,0.);
      if(accessMCInfo){
-        
         fwlite::Handle<GenEventInfoProduct> genEventInfo;
         genEventInfo.getByLabel(ev,"generator");
  
@@ -193,9 +195,9 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         if(!genParticlesCollection.isValid()) {std::cout << ">>> ERROR: Gen particles collection could not be accessed" << std::endl;continue;}
 
         const reco::GenParticleCollection& genParticles = *genParticlesCollection;
-        math::XYZTLorentzVector genAllParticles(0.,0.,0.,0.);
+        /*math::XYZTLorentzVector genAllParticles(0.,0.,0.,0.);
         math::XYZTLorentzVector genProtonPlus(0.,0.,0.,0.);
-        math::XYZTLorentzVector genProtonMinus(0.,0.,0.,0.);
+        math::XYZTLorentzVector genProtonMinus(0.,0.,0.,0.);*/
         setGenInfo(genParticles,Ebeam,genAllParticles,genProtonPlus,genProtonMinus);
         histosTH1F["MxGen"]->Fill(genAllParticles.M());
         double xigen_plus = -1.;
@@ -439,6 +441,9 @@ std::endl;continue;}
 
      histosTH1F["MxFromJets"]->Fill(MxFromJets);
      histosTH1F["MxFromPFCands"]->Fill(MxFromPFCands);
+     if(accessMCInfo){
+        histosTH1F["ResMx"]->Fill(MxFromPFCands - genAllParticles.M());
+     }
 
      if(doMxSelection && ((MxFromPFCands < MxMin)||MxFromPFCands > MxMax)) continue;
 
@@ -460,6 +465,18 @@ std::endl;continue;}
      std::pair<double,double> EPlusPzFromPFCands = EPlusPz(*pfCandCollection);
      histosTH1F["EPlusPzFromPFCands"]->Fill(EPlusPzFromPFCands.first);
      histosTH1F["EMinusPzFromPFCands"]->Fill(EPlusPzFromPFCands.second);
+
+     if(accessMCInfo){
+        // xi < 0.1
+        if(genProtonPlus.pz() > 0.9*Ebeam){
+           double xigen_plus = 1 - genProtonPlus.pz()/Ebeam;
+           histosTH1F["ResXiPlus"]->Fill(xiFromPFCands.first - xigen_plus);
+        }
+        if(genProtonMinus.pz() < -0.9*Ebeam){
+           double xigen_minus = 1 + genProtonMinus.pz()/Ebeam;
+           histosTH1F["ResXiMinus"]->Fill(xiFromPFCands.second - xigen_minus);
+        }
+     }
 
      // Access multiplicities
      fwlite::Handle<unsigned int> trackMultiplicity; 
@@ -612,6 +629,9 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["MxGen"] = new TH1F("MxGen","MxGen",200,-10.,400.);
    histosTH1F["xiGenPlus"] = new TH1F("xiGenPlus","xiGenPlus",200,0.,1.);
    histosTH1F["xiGenMinus"] = new TH1F("xiGenMinus","xiGenMinus",200,0.,1.);
+   histosTH1F["ResMx"] = new TH1F("ResMx","ResMx",100,-50.,50.);
+   histosTH1F["ResXiPlus"] = new TH1F("ResXiPlus","ResXiPlus",100,-0.1,0.1);
+   histosTH1F["ResXiMinus"] = new TH1F("ResXiMinus","ResXiMinus",100,-0.1,0.1);
 
    histosTH1F["BeamHaloId"] = new TH1F("BeamHaloId","BeamHaloId",10,0,10);
    histosTH1F["BeamHaloId"]->GetXaxis()->SetBinLabel(1,"CSCLooseHaloId");
