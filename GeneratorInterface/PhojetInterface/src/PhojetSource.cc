@@ -1,6 +1,6 @@
 /*
- *  $Date: 2009/12/14 16:51:52 $
- *  $Revision: 1.3 $
+ *  $Date: 2009/12/30 14:06:18 $
+ *  $Revision: 1.4 $
  *  
  */
 
@@ -207,7 +207,7 @@ PhojetSource::PhojetSource( const ParameterSet & pset,
 
   sigmaMax = sigmax;
   //cout << "Sigmax = " << sigmax << endl; 
-  cout << endl; // Stetically add for the output
+  //cout << endl; // Stetically add for the output
   //********                                      
   
   produces<HepMCProduct>();
@@ -279,10 +279,13 @@ bool PhojetSource::produce(Event & e) {
   int mode = 1;
   int irej;
   double sigcur; 	
-  pho_event(mode,p1,p2,sigcur,irej);
-  if(irej != 0){
-     LogWarning("") << "   Problem in event generation...skipping.\n";
-     return true;
+  while(1) {
+    pho_event(mode,p1,p2,sigcur,irej);
+    if(irej != 0){
+      LogWarning("") << "   Problem in event generation...skipping and retrying.\n";
+    } else {
+      break;
+    }
   }
 
   //cout << "Sigcur = " << sigcur << endl;		

@@ -6,7 +6,7 @@
 <use name=pythia6>
 #<use name=lhapdf>
 <use name=f77compiler>
-
+<flags FFLAGS="-O">
 <flags EDM_PLUGIN=1>
 <export>
  <use name=boost>
