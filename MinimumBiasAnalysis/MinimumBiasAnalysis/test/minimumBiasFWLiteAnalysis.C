@@ -13,10 +13,12 @@
 #include "TTree.h"
 #include "TMath.h"
 #include "Math/GenVector/LorentzVector.h"
+
 #include <cmath>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <map>
 
 // Trick to make CINT happy
@@ -40,6 +42,7 @@
 #include "DataFormats/FWLite/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #endif
 
@@ -53,21 +56,33 @@ using namespace exclusiveDijetsAnalysis;
 typedef std::map<std::string,TH1F*> HistoMapTH1F;
 typedef std::map<std::string,TH2F*> HistoMapTH2F;
 
-//enum gen = {PYTHIA,PHOJET}
+enum generator_t {PYTHIA,PHOJET};
+enum process_category_t {All,SD,NonSD,Inelastic,DD,Diff};
 
 void bookHistosTH1F(HistoMapTH1F&);
-void getProcessIds(std::vector<int>&, std::vector<std::string>&);
+void getProcessIdsPYTHIA(std::vector<int>&, std::vector<std::string>&);
+void getProcessIdsPHOJET(std::vector<int>&, std::vector<std::string>&);
+void getSelectedProcIdsPYTHIA(int,std::vector<int>&);
+void getSelectedProcIdsPHOJET(int,std::vector<int>&);
 //void setGenInfo(reco::GenParticleCollection const&, double, math::XYZTLorentzVector&, math::XYZTLorentzVector&, math::XYZTLorentzVector&);
 
 void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
                                std::string const& outFileName = "analysisMinBiasFWLite_histos.root",
+                               bool selectEventsInRuns = false,
                                bool accessMCInfo = false,
-                               bool selectEventsInRuns = false, 
+                               int genType = PYTHIA,  
+                               int processCategory = All, 
                                int maxEvents = -1, bool verbose = false) {
    if(verbose){
      std::cout << ">>> Reading files: " << std::endl;
      for(std::vector<std::string>::const_iterator it = fileNames.begin(); it != fileNames.end(); ++it)
                std::cout << "  " << *it << std::endl; 
+
+     std::cout << "Use only selected runs: " << selectEventsInRuns << std::endl
+               << "Access MC Info: " << accessMCInfo << std::endl
+               << "Generator type (PYTHIA=0, PHOJET=1): " << genType << std::endl
+               << "Processes to analyze (All=0, SD=1, NonSD=2, Inelastic= 3, DD=4, Diff=5): " << processCategory << std::endl
+               << ">>> Writing histograms to " << outFileName << std::endl;
    } 
 
    // Chain the input files
@@ -93,11 +108,19 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    histosTH2F["avgEcalTimeVsiEta"] = new TH2F("avgEcalTimeVsiEta","avgEcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
    histosTH2F["avgHcalTimeVsiEta"] = new TH2F("avgHcalTimeVsiEta","avgHcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
  
+   //generator_t genType = PHOJET;
+   std::string generatorLabel = "generator";
+   if(genType == PHOJET) generatorLabel = "source";
    std::vector<int> processIDs;
-   std::vector<std::string> processNames; 
-   getProcessIds(processIDs,processNames);
-   histosTH1F["ProcessId"] = new TH1F("ProcessId","ProcessId",processIDs.size(),0,processIDs.size());
-   for(size_t iprocess = 0; iprocess < processIDs.size(); ++iprocess) histosTH1F["ProcessId"] ->GetXaxis()->SetBinLabel(iprocess + 1,processNames[iprocess].c_str());
+   std::vector<std::string> processNames;
+   if(accessMCInfo){ 
+      if(genType == PYTHIA) getProcessIdsPYTHIA(processIDs,processNames);
+      else if(genType == PHOJET) getProcessIdsPHOJET(processIDs,processNames);
+      else {std::cout << ">>> ERROR: Need to set a generator type" << std::endl;return;}
+
+      histosTH1F["ProcessId"] = new TH1F("ProcessId","ProcessId",processIDs.size(),0,processIDs.size());
+      for(size_t iprocess = 0; iprocess < processIDs.size(); ++iprocess) histosTH1F["ProcessId"] ->GetXaxis()->SetBinLabel(iprocess + 1,processNames[iprocess].c_str());
+   }
 
    //bool accessEdmNtupleVariables = false;
 
@@ -105,18 +128,23 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    //double Ebeam = 1180.;
    int thresholdHF = 16;// 0.2 GeV
 
-   bool selectProcessIDs = false;
-   std::vector<int> selectedProcIDs;
-   /*selectedProcIDs.push_back(11); //f_i f_j -> f_i f_j (QCD)
-   selectedProcIDs.push_back(12); //f_i f_ibar -> f_k f_kbar
-   selectedProcIDs.push_back(13); //f_i f_ibar -> g g
-   selectedProcIDs.push_back(28); //f_i g -> f_i g
-   selectedProcIDs.push_back(53); //g g -> f_k f_kbar
-   selectedProcIDs.push_back(68); //g g -> g g
-   selectedProcIDs.push_back(95); //low-p_T production*/
-   selectedProcIDs.push_back(92); //SD AB->XB
-   selectedProcIDs.push_back(93); //SD AB->AX
-   selectedProcIDs.push_back(94); //DD 
+   bool selectProcessIds = (accessMCInfo && (processCategory != All));
+   std::vector<int> selectedProcIds;
+   if(accessMCInfo){
+      if(selectProcessIds){
+         if(genType == PYTHIA) getSelectedProcIdsPYTHIA(processCategory,selectedProcIds);
+         else if(genType == PHOJET) getSelectedProcIdsPHOJET(processCategory,selectedProcIds);
+      }
+      if(verbose){
+         std::stringstream out_str;
+         out_str << "Selecting events with process id=";
+         std::vector<int>::const_iterator proc = selectedProcIds.begin();
+         std::vector<int>::const_iterator proc_end = selectedProcIds.end();
+         for(; proc != proc_end; ++proc) out_str << " " << *proc;
+         out_str << "\n";
+         std::cout << out_str.str();
+      } 
+   }
 
    std::vector<int> selectedRuns;
    selectedRuns.push_back(124020); 
@@ -174,21 +202,27 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      math::XYZTLorentzVector genProtonMinus(0.,0.,0.,0.);
      if(accessMCInfo){
         fwlite::Handle<GenEventInfoProduct> genEventInfo;
-        genEventInfo.getByLabel(ev,"generator");
+        genEventInfo.getByLabel(ev,generatorLabel.c_str());
  
         //if(!genEventInfo.isValid()) {std::cout << ">>> ERROR: Gen event info could not be accessed" << std::endl;continue;}
 
+        unsigned int processId = -1;
+        std::vector<int>::const_iterator it_processId = processIDs.end();
         if(genEventInfo.isValid()){
-           unsigned int processId = genEventInfo->signalProcessID();
-           std::vector<int>::const_iterator it_processId = find(processIDs.begin(),processIDs.end(),processId);
-           if(it_processId != processIDs.end()){
-              int idx_processId = it_processId - processIDs.begin();
-              histosTH1F["ProcessId"]->Fill(idx_processId);
-           }  
- 
-           if(selectProcessIDs && find(selectedProcIDs.begin(),selectedProcIDs.end(),processId) == selectedProcIDs.end()) continue;
+           processId = genEventInfo->signalProcessID();
+        } else {
+           fwlite::Handle<edm::HepMCProduct> hepMCProduct;
+           hepMCProduct.getByLabel(ev,generatorLabel.c_str());
+           processId = hepMCProduct->getHepMCData().signal_process_id();
         }
+        if(selectProcessIds && find(selectedProcIds.begin(),selectedProcIds.end(),processId) == selectedProcIds.end()) continue;
 
+        it_processId = find(processIDs.begin(),processIDs.end(),processId);
+        if(it_processId != processIDs.end()){
+           int idx_processId = it_processId - processIDs.begin();
+           histosTH1F["ProcessId"]->Fill(idx_processId);
+        }  
+ 
         fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
         genParticlesCollection.getByLabel(ev,"genParticles");
 
@@ -199,13 +233,13 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         math::XYZTLorentzVector genProtonPlus(0.,0.,0.,0.);
         math::XYZTLorentzVector genProtonMinus(0.,0.,0.,0.);*/
         setGenInfo(genParticles,Ebeam,genAllParticles,genProtonPlus,genProtonMinus);
-        histosTH1F["MxGen"]->Fill(genAllParticles.M());
+        /*histosTH1F["MxGen"]->Fill(genAllParticles.M());
         double xigen_plus = -1.;
         double xigen_minus = -1.;
         if(genProtonPlus.pz() > 0.75*Ebeam) xigen_plus = 1 - genProtonPlus.pz()/Ebeam;
         if(genProtonMinus.pz() < -0.75*Ebeam) xigen_minus = 1 + genProtonMinus.pz()/Ebeam;
         histosTH1F["xiGenPlus"]->Fill(xigen_plus);
-        histosTH1F["xiGenMinus"]->Fill(xigen_minus);
+        histosTH1F["xiGenMinus"]->Fill(xigen_minus);*/
 
      }
 
@@ -442,6 +476,7 @@ std::endl;continue;}
      histosTH1F["MxFromJets"]->Fill(MxFromJets);
      histosTH1F["MxFromPFCands"]->Fill(MxFromPFCands);
      if(accessMCInfo){
+        histosTH1F["MxGen"]->Fill(genAllParticles.M());
         histosTH1F["ResMx"]->Fill(MxFromPFCands - genAllParticles.M());
      }
 
@@ -470,10 +505,12 @@ std::endl;continue;}
         // xi < 0.1
         if(genProtonPlus.pz() > 0.9*Ebeam){
            double xigen_plus = 1 - genProtonPlus.pz()/Ebeam;
+           histosTH1F["xiGenPlus"]->Fill(xigen_plus); 
            histosTH1F["ResXiPlus"]->Fill(xiFromPFCands.first - xigen_plus);
         }
         if(genProtonMinus.pz() < -0.9*Ebeam){
            double xigen_minus = 1 + genProtonMinus.pz()/Ebeam;
+           histosTH1F["xiGenMinus"]->Fill(xigen_minus);
            histosTH1F["ResXiMinus"]->Fill(xiFromPFCands.second - xigen_minus);
         }
      }
@@ -593,8 +630,8 @@ std::endl;continue;}
 
 void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["nVertex"] = new TH1F("nVertex","Nr. of offline primary vertexes",10,0,10);
-   histosTH1F["posXPrimVtx"] = new TH1F("posXPrimVtx","x position of primary vertexes",100,-15.,15.);
-   histosTH1F["posYPrimVtx"] = new TH1F("posYPrimVtx","y position of primary vertexes",100,-15.,15.);
+   histosTH1F["posXPrimVtx"] = new TH1F("posXPrimVtx","x position of primary vertexes",100,-3.,3.);
+   histosTH1F["posYPrimVtx"] = new TH1F("posYPrimVtx","y position of primary vertexes",100,-3.,3.);
    histosTH1F["posZPrimVtx"] = new TH1F("posZPrimVtx","z position of primary vertexes",100,-30.,30.);
    histosTH1F["leadingJetPt"] = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
    histosTH1F["leadingJetEta"] = new TH1F("leadingJetEta","leadingJetEta",100,-5.,5.);
@@ -665,7 +702,7 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    
 }
 
-void getProcessIds(std::vector<int>& processIDs, std::vector<std::string>& processNames){
+void getProcessIdsPYTHIA(std::vector<int>& processIDs, std::vector<std::string>& processNames){
    processIDs.push_back(11); //f_i f_j -> f_i f_j (QCD)
    processNames.push_back("f_{i} f_{j} #rightarrow f_{i} f_{j}");
    processIDs.push_back(12); //f_i f_ibar -> f_k f_kbar
@@ -686,4 +723,84 @@ void getProcessIds(std::vector<int>& processIDs, std::vector<std::string>& proce
    processNames.push_back("DD");
    processIDs.push_back(95); //low-p_T production 
    processNames.push_back("low-p_{T}");
+}
+
+void getProcessIdsPHOJET(std::vector<int>& processIDs, std::vector<std::string>& processNames){
+   processIDs.push_back(1);
+   processNames.push_back("Inelastic");
+   processIDs.push_back(2);
+   processNames.push_back("Elastic");
+   processIDs.push_back(3);
+   processNames.push_back("Quasi-elastic VM");
+   processIDs.push_back(4);
+   processNames.push_back("Central diffraction");
+   processIDs.push_back(5);
+   processNames.push_back("Single diffraction Part. 1");
+   processIDs.push_back(6);
+   processNames.push_back("Single diffraction Part. 2");
+   processIDs.push_back(7);
+   processNames.push_back("Double diffraction");
+}
+
+void getSelectedProcIdsPYTHIA(int processCategory,std::vector<int>& selectedProcIds){
+   switch (processCategory){
+      case SD:
+         selectedProcIds.push_back(92); //SD AB->XB
+         selectedProcIds.push_back(93); //SD AB->AX
+         break;
+      case NonSD:
+         selectedProcIds.push_back(11); //f_i f_j -> f_i f_j (QCD)
+         selectedProcIds.push_back(12); //f_i f_ibar -> f_k f_kbar
+         selectedProcIds.push_back(13); //f_i f_ibar -> g g
+         selectedProcIds.push_back(28); //f_i g -> f_i g
+         selectedProcIds.push_back(53); //g g -> f_k f_kbar
+         selectedProcIds.push_back(68); //g g -> g g
+         selectedProcIds.push_back(95); //low-p_T production
+         selectedProcIds.push_back(94); //DD
+         break;
+      case Inelastic:
+         selectedProcIds.push_back(11); //f_i f_j -> f_i f_j (QCD)
+         selectedProcIds.push_back(12); //f_i f_ibar -> f_k f_kbar
+         selectedProcIds.push_back(13); //f_i f_ibar -> g g
+         selectedProcIds.push_back(28); //f_i g -> f_i g
+         selectedProcIds.push_back(53); //g g -> f_k f_kbar
+         selectedProcIds.push_back(68); //g g -> g g
+         selectedProcIds.push_back(95); //low-p_T production
+         break;
+      case DD:
+         selectedProcIds.push_back(94); //DD
+         break;
+      case Diff:
+         selectedProcIds.push_back(92); //SD AB->XB
+         selectedProcIds.push_back(93); //SD AB->AX
+         selectedProcIds.push_back(94); //DD
+         break;
+   }  
+}
+
+void getSelectedProcIdsPHOJET(int processCategory,std::vector<int>& selectedProcIds){
+   switch (processCategory){
+      case SD:
+         selectedProcIds.push_back(5);
+         selectedProcIds.push_back(6);
+         break;
+      case NonSD:
+         selectedProcIds.push_back(1);
+         selectedProcIds.push_back(3);
+         selectedProcIds.push_back(4);
+         selectedProcIds.push_back(7);
+         break;
+      case Inelastic:
+         selectedProcIds.push_back(1);
+         break;
+      case DD:
+         selectedProcIds.push_back(7);
+         break;
+      case Diff:
+         selectedProcIds.push_back(4);
+         selectedProcIds.push_back(5);
+         selectedProcIds.push_back(6);
+         selectedProcIds.push_back(7);
+         break;
+   }
 }
