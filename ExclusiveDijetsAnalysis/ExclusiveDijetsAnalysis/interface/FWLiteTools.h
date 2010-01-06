@@ -53,23 +53,28 @@ bool highPurityTracksFilter(const TrackColl& trackCollection, double thresh, uns
 }
 
 template <class PartColl>
-double MassColl(PartColl& partCollection, double ptThreshold = -1.){
+double MassColl(PartColl& partCollection, double ptThreshold = -1., double energyHBHEThreshold = -1., double energyHFThreshold = -1.){
    math::XYZTLorentzVector allCands(0.,0.,0.,0.);
    for(typename PartColl::const_iterator part = partCollection.begin();
                                          part != partCollection.end(); ++part){
-      if(part->pt() >= ptThreshold) allCands += part->p4();
+      if(part->pt() < ptThreshold) continue;
+      if((fabs(part->eta()) < 3.0) && (part->energy() < energyHBHEThreshold)) continue;
+      if((fabs(part->eta()) >= 3.0) && ((fabs(part->eta()) <= 5.0)) && (part->energy() < energyHFThreshold)) continue;
+      allCands += part->p4();
    }
 
    return allCands.M();
 }
 
 template <class Coll>
-std::pair<double,double> xi(Coll& partCollection, double Ebeam, double ptThreshold = -1.){
+std::pair<double,double> xi(Coll& partCollection, double Ebeam, double ptThreshold = -1., double energyHBHEThreshold = -1., double energyHFThreshold = -1.){
 
    double xi_towers_plus = 0.;
    double xi_towers_minus = 0.;
    for(typename Coll::const_iterator part = partCollection.begin(); part != partCollection.end(); ++part){
      if(part->pt() < ptThreshold) continue;
+     if((fabs(part->eta()) < 3.0) && (part->energy() < energyHBHEThreshold)) continue;
+     if((fabs(part->eta()) >= 3.0) && ((fabs(part->eta()) <= 5.0)) && (part->energy() < energyHFThreshold)) continue;
 
      //double correction = (jetCorrector)?(jetCorrector->getCorrection(part->pt(),part->eta())):1.;
      xi_towers_plus += part->et()*TMath::Exp(part->eta());
@@ -83,13 +88,15 @@ std::pair<double,double> xi(Coll& partCollection, double Ebeam, double ptThresho
 }
 
 template <class Coll>
-std::pair<double,double> EPlusPz(Coll& partCollection, double ptThreshold = -1.){
+std::pair<double,double> EPlusPz(Coll& partCollection, double ptThreshold = -1., double energyHBHEThreshold = -1., double energyHFThreshold = -1.){
    double e_plus_pz = 0.;
    double e_minus_pz = 0.;
    typename Coll::const_iterator part = partCollection.begin();
    typename Coll::const_iterator part_end = partCollection.end();
    for(; part != part_end; ++part){
       if(part->pt() < ptThreshold) continue;
+      if((fabs(part->eta()) < 3.0) && (part->energy() < energyHBHEThreshold)) continue;
+      if((fabs(part->eta()) >= 3.0) && ((fabs(part->eta()) <= 5.0)) && (part->energy() < energyHFThreshold)) continue;
 
       e_plus_pz += part->energy() + part->pz(); 
       e_minus_pz += part->energy() - part->pz();
