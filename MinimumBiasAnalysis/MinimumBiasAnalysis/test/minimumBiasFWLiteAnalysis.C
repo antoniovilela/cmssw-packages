@@ -81,9 +81,36 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      std::cout << "Use only selected runs: " << selectEventsInRuns << std::endl
                << "Access MC Info: " << accessMCInfo << std::endl
                << "Generator type (PYTHIA=0, PHOJET=1): " << genType << std::endl
-               << "Processes to analyze (All=0, SD=1, NonSD=2, Inelastic= 3, DD=4, Diff=5): " << processCategory << std::endl
+               << "Processes to analyze (All=0, SD=1, NonSD=2, Inelastic=3, DD=4, Diff=5): " << processCategory << std::endl
                << ">>> Writing histograms to " << outFileName << std::endl;
    } 
+
+   std::vector<int> selectedRuns;
+   selectedRuns.push_back(124020);
+   selectedRuns.push_back(124025);
+   selectedRuns.push_back(124027);
+   selectedRuns.push_back(124030);
+
+   std::string generatorLabel = "generator";
+   if(genType == PHOJET) generatorLabel = "source";
+
+   bool selectProcessIds = (accessMCInfo && (processCategory != All));
+   std::vector<int> selectedProcIds;
+   if(accessMCInfo){
+      if(selectProcessIds){
+         if(genType == PYTHIA) getSelectedProcIdsPYTHIA(processCategory,selectedProcIds);
+         else if(genType == PHOJET) getSelectedProcIdsPHOJET(processCategory,selectedProcIds);
+      }
+      if(verbose){
+         std::stringstream out_str;
+         out_str << "Selecting events with process id=";
+         std::vector<int>::const_iterator proc = selectedProcIds.begin();
+         std::vector<int>::const_iterator proc_end = selectedProcIds.end();
+         for(; proc != proc_end; ++proc) out_str << " " << *proc;
+         out_str << "\n";
+         std::cout << out_str.str();
+      }
+   }
 
    // Chain the input files
    fwlite::ChainEvent ev(fileNames);
@@ -108,9 +135,6 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    histosTH2F["avgEcalTimeVsiEta"] = new TH2F("avgEcalTimeVsiEta","avgEcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
    histosTH2F["avgHcalTimeVsiEta"] = new TH2F("avgHcalTimeVsiEta","avgHcalTimeVsiEta",2*absiEtaMaxLim,-absiEtaMaxLim,absiEtaMaxLim,200,-100.,100.);
  
-   //generator_t genType = PHOJET;
-   std::string generatorLabel = "generator";
-   if(genType == PHOJET) generatorLabel = "source";
    std::vector<int> processIDs;
    std::vector<std::string> processNames;
    if(accessMCInfo){ 
@@ -126,32 +150,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    double Ebeam = 450.;
    //double Ebeam = 1180.;
-   int thresholdHF = 16;// 0.2 GeV
+   int thresholdHF = 15;// 0.2 GeV
 
-   bool selectProcessIds = (accessMCInfo && (processCategory != All));
-   std::vector<int> selectedProcIds;
-   if(accessMCInfo){
-      if(selectProcessIds){
-         if(genType == PYTHIA) getSelectedProcIdsPYTHIA(processCategory,selectedProcIds);
-         else if(genType == PHOJET) getSelectedProcIdsPHOJET(processCategory,selectedProcIds);
-      }
-      if(verbose){
-         std::stringstream out_str;
-         out_str << "Selecting events with process id=";
-         std::vector<int>::const_iterator proc = selectedProcIds.begin();
-         std::vector<int>::const_iterator proc_end = selectedProcIds.end();
-         for(; proc != proc_end; ++proc) out_str << " " << *proc;
-         out_str << "\n";
-         std::cout << out_str.str();
-      } 
-   }
-
-   std::vector<int> selectedRuns;
-   selectedRuns.push_back(124020); 
-   selectedRuns.push_back(124025);
-   selectedRuns.push_back(124027);
-   selectedRuns.push_back(124030);
- 
    bool doTriggerSelection = true;
    std::vector<std::string> hltPaths;
    //hltPaths.push_back("HLT_PhysicsDeclared");
@@ -183,7 +183,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
      if((maxEvents > 0)&&(nEvts == maxEvents)) break;
 	
      ++nEvts;
-     if(verbose) std::cout << ">>> Event number: " << nEvts << endl;
+     if(verbose) std::cout << ">>> Number of processed events: " << nEvts << endl;
  
      int eventNumber = ev.id().event();
      int runNumber = ev.id().run();
@@ -471,7 +471,7 @@ std::endl;continue;}
 
      // Compute Mx
      double MxFromJets = MassColl(*jetCollection,10.);
-     double MxFromPFCands = MassColl(*pfCandCollection);
+     double MxFromPFCands = MassColl(*pfCandCollection,-1.,1.0,3.0);
 
      histosTH1F["MxFromJets"]->Fill(MxFromJets);
      histosTH1F["MxFromPFCands"]->Fill(MxFromPFCands);
@@ -489,15 +489,19 @@ std::endl;continue;}
      histosTH1F["xiPlusFromJets"]->Fill(xiFromJets.first);
      histosTH1F["xiMinusFromJets"]->Fill(xiFromJets.second);
 
-     std::pair<double,double> xiFromPFCands = xi(*pfCandCollection,Ebeam);
+     std::pair<double,double> xiFromTowers = xi(*caloTowerCollection,Ebeam,-1.0,1.0,3.0);
+     histosTH1F["xiPlusFromTowers"]->Fill(xiFromTowers.first);
+     histosTH1F["xiMinusFromTowers"]->Fill(xiFromTowers.second);
+
+     std::pair<double,double> xiFromPFCands = xi(*pfCandCollection,Ebeam,-1.0,1.0,3.0);
      histosTH1F["xiPlusFromPFCands"]->Fill(xiFromPFCands.first);
      histosTH1F["xiMinusFromPFCands"]->Fill(xiFromPFCands.second);
- 
-     std::pair<double,double> EPlusPzFromTowers = EPlusPz(*caloTowerCollection);
+
+     std::pair<double,double> EPlusPzFromTowers = EPlusPz(*caloTowerCollection,-1.0,1.0,3.0);
      histosTH1F["EPlusPzFromTowers"]->Fill(EPlusPzFromTowers.first);
      histosTH1F["EMinusPzFromTowers"]->Fill(EPlusPzFromTowers.second);
 
-     std::pair<double,double> EPlusPzFromPFCands = EPlusPz(*pfCandCollection);
+     std::pair<double,double> EPlusPzFromPFCands = EPlusPz(*pfCandCollection,-1.0,1.0,3.0);
      histosTH1F["EPlusPzFromPFCands"]->Fill(EPlusPzFromPFCands.first);
      histosTH1F["EMinusPzFromPFCands"]->Fill(EPlusPzFromPFCands.second);
 
@@ -646,6 +650,8 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["xiTowerMinus"] = new TH1F("xiTowerMinus","xiTowerMinus",200,0.,1.);
    histosTH1F["xiPlusFromJets"] = new TH1F("xiPlusFromJets","xiPlusFromJets",200,0.,1.);
    histosTH1F["xiMinusFromJets"] = new TH1F("xiMinusFromJets","xiMinusFromJets",200,0.,1.);
+   histosTH1F["xiPlusFromTowers"] = new TH1F("xiPlusFromTowers","xiPlusFromTowers",200,0.,1.);
+   histosTH1F["xiMinusFromTowers"] = new TH1F("xiMinusFromTowers","xiMinusFromTowers",200,0.,1.);
    histosTH1F["xiPlusFromPFCands"] = new TH1F("xiPlusFromPFCands","xiPlusFromPFCands",200,0.,1.);
    histosTH1F["xiMinusFromPFCands"] = new TH1F("xiMinusFromPFCands","xiMinusFromPFCands",200,0.,1.);
    histosTH1F["missingMassFromXiTower"] = new TH1F("missingMassFromXiTower","missingMassFromXiTower",200,-10.,800.);
