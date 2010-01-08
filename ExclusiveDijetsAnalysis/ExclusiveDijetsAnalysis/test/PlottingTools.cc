@@ -67,8 +67,9 @@ std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<st
    return hist;
 }*/ 
 
-TH1F* getHisto(TDirectory* dir, const std::string& refVar){
-   TH1F* hist = static_cast<TH1F*>(dir->Get(refVar.c_str()));
+TH1F* getHisto(TDirectory const* dir, std::string const& refVar){
+   TDirectory* mydir = const_cast<TDirectory*>(dir);
+   TH1F* hist = static_cast<TH1F*>(mydir->Get(refVar.c_str()));
 
    //if(!hist) std::cout << ">>>> Error: histogram " << refVar.c_str() << " not found." << std::endl;
    if(!hist) throw RootException("ERROR: histogram not found: " + refVar);

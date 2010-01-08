@@ -1,7 +1,9 @@
 #ifndef ExclusiveDijetsAnalysis_Plotter_h
 #define ExclusiveDijetsAnalysis_Plotter_h
 
+#include "TH1F.h"
 #include "TDirectory.h"
+#include "THStack.h"
 
 #include "PlottingTools.h"
 
@@ -28,6 +30,7 @@ class Plotter{
       //typedef std::pair<std::string,std::pair<std::string,TDirectory*> > VarDesc;
       //typedef std::pair<std::string,std::pair<TDirectory*,std::pair<std::string,double> > > VarDesc;
       typedef std::map<std::string, std::vector<VarDesc> > VarMap;
+      typedef std::pair<TH1F*,std::string> HistDesc;
 
       Plotter(): verbose_(false),rebin_(1) {}
     
@@ -38,9 +41,16 @@ class Plotter{
       void plot(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const std::vector<double>&, const char* drawOption = "");
 
       void plot(std::map<std::string,std::vector<std::string> >&, TDirectory*, const char* drawOption = "");
-      
       void plot(VarMap& variablesMap, const char* drawOption = "");
+
+      void plotComponents(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, const std::vector<double>& normFactors, const char* drawOption = "");
+      void plotComponents(VarMap const& variablesMap, const char* drawOption = "");
+
    private:
+      TH1F* loadHisto(VarDesc const&);
+      std::map<std::string,std::vector<HistDesc> > loadHistos(VarMap const&);
+      THStack* buildTHStack(std::string const&, std::vector<HistDesc> const&);
+
       bool verbose_;
       int rebin_;
       //NormPolicy norm_;

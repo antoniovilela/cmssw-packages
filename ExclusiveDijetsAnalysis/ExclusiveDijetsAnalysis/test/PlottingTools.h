@@ -79,7 +79,7 @@ class RootException: public std::exception{
 };
  
 //TH1F* getHisto(TFile*, const std::string&); 
-TH1F* getHisto(TDirectory*, const std::string&);
+TH1F* getHisto(TDirectory const*, std::string const&);
 void scaleHisto(TH1F* histo, double scale = 1., int line = 1, int color = 1, int rebin = 1);
 TH1F* rebinHisto(TH1F const* histo, std::vector<int> const& groups);
 std::map<std::string,std::vector<std::string> > buildVarMap(const std::vector<std::string>& varNames,const std::vector<std::string>& triggerBits);

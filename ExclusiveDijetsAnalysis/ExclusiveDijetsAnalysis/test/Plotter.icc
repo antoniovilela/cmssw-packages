@@ -8,6 +8,115 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <algorithm>
+
+template <class NormPolicy>
+void Plotter<NormPolicy>::plotComponents(VarMap const& variablesMap, const char* drawOption){
+   std::string option = std::string(drawOption);
+ 
+   std::map<std::string,TCanvas*> canvasMap;
+   std::map<std::string,TLegend*> legendMap;
+   std::map<std::string,std::vector<HistDesc> > histoSets = loadHistos(variablesMap);
+   std::map<std::string,std::vector<HistDesc> >::const_iterator set = histoSets.begin();
+   std::map<std::string,std::vector<HistDesc> >::const_iterator sets_end = histoSets.end();
+   for(; set != sets_end; ++set){
+      const std::string& setName = set->first;
+      canvasMap[setName] = new TCanvas(setName.c_str(),setName.c_str());
+      canvasMap[setName]->cd();
+
+      legendMap[setName] = new TLegend(0.4,0.7,0.95,0.8);
+    
+      std::vector<HistDesc> const& histos = set->second;
+      HistDesc const& histoFirst = histos[0];
+      std::vector<HistDesc> stackedHistos(histos.size() - 1);
+      std::copy(histos.begin() + 1, histos.end(), stackedHistos.begin());
+      THStack* stack = buildTHStack(setName,stackedHistos);
+ 
+      histoFirst.first->Draw();
+      stack->Draw((option + "SAME").c_str()); 
+     
+      std::vector<HistDesc>::const_iterator histo = histos.begin();
+      std::vector<HistDesc>::const_iterator histos_end = histos.end();
+      for(; histo != histos_end; ++histo) legendMap[setName]->AddEntry(histo->first,histo->second.c_str(),"L");
+
+      legendMap[setName]->SetFillColor(0);
+      legendMap[setName]->Draw("SAME");
+   }
+}
+
+template <class NormPolicy>
+THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<HistDesc> const& histos){
+
+   std::vector<HistDesc>::const_iterator histo = histos.begin();
+   std::vector<HistDesc>::const_iterator histos_end = histos.end();
+
+   THStack* stack = new THStack(("stack_" + name).c_str(),name.c_str());
+   size_t index = 0;
+   for(; histo != histos_end; ++histo, ++index){
+      histo->first->SetLineColor(index+2);
+      
+      stack->Add(histo->first);
+   }
+
+   return stack;
+}
+
+template <class NormPolicy>
+std::map<std::string,std::vector<std::pair<TH1F*,std::string> > > Plotter<NormPolicy>::loadHistos(VarMap const& variablesMap){
+
+   // HistDesc --> std::pair<TH1F*,std::string>
+   std::map<std::string,std::vector<HistDesc> > histos;
+   for(VarMap::const_iterator cat = variablesMap.begin(); cat != variablesMap.end(); ++cat){
+      const std::string& catName = cat->first;
+
+      histos[catName] = std::vector<HistDesc>();
+
+      std::vector<VarDesc> const& vars = cat->second;
+      size_t index = 0;
+      for(std::vector<VarDesc>::const_iterator var = vars.begin(); var != vars.end(); ++var,++index){
+         TH1F* histo_new = loadHisto(*var);
+         std::string const& desc = var->label();
+   
+         histos[catName].push_back(std::make_pair(histo_new,desc));
+      }
+   }
+
+   return histos;
+}
+
+template <class NormPolicy>
+TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var){
+   std::string const& name = var.name();
+   TDirectory const* dir = var.dir();
+   //std::string const& desc = var.label();
+   double normFactor = var.norm();
+
+   TH1F* histo = getHisto(dir,name);
+   // Clone histogram
+   TH1F* histo_new = static_cast<TH1F*>(histo->Clone((name + "_scaled").c_str()));
+
+   double scaleFactor = NormPolicy::GetNorm(histo_new)*normFactor/histo_new->GetSumOfWeights();
+   scaleHisto(histo_new,scaleFactor,1,1,rebin_);
+
+   return histo_new;
+}
+
+template <class NormPolicy>
+void Plotter<NormPolicy>::plotComponents(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, const std::vector<double>& normFactors, const char* drawOption){
+   VarMap variablesMap;
+   for(std::vector<std::string>::const_iterator var = variables.begin(); var != variables.end(); ++var){
+      std::vector<VarDesc> varVector;
+      size_t idx = 0;
+      for(std::vector<std::pair<std::string,TDirectory*> >::const_iterator dir = directories.begin(); dir != directories.end(); ++dir,++idx){
+         varVector.push_back(VarDesc(*var,dir->second,dir->first,normFactors[idx]));
+
+      }
+      variablesMap[*var] = varVector;
+   }
+   plotComponents(variablesMap,drawOption);
+}
+
+//======================================================
 
 template <class NormPolicy>
 void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
