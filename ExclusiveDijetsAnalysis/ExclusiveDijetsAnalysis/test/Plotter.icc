@@ -47,15 +47,34 @@ void Plotter<NormPolicy>::plotComponents(VarMap const& variablesMap, const char*
 template <class NormPolicy>
 THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<HistDesc> const& histos){
 
-   std::vector<HistDesc>::const_iterator histo = histos.begin();
-   std::vector<HistDesc>::const_iterator histos_end = histos.end();
+   std::vector<HistDesc> reversedHistos(histos);
+   std::reverse(reversedHistos.begin(),reversedHistos.end());
+
+   int colors[] = {kRed,kBlue};
+   std::vector<int> vec_colors(colors,colors + sizeof(colors)/sizeof(int));
+   int linestyles[] = {kDashed,kDotted,kDashDotted};
+   std::vector<int> vec_linestyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+   int fillstyles[] = {3004,3005,3006,3007,3013};
+   std::vector<int> vec_fillstyles(fillstyles,fillstyles + sizeof(fillstyles)/sizeof(int));
 
    THStack* stack = new THStack(("stack_" + name).c_str(),name.c_str());
    size_t index = 0;
-   for(; histo != histos_end; ++histo, ++index){
-      histo->first->SetLineColor(index+2);
-      
-      stack->Add(histo->first);
+   std::vector<HistDesc>::const_iterator it_histo = reversedHistos.begin();
+   std::vector<HistDesc>::const_iterator histos_end = reversedHistos.end();
+   //std::vector<HistDesc>::const_iterator histos_last = reversedHistos.end() - 1;
+   for(; it_histo != histos_end; ++it_histo, ++index){
+      TH1F* histo = it_histo->first;
+      histo->SetLineColor(vec_colors[index % vec_colors.size()]);
+      histo->SetLineStyle(vec_linestyles[index % vec_linestyles.size()]);
+      histo->SetFillColor(vec_colors[index % vec_colors.size()]);
+      histo->SetFillStyle(vec_fillstyles[index % vec_fillstyles.size()]);
+      /*if(it_histo == histos_last){
+         histo->SetLineStyle(1);
+      } else{
+         histo->SetLineStyle(vec_styles[index % vec_styles.size()]);
+      }*/
+
+      stack->Add(histo);
    }
 
    return stack;
