@@ -32,8 +32,11 @@ void Plotter<NormPolicy>::plotComponents(VarMap const& variablesMap, const char*
       std::copy(histos.begin() + 1, histos.end(), stackedHistos.begin());
       THStack* stack = buildTHStack(setName,stackedHistos);
  
-      histoFirst.first->Draw();
-      stack->Draw((option + "SAME").c_str()); 
+      histoFirst.first->SetMarkerSize(0.9);
+      /*histoFirst.first->Draw();
+      stack->Draw((option + "SAME").c_str());*/
+      stack->Draw(option.c_str());
+      histoFirst.first->Draw("SAME");
      
       std::vector<HistDesc>::const_iterator histo = histos.begin();
       std::vector<HistDesc>::const_iterator histos_end = histos.end();
