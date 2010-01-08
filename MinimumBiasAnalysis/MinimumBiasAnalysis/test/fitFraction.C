@@ -12,7 +12,7 @@ void fitFraction(const char* fitVariable = "multiplicityHFPlus", int rebin = 1){
   TFile* fileData = TFile::Open("root/analysisMinBiasFWLite_histos_MinimumBias_Dec19thReReco-Runs124020-124030_new_highQualityTracks.root");
   //TFile* fileData = TFile::Open("root/analysisMinBiasFWLite_histos_MinimumBias_Dec19thReReco-Run124120_new_highQualityTracks.root");
   // Use MC for closure test
-  //TFile* fileData = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
+  //TFile* fileData = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
   //TFile* fileData = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks.root"); 
   //TFile* fileData = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
   TH1F* h_EventSelection_Data = static_cast<TH1F*>(fileData->Get("EventSelection"));
@@ -20,26 +20,28 @@ void fitFraction(const char* fitVariable = "multiplicityHFPlus", int rebin = 1){
   TH1F* h_fitVar_Data = static_cast<TH1F*>(h_fitVar_Data_tmp->Clone((std::string(fitVariable) + "_Data").c_str()));
 
   // Components
-  //TFile* fileMC_all = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
+  /*TFile* fileMC_all = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
   //TFile* fileMC_all = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks.root"); 
-  TFile* fileMC_all = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root"); 
-  TH1F* h_EventSelection_all = static_cast<TH1F*>(fileMC_all->Get("EventSelection"));
+  //TFile* fileMC_all = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root"); 
+  TH1F* h_EventSelection_all = static_cast<TH1F*>(fileMC_all->Get("EventSelection"));*/
 
   //TFile* fileMC_sig = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_SD.root");
   //TFile* fileMC_sig = TFile::Open("analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_SD_DD.root");
+  //TFile* fileMC_sig = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Diff.root"); 
   //TFile* fileMC_sig = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks_SD.root");
   TFile* fileMC_sig = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_SD.root");
   TH1F* h_EventSelection_sig = static_cast<TH1F*>(fileMC_sig->Get("EventSelection"));
-  TH1F* h_fitVar_sig_tmp = static_cast<TH1F*>(fileMC_sig->Get(fitVariable));
-  TH1F* h_fitVar_sig = static_cast<TH1F*>(h_fitVar_sig_tmp->Clone((std::string(fitVariable) + "_sig").c_str()));
+  TH1F* h_fitVar_sig_original = static_cast<TH1F*>(fileMC_sig->Get(fitVariable));
+  TH1F* h_fitVar_sig = static_cast<TH1F*>(h_fitVar_sig_original->Clone((std::string(fitVariable) + "_sig").c_str()));
 
   //TFile* fileMC_back = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_NonSD.root");
   //TFile* fileMC_back = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_QCD.root");
+  //TFile* fileMC_back = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Inelastic.root");
   //TFile* fileMC_back = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks_NonSD.root");
   TFile* fileMC_back = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_NonSD.root");
   TH1F* h_EventSelection_back = static_cast<TH1F*>(fileMC_back->Get("EventSelection"));
-  TH1F* h_fitVar_back_tmp = static_cast<TH1F*>(fileMC_back->Get(fitVariable));
-  TH1F* h_fitVar_back = static_cast<TH1F*>(h_fitVar_back_tmp->Clone((std::string(fitVariable) + "_back").c_str()));
+  TH1F* h_fitVar_back_original = static_cast<TH1F*>(fileMC_back->Get(fitVariable));
+  TH1F* h_fitVar_back = static_cast<TH1F*>(h_fitVar_back_original->Clone((std::string(fitVariable) + "_back").c_str()));
 
   // Rebin
   h_fitVar_Data->Rebin(rebin);
@@ -90,19 +92,27 @@ void fitFraction(const char* fitVariable = "multiplicityHFPlus", int rebin = 1){
   std::cout << "Frac back = " << frac_back << " +/- " << err_back << std::endl;
 
   // MC efficiencies
-  double effMCPreSel_all = h_EventSelection_all->GetBinContent(7)/h_EventSelection_all->GetBinContent(2);
+  /*double effMCPreSel_all = h_EventSelection_all->GetBinContent(7)/h_EventSelection_all->GetBinContent(2);
   double effMC_sig = h_EventSelection_sig->GetBinContent(11)/h_EventSelection_sig->GetBinContent(2);
 
   double nEventsPreSel_Data = h_EventSelection_Data->GetBinContent(7);
   double nEventsRun_Data = nEventsPreSel_Data/effMCPreSel_all;
   double nEventsCorr_sig = frac_sig*h_fitVar_Data->Integral()/effMC_sig;
-
+  
   double frac_diff = nEventsCorr_sig/nEventsRun_Data;
+  double err_diff = frac_diff*(err_sig/frac_sig);*/
+
+  double effMC_sig = h_fitVar_sig_original->Integral()/h_EventSelection_sig->GetBinContent(2);
+  double effMC_back = h_fitVar_back_original->Integral()/h_EventSelection_back->GetBinContent(2);
+  double nEventsCorr_sig = frac_sig*h_fitVar_Data->Integral()/effMC_sig;
+  double nEventsCorr_back = frac_back*h_fitVar_Data->Integral()/effMC_back; 
+
+  double frac_diff = nEventsCorr_sig/(nEventsCorr_sig + nEventsCorr_back);
   double err_diff = frac_diff*(err_sig/frac_sig);
 
   double frac_diff_MC = h_EventSelection_sig->GetBinContent(2)/h_EventSelection_sig->GetBinContent(1); 
 
-  std::cout << "Number of events = " << nEventsRun_Data << std::endl;
+  std::cout << "Number of events = " << (nEventsCorr_sig + nEventsCorr_back) << std::endl;
   std::cout << "Frac diff (MC)   = " << frac_diff_MC << std::endl;
   std::cout << "Frac diff        = " << frac_diff << " +/- " << err_diff << std::endl;
 }
