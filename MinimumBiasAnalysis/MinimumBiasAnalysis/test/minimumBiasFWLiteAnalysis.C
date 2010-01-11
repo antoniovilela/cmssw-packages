@@ -151,6 +151,18 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    double Ebeam = 450.;
    //double Ebeam = 1180.;
    int thresholdHF = 15;// 0.2 GeV
+   double energyThresholdHF = 3.0;
+   double energyThresholdHBHE = 1.5;
+   //double ptThresholdTrk = 0.5;
+   std::map<int,std::pair<double,double> > thresholds;
+   thresholds[reco::PFCandidate::X] = std::make_pair(-1.,1.0);
+   thresholds[reco::PFCandidate::h] = std::make_pair(0.5,-1.);
+   thresholds[reco::PFCandidate::e] = std::make_pair(0.5,-1.); 
+   thresholds[reco::PFCandidate::mu] = std::make_pair(0.5,-1.); 
+   thresholds[reco::PFCandidate::gamma] = std::make_pair(0.5,1.0);
+   thresholds[reco::PFCandidate::h0] = std::make_pair(-1.,1.5);
+   thresholds[reco::PFCandidate::h_HF] = std::make_pair(-1.,3.0);
+   thresholds[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,3.0);
 
    bool doTriggerSelection = true;
    std::vector<std::string> hltPaths;
@@ -206,7 +218,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
  
         //if(!genEventInfo.isValid()) {std::cout << ">>> ERROR: Gen event info could not be accessed" << std::endl;continue;}
 
-        unsigned int processId = -1;
+        int processId = -1;
         std::vector<int>::const_iterator it_processId = processIDs.end();
         if(genEventInfo.isValid()){
            processId = genEventInfo->signalProcessID();
@@ -471,9 +483,12 @@ std::endl;continue;}
 
      // Compute Mx
      double MxFromJets = MassColl(*jetCollection,10.);
-     double MxFromPFCands = MassColl(*pfCandCollection,-1.,1.0,3.0);
+     double MxFromTowers = MassColl(*caloTowerCollection,-1.,energyThresholdHBHE,energyThresholdHF);
+     //double MxFromPFCands = MassColl(*pfCandCollection,-1.,-1.,energyThresholdHF);
+     double MxFromPFCands = MassColl(*pfCandCollection,thresholds);
 
      histosTH1F["MxFromJets"]->Fill(MxFromJets);
+     histosTH1F["MxFromTowers"]->Fill(MxFromTowers);
      histosTH1F["MxFromPFCands"]->Fill(MxFromPFCands);
      if(accessMCInfo){
         histosTH1F["MxGen"]->Fill(genAllParticles.M());
@@ -489,19 +504,21 @@ std::endl;continue;}
      histosTH1F["xiPlusFromJets"]->Fill(xiFromJets.first);
      histosTH1F["xiMinusFromJets"]->Fill(xiFromJets.second);
 
-     std::pair<double,double> xiFromTowers = xi(*caloTowerCollection,Ebeam,-1.0,1.0,3.0);
+     std::pair<double,double> xiFromTowers = xi(*caloTowerCollection,Ebeam,-1.,energyThresholdHBHE,energyThresholdHF);
      histosTH1F["xiPlusFromTowers"]->Fill(xiFromTowers.first);
      histosTH1F["xiMinusFromTowers"]->Fill(xiFromTowers.second);
 
-     std::pair<double,double> xiFromPFCands = xi(*pfCandCollection,Ebeam,-1.0,1.0,3.0);
+     //std::pair<double,double> xiFromPFCands = xi(*pfCandCollection,Ebeam,-1.,-1.,energyThresholdHF);
+     std::pair<double,double> xiFromPFCands = xi(*pfCandCollection,Ebeam,thresholds);
      histosTH1F["xiPlusFromPFCands"]->Fill(xiFromPFCands.first);
      histosTH1F["xiMinusFromPFCands"]->Fill(xiFromPFCands.second);
 
-     std::pair<double,double> EPlusPzFromTowers = EPlusPz(*caloTowerCollection,-1.0,1.0,3.0);
+     std::pair<double,double> EPlusPzFromTowers = EPlusPz(*caloTowerCollection,-1.,energyThresholdHBHE,energyThresholdHF);
      histosTH1F["EPlusPzFromTowers"]->Fill(EPlusPzFromTowers.first);
      histosTH1F["EMinusPzFromTowers"]->Fill(EPlusPzFromTowers.second);
 
-     std::pair<double,double> EPlusPzFromPFCands = EPlusPz(*pfCandCollection,-1.0,1.0,3.0);
+     //std::pair<double,double> EPlusPzFromPFCands = EPlusPz(*pfCandCollection,-1.,-1.,energyThresholdHF);
+     std::pair<double,double> EPlusPzFromPFCands = EPlusPz(*pfCandCollection,thresholds);
      histosTH1F["EPlusPzFromPFCands"]->Fill(EPlusPzFromPFCands.first);
      histosTH1F["EMinusPzFromPFCands"]->Fill(EPlusPzFromPFCands.second);
 
@@ -658,6 +675,7 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["missingMassFromXiFromJets"] = new TH1F("missingMassFromXiFromJets","missingMassFromXiFromJets",200,-10.,800.);
    histosTH1F["missingMassFromXiFromPFCands"] = new TH1F("missingMassFromXiFromPFCands","missingMassFromXiFromPFCands",200,-10.,800.);
    histosTH1F["MxFromJets"] = new TH1F("MxFromJets","MxFromJets",200,-10.,400.);
+   histosTH1F["MxFromTowers"] = new TH1F("MxFromTowers","MxFromTowers",200,-10.,400.);
    histosTH1F["MxFromPFCands"] = new TH1F("MxFromPFCands","MxFromPFCands",200,-10.,400.);
    histosTH1F["towerEcalTime"] = new TH1F("towerEcalTime","towerEcalTime",200,-100.,100.);
    histosTH1F["towerHcalTime"] = new TH1F("towerHcalTime","towerHcalTime",200,-100.,100.);

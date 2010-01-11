@@ -2,6 +2,7 @@
 #define MinimumBiasAnalysis_FWLiteTools_h
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
 void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                                  math::XYZTLorentzVector& genAllParticles,
@@ -35,5 +36,70 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                               proton1->pz(),proton1->energy());
    if(proton2 != genParticles.end()) genProtonMinus.SetPxPyPzE(proton2->px(),proton2->py(),
                                                                proton2->pz(),proton2->energy());
+}
+
+bool pflowThreshold(reco::PFCandidate const& part, std::map<int,std::pair<double,double> > const& thresholds){
+
+   bool accept = true;
+
+   double ptThreshold = -1.0;
+   double eThreshold = -1.0;
+   int partType = part.particleId();
+   std::map<int,std::pair<double,double> >::const_iterator it_threshold = thresholds.find(partType);
+   if(it_threshold != thresholds.end()) {
+      ptThreshold = it_threshold->second.first;
+      eThreshold = it_threshold->second.second;
+   }
+
+   if(part.pt() < ptThreshold) accept = false;
+   if(part.energy() < eThreshold) accept = false;
+
+   return accept;
+}
+
+// FIXME: Generalize for any collection with changeable threshold scheme
+double MassColl(reco::PFCandidateCollection const& pflowCollection, std::map<int,std::pair<double,double> > const& thresholds){
+   math::XYZTLorentzVector allCands(0.,0.,0.,0.);
+   reco::PFCandidateCollection::const_iterator part = pflowCollection.begin();
+   reco::PFCandidateCollection::const_iterator pfCands_end = pflowCollection.end();
+   for(; part != pfCands_end; ++part){
+      if(pflowThreshold(*part,thresholds)) allCands += part->p4();
+   }
+
+   return allCands.M();
+}
+
+std::pair<double,double> xi(reco::PFCandidateCollection const& pflowCollection, double Ebeam,  std::map<int,std::pair<double,double> > const& thresholds){
+
+   double xi_towers_plus = 0.;
+   double xi_towers_minus = 0.;
+   reco::PFCandidateCollection::const_iterator part = pflowCollection.begin();
+   reco::PFCandidateCollection::const_iterator pfCands_end = pflowCollection.end();
+   for(; part != pfCands_end; ++part){
+     if(!pflowThreshold(*part,thresholds)) continue;
+
+     xi_towers_plus += part->et()*TMath::Exp(part->eta());
+     xi_towers_minus += part->et()*TMath::Exp(-part->eta());
+   }
+
+   xi_towers_plus /= 2*Ebeam;
+   xi_towers_minus /= 2*Ebeam;
+   
+   return std::make_pair(xi_towers_plus,xi_towers_minus);
+}
+
+std::pair<double,double> EPlusPz(reco::PFCandidateCollection const& pflowCollection, std::map<int,std::pair<double,double> > const& thresholds){
+   double e_plus_pz = 0.;
+   double e_minus_pz = 0.;
+   reco::PFCandidateCollection::const_iterator part = pflowCollection.begin();
+   reco::PFCandidateCollection::const_iterator pfCands_end = pflowCollection.end();
+   for(; part != pfCands_end; ++part){
+      if(!pflowThreshold(*part,thresholds)) continue;
+
+      e_plus_pz += part->energy() + part->pz(); 
+      e_minus_pz += part->energy() - part->pz();
+   }
+
+   return std::make_pair(e_plus_pz,e_minus_pz);
 }
 #endif
