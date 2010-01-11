@@ -33,10 +33,10 @@ void Plotter<NormPolicy>::plotComponents(VarMap const& variablesMap, const char*
       THStack* stack = buildTHStack(setName,stackedHistos);
  
       histoFirst.first->SetMarkerSize(0.9);
-      /*histoFirst.first->Draw();
-      stack->Draw((option + "SAME").c_str());*/
-      stack->Draw(option.c_str());
-      histoFirst.first->Draw("SAME");
+      histoFirst.first->Draw();
+      stack->Draw((option + "SAME").c_str());
+      /*stack->Draw(option.c_str());
+      histoFirst.first->Draw("SAME");*/
      
       std::vector<HistDesc>::const_iterator histo = histos.begin();
       std::vector<HistDesc>::const_iterator histos_end = histos.end();
@@ -145,6 +145,10 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
 
    //std::string option = std::string(drawOption) + "SAME";
    std::string option = std::string(drawOption);
+
+   int colors[] = {kBlack,kBlue,kRed,kMagenta,kOrange};
+   std::vector<int> vec_colors(colors,colors + sizeof(colors)/sizeof(int));
+
    std::map<std::string,TCanvas*> canvasesVar;
    std::map<std::string,TLegend*> legendsVar;
    std::map<std::string,std::vector<TH1F*> > histosVar;
@@ -179,7 +183,8 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
          TH1F* histo = getHisto(dir,name);
 
          //scaleHisto(histo,1,1,(index + 1));
-         scaleHisto(histo,1,1,(index + 1),rebin_); 
+         //scaleHisto(histo,1,1,(index + 1),rebin_); 
+         scaleHisto(histo,1,1,vec_colors[index % vec_colors.size()],rebin_);
 
          legendsVar[catName]->AddEntry(histo,desc.c_str(),"L"); 
          if(var == vars.begin()) histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor);
