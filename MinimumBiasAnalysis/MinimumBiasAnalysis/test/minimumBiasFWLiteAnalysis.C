@@ -148,8 +148,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    //bool accessEdmNtupleVariables = false;
 
-   double Ebeam = 450.;
-   //double Ebeam = 1180.;
+   //double Ebeam = 450.;
+   double Ebeam = 1180.;
    int thresholdHF = 15;// 0.2 GeV
    double energyThresholdHF = 3.0;
    double energyThresholdHBHE = 1.5;

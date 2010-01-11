@@ -9,7 +9,7 @@
 void fitFraction(const char* fitVariable = "multiplicityHFPlus", int rebin = 1){
 
   // Data 
-  TFile* fileData = TFile::Open("root/analysisMinBiasFWLite_histos_MinimumBias_Dec19thReReco-Runs124020-124030_new_highQualityTracks.root");
+  TFile* fileData = TFile::Open("analysisMinBiasFWLite_histos_MinimumBias_Dec19thReReco-Runs124020-124030_new_highQualityTracks.root");
   //TFile* fileData = TFile::Open("root/analysisMinBiasFWLite_histos_MinimumBias_Dec19thReReco-Run124120_new_highQualityTracks.root");
   // Use MC for closure test
   //TFile* fileData = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
@@ -29,7 +29,7 @@ void fitFraction(const char* fitVariable = "multiplicityHFPlus", int rebin = 1){
   //TFile* fileMC_sig = TFile::Open("analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_SD_DD.root");
   //TFile* fileMC_sig = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Diff.root"); 
   //TFile* fileMC_sig = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks_SD.root");
-  TFile* fileMC_sig = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_SD.root");
+  TFile* fileMC_sig = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Diff.root");
   TH1F* h_EventSelection_sig = static_cast<TH1F*>(fileMC_sig->Get("EventSelection"));
   TH1F* h_fitVar_sig_original = static_cast<TH1F*>(fileMC_sig->Get(fitVariable));
   TH1F* h_fitVar_sig = static_cast<TH1F*>(h_fitVar_sig_original->Clone((std::string(fitVariable) + "_sig").c_str()));
@@ -38,7 +38,7 @@ void fitFraction(const char* fitVariable = "multiplicityHFPlus", int rebin = 1){
   //TFile* fileMC_back = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_QCD.root");
   //TFile* fileMC_back = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Inelastic.root");
   //TFile* fileMC_back = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks_NonSD.root");
-  TFile* fileMC_back = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_NonSD.root");
+  TFile* fileMC_back = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Inelastic.root");
   TH1F* h_EventSelection_back = static_cast<TH1F*>(fileMC_back->Get("EventSelection"));
   TH1F* h_fitVar_back_original = static_cast<TH1F*>(fileMC_back->Get(fitVariable));
   TH1F* h_fitVar_back = static_cast<TH1F*>(h_fitVar_back_original->Clone((std::string(fitVariable) + "_back").c_str()));
