@@ -14,6 +14,7 @@ process.source = cms.Source("PoolSource",
         '/store/data/BeamCommissioning09/MinimumBias/RECO/v2/000/124/030/E6A8AB2F-78E7-DE11-973F-001617C3B710.root'
     )
 )
+"""
 # Run 124030
 process.source.fileNames = (
     '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0103/D6FC56AE-ADEE-DE11-B2F7-0024E87680E7.root',
@@ -27,6 +28,17 @@ process.source.fileNames = (
     '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/1E35A2C5-1CED-DE11-BB47-0024E86E8D18.root',
     '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/0A8CFAC4-18ED-DE11-8CD8-001D0967C1DF.root'
 )
+"""
+# Run 124120
+process.source.fileNames = (
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/B4237151-29ED-DE11-81ED-0015178C1804.root',
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/A674A9FE-19ED-DE11-8C16-00151785FF78.root',
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/A622C6B7-18ED-DE11-AB28-0024E8768C23.root',
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/94AB71E7-1BED-DE11-AE0C-001D0967D314.root',
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/745BD05C-21ED-DE11-A20D-001D0967CF77.root',
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/66001B96-10ED-DE11-9728-0024E8767DA0.root',
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/223763C6-18ED-DE11-89A4-001D0967D49F.root',
+)
 
 process.load("Configuration/StandardSequences/Geometry_cff")
 process.load("Configuration/StandardSequences/MagneticField_cff")
@@ -35,9 +47,9 @@ process.load("Configuration/StandardSequences/FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = 'GR09_R_V5::All'
 
 process.load("MinimumBiasAnalysis.MinimumBiasAnalysis.analysisSequences_cff")
-#process.xiTower.comEnergy = 2360.0
-#process.xiFromCaloTowers.comEnergy = 2360.0
-#process.xiFromJets.comEnergy = 2360.0
+process.xiTower.comEnergy = 2360.0
+process.xiFromCaloTowers.comEnergy = 2360.0
+process.xiFromJets.comEnergy = 2360.0
 
 process.load("RecoMET.Configuration.RecoMET_BeamHaloId_cff")
 
@@ -54,7 +66,8 @@ process.pixelClusterSelection = cms.EDFilter("PixelClusterSelection",
 process.load("MinimumBiasAnalysis.MinimumBiasAnalysis.outputModule_cfi")
 from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasEventContent_cff import MinimumBiasEventContent
 process.output.outputCommands = MinimumBiasEventContent.outputCommands
-process.output.fileName = 'minimumBias.root'
+#process.output.fileName = 'minimumBias.root'
+process.output.fileName = '/tmp/antoniov/minimumBias.root'
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 #process.output.SelectEvents.SelectEvents = cms.vstring('*')
 #process.output.SelectEvents.SelectEvents = cms.vstring('generalTracksPath','pixelTracksPath','pixelLessTracksPath')
@@ -90,7 +103,10 @@ process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
 #process.reco_step = cms.Path(process.eventSelection_new+process.recoSequence+process.BeamHaloId)
 
 process.selection_step = cms.Path(process.eventSelection)
-process.reco_step = cms.Path(process.recoSequence+process.BeamHaloId)
+process.reco_step = cms.Path(process.eventSelection+process.recoSequence+process.BeamHaloId)
+
+process.selection_step.replace(process.eventSelection,process.eventSelectionNoColl)
+process.reco_step.replace(process.eventSelection,process.eventSelectionNoColl)
 
 process.out_step = cms.EndPath(process.output)
 #process.schedule = cms.Schedule(process.hlt_step,process.reco_step,process.analysis_step,process.out_step)

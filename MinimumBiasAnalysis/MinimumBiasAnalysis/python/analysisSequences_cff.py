@@ -12,8 +12,23 @@ from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import *
 hltLevel1GTSeed.L1TechTriggerSeeding = cms.bool(True)
 #hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('32 OR 33 OR 34 OR 35 OR 36 OR 37 OR 38 OR 39 OR 40 OR 41 OR 42 OR 43')
 # BPTX and BSC(OR)
-hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0 AND 34')
-l1tech = cms.Sequence(hltLevel1GTSeed)
+#hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0 AND 34')
+#hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0 AND 34 AND (NOT 36) AND (NOT 37) AND (NOT 38) AND (NOT 39)')
+bptx = hltLevel1GTSeed.clone(L1SeedsLogicalExpression = cms.string('0'))
+bscOr = hltLevel1GTSeed.clone(L1SeedsLogicalExpression = cms.string('34'))
+beamHaloVeto = hltLevel1GTSeed.clone(L1SeedsLogicalExpression = cms.string('(NOT 36) AND (NOT 37) AND (NOT 38) AND (NOT 39)'))
+#l1tech = cms.Sequence(hltLevel1GTSeed)
+#l1tech = cms.Sequence(bptx+bscOr+beamHaloVeto)
+# BPTX OR
+bptxOr = cms.EDFilter("L1Filter",
+    inputTag     = cms.InputTag("gtDigis"),
+    useAODRecord = cms.bool(False),
+    useFinalDecision = cms.bool(False),
+    algorithms = cms.vstring("L1_BptxPlusORMinus") # or L1_BptxPlus or L1_BptxMinus
+    #algorithms = cms.vstring("L1_BptxPlus")
+)
+l1Coll = cms.Sequence(bptx+bscOr+beamHaloVeto)
+l1NoColl = cms.Sequence(bptxOr+~bptx+bscOr+beamHaloVeto)
 
 primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
     vertexCollection = cms.InputTag('offlinePrimaryVertices'),
@@ -75,9 +90,12 @@ xiFromJets.comEnergy = 900.0
 #hlt = cms.Sequence(lumiSectionSel+minimumBiasHLTFilter)
 #hlt = cms.Sequence(lumiSectionSel)
 #hlt = cms.Sequence(l1tech)
-hlt = cms.Sequence(l1tech+minimumBiasHLTFilter)
+#hlt = cms.Sequence(l1tech+minimumBiasHLTFilter)
+hlt = cms.Sequence(l1Coll+minimumBiasHLTFilter)
+hltNoColl = cms.Sequence(l1NoColl+minimumBiasHLTFilter)
 #eventSelection = cms.Sequence(hlt+primaryVertexFilter+filterScraping)
 eventSelection = cms.Sequence(hlt+primaryVertexFilter)
+eventSelectionNoColl = cms.Sequence(hltNoColl+primaryVertexFilter)
 #jets = cms.Sequence(L2L3CorJetSC5PF+L2L3CorJetSC7PF*leadingJets)
 #tracks = cms.Sequence(selectGoodTracks*
 #                      selectTracksAssociatedToPV*
