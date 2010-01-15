@@ -148,8 +148,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    //bool accessEdmNtupleVariables = false;
 
-   //double Ebeam = 450.;
-   double Ebeam = 1180.;
+   double Ebeam = 450.;
+   //double Ebeam = 1180.;
    int thresholdHF = 15;// 0.2 GeV
    double energyThresholdHF = 3.0;
    double energyThresholdHBHE = 1.5;
@@ -171,7 +171,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    hltPaths.push_back("HLT_MinBiasBSC_OR");
    bool doHcalNoiseSelection = true;
    // Pre-selection
-   bool doGoodVertexSelection = true;
+   bool doGoodVertexSelection = false;
    bool doHighQualityTracksSelection = true;
    // Event selection
    // Prim. vertices
@@ -385,6 +385,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         histosTH1F["posXPrimVtx"]->Fill(primVertex.x());
         histosTH1F["posYPrimVtx"]->Fill(primVertex.y());
         histosTH1F["posZPrimVtx"]->Fill(primVertex.z());
+        histosTH1F["posRPrimVtx"]->Fill(primVertex.position().rho());
 
         if(doVertexSelection && (fabs(primVertex.z()) > primVtxZMax)) continue;
      }
@@ -654,6 +655,7 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["posXPrimVtx"] = new TH1F("posXPrimVtx","x position of primary vertexes",100,-1.,1.);
    histosTH1F["posYPrimVtx"] = new TH1F("posYPrimVtx","y position of primary vertexes",100,-1.,1.);
    histosTH1F["posZPrimVtx"] = new TH1F("posZPrimVtx","z position of primary vertexes",100,-30.,30.);
+   histosTH1F["posRPrimVtx"] = new TH1F("posRPrimVtx","rho position of primary vertexes",100,0.,5.);
    histosTH1F["leadingJetPt"] = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
    histosTH1F["leadingJetEta"] = new TH1F("leadingJetEta","leadingJetEta",100,-5.,5.);
    histosTH1F["leadingJetPhi"] = new TH1F("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);

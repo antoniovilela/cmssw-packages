@@ -6,8 +6,10 @@
 #include "TH2F.h"
 #include "TTree.h"
 
-#include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/test/PlottingTools.h"
-#include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/test/Plotter.h"
+//#include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/test/PlottingTools.h"
+//#include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/test/Plotter.h"
+#include "Utilities/PlottingTools/interface/PlottingTools.h"
+#include "Utilities/PlottingTools/interface/Plotter.h"
 
 #include <iostream>
 #include <vector>
@@ -62,17 +64,17 @@ void plot(const char* drawOption = "", int rebin = 1){
    std::vector<double> normFactors;
 
    //setDirsPYTHIAPHOJET(dirs,normFactors);
-   setDirsMCComponents(dirs,normFactors);
+   //setDirsMCComponents(dirs,normFactors);
    //setDirsDataMC(dirs,normFactors);
-   //setDirsDataMCComponents(dirs,normFactors);
+   setDirsDataMCComponents(dirs,normFactors);
    //setDirsCompareData(dirs,normFactors);
 
    //Plotter<NumberEntriesNorm> plotter;
    Plotter<DefaultNorm> plotter;
    plotter.SetRebin(rebin);
    //plotter.plot(variables,dirs,drawOption);
-   plotter.plot(variables,dirs,normFactors,drawOption);
-   //plotter.plotComponents(variables,dirs,normFactors,drawOption);
+   //plotter.plot(variables,dirs,normFactors,drawOption);
+   plotter.plotComponents(variables,dirs,normFactors,drawOption);
 
 }
 
@@ -160,7 +162,7 @@ void setDirsDataMC(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::
 
 void setDirsDataMCComponents(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
    //TFile* file_Data = TFile::Open("analysisMinBiasFWLite_histos_MinimumBias_Dec19thReReco-Runs124020-124030_new_highQualityTracks.root");
-   TFile* file_Data = TFile::Open("analysisMinBiasFWLite_histos_MinimumBias_Dec14thReReco-Runs124020-124030_new_highQualityTracks.root"); 
+   TFile* file_Data = TFile::Open("root/analysisMinBiasFWLite_histos_MinimumBias_Dec14thReReco-Runs124020-124030_new_highQualityTracks.root"); 
    //TFile* file_Data = TFile::Open("root/analysisMinBiasFWLite_histos_MinimumBias_Dec19thReReco-Run124120.root");
    TH1F* h_EventSelection_Data = static_cast<TH1F*>(file_Data->Get("EventSelection"));
    double nEventsRun_Data = h_EventSelection_Data->GetBinContent(2);
@@ -168,9 +170,9 @@ void setDirsDataMCComponents(std::vector<std::pair<std::string,TDirectory*> >& d
    double nEventsPreSel_Data = h_EventSelection_Data->GetBinContent(7);
    double nEventsFullSel_Data = h_EventSelection_Data->GetBinContent(11);
 
-   //TFile* fileMC_All = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
+   TFile* fileMC_All = TFile::Open("root/analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
    //TFile* fileMC_All = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks.root");
-   TFile* fileMC_All = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
+   //TFile* fileMC_All = TFile::Open("root/analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
    TH1F* h_EventSelection_All = static_cast<TH1F*>(fileMC_All->Get("EventSelection"));
    double nEvents_All = h_EventSelection_All->GetBinContent(2);
    double nEventsRun_All = h_EventSelection_All->GetBinContent(2);
@@ -178,18 +180,18 @@ void setDirsDataMCComponents(std::vector<std::pair<std::string,TDirectory*> >& d
    double nEventsPreSel_All = h_EventSelection_All->GetBinContent(7);
    double nEventsFullSel_All = h_EventSelection_All->GetBinContent(11);
 
-   //TFile* fileMC_Diff = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Diff.root");
+   TFile* fileMC_Diff = TFile::Open("root/analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Diff.root");
    //TFile* fileMC_Diff = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks_Diff.root");
-   TFile* fileMC_Diff = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Diff.root");
+   //TFile* fileMC_Diff = TFile::Open("root/analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Diff.root");
    TH1F* h_EventSelection_Diff = static_cast<TH1F*>(fileMC_Diff->Get("EventSelection"));
    double nEvents_Diff = h_EventSelection_Diff->GetBinContent(1);
    double nEventsRun_Diff = h_EventSelection_Diff->GetBinContent(2);
    double nEventsPreSel_Diff = h_EventSelection_Diff->GetBinContent(7);
    double nEventsFullSel_Diff = h_EventSelection_Diff->GetBinContent(11);
 
-   //TFile* fileMC_Inel = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Inelastic.root");
+   TFile* fileMC_Inel = TFile::Open("root/analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Inelastic.root");
    //TFile* fileMC_Inel = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks_Inel.root");
-   TFile* fileMC_Inel = TFile::Open("analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Inelastic.root");
+   //TFile* fileMC_Inel = TFile::Open("root/analysisMinBiasFWLite_histos_PHOJET_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Inelastic.root");
    TH1F* h_EventSelection_Inel = static_cast<TH1F*>(fileMC_Inel->Get("EventSelection"));
    double nEvents_Inel = h_EventSelection_Inel->GetBinContent(1);
    double nEventsRun_Inel = h_EventSelection_Inel->GetBinContent(2);
