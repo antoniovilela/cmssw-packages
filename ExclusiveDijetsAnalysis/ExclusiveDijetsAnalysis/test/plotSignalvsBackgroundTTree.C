@@ -37,18 +37,11 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    samples.push_back("QCD non-diffractive");
 
    std::vector<TFile*> files;
-   /*files.push_back(TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU_nHFMax_0.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_nHFMax_0.root")); 
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_nHFMax_0.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_nHFMax_0.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU_nHFMax_0.root"));*/
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU.root"));
-   //files.push_back(TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_noPU.root")); 
-   //files.push_back(TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_noPU.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_FastSim.root")); 
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_FastSim.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU.root"));
-   files.push_back(TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_noPU_AOD.root"));
+   files.push_back(TFile::Open("root/selection/nHFMax_0/analysisDijetsTTree_histos_CEPDijets_M100_noPU.root"));
+   files.push_back(TFile::Open("root/selection/nHFMax_0/analysisDijetsTTree_histos_SDPlusDijets_Pt30_FastSim.root")); 
+   files.push_back(TFile::Open("root/selection/nHFMax_0/analysisDijetsTTree_histos_SDMinusDijets_Pt30_FastSim.root"));
+   files.push_back(TFile::Open("root/selection/nHFMax_0/analysisDijetsTTree_histos_DPEDijets_Pt40_noPU.root"));
+   files.push_back(TFile::Open("root/selection/nHFMax_0/analysisDijetsTTree_histos_QCD100to250-madgraph_FastSim_nHFMax_0.root"));
 
    std::vector<TDirectory*> directories;
 
@@ -92,7 +85,7 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    }
 
    std::vector<string> refVar;
-   refVar.push_back("leadingJetPt");
+   /*refVar.push_back("leadingJetPt");
    refVar.push_back("leadingJetEta");
    refVar.push_back("leadingJetPhi");
    refVar.push_back("secondJetPt");
@@ -111,7 +104,7 @@ void plot(bool Norm = false, int rebinFactor = 1, bool variableBin = false, std:
    refVar.push_back("missingMassFromXi");
    refVar.push_back("MxFromJets");
    refVar.push_back("xiPlusFromPFCandsAfterSel");
-   refVar.push_back("xiMinusFromPFCandsAfterSel");
+   refVar.push_back("xiMinusFromPFCandsAfterSel");*/
    refVar.push_back("RjjFromJets");
    refVar.push_back("RjjFromPFCands");
    refVar.push_back("RjjFromJetsAfterSel");

@@ -16,16 +16,26 @@ std::map<std::string,std::vector<double> > getEvents(std::vector<string>& vars, 
 
 std::vector<std::pair<std::string,TFile*> > getAllSamples(){
    std::vector<std::pair<std::string,TFile*> > files;
-   /*files.push_back(std::make_pair("CEP di-jets",TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU_nHFMax_0.root")));
-   files.push_back(std::make_pair("SD-plus di-jets",TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_nHFMax_0.root")));
-   files.push_back(std::make_pair("SD-minus di-jets",TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_nHFMax_0.root")));
-   files.push_back(std::make_pair("QCD non-diffractive",TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_nHFMax_0.root")));
-   files.push_back(std::make_pair("DPE di-jets",TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU_nHFMax_0.root")));*/
-   files.push_back(std::make_pair("CEP di-jets",TFile::Open("analysisDijetsTTree_histos_CEPDijets_M100_noPU.root"))); 
-   files.push_back(std::make_pair("SD-plus di-jets",TFile::Open("analysisDijetsTTree_histos_SDPlusDijets_Pt30_noPU.root")));
-   files.push_back(std::make_pair("SD-minus di-jets",TFile::Open("analysisDijetsTTree_histos_SDMinusDijets_Pt30_noPU.root"))); 
-   files.push_back(std::make_pair("DPE di-jets",TFile::Open("analysisDijetsTTree_histos_DPEDijets_Pt40_noPU.root")));
-   files.push_back(std::make_pair("QCD non-diffractive",TFile::Open("analysisDijetsTTree_histos_QCD100to250-madgraph_noPU_AOD.root")));
+   std::string selection = "nHFMax_0";
+   std::string dir = "root/selection/" + selection + "/"; 
+   files.push_back(std::make_pair("CEP di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_CEPDijets_M100_noPU.root").c_str()))); 
+   //files.push_back(std::make_pair("SD-plus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDPlusDijets_Pt30_noPU.root").c_str())));
+   //files.push_back(std::make_pair("SD-minus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDMinusDijets_Pt30_noPU.root").c_str()))); 
+   files.push_back(std::make_pair("SD-plus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDPlusDijets_Pt30_FastSim.root").c_str())));
+   files.push_back(std::make_pair("SD-minus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDMinusDijets_Pt30_FastSim.root").c_str())));
+   files.push_back(std::make_pair("DPE di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_DPEDijets_Pt40_noPU.root").c_str())));
+   //files.push_back(std::make_pair("QCD non-diffractive",TFile::Open((dir + "analysisDijetsTTree_histos_QCD100to250-madgraph_noPU_AOD.root").c_str())));
+   files.push_back(std::make_pair("QCD non-diffractive",TFile::Open((dir + "analysisDijetsTTree_histos_QCD100to250-madgraph_FastSim.root").c_str())));
+
+   return files;
+}
+
+std::vector<std::pair<std::string,TFile*> > getPUSamples(){
+   std::vector<std::pair<std::string,TFile*> > files;
+   std::string selection = "nHFMax_1";
+   std::string dir = "root/selection/" + selection + "/";
+   files.push_back(std::make_pair("CEP di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_CEPDijets_M100_StageA156Bx_PU.root").c_str())));
+   files.push_back(std::make_pair("DPE di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_DPEDijets_Pt40_StageA156Bx_PU.root").c_str())));
 
    return files;
 }
@@ -63,7 +73,8 @@ void plot(){
 
    std::map<std::string,TDirectory*> dirMap = makeMap(samples,directories);*/
  
-   std::vector<std::pair<std::string,TFile*> > files = getAllSamples();
+   //std::vector<std::pair<std::string,TFile*> > files = getAllSamples();
+   std::vector<std::pair<std::string,TFile*> > files = getPUSamples(); 
    //std::vector<std::pair<std::string,TFile*> > files = getSystSamples();
 
    std::map<std::string,TDirectory*> dirMap;
@@ -71,6 +82,13 @@ void plot(){
       dirMap[it->first] = static_cast<TDirectory*>(it->second);
    }
  
+   std::map<std::string, double> sigmaMap;
+   sigmaMap["CEP di-jets"] = 250.;
+   sigmaMap["SD-plus di-jets"] = 300000./2;
+   sigmaMap["SD-minus di-jets"] = 300000./2;
+   sigmaMap["DPE di-jets"] = 4600.;
+   sigmaMap["QCD non-diffractive"] = 15000000.;
+
    std::vector<string> variablesForEff;
    variablesForEff.push_back("leadingJetPt");
    variablesForEff.push_back("leadingJetEta");
@@ -113,7 +131,9 @@ void plot(){
       std::vector<double> const& myvec = it->second;
       for(size_t idx = 0; idx < myvec.size(); ++idx){
          size_t idx_previous = idx ? (idx - 1) : 0;
-         std::cout << idx << ": " << myvec[idx] << "  wrt previous " << myvec[idx]/myvec[idx_previous] << std::endl;
+         std::cout << idx << ": " << myvec[idx]
+                                  << "  wrt previous " << myvec[idx]/myvec[idx_previous]
+                                  << " sigma " << sigmaMap[it->first]*myvec[idx] << std::endl;
       } 
    }
 }

@@ -35,9 +35,24 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
                                   std::string const& treeName,
                                   std::string const& singleVtxFilterName,
                                   std::string const& dijetsFilterName,
-                                  std::string const& fileHLTName, 
+                                  std::string const& fileHLTName,
                                   std::string const& outFileName = "analysisDijetsTTree_histos.root",
-                                  int maxEvents = -1, bool verbose = false){
+                                  int maxEvents = -1, bool verbose = false);
+
+void exclusiveDijetsTTreeAnalysis(TFile*,TTree*,std::string const&,
+                                  std::string const&,std::string const&,std::string const&,
+                                  int,bool);
+
+void exclusiveDijetsTTreeAnalysis(TTree*,TH1F*,TH1F*,TTree*,TTree*,
+                                  std::string const&,int,bool);
+
+void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
+                                  std::string const& treeName,
+                                  std::string const& singleVtxFilterName,
+                                  std::string const& dijetsFilterName,
+                                  std::string const& fileHLTName,
+                                  std::string const& outFileName,
+                                  int maxEvents, bool verbose){
 
    if(verbose) std::cout << ">>> Reading file: " << fileName << std::endl;
 
@@ -55,17 +70,39 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
       return;
    }
 
+   exclusiveDijetsTTreeAnalysis(file,data,singleVtxFilterName,dijetsFilterName,fileHLTName,outFileName,maxEvents,verbose); 
+}
+  
+void exclusiveDijetsTTreeAnalysis(TFile* file,
+                                  TTree* data,
+                                  std::string const& singleVtxFilterName,
+                                  std::string const& dijetsFilterName,
+                                  std::string const& fileHLTName, 
+                                  std::string const& outFileName,
+                                  int maxEvents, bool verbose){
+
+   if(!file){
+      std::cout << "ERROR: Could not open " << file->GetName() << std::endl;
+      return;
+   }
+
+   if(!data){
+      std::cout << "ERROR: Could not open " << data->GetName() << std::endl;
+      file->Close();
+      return;
+   }
+
    // For efficiencies
    TH1F* h_nVertexFilter = dynamic_cast<TH1F*>(file->Get((singleVtxFilterName + "/nVertex").c_str()));
    if(!h_nVertexFilter){
-      std::cout << "ERROR: Could not find reference histo " << singleVtxFilterName << " in " << fileName << std::endl;
+      std::cout << "ERROR: Could not find reference histo " << singleVtxFilterName << " in " << file->GetName() << std::endl;
       file->Close();
       return;
    }
 
    TH1F* h_leadingJetPtFilter = dynamic_cast<TH1F*>(file->Get((dijetsFilterName + "/leadingJetPt").c_str()));
    if(!h_leadingJetPtFilter){
-      std::cout << "ERROR: Could not find reference histo " << dijetsFilterName << " in " << fileName << std::endl;
+      std::cout << "ERROR: Could not find reference histo " << dijetsFilterName << " in " << file->GetName() << std::endl;
       file->Close();
       return;
    }
@@ -95,6 +132,15 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
       return;
    }
 
+   exclusiveDijetsTTreeAnalysis(data,h_nVertexFilter,h_leadingJetPtFilter,dataHLT_before,dataHLT_after,outFileName,maxEvents,verbose);
+}
+
+void exclusiveDijetsTTreeAnalysis(TTree* data,
+                                  TH1F* h_nVertexFilter,
+                                  TH1F* h_leadingJetPtFilter,
+                                  TTree* dataHLT_before, TTree* dataHLT_after,
+                                  std::string const& outFileName,
+                                  int maxEvents, bool verbose){
    EventData eventData;
    setTTreeBranches(*data,eventData);
    int nEntries = data->GetEntries(); 
@@ -103,7 +149,7 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    TFile* hfile = new TFile(outFileName.c_str(),"recreate","data histograms");
 
    // Book Histograms
-   //TH1::SetDefaultSumw2(true);
+   TH1::SetDefaultSumw2(true);
 
    HistoMapTH1F histosTH1F;
    HistoMapTH2F histosTH2F; 
@@ -151,8 +197,8 @@ void exclusiveDijetsTTreeAnalysis(std::string const& fileName,
    int nTracksMax = 3;
    // HF-multiplicity
    bool doHFMultiplicitySelection = true; 
-   int nHFPlusMax = 2;
-   int nHFMinusMax = 2;
+   int nHFPlusMax = 0;
+   int nHFMinusMax = 0;
 
    // Loop over TTree
    //int nEntries = data->GetEntries();

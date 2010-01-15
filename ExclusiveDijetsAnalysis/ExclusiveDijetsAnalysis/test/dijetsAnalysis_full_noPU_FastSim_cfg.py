@@ -6,8 +6,8 @@ if hasattr(process,'output'): del process.output
 if hasattr(process,'out_step'): del process.out_step
 if hasattr(process,'analysis_step'): del process.analysis_step
 
-process.MessageLogger.cerr.threshold = 'INFO'
-process.maxEvents.input = 5000
+process.MessageLogger.cerr.threshold = 'WARNING'
+#process.maxEvents.input = 5000
 process.source.fileNames = cms.untracked.vstring('file:/data1/antoniov/QCD100to250-madgraph_IDEAL_V12_FastSim_GEN-SIM-DIGI-RECO_FCE6F1F2-FE1C-DE11-9095-0019B9CB01A7.root')
 
 # Analysis sequences
