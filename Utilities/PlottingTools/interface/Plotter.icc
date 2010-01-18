@@ -11,6 +11,23 @@
 #include <algorithm>
 
 template <class NormPolicy>
+Plotter<NormPolicy>::Plotter<NormPolicy>(): verbose_(false),rebin_(1){
+   // Default colors/styles
+   int colors[] = {kRed,kBlue,kMagenta};
+   std::vector<int> vec_colors(colors,colors + sizeof(colors)/sizeof(int));
+   int linestyles[] = {kDashed,kDotted,kDashDotted};
+   std::vector<int> vec_linestyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+   int fillstyles[] = {3004,3006,3005,3007,3013};
+   std::vector<int> vec_fillstyles(fillstyles,fillstyles + sizeof(fillstyles)/sizeof(int)); 
+
+   SetColors(vec_colors);
+   SetLineStyles(vec_linestyles);
+   SetFillStyles(vec_fillstyles);
+}
+
+//======================================================
+
+template <class NormPolicy>
 //void Plotter<NormPolicy>::plotComponents(VarMap const& variablesMap, const char* drawOption){
 void Plotter<NormPolicy>::plotStack(VarMap const& variablesMap, const char* drawOption, bool firstAsRefHist){ 
    std::string option = std::string(drawOption);
@@ -60,13 +77,14 @@ THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<
    std::vector<HistDesc> reversedHistos(histos);
    std::reverse(reversedHistos.begin(),reversedHistos.end());
 
-   int colors[] = {kRed,kBlue,kMagenta};
-   std::vector<int> vec_colors(colors,colors + sizeof(colors)/sizeof(int));
-   int linestyles[] = {kDashed,kDotted,kDashDotted};
-   std::vector<int> vec_linestyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
-   int fillstyles[] = {3004,3006,3005,3007,3013};
-   std::vector<int> vec_fillstyles(fillstyles,fillstyles + sizeof(fillstyles)/sizeof(int));
-
+   // Get reversed colors/styles as well
+   std::vector<int> colors(histColors_);
+   std::reverse(colors.begin(),colors.end());
+   std::vector<int> linestyles(histLineStyles_);
+   std::reverse(linestyles.begin(),linestyles.end());
+   std::vector<int> fillstyles(histFillStyles_);
+   std::reverse(fillstyles.begin(),fillstyles.end());
+ 
    THStack* stack = new THStack(("stack_" + name).c_str(),name.c_str());
    size_t index = 0;
    std::vector<HistDesc>::const_iterator it_histo = reversedHistos.begin();
@@ -74,10 +92,10 @@ THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<
    //std::vector<HistDesc>::const_iterator histos_last = reversedHistos.end() - 1;
    for(; it_histo != histos_end; ++it_histo, ++index){
       TH1F* histo = it_histo->first;
-      histo->SetLineColor(vec_colors[index % vec_colors.size()]);
-      histo->SetLineStyle(vec_linestyles[index % vec_linestyles.size()]);
-      histo->SetFillColor(vec_colors[index % vec_colors.size()]);
-      histo->SetFillStyle(vec_fillstyles[index % vec_fillstyles.size()]);
+      histo->SetLineColor(colors[index % colors.size()]);
+      histo->SetLineStyle(linestyles[index % linestyles.size()]);
+      histo->SetFillColor(colors[index % colors.size()]);
+      histo->SetFillStyle(fillstyles[index % fillstyles.size()]);
       /*if(it_histo == histos_last){
          histo->SetLineStyle(1);
       } else{
@@ -120,11 +138,13 @@ TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var){
    //std::string const& desc = var.label();
    double normFactor = var.norm();
 
+   if(verbose_) std::cout << " Accessing " << name << " in " << dir->GetName() << std::endl;
+
    TH1F* histo = getHisto(dir,name);
    // Clone histogram
    TH1F* histo_new = static_cast<TH1F*>(histo->Clone((name + "_scaled").c_str()));
 
-   double scaleFactor = NormPolicy::GetNorm(histo_new)*normFactor/histo_new->GetSumOfWeights();
+   double scaleFactor = (histo_new->GetSumOfWeights() > 0.) ? NormPolicy::GetNorm(histo_new)*normFactor/histo_new->GetSumOfWeights() : 1.;
    scaleHisto(histo_new,scaleFactor,1,1,rebin_);
 
    return histo_new;
@@ -133,6 +153,13 @@ TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var){
 
 template <class NormPolicy>
 typename Plotter<NormPolicy>::VarMap Plotter<NormPolicy>::makeVarMap(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, const std::vector<double>& normFactors){
+
+   if(normFactors.size() != directories.size()){
+      std::string errMessage = "ERROR: Input vectors must have the same size."; 
+      std::cout << errMessage << std::endl; 
+      throw RootException(errMessage);
+   }
+
    VarMap variablesMap;
    for(std::vector<std::string>::const_iterator var = variables.begin(); var != variables.end(); ++var){
       std::vector<VarDesc> varVector;
@@ -165,9 +192,6 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
 
    //std::string option = std::string(drawOption) + "SAME";
    std::string option = std::string(drawOption);
-
-   int colors[] = {kBlack,kBlue,kRed,kMagenta,kOrange};
-   std::vector<int> vec_colors(colors,colors + sizeof(colors)/sizeof(int));
 
    std::map<std::string,TCanvas*> canvasesVar;
    std::map<std::string,TLegend*> legendsVar;
@@ -204,7 +228,8 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
 
          //scaleHisto(histo,1,1,(index + 1));
          //scaleHisto(histo,1,1,(index + 1),rebin_); 
-         scaleHisto(histo,1,1,vec_colors[index % vec_colors.size()],rebin_);
+         //scaleHisto(histo,1,1,histColors_[index % histColors_.size()],rebin_);
+         scaleHisto(histo,1.,histLineStyles_[index % histLineStyles_.size()],histColors_[index % histColors_.size()],rebin_);
 
          legendsVar[catName]->AddEntry(histo,desc.c_str(),"L"); 
          if(var == vars.begin()) histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor);

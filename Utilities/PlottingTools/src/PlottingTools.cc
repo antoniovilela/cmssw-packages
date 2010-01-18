@@ -14,7 +14,7 @@
 #include <map>
 #include <algorithm>
 
-//double ConstNorm::normalization = 1.0;
+double ConstNorm::normalization = 1.0;
 
 void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm){
    std::map<std::string,TCanvas*> canvasesVar;
@@ -82,7 +82,7 @@ void scaleHisto(TH1F* histo, double scale, int line, int color, int rebin){
    histo->Scale(scale);
 
    histo->Rebin(rebin);
-   histo->SetLineWidth(2);
+   histo->SetLineWidth(3);
    histo->SetLineStyle(line);
    histo->SetLineColor(color);
 
