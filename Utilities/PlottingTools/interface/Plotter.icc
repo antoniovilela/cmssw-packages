@@ -11,7 +11,7 @@
 #include <algorithm>
 
 template <class NormPolicy>
-Plotter<NormPolicy>::Plotter<NormPolicy>(): verbose_(false),rebin_(1){
+Plotter<NormPolicy>::Plotter(): verbose_(false),rebin_(1){
    // Default colors/styles
    int colors[] = {kRed,kBlue,kMagenta};
    std::vector<int> vec_colors(colors,colors + sizeof(colors)/sizeof(int));
