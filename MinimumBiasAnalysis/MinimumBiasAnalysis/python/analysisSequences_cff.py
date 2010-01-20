@@ -1,9 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
 lumiSectionSel = cms.EDFilter("LumiSectionSelection",
-      Runs = cms.vuint32(122294,122314,123151),
-      LumiSectionMin = cms.vuint32(37,24,3),
-      LumiSectionMax = cms.vuint32(43,37,24), 
+      Runs = cms.vuint32(124023),
+      LumiSectionMin = cms.vuint32(41),
+      LumiSectionMax = cms.vuint32(96), 
       applyfilter = cms.untracked.bool(True)
 )
 
@@ -27,12 +27,20 @@ bptxOr = cms.EDFilter("L1Filter",
     algorithms = cms.vstring("L1_BptxPlusORMinus") # or L1_BptxPlus or L1_BptxMinus
     #algorithms = cms.vstring("L1_BptxPlus")
 )
+"""
+bptxOr = hltLevel1GTSeed.clone(
+    #L1TechTriggerSeeding = False,
+    L1SeedsLogicalExpression = cms.string('82')
+)
+"""
 l1Coll = cms.Sequence(bptx+bscOr+beamHaloVeto)
-l1NoColl = cms.Sequence(bptxOr+~bptx+bscOr+beamHaloVeto)
+l1NoColl = cms.Sequence(~bptx+bscOr+beamHaloVeto)
+l1NoBPTX = cms.Sequence(bscOr+beamHaloVeto)
 
 primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
     vertexCollection = cms.InputTag('offlinePrimaryVertices'),
-    minimumNumberOfTracks = cms.uint32(3),
+    #minimumNumberOfTracks = cms.uint32(3),
+    minimumNumberOfTracks = cms.uint32(2),
     maxAbsZ = cms.double(15),	
     maxd0 = cms.double(2)	
 )
@@ -91,11 +99,16 @@ xiFromJets.comEnergy = 900.0
 #hlt = cms.Sequence(lumiSectionSel)
 #hlt = cms.Sequence(l1tech)
 #hlt = cms.Sequence(l1tech+minimumBiasHLTFilter)
-hlt = cms.Sequence(l1Coll+minimumBiasHLTFilter)
-hltNoColl = cms.Sequence(l1NoColl+minimumBiasHLTFilter)
+#hlt = cms.Sequence(l1Coll+minimumBiasHLTFilter)
+#hltNoColl = cms.Sequence(l1NoColl+minimumBiasHLTFilter)
+#hltNoBPTX = cms.Sequence(l1NoBPTX+minimumBiasHLTFilter)
+hlt = cms.Sequence(l1Coll)
+hltNoColl = cms.Sequence(l1NoColl)
+hltNoBPTX = cms.Sequence(l1NoBPTX)
 #eventSelection = cms.Sequence(hlt+primaryVertexFilter+filterScraping)
-eventSelection = cms.Sequence(hlt+primaryVertexFilter)
-eventSelectionNoColl = cms.Sequence(hltNoColl+primaryVertexFilter)
+eventSelection = cms.Sequence(lumiSectionSel+hlt+primaryVertexFilter+filterScraping)
+eventSelectionNoColl = cms.Sequence(lumiSectionSel+hltNoColl+primaryVertexFilter+filterScraping)
+eventSelectionNoBPTX = cms.Sequence(lumiSectionSel+hltNoBPTX+primaryVertexFilter+filterScraping)
 #jets = cms.Sequence(L2L3CorJetSC5PF+L2L3CorJetSC7PF*leadingJets)
 #tracks = cms.Sequence(selectGoodTracks*
 #                      selectTracksAssociatedToPV*

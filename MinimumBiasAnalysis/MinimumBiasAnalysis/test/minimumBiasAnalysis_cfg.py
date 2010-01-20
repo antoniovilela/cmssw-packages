@@ -3,10 +3,11 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
+process.MessageLogger.cerr.threshold = 'INFO'
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5000) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -29,6 +30,7 @@ process.source.fileNames = (
     '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/0A8CFAC4-18ED-DE11-8CD8-001D0967C1DF.root'
 )
 """
+"""
 # Run 124120
 process.source.fileNames = (
     '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/B4237151-29ED-DE11-81ED-0015178C1804.root',
@@ -39,6 +41,19 @@ process.source.fileNames = (
     '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/66001B96-10ED-DE11-9728-0024E8767DA0.root',
     '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/223763C6-18ED-DE11-89A4-001D0967D49F.root',
 )
+"""
+"""
+process.source.fileNames = (
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/663440DF-27ED-DE11-9C09-0024E8769B53.root',
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/3C61F9E1-13ED-DE11-B2F0-001D0967D580.root',
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/3C49F7B3-10ED-DE11-AAD1-001D0967D1C0.root',
+    '/store/data/BeamCommissioning09/MinimumBias/RECO/Dec19thReReco_336p3_v2/0102/34C9CBD8-17ED-DE11-A1BA-0024E876842C.root'
+)
+"""
+#from fileNames_ZeroBias_124023_Lumi_41_96 import fileNames as filesZeroBias 
+from fileNames_MinimumBias_124023_Lumi_41_96 import fileNames as filesMinimumBias
+#process.source.fileNames = filesZeroBias
+process.source.fileNames = filesMinimumBias
 
 process.load("Configuration/StandardSequences/Geometry_cff")
 process.load("Configuration/StandardSequences/MagneticField_cff")
@@ -47,9 +62,9 @@ process.load("Configuration/StandardSequences/FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = 'GR09_R_V5::All'
 
 process.load("MinimumBiasAnalysis.MinimumBiasAnalysis.analysisSequences_cff")
-process.xiTower.comEnergy = 2360.0
-process.xiFromCaloTowers.comEnergy = 2360.0
-process.xiFromJets.comEnergy = 2360.0
+#process.xiTower.comEnergy = 2360.0
+#process.xiFromCaloTowers.comEnergy = 2360.0
+#process.xiFromJets.comEnergy = 2360.0
 
 process.load("RecoMET.Configuration.RecoMET_BeamHaloId_cff")
 
@@ -66,8 +81,8 @@ process.pixelClusterSelection = cms.EDFilter("PixelClusterSelection",
 process.load("MinimumBiasAnalysis.MinimumBiasAnalysis.outputModule_cfi")
 from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasEventContent_cff import MinimumBiasEventContent
 process.output.outputCommands = MinimumBiasEventContent.outputCommands
-#process.output.fileName = 'minimumBias.root'
-process.output.fileName = '/tmp/antoniov/minimumBias.root'
+process.output.fileName = 'minimumBias.root'
+#process.output.fileName = '/tmp/antoniov/minimumBias.root'
 process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 #process.output.SelectEvents.SelectEvents = cms.vstring('*')
 #process.output.SelectEvents.SelectEvents = cms.vstring('generalTracksPath','pixelTracksPath','pixelLessTracksPath')
@@ -105,8 +120,12 @@ process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
 process.selection_step = cms.Path(process.eventSelection)
 process.reco_step = cms.Path(process.eventSelection+process.recoSequence+process.BeamHaloId)
 
-process.selection_step.replace(process.eventSelection,process.eventSelectionNoColl)
-process.reco_step.replace(process.eventSelection,process.eventSelectionNoColl)
+#process.selection_step.replace(process.eventSelection,process.eventSelectionNoColl)
+#process.reco_step.replace(process.eventSelection,process.eventSelectionNoColl)
+#process.selection_step.replace(process.eventSelection,process.eventSelectionNoBPTX)
+#process.reco_step.replace(process.eventSelection,process.eventSelectionNoBPTX)
+#process.selection_step.replace(process.eventSelection,process.hltNoColl)
+#process.reco_step.replace(process.eventSelection,process.hltNoColl)
 
 process.out_step = cms.EndPath(process.output)
 #process.schedule = cms.Schedule(process.hlt_step,process.reco_step,process.analysis_step,process.out_step)
