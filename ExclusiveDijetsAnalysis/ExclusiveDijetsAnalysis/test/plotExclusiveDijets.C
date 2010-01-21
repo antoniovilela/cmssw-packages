@@ -105,8 +105,8 @@ void plot(std::string const& selection = "nHFMax_0", int rebin = 1, const char* 
    variablesStack.push_back("LogRjjFromJetsAfterSel");
    variablesStack.push_back("LogRjjFromPFCandsAfterSel");
 
-   Plotter<NumberEntriesNorm> plotter;
-   //Plotter<DefaultNorm> plotter;
+   //Plotter<NumberEntriesNorm> plotter;
+   Plotter<DefaultNorm> plotter;
    int colors[] = {kBlack,kMagenta,kOrange,kBlue,kRed};
    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
    //int linestyles[] = {kSolid,kDashed,kDotted,kDashDotted,kDashDotted};

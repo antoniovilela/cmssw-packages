@@ -12,11 +12,11 @@
 #include <iostream>
 #include <vector>
 
-std::vector<std::pair<std::string,TFile*> > getSignalSamples(){
+std::vector<std::pair<std::string,TFile*> > getSignalSamples(std::string const& selection){
    std::vector<std::pair<std::string,TFile*> > files;
-   std::string selection = "nHFMax_0";
+   //std::string selection = "nHFMax_0";
    std::string dir = "root/selection/" + selection + "/";
-   files.push_back(std::make_pair("Average Pile-up",TFile::Open((dir + "AvePU/analysisDijetsTTree_histos_CEPDijets_M100.root").c_str())));
+   files.push_back(std::make_pair("<N_{PU}> = 2.1",TFile::Open((dir + "AvePU/analysisDijetsTTree_histos_CEPDijets_M100.root").c_str())));
    files.push_back(std::make_pair("N_{PU} = 0",TFile::Open((dir + "0PU/analysisDijetsTTree_histos_CEPDijets_M100.root").c_str())));
    files.push_back(std::make_pair("N_{PU} = 1",TFile::Open((dir + "1PU/analysisDijetsTTree_histos_CEPDijets_M100.root").c_str())));
    files.push_back(std::make_pair("N_{PU} = 2",TFile::Open((dir + "2PU/analysisDijetsTTree_histos_CEPDijets_M100.root").c_str())));
@@ -26,7 +26,7 @@ std::vector<std::pair<std::string,TFile*> > getSignalSamples(){
    return files;
 }
 
-void plot(int rebin = 1){
+void plot(std::string const& selection = "nHFMax_0", int rebin = 1){
    double sigma = 250.; //pb
 
    std::vector<string> variables;
@@ -38,6 +38,7 @@ void plot(int rebin = 1){
    variables.push_back("massDijets");
    variables.push_back("missingMassFromXi");
    variables.push_back("MxFromJets");
+   variables.push_back("MxFromPFCands");
    variables.push_back("xiPlusFromPFCandsAfterSel");
    variables.push_back("xiMinusFromPFCandsAfterSel");
    variables.push_back("RjjFromJets");
@@ -49,14 +50,18 @@ void plot(int rebin = 1){
    variables.push_back("LogRjjFromJetsAfterSel");
    variables.push_back("LogRjjFromPFCandsAfterSel");
 
-   std::vector<std::pair<std::string,TFile*> > files = getSignalSamples();
+   std::vector<std::pair<std::string,TFile*> > files = getSignalSamples(selection);
 
    std::vector<std::pair<std::string,TDirectory*> > dirs;
    for(std::vector<std::pair<std::string,TFile*> >::const_iterator it = files.begin(); it != files.end(); ++it){
       dirs.push_back(std::make_pair(it->first,static_cast<TDirectory*>(it->second)));
    }
 
-   std::vector<double> normFactors(dirs.size(),1.);
+   std::string refVar = "leadingJetPt";
+   TH1F const* histRef = getHisto(dirs[0].second,refVar);
+   double nEventsRef = histRef->GetSumOfWeights();
+
+   std::vector<double> normFactors(dirs.size(),1./nEventsRef);
 
    int colors[] = {kRed,kBlue,kMagenta,kYellow,kOrange};
    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
