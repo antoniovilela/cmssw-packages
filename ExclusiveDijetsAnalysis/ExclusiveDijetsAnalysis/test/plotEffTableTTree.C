@@ -4,7 +4,7 @@
 #include "TH2F.h"
 #include "TTree.h"
 
-#include "PlottingTools.h"
+#include "Utilities/PlottingTools/interface/PlottingTools.h"
 
 #include <iostream>
 #include <vector>
@@ -12,30 +12,38 @@
 #include <algorithm>
 #include <functional>
 
-std::map<std::string,std::vector<double> > getEvents(std::vector<string>& vars, std::map<std::string,TDirectory*>& dirMap);
+std::map<std::string,std::vector<double> > getEvents(std::vector<std::string>& vars, std::map<std::string,TDirectory*>& dirMap);
 
-std::vector<std::pair<std::string,TFile*> > getAllSamples(){
+std::vector<std::pair<std::string,TFile*> > getFullSimSamples(std::string const& selection){
    std::vector<std::pair<std::string,TFile*> > files;
-   std::string selection = "nHFMax_0";
-   std::string dir = "root/selection/" + selection + "/"; 
+   //std::string selection = "nHFMax_0";
+   std::string dir = "root/selection/" + selection + "/noPU/"; 
    files.push_back(std::make_pair("CEP di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_CEPDijets_M100_noPU.root").c_str()))); 
-   //files.push_back(std::make_pair("SD-plus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDPlusDijets_Pt30_noPU.root").c_str())));
-   //files.push_back(std::make_pair("SD-minus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDMinusDijets_Pt30_noPU.root").c_str()))); 
+   files.push_back(std::make_pair("SD-plus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDPlusDijets_Pt30_noPU.root").c_str())));
+   files.push_back(std::make_pair("SD-minus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDMinusDijets_Pt30_noPU.root").c_str()))); 
+   files.push_back(std::make_pair("DPE di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_DPEDijets_Pt40_noPU.root").c_str())));
+   files.push_back(std::make_pair("QCD non-diffractive",TFile::Open((dir + "analysisDijetsTTree_histos_QCD100to250-madgraph_noPU_AOD.root").c_str())));
+
+   return files;
+}
+
+std::vector<std::pair<std::string,TFile*> > getFastSimSamples(std::string const& selection){
+   std::vector<std::pair<std::string,TFile*> > files;
+   //std::string selection = "nHFMax_0";
+   std::string dir = "root/selection/" + selection + "/noPU/";
    files.push_back(std::make_pair("SD-plus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDPlusDijets_Pt30_FastSim.root").c_str())));
    files.push_back(std::make_pair("SD-minus di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_SDMinusDijets_Pt30_FastSim.root").c_str())));
-   files.push_back(std::make_pair("DPE di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_DPEDijets_Pt40_noPU.root").c_str())));
-   //files.push_back(std::make_pair("QCD non-diffractive",TFile::Open((dir + "analysisDijetsTTree_histos_QCD100to250-madgraph_noPU_AOD.root").c_str())));
    files.push_back(std::make_pair("QCD non-diffractive",TFile::Open((dir + "analysisDijetsTTree_histos_QCD100to250-madgraph_FastSim.root").c_str())));
 
    return files;
 }
 
-std::vector<std::pair<std::string,TFile*> > getPUSamples(){
+std::vector<std::pair<std::string,TFile*> > getPUSamples(std::string const& selection,std::string const& puDir){
    std::vector<std::pair<std::string,TFile*> > files;
-   std::string selection = "nHFMax_1";
-   std::string dir = "root/selection/" + selection + "/";
-   files.push_back(std::make_pair("CEP di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_CEPDijets_M100_StageA156Bx_PU.root").c_str())));
-   files.push_back(std::make_pair("DPE di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_DPEDijets_Pt40_StageA156Bx_PU.root").c_str())));
+   //std::string selection = "nHFMax_1";
+   std::string dir = "root/selection/" + selection + "/"  + puDir + "/";
+   files.push_back(std::make_pair("CEP di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_CEPDijets_M100.root").c_str())));
+   files.push_back(std::make_pair("DPE di-jets",TFile::Open((dir + "analysisDijetsTTree_histos_DPEDijets_Pt40.root").c_str())));
 
    return files;
 }
@@ -73,8 +81,10 @@ void plot(){
 
    std::map<std::string,TDirectory*> dirMap = makeMap(samples,directories);*/
  
-   //std::vector<std::pair<std::string,TFile*> > files = getAllSamples();
-   std::vector<std::pair<std::string,TFile*> > files = getPUSamples(); 
+   std::string selection = "nHFMax_2";
+   //std::vector<std::pair<std::string,TFile*> > files = getFullSimSamples(selection);
+   //std::vector<std::pair<std::string,TFile*> > files = getFastSimSamples(selection);
+   std::vector<std::pair<std::string,TFile*> > files = getPUSamples(selection,"AvePU"); 
    //std::vector<std::pair<std::string,TFile*> > files = getSystSamples();
 
    std::map<std::string,TDirectory*> dirMap;
@@ -94,13 +104,18 @@ void plot(){
    variablesForEff.push_back("leadingJetEta");
    variablesForEff.push_back("jetsAveEta");
    variablesForEff.push_back("massDijets");
-   variablesForEff.push_back("RjjFromJets");
+   //variablesForEff.push_back("RjjFromJets");
    variablesForEff.push_back("trackMultiplicity");
    variablesForEff.push_back("RjjFromJetsAfterSel");
 
    std::map<std::string,std::vector<double> > nEvents = getEvents(variablesForEff,dirMap);
+   std::map<std::string,std::vector<double> > nEventsErrors(nEvents);
+   for(std::map<std::string,std::vector<double> >::iterator it = nEventsErrors.begin(); it != nEventsErrors.end(); ++it){
+      std::vector<double>& errVec = it->second;
+      std::transform(errVec.begin(),errVec.end(),errVec.begin(),sqrt);
+   }
 
-    for(std::map<std::string,TDirectory*>::const_iterator it = dirMap.begin(); it != dirMap.end(); ++it){
+   for(std::map<std::string,TDirectory*>::const_iterator it = dirMap.begin(); it != dirMap.end(); ++it){
 
       const TH1F* h_SelEff = static_cast<const TH1F*>(it->second->Get("SelectionEff"));
       const TH1F* h_leadingJetPt_dijetsSelection = static_cast<const TH1F*>(it->second->Get("leadingJetPt"));
@@ -109,6 +124,7 @@ void plot(){
       double eff_Vtx = h_SelEff->GetBinContent(2);
       double eff_dijetsSelection = h_SelEff->GetBinContent(3);
 
+      std::cout << "===============================================" << std::endl;
       std::cout << " Efficiency for HLT selection " << it->first << ": " << eff_HLT << std::endl;
       std::cout << " Efficiency for Vertex selection " << it->first << ": " << eff_Vtx << std::endl;
       std::cout << " Efficiency for Di-jets selection " << it->first << ": " << eff_dijetsSelection << std::endl;
@@ -116,6 +132,11 @@ void plot(){
       double nEventsAfterSel = h_leadingJetPt_dijetsSelection->GetEntries();
  
       std::vector<double>& myvec = nEvents[it->first];
+      std::vector<double>& errVec = nEventsErrors[it->first];
+      /*for(size_t idx = 0; idx < myvec.size(); ++idx){
+         std::cout << myvec[idx] << "  " << errVec[idx] << std::endl;  
+      }*/
+
       //myvec.insert(myvec.begin(),(double)h_leadingJetPt_HLT->GetEntries());
       //double nHLT = myvec[0];
       //std::transform(myvec.begin(),myvec.end(),myvec.begin(),std::bind1st(std::multiplies<double>(),eff_HLT/nHLT));
@@ -123,17 +144,23 @@ void plot(){
       std::transform(myvec.begin(),myvec.end(),myvec.begin(),std::bind1st(std::multiplies<double>(),eff_HLT*eff_Vtx*eff_dijetsSelection/nEventsAfterSel));
       myvec.insert(myvec.begin(),eff_HLT*eff_Vtx);
       myvec.insert(myvec.begin(),eff_HLT);
+
+      std::transform(errVec.begin(),errVec.end(),errVec.begin(),std::bind1st(std::multiplies<double>(),eff_HLT*eff_Vtx*eff_dijetsSelection/nEventsAfterSel));
+      errVec.insert(errVec.begin(),-1.);
+      errVec.insert(errVec.begin(),-1.);
    }
 
    std::map<std::string,std::vector<double> >::const_iterator nEvents_end = nEvents.end();
    for(std::map<std::string,std::vector<double> >::const_iterator it = nEvents.begin(); it != nEvents_end; ++it){
+      std::cout << "===============================================" << std::endl;
       std::cout << " Efficiencies for " << it->first << std::endl;
       std::vector<double> const& myvec = it->second;
+      std::vector<double> const& errVec = nEventsErrors[it->first];
       for(size_t idx = 0; idx < myvec.size(); ++idx){
          size_t idx_previous = idx ? (idx - 1) : 0;
-         std::cout << idx << ": " << myvec[idx]
-                                  << "  wrt previous " << myvec[idx]/myvec[idx_previous]
-                                  << " sigma " << sigmaMap[it->first]*myvec[idx] << std::endl;
+         std::cout << idx << ": " << myvec[idx] << " +/- " << errVec[idx]
+                                  << "    wrt previous " << myvec[idx]/myvec[idx_previous]
+                                  << "    sigma " << sigmaMap[it->first]*myvec[idx] << std::endl;
       } 
    }
 }
