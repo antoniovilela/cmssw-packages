@@ -7,4 +7,5 @@
   <use name=Geometry/TrackerGeometryBuilder>
   <use name=DataFormats/TrackerRecHit2D> 
   <use name=PhysicsTools/UtilAlgos>
+  <use name=MinimumBiasAnalysis/MinimumBiasAnalysis>
 </library>
