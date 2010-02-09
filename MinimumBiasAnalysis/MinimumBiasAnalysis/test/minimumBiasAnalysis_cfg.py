@@ -51,15 +51,15 @@ process.source.fileNames = (
 )
 """
 #from fileNames_ZeroBias_124023_Lumi_41_96 import fileNames as filesZeroBias 
-from fileNames_MinimumBias_124023_Lumi_41_96 import fileNames as filesMinimumBias
+#from fileNames_MinimumBias_124023_Lumi_41_96 import fileNames as filesMinimumBias
 #process.source.fileNames = filesZeroBias
-process.source.fileNames = filesMinimumBias
+#process.source.fileNames = filesMinimumBias
 
 process.load("Configuration/StandardSequences/Geometry_cff")
 process.load("Configuration/StandardSequences/MagneticField_cff")
 process.load("Configuration/StandardSequences/FrontierConditions_GlobalTag_cff")
 #process.GlobalTag.globaltag = 'GR09_P_V8::All'
-process.GlobalTag.globaltag = 'GR09_R_V5::All'
+process.GlobalTag.globaltag = 'GR09_R_V6A::All'
 
 process.load("MinimumBiasAnalysis.MinimumBiasAnalysis.analysisSequences_cff")
 #process.xiTower.comEnergy = 2360.0
