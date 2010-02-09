@@ -27,6 +27,7 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   vertexTag_(pset.getParameter<edm::InputTag>("VertexTag")), 
   metTag_(pset.getParameter<edm::InputTag>("METTag")),
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
+  caloTowerTag_(pset.getParameter<edm::InputTag>("CaloTowerTag")),
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
   thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
   energyThresholdHBHE_(pset.getParameter<double>("EnergyThresholdHBHE")),
@@ -123,11 +124,17 @@ void MinimumBiasAnalysis::fillJetInfo(EventData& eventData, const edm::Event& ev
   edm::Handle<edm::View<reco::Jet> > jetCollectionH;
   event.getByLabel(jetTag_,jetCollectionH);
 
-  const reco::Jet& leadingJet = (*jetCollectionH)[0];
+  if(jetCollectionH->size() > 0){
+     const reco::Jet& leadingJet = (*jetCollectionH)[0];
 
-  eventData.leadingJetPt_ = leadingJet.pt();
-  eventData.leadingJetEta_ = leadingJet.eta();
-  eventData.leadingJetPhi_ = leadingJet.phi();
+     eventData.leadingJetPt_ = leadingJet.pt();
+     eventData.leadingJetEta_ = leadingJet.eta();
+     eventData.leadingJetPhi_ = leadingJet.phi();
+  } else{
+     eventData.leadingJetPt_ = -999.;
+     eventData.leadingJetEta_ = -999.;
+     eventData.leadingJetPhi_ = -999.;
+  }  
 }
 
 void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
@@ -136,7 +143,7 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   event.getByLabel("trackMultiplicity","trackMultiplicity",trackMultiplicity);
   
   edm::Handle<unsigned int> trackMultiplicityAssociatedToPV;
-  event.getByLabel("trackMultiplicityAssociatedToPV","trackMultiplicity",trackMultiplicity);
+  event.getByLabel("trackMultiplicityAssociatedToPV","trackMultiplicity",trackMultiplicityAssociatedToPV);
 
   edm::Handle<std::vector<unsigned int> > nHFPlus;
   event.getByLabel("hfTower","nHFplus",nHFPlus);
