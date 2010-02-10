@@ -54,6 +54,7 @@ void MinimumBiasAnalysis::fillEventData(EventData& eventData, const edm::Event& 
   fillNoiseInfo(eventData,event,setup); 
   fillVertexInfo(eventData,event,setup);
   fillJetInfo(eventData,event,setup);
+  fillMETInfo(eventData,event,setup);
   fillEventVariables(eventData,event,setup);
 }
 

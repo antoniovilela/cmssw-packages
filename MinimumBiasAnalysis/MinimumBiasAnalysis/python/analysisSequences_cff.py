@@ -38,21 +38,9 @@ l1CollBscOr = cms.Sequence(bptx+bscOr+beamHaloVeto)
 l1NoCollBscOr = cms.Sequence(~bptx+bscOr+beamHaloVeto)
 l1NoBPTXBscOr = cms.Sequence(bscOr+beamHaloVeto)
 
+from MinimumBiasAnalysis.MinimumBiasAnalysis.primaryVertexFilter_cfi import *
 
-primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
-    vertexCollection = cms.InputTag('offlinePrimaryVertices'),
-    #minimumNumberOfTracks = cms.uint32(3),
-    minimumNumberOfTracks = cms.uint32(2),
-    maxAbsZ = cms.double(15),	
-    maxd0 = cms.double(2)	
-)
-
-filterScraping = cms.EDFilter("FilterOutScraping",
-    applyfilter = cms.untracked.bool(True),
-    debugOn = cms.untracked.bool(True),
-    numtrack = cms.untracked.uint32(10),
-    thresh = cms.untracked.double(0.2)
-)
+from MinimumBiasAnalysis.MinimumBiasAnalysis.filterScraping_cfi import *
 
 from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasHLTPaths_cfi import *
 hltMinBiasBSCORFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_MinBiasBSC_OR'])
@@ -64,11 +52,16 @@ leadingJets.src = "sisCone7CaloJets"
 
 #from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectGoodTracks_cfi import *
 #selectGoodTracks.cut = "pt > 0.5 & numberOfValidHits > 7 & d0 <= 3.5"
+from PhysicsTools.RecoAlgos.recoTrackSelector_cfi import *
+recoTrackSelector.src = "generalTracks"
+recoTrackSelector.minRapidity = -2.0
+recoTrackSelector.maxRapidity = 2.0
+recoTrackSelector.ptMin = 0.5
+recoTrackSelector.quality = ["highPurity"]
+selectGoodTracks = recoTrackSelector
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import *
-#selectTracksAssociatedToPV.src = "selectGoodTracks"
-#selectTracksAssociatedToPV.src = cms.InputTag("generalTracks","","RETRACK")
-#selectTracksAssociatedToPV.VertexTag = cms.InputTag("offlinePrimaryVertices","","REVERTEX")
+selectTracksAssociatedToPV.src = "selectGoodTracks"
 selectTracksAssociatedToPV.MaxDistanceFromVertex = 1.0
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
@@ -115,7 +108,7 @@ eventSelectionMinBiasPixel = cms.Sequence(hltMinBiasPixel+primaryVertexFilter+fi
 #                      selectTracksAssociatedToPV*
 #                      tracksOutsideJets+
 #                      tracksTransverseRegion) 
-tracks = cms.Sequence(selectTracksAssociatedToPV)
+tracks = cms.Sequence(selectGoodTracks*selectTracksAssociatedToPV)
 #edmDump = cms.Sequence(trackMultiplicity+
 #                       trackMultiplicityAssociatedToPV+
 #                       trackMultiplicityOutsideJets+
