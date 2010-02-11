@@ -8,10 +8,15 @@ process.source = cms.Source("PoolSource",
 from fileNames_MinBias_STARTUP3X_V8P_900GeV_Jan29ReReco import fileNames
 process.source.fileNames = fileNames
 process.GlobalTag.globaltag = 'STARTUP3X_V8P::All'
-process.minimumBiasTTreeAnalysis_eventSelectionMinBiasBSCOR.AccessMCInfo = True
-process.minimumBiasTTreeAnalysis_eventSelectionMinBiasPixel.AccessMCInfo = True
-process.minimumBiasTTreeAnalysis_eventSelectionMinBiasBSCORNoBPTX.AccessMCInfo = True
-process.minimumBiasTTreeAnalysis_eventSelectionMinBiasPixelNoBPTX.AccessMCInfo = True
+AnalysisModules = ['minimumBiasTTreeAnalysis_eventSelection',
+                   'minimumBiasTTreeAnalysis_eventSelectionMinBiasBSCOR',
+                   'minimumBiasTTreeAnalysis_eventSelectionMinBiasPixel',
+                   'minimumBiasTTreeAnalysis_eventSelectionMinBiasBSCORNoBPTX',
+                   'minimumBiasTTreeAnalysis_eventSelectionMinBiasPixelNoBPTX']
+for analysis in AnalysisModules:
+    module = getattr(process,analysis)
+    module.AccessMCInfo = True
+    #module.TriggerResultsTag = cms.InputTag("TriggerResults::HLT8E29")
 
 for pathname in process.paths:
     getattr(process,pathname).remove(getattr(process,'bptx'))

@@ -19,6 +19,7 @@ class MinimumBiasAnalysis {
   private:
      void fillEventInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillNoiseInfo(EventData&, const edm::Event&, const edm::EventSetup&);
+     void fillTriggerInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillVertexInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillMETInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillJetInfo(EventData&, const edm::Event&, const edm::EventSetup&);
@@ -30,6 +31,7 @@ class MinimumBiasAnalysis {
      edm::InputTag jetTag_;
      edm::InputTag caloTowerTag_;
      edm::InputTag particleFlowTag_;
+     edm::InputTag triggerResultsTag_;
 
      unsigned int thresholdHF_;
      double energyThresholdHBHE_;

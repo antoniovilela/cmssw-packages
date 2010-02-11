@@ -117,6 +117,20 @@ process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
 #process.selection_step = cms.Path(process.eventSelection_new)
 #process.reco_step = cms.Path(process.eventSelection_new+process.recoSequence+process.BeamHaloId)
 
+"""
+hltPaths = ('hltMinBiasBSCOR',
+            'hltMinBiasPixel',
+            'hltMinBiasBSCORNoColl',
+            'hltMinBiasPixelNoColl',
+            'hltMinBiasBSCORNoBPTX',
+            'hltMinBiasPixelNoBPTX')
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import addPath
+for path in hltPaths:
+    addPath(process,getattr(process,path))
+"""
+#process.HLT_MinBiasBSCOR = cms.Path(process.bscOr)
+#process.HLT_MinBiasPixel = cms.Path(process.hltMinBiasPixelSingleTrackFilter)
+
 process.selection_step = cms.Path(process.eventSelection)
 process.reco_step = cms.Path(process.eventSelection+process.recoSequence+process.BeamHaloId)
 

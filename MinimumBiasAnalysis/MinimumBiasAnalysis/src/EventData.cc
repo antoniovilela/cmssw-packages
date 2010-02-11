@@ -7,6 +7,9 @@ namespace minimumBiasAnalysis {
      data.Branch("runNumber",&eventData.runNumber_,"runNumber/I");
      data.Branch("eventNumber",&eventData.eventNumber_,"eventNumber/I");
      data.Branch("lumiSection",&eventData.lumiSection_,"lumiSection/I");
+     data.Branch("bunchCrossing",&eventData.bunchCrossing_,"bunchCrossing/I");
+     data.Branch("HLT_MinBiasBSCOR",&eventData.HLT_MinBiasBSCOR_,"HLT_MinBiasBSCOR/I");
+     data.Branch("HLT_MinBiasPixel",&eventData.HLT_MinBiasPixel_,"HLT_MinBiasPixel/I"); 
      data.Branch("nVertex",&eventData.nVertex_,"nVertex/I");
      data.Branch("posXPrimVtx",&eventData.posXPrimVtx_,"posXPrimVtx/D");
      data.Branch("posYPrimVtx",&eventData.posYPrimVtx_,"posYPrimVtx/D");
@@ -58,6 +61,9 @@ namespace minimumBiasAnalysis {
      data.SetBranchAddress("runNumber",&eventData.runNumber_);
      data.SetBranchAddress("eventNumber",&eventData.eventNumber_);
      data.SetBranchAddress("lumiSection",&eventData.lumiSection_);
+     data.SetBranchAddress("bunchCrossing",&eventData.bunchCrossing_);
+     data.SetBranchAddress("HLT_MinBiasBSCOR",&eventData.HLT_MinBiasBSCOR_);
+     data.SetBranchAddress("HLT_MinBiasPixel",&eventData.HLT_MinBiasPixel_);
      data.SetBranchAddress("nVertex",&eventData.nVertex_);
      data.SetBranchAddress("posXPrimVtx",&eventData.posXPrimVtx_);
      data.SetBranchAddress("posYPrimVtx",&eventData.posYPrimVtx_);

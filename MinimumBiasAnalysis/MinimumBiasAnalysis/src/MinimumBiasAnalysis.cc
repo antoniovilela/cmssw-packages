@@ -14,6 +14,8 @@
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Framework/interface/TriggerNames.h"
 
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
 #include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/interface/FWLiteTools.h"
@@ -29,6 +31,7 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
   caloTowerTag_(pset.getParameter<edm::InputTag>("CaloTowerTag")),
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
+  triggerResultsTag_(pset.getParameter<edm::InputTag>("TriggerResultsTag")),
   thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
   energyThresholdHBHE_(pset.getParameter<double>("EnergyThresholdHBHE")),
   energyThresholdHF_(pset.getParameter<double>("EnergyThresholdHF")),
@@ -36,6 +39,7 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   accessMCInfo_(pset.getUntrackedParameter<bool>("AccessMCInfo",false)),
   genAllParticles_(0.,0.,0.,0.),genProtonPlus_(0.,0.,0.,0.),genProtonMinus_(0.,0.,0.,0.)
 {
+  //FIXME
   thresholdsPFlow_[reco::PFCandidate::X] = std::make_pair(-1.,-1.);
   thresholdsPFlow_[reco::PFCandidate::h] = std::make_pair(-1.,-1.);
   thresholdsPFlow_[reco::PFCandidate::e] = std::make_pair(-1.,-1.); 
@@ -53,6 +57,7 @@ void MinimumBiasAnalysis::servicesBeginRun(const edm::Run& run, const edm::Event
 void MinimumBiasAnalysis::fillEventData(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   fillEventInfo(eventData,event,setup);
   fillNoiseInfo(eventData,event,setup); 
+  fillTriggerInfo(eventData,event,setup);
   fillVertexInfo(eventData,event,setup);
   fillJetInfo(eventData,event,setup);
   fillMETInfo(eventData,event,setup);
@@ -63,10 +68,12 @@ void MinimumBiasAnalysis::fillEventInfo(EventData& eventData, const edm::Event& 
   unsigned int eventNumber = event.id().event();
   unsigned int runNumber = event.id().run();
   unsigned int lumiSection = event.luminosityBlock();
+  int bunchCrossing = event.bunchCrossing();
 
   eventData.eventNumber_ = eventNumber;
   eventData.runNumber_ = runNumber;
   eventData.lumiSection_ = lumiSection;
+  eventData.bunchCrossing_ = bunchCrossing;
 }
 
 void MinimumBiasAnalysis::fillNoiseInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
@@ -87,6 +94,27 @@ void MinimumBiasAnalysis::fillNoiseInfo(EventData& eventData, const edm::Event& 
 
   eventData.BeamHaloLooseId_ = beamHaloLooseId ? 1 : 0;
   eventData.BeamHaloTightId_ = beamHaloTightId ? 1 : 0;
+}
+
+void MinimumBiasAnalysis::fillTriggerInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+  //FIXME
+  edm::Handle<edm::TriggerResults> triggerResults;
+  event.getByLabel(triggerResultsTag_, triggerResults);
+
+  edm::TriggerNames triggerNames;
+  triggerNames.init(*triggerResults);
+
+  /*std::vector<std::string>::const_iterator pathName = triggerResultsPaths_.begin();
+  std::vector<std::string>::const_iterator pathNames_end = triggerResultsPaths_.end();
+  for(; pathName != pathNames_end; ++pathName){
+     int trigIdx = triggerNames.triggerIndex(*pathName);
+     bool wasrun = triggerResults->wasrun(trigIdx);
+     bool accept = triggerResults->accept(trigIdx);
+  }*/
+  int idx_HLT_MinBiasBSCOR = triggerNames.triggerIndex("HLT_MinBiasBSC_OR");
+  int idx_HLT_MinBiasPixel = triggerNames.triggerIndex("HLT_MinBiasPixel_SingleTrack"); 
+  eventData.HLT_MinBiasBSCOR_ = (triggerResults->wasrun(idx_HLT_MinBiasBSCOR) && triggerResults->accept(idx_HLT_MinBiasBSCOR)) ? 1 : 0;
+  eventData.HLT_MinBiasPixel_ = (triggerResults->wasrun(idx_HLT_MinBiasPixel) && triggerResults->accept(idx_HLT_MinBiasPixel)) ? 1 : 0; 
 }
 
 void MinimumBiasAnalysis::fillVertexInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){

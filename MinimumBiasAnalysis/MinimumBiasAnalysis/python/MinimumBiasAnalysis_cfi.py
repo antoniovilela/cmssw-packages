@@ -7,6 +7,7 @@ MinimumBiasAnalysis = cms.PSet(
     METTag = cms.InputTag("met"),
     CaloTowerTag = cms.InputTag("towerMaker"), 
     ParticleFlowTag = cms.InputTag("particleFlow"),
+    TriggerResultsTag = cms.InputTag("TriggerResults::HLT"),
     # Misc
     HFThresholdIndex = cms.uint32(15),
     EnergyThresholdHBHE = cms.double(-1.),
