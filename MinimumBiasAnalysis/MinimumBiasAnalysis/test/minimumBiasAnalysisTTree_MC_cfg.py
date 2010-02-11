@@ -10,6 +10,8 @@ process.source.fileNames = fileNames
 process.GlobalTag.globaltag = 'STARTUP3X_V8P::All'
 process.minimumBiasTTreeAnalysis_eventSelectionMinBiasBSCOR.AccessMCInfo = True
 process.minimumBiasTTreeAnalysis_eventSelectionMinBiasPixel.AccessMCInfo = True
+process.minimumBiasTTreeAnalysis_eventSelectionMinBiasBSCORNoBPTX.AccessMCInfo = True
+process.minimumBiasTTreeAnalysis_eventSelectionMinBiasPixelNoBPTX.AccessMCInfo = True
 
 for pathname in process.paths:
     getattr(process,pathname).remove(getattr(process,'bptx'))

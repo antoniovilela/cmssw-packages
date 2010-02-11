@@ -19,6 +19,8 @@ from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import 
 #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR')
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel')
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoBPTX')
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoBPTX')
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisMinBias_TTree_MinimumBias.root")

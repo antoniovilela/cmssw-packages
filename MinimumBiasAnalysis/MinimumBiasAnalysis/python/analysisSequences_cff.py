@@ -35,7 +35,9 @@ bptxOr = hltLevel1GTSeed.clone(
 """
 l1Coll = cms.Sequence(bptx+beamHaloVeto)
 l1CollBscOr = cms.Sequence(bptx+bscOr+beamHaloVeto)
+l1NoColl = cms.Sequence(~bptx+beamHaloVeto)
 l1NoCollBscOr = cms.Sequence(~bptx+bscOr+beamHaloVeto)
+l1NoBPTX = cms.Sequence(beamHaloVeto)
 l1NoBPTXBscOr = cms.Sequence(bscOr+beamHaloVeto)
 
 from MinimumBiasAnalysis.MinimumBiasAnalysis.primaryVertexFilter_cfi import *
@@ -96,12 +98,16 @@ xiFromJets.comEnergy = 900.0
 #hltNoBPTX = cms.Sequence(l1NoBPTX)
 hltMinBiasBSCOR = cms.Sequence(l1CollBscOr+hltMinBiasBSCORFilter)
 hltMinBiasPixel = cms.Sequence(l1Coll+hltMinBiasPixelSingleTrackFilter)
+hltMinBiasBSCORNoBPTX = cms.Sequence(l1NoBPTX+hltMinBiasBSCORFilter)
+hltMinBiasPixelNoBPTX = cms.Sequence(l1NoBPTX+hltMinBiasPixelSingleTrackFilter)
 
-eventSelection = cms.Sequence(l1Coll+primaryVertexFilter+filterScraping)
+eventSelection = cms.Sequence(primaryVertexFilter+filterScraping)
 #eventSelectionNoColl = cms.Sequence(hltNoColl+primaryVertexFilter+filterScraping)
 #eventSelectionNoBPTX = cms.Sequence(hltNoBPTX+primaryVertexFilter+filterScraping)
-eventSelectionMinBiasBSCOR = cms.Sequence(hltMinBiasBSCOR+primaryVertexFilter+filterScraping)
-eventSelectionMinBiasPixel = cms.Sequence(hltMinBiasPixel+primaryVertexFilter+filterScraping)
+eventSelectionMinBiasBSCOR = cms.Sequence(hltMinBiasBSCOR+eventSelection)
+eventSelectionMinBiasPixel = cms.Sequence(hltMinBiasPixel+eventSelection)
+eventSelectionMinBiasBSCORNoBPTX = cms.Sequence(hltMinBiasBSCORNoBPTX+eventSelection)
+eventSelectionMinBiasPixelNoBPTX = cms.Sequence(hltMinBiasPixelNoBPTX+eventSelection)
 
 #jets = cms.Sequence(L2L3CorJetSC5PF+L2L3CorJetSC7PF*leadingJets)
 #tracks = cms.Sequence(selectGoodTracks*
