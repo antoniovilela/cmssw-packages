@@ -4,6 +4,9 @@
 
 namespace minimumBiasAnalysis {
   void addTTreeBranches(TTree& data, EventData& eventData){
+     data.Branch("runNumber",&eventData.runNumber_,"runNumber/I");
+     data.Branch("eventNumber",&eventData.eventNumber_,"eventNumber/I");
+     data.Branch("lumiSection",&eventData.lumiSection_,"lumiSection/I");
      data.Branch("nVertex",&eventData.nVertex_,"nVertex/I");
      data.Branch("posXPrimVtx",&eventData.posXPrimVtx_,"posXPrimVtx/D");
      data.Branch("posYPrimVtx",&eventData.posYPrimVtx_,"posYPrimVtx/D");
@@ -52,6 +55,9 @@ namespace minimumBiasAnalysis {
   }
 
   void setTTreeBranches(TTree& data, EventData& eventData){
+     data.SetBranchAddress("runNumber",&eventData.runNumber_);
+     data.SetBranchAddress("eventNumber",&eventData.eventNumber_);
+     data.SetBranchAddress("lumiSection",&eventData.lumiSection_);
      data.SetBranchAddress("nVertex",&eventData.nVertex_);
      data.SetBranchAddress("posXPrimVtx",&eventData.posXPrimVtx_);
      data.SetBranchAddress("posYPrimVtx",&eventData.posYPrimVtx_);

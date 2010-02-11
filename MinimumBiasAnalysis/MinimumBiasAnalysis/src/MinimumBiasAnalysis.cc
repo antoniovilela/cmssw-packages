@@ -51,11 +51,22 @@ MinimumBiasAnalysis::~MinimumBiasAnalysis(){}
 void MinimumBiasAnalysis::servicesBeginRun(const edm::Run& run, const edm::EventSetup& setup) {}
 
 void MinimumBiasAnalysis::fillEventData(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+  fillEventInfo(eventData,event,setup);
   fillNoiseInfo(eventData,event,setup); 
   fillVertexInfo(eventData,event,setup);
   fillJetInfo(eventData,event,setup);
   fillMETInfo(eventData,event,setup);
   fillEventVariables(eventData,event,setup);
+}
+
+void MinimumBiasAnalysis::fillEventInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+  unsigned int eventNumber = event.id().event();
+  unsigned int runNumber = event.id().run();
+  unsigned int lumiSection = event.luminosityBlock();
+
+  eventData.eventNumber_ = eventNumber;
+  eventData.runNumber_ = runNumber;
+  eventData.lumiSection_ = lumiSection;
 }
 
 void MinimumBiasAnalysis::fillNoiseInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){

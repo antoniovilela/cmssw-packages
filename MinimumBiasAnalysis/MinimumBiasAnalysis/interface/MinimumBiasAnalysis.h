@@ -17,6 +17,7 @@ class MinimumBiasAnalysis {
      void servicesBeginRun(const edm::Run&, const edm::EventSetup&);
      void fillEventData(EventData&, const edm::Event&, const edm::EventSetup&);
   private:
+     void fillEventInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillNoiseInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillVertexInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillMETInfo(EventData&, const edm::Event&, const edm::EventSetup&);
