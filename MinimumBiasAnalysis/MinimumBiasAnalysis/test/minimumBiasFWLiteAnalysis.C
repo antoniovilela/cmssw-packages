@@ -123,6 +123,10 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    HistoMapTH1F histosTH1F;
    bookHistosTH1F(histosTH1F);
+   histosTH1F["hfTowerEmFraction"] = new TH1F("hfTowerEmFraction","hfTowerEmFraction",200,-1.1,1.1);
+   histosTH1F["hfTowerEnergy"] = new TH1F("hfTowerEnergy","hfTowerEnergy",200,-0.5,10.);
+   histosTH1F["hfTowerMultPlus"] = new TH1F("hfTowerMultPlus","hfTowerMultPlus",20,0,20);
+   histosTH1F["hfTowerMultMinus"] = new TH1F("hfTowerMultMinus","hfTowerMultMinus",20,0,20);
 
    HistoMapTH2F histosTH2F;
    histosTH2F["iEtaVsHFCountPlus"] = new TH2F("iEtaVsHFCountPlus","iEtaVsHFCountPlus",13,29,42,20,0,20);
@@ -172,7 +176,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    bool doHcalNoiseSelection = true;
    // Pre-selection
    bool doGoodVertexSelection = false;
-   bool doHighQualityTracksSelection = true;
+   bool doHighQualityTracksSelection = false;
    // Event selection
    // Prim. vertices
    bool doVertexSelection = true;
@@ -386,6 +390,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
         histosTH1F["posYPrimVtx"]->Fill(primVertex.y());
         histosTH1F["posZPrimVtx"]->Fill(primVertex.z());
         histosTH1F["posRPrimVtx"]->Fill(primVertex.position().rho());
+        histosTH1F["numberDOF"]->Fill(primVertex.ndof());
 
         if(doVertexSelection && (fabs(primVertex.z()) > primVtxZMax)) continue;
      }
@@ -427,11 +432,26 @@ std::endl;continue;}
      std::vector<CaloTower>::const_iterator caloTower_end = caloTowerCollection->end();
      float timeMin = -200.;
      float timeMax = 200.;
+     int nHFTowersPlus = 0;
+     int nHFTowersMinus = 0; 
      for(; caloTower != caloTower_end; ++caloTower){
         double energy = caloTower->energy();
-        if(energy < 1.0) continue;
- 
         int ieta = caloTower->id().ieta();
+        if(fabs(ieta) > 29 && fabs(ieta) < 42){
+           histosTH1F["hfTowerEnergy"]->Fill(energy);
+
+           double emEnergy = caloTower->emEnergy();
+           double hadEnergy = caloTower->hadEnergy();
+           double emFrac = fabs(emEnergy/(emEnergy+hadEnergy)); 
+           if(energy > 50.0) histosTH1F["hfTowerEmFraction"]->Fill(emFrac);
+
+           if(energy >= energyThresholdHF){
+              if(ieta >= 0) ++nHFTowersPlus;
+              else ++nHFTowersMinus;
+           }  
+        }
+
+        if(energy < 1.0) continue;
         float ecalTime = caloTower->ecalTime();
         float hcalTime = caloTower->hcalTime();
  
@@ -450,6 +470,9 @@ std::endl;continue;}
         avgHcalTimePeriEta[ieta] += caloTower->energy()*hcalTime;
         sumETowersPeriEta[ieta] += caloTower->energy(); 
      }
+     histosTH1F["hfTowerMultPlus"]->Fill(nHFTowersPlus);
+     histosTH1F["hfTowerMultMinus"]->Fill(nHFTowersMinus);
+
      for(std::map<int,float>::const_iterator it_ieta = sumETowersPeriEta.begin(); it_ieta != sumETowersPeriEta.end(); ++it_ieta){
         int ieta = it_ieta->first;
         float sumE = it_ieta->second;
@@ -551,10 +574,10 @@ std::endl;continue;}
      nHFMinus.getByLabel(ev,"hfTower","nHFminus");
 
      fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaPlus;
-     mapThreshToiEtaPlus.getByLabel(ev,"hfTower","mapTreshToiEtaplus");
+     mapThreshToiEtaPlus.getByLabel(ev,"hfTower","mapThreshToiEtaplus");
 
      fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaMinus;
-     mapThreshToiEtaMinus.getByLabel(ev,"hfTower","mapTreshToiEtaminus");
+     mapThreshToiEtaMinus.getByLabel(ev,"hfTower","mapThreshToiEtaminus");
 
      fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > iEtaHFMultiplicityPlus;
      iEtaHFMultiplicityPlus.getByLabel(ev,"hfTower","iEtaHFMultiplicityPlus");
@@ -656,6 +679,7 @@ void bookHistosTH1F(HistoMapTH1F& histosTH1F){
    histosTH1F["posYPrimVtx"] = new TH1F("posYPrimVtx","y position of primary vertexes",100,-1.,1.);
    histosTH1F["posZPrimVtx"] = new TH1F("posZPrimVtx","z position of primary vertexes",100,-30.,30.);
    histosTH1F["posRPrimVtx"] = new TH1F("posRPrimVtx","rho position of primary vertexes",100,0.,5.);
+   histosTH1F["numberDOF"] = new TH1F("numberDOF","ndof of primary vertexes",100,0.,15.);
    histosTH1F["leadingJetPt"] = new TH1F("leadingJetPt","leadingJetPt",100,0.,100.);
    histosTH1F["leadingJetEta"] = new TH1F("leadingJetEta","leadingJetEta",100,-5.,5.);
    histosTH1F["leadingJetPhi"] = new TH1F("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);

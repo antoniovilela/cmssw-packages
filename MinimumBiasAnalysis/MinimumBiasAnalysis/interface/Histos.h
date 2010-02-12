@@ -41,6 +41,7 @@ namespace minimumBiasAnalysis {
      histos["xiPlusFromPFCands"] = adaptor.template make<TH1F>("xiPlusFromPFCands","xiPlusFromPFCands",200,0.,1.);
      histos["xiMinusFromPFCands"] = adaptor.template make<TH1F>("xiMinusFromPFCands","xiMinusFromPFCands",200,0.,1.);
      histos["missingMassFromXiTower"] = adaptor.template make<TH1F>("missingMassFromXiTower","missingMassFromXiTower",200,-10.,800.);
+     histos["missingMassFromXiFromTowers"] = adaptor.template make<TH1F>("missingMassFromXiFromTowers","missingMassFromXiFromTowers",200,-10.,800.);
      histos["missingMassFromXiFromJets"] = adaptor.template make<TH1F>("missingMassFromXiFromJets","missingMassFromXiFromJets",200,-10.,800.);
      histos["missingMassFromXiFromPFCands"] = adaptor.template make<TH1F>("missingMassFromXiFromPFCands","missingMassFromXiFromPFCands",200,-10.,800.);
      histos["MxFromJets"] = adaptor.template make<TH1F>("MxFromJets","MxFromJets",200,-10.,400.);
@@ -50,7 +51,7 @@ namespace minimumBiasAnalysis {
      histos["towerHcalTime"] = adaptor.template make<TH1F>("towerHcalTime","towerHcalTime",200,-100.,100.);
      histos["energySumVsEcalTime"] = adaptor.template make<TH1F>("energySumVsEcalTime","energySumVsEcalTime",200,-100.,100.);
      histos["energySumVsHcalTime"] = adaptor.template make<TH1F>("energySumVsHcalTime","energySumVsHcalTime",200,-100.,100.);
-     histos["sumET"] = adaptor.template make<TH1F>("sumET","sumET",200,0.,400.);
+     histos["sumET"] = adaptor.template make<TH1F>("sumET","sumET",200,0.,100.);
      histos["EPlusPzFromTowers"] = adaptor.template make<TH1F>("EPlusPzFromTowers","EPlusPzFromTowers",200,0.,600.);  
      histos["EMinusPzFromTowers"] = adaptor.template make<TH1F>("EMinusPzFromTowers","EMinusPzFromTowers",200,0.,600.);
      histos["EPlusPzFromPFCands"] = adaptor.template make<TH1F>("EPlusPzFromPFCands","EPlusPzFromPFCands",200,0.,600.);
@@ -64,8 +65,8 @@ namespace minimumBiasAnalysis {
      histos["ResXiMinus"] = adaptor.template make<TH1F>("ResXiMinus","ResXiMinus",100,-0.1,0.1);
 
      histos["BeamHaloId"] = adaptor.template make<TH1F>("BeamHaloId","BeamHaloId",2,0,2);
-     histos["BeamHaloId"]->GetXaxis()->SetBinLabel(9,"BeamHaloLooseId");
-     histos["BeamHaloId"]->GetXaxis()->SetBinLabel(10,"BeamHaloTightId");
+     histos["BeamHaloId"]->GetXaxis()->SetBinLabel(1,"BeamHaloLooseId");
+     histos["BeamHaloId"]->GetXaxis()->SetBinLabel(2,"BeamHaloTightId");
 
      histos["HcalNoiseId"] = adaptor.template make<TH1F>("HcalNoiseId","HcalNoiseId",2,0,2);
      histos["HcalNoiseId"]->GetXaxis()->SetBinLabel(1,"LooseNoiseFilter");
@@ -88,6 +89,9 @@ namespace minimumBiasAnalysis {
 
   template <class Adaptor>
   void bookHistos(HistoMapTH2F& histos, const Adaptor& adaptor){
+     histos["iEtaVsHFCountPlus"] = adaptor.template make<TH2F>("iEtaVsHFCountPlus","iEtaVsHFCountPlus",13,29,42,20,0,20);
+     histos["iEtaVsHFCountMinus"] = adaptor.template make<TH2F>("iEtaVsHFCountMinus","iEtaVsHFCountMinus",13,29,42,20,0,20);
+ 
   }
 
 } // namespace

@@ -4,6 +4,7 @@
 
 namespace minimumBiasAnalysis {
   void addTTreeBranches(TTree& data, EventData& eventData){
+     data.Branch("processId",&eventData.processId_,"processId/I");
      data.Branch("runNumber",&eventData.runNumber_,"runNumber/I");
      data.Branch("eventNumber",&eventData.eventNumber_,"eventNumber/I");
      data.Branch("lumiSection",&eventData.lumiSection_,"lumiSection/I");
@@ -58,6 +59,7 @@ namespace minimumBiasAnalysis {
   }
 
   void setTTreeBranches(TTree& data, EventData& eventData){
+     data.SetBranchAddress("processId",&eventData.processId_);
      data.SetBranchAddress("runNumber",&eventData.runNumber_);
      data.SetBranchAddress("eventNumber",&eventData.eventNumber_);
      data.SetBranchAddress("lumiSection",&eventData.lumiSection_);

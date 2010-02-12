@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from minimumBiasAnalysisTTree_cfg import process
 
+process.maxEvents.input = 10000
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring()
 )
@@ -17,8 +18,9 @@ for analysis in AnalysisModules:
     module = getattr(process,analysis)
     module.AccessMCInfo = True
     #module.TriggerResultsTag = cms.InputTag("TriggerResults::HLT8E29")
-
 for pathname in process.paths:
     getattr(process,pathname).remove(getattr(process,'bptx'))
+    getattr(process,pathname).remove(getattr(process,'lumiSectionSelection'))
+    getattr(process,pathname).remove(getattr(process,'hltPhysicsDeclared'))
 
 process.TFileService.fileName = "analysisMinBias_TTree_MinBias.root"

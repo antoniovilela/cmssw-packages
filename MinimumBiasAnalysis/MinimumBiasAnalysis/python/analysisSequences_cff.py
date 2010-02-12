@@ -1,13 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-"""
-lumiSectionSel = cms.EDFilter("LumiSectionSelection",
-      Runs = cms.vuint32(124023),
-      LumiSectionMin = cms.vuint32(41),
-      LumiSectionMax = cms.vuint32(96), 
-      applyfilter = cms.untracked.bool(True)
-)
-"""
+from MinimumBiasAnalysis.MinimumBiasAnalysis.lumiSectionSelection_cfi import *
 
 from L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff import *
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import *
@@ -42,6 +35,7 @@ from MinimumBiasAnalysis.MinimumBiasAnalysis.primaryVertexFilter_cfi import *
 from MinimumBiasAnalysis.MinimumBiasAnalysis.filterScraping_cfi import *
 
 from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasHLTPaths_cfi import *
+hltPhysicsDeclared = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_PhysicsDeclared'])
 hltMinBiasBSCORFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_MinBiasBSC_OR'])
 hltMinBiasPixelSingleTrackFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_MinBiasPixel_SingleTrack'])
 
@@ -80,6 +74,7 @@ trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsid
 trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.hfTower_cfi import *
+hfTower.DiscardFlaggedTowers = True
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import *
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromJets_cfi import *
@@ -97,13 +92,15 @@ hltMinBiasPixelNoColl = cms.Sequence(l1NoColl+hltMinBiasPixelSingleTrackFilter)
 hltMinBiasBSCORNoBPTX = cms.Sequence(l1NoBPTXBscOr)
 hltMinBiasPixelNoBPTX = cms.Sequence(l1NoBPTX+hltMinBiasPixelSingleTrackFilter)
 
-eventSelection = cms.Sequence(primaryVertexFilter+filterScraping)
-eventSelectionMinBiasBSCOR = cms.Sequence(hltMinBiasBSCOR+eventSelection)
-eventSelectionMinBiasPixel = cms.Sequence(hltMinBiasPixel+eventSelection)
-eventSelectionMinBiasBSCORNoColl = cms.Sequence(hltMinBiasBSCORNoColl+eventSelection)
-eventSelectionMinBiasPixelNoColl = cms.Sequence(hltMinBiasPixelNoColl+eventSelection)
-eventSelectionMinBiasBSCORNoBPTX = cms.Sequence(hltMinBiasBSCORNoBPTX+eventSelection)
-eventSelectionMinBiasPixelNoBPTX = cms.Sequence(hltMinBiasPixelNoBPTX+eventSelection)
+preSelection = cms.Sequence(lumiSectionSelection+hltPhysicsDeclared)
+offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping)
+eventSelection = cms.Sequence(preSelection+offlineSelection)
+eventSelectionMinBiasBSCOR = cms.Sequence(preSelection+hltMinBiasBSCOR+offlineSelection)
+eventSelectionMinBiasPixel = cms.Sequence(preSelection+hltMinBiasPixel+offlineSelection)
+eventSelectionMinBiasBSCORNoColl = cms.Sequence(preSelection+hltMinBiasBSCORNoColl+offlineSelection)
+eventSelectionMinBiasPixelNoColl = cms.Sequence(preSelection+hltMinBiasPixelNoColl+offlineSelection)
+eventSelectionMinBiasBSCORNoBPTX = cms.Sequence(preSelection+hltMinBiasBSCORNoBPTX+offlineSelection)
+eventSelectionMinBiasPixelNoBPTX = cms.Sequence(preSelection+hltMinBiasPixelNoBPTX+offlineSelection)
 
 #jets = cms.Sequence(L2L3CorJetSC5PF+L2L3CorJetSC7PF*leadingJets)
 #tracks = cms.Sequence(selectGoodTracks*
