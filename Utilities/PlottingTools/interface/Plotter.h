@@ -1,5 +1,5 @@
-#ifndef ExclusiveDijetsAnalysis_Plotter_h
-#define ExclusiveDijetsAnalysis_Plotter_h
+#ifndef UtilitiesPlottingTools_Plotter_h
+#define UtilitiesPlottingTools_Plotter_h
 
 #include "TH1F.h"
 #include "TDirectory.h"
