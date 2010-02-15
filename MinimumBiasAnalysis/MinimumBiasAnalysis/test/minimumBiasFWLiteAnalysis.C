@@ -123,7 +123,7 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
 
    HistoMapTH1F histosTH1F;
    bookHistosTH1F(histosTH1F);
-   histosTH1F["hfTowerEmFraction"] = new TH1F("hfTowerEmFraction","hfTowerEmFraction",200,-1.1,1.1);
+   histosTH1F["hfTowerEmFraction"] = new TH1F("hfTowerEmFraction","hfTowerEmFraction",400,0.,1.1);
    histosTH1F["hfTowerEnergy"] = new TH1F("hfTowerEnergy","hfTowerEnergy",200,-0.5,10.);
    histosTH1F["hfTowerMultPlus"] = new TH1F("hfTowerMultPlus","hfTowerMultPlus",20,0,20);
    histosTH1F["hfTowerMultMinus"] = new TH1F("hfTowerMultMinus","hfTowerMultMinus",20,0,20);
@@ -442,8 +442,9 @@ std::endl;continue;}
 
            double emEnergy = caloTower->emEnergy();
            double hadEnergy = caloTower->hadEnergy();
-           double emFrac = fabs(emEnergy/(emEnergy+hadEnergy)); 
-           if(energy > 50.0) histosTH1F["hfTowerEmFraction"]->Fill(emFrac);
+           double eTot = emEnergy + hadEnergy;
+           double emFrac = fabs(emEnergy/eTot); 
+           if(eTot > 50.0) histosTH1F["hfTowerEmFraction"]->Fill(emFrac);
 
            if(energy >= energyThresholdHF){
               if(ieta >= 0) ++nHFTowersPlus;

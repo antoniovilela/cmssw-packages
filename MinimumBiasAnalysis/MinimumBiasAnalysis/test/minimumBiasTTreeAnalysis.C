@@ -45,7 +45,7 @@ void minimumBiasTTreeAnalysis(std::string const& fileName,
                               int processCategory,
                               int maxEvents, bool verbose) {
    
-   if(verbose) std::cout << ">>> Reading file: " << fileName << std::endl;
+   std::cout << ">>> Reading file: " << fileName << std::endl;
 
    TFile* file = TFile::Open(fileName.c_str(),"read");
    if(!file){
@@ -73,15 +73,13 @@ void minimumBiasTTreeAnalysis(TTree* data,
                               int processCategory,
                               int maxEvents, bool verbose) {
 
-   if(verbose){
-     std::cout << ">>> Reading TTree: " << data->GetName() << std::endl;
+   std::cout << ">>> Reading TTree: " << data->GetName() << std::endl;
 
-     std::cout << "Use only selected runs: " << selectEventsInRuns << std::endl
-               << "Access MC Info: " << accessMCInfo << std::endl
-               << "Generator type (PYTHIA=0, PHOJET=1): " << genType << std::endl
-               << "Processes to analyze (All=0, SD=1, NonSD=2, Inelastic=3, DD=4, Diff=5): " << processCategory << std::endl
-               << ">>> Writing histograms to " << outFileName << std::endl;
-   } 
+   std::cout << "Use only selected runs: " << selectEventsInRuns << std::endl
+             << "Access MC Info: " << accessMCInfo << std::endl
+             << "Generator type (PYTHIA=0, PHOJET=1): " << genType << std::endl
+             << "Processes to analyze (All=0, SD=1, NonSD=2, Inelastic=3, DD=4, Diff=5): " << processCategory << std::endl
+             << ">>> Writing histograms to " << outFileName << std::endl;
 
    std::vector<int> selectedRuns;
    selectedRuns.push_back(124020);
