@@ -81,7 +81,7 @@ void plot(){
 
    std::map<std::string,TDirectory*> dirMap = makeMap(samples,directories);*/
  
-   std::string selection = "nHFMax_2";
+   std::string selection = "nHFMax_0";
    //std::vector<std::pair<std::string,TFile*> > files = getFullSimSamples(selection);
    //std::vector<std::pair<std::string,TFile*> > files = getFastSimSamples(selection);
    std::vector<std::pair<std::string,TFile*> > files = getPUSamples(selection,"AvePU"); 
@@ -92,6 +92,7 @@ void plot(){
       dirMap[it->first] = static_cast<TDirectory*>(it->second);
    }
  
+   double Lum = 100.;
    std::map<std::string, double> sigmaMap;
    sigmaMap["CEP di-jets"] = 250.;
    sigmaMap["SD-plus di-jets"] = 300000./2;
@@ -106,7 +107,7 @@ void plot(){
    variablesForEff.push_back("massDijets");
    //variablesForEff.push_back("RjjFromJets");
    variablesForEff.push_back("trackMultiplicity");
-   variablesForEff.push_back("RjjFromJetsAfterSel");
+   variablesForEff.push_back("RjjFromPFCandsAfterSel");
 
    std::map<std::string,std::vector<double> > nEvents = getEvents(variablesForEff,dirMap);
    std::map<std::string,std::vector<double> > nEventsErrors(nEvents);
@@ -148,6 +149,17 @@ void plot(){
       std::transform(errVec.begin(),errVec.end(),errVec.begin(),std::bind1st(std::multiplies<double>(),eff_HLT*eff_Vtx*eff_dijetsSelection/nEventsAfterSel));
       errVec.insert(errVec.begin(),-1.);
       errVec.insert(errVec.begin(),-1.);
+
+      TH1F* h_RjjAfterSel = static_cast<const TH1F*>(it->second->Get("RjjFromPFCandsAfterSel"));
+      int binLow = h_RjjAfterSel->FindBin(0.90);
+      int binHigh = h_RjjAfterSel->FindBin(1.00);
+      double xlow = h_RjjAfterSel->GetBinLowEdge(binLow);
+      double xhigh = h_RjjAfterSel->GetBinLowEdge(binHigh) + h_RjjAfterSel->GetBinWidth(binHigh);
+      std::cout << "Rjj region: " << xlow << " - " << xhigh << std::endl;
+      //double nEventsFullSelLastBin = h_RjjAfterSel->GetBinContent(h_RjjAfterSel->FindBin(0.98));
+      double nEventsFullSelLastBin = h_RjjAfterSel->Integral(binLow,binHigh);
+      myvec.push_back((eff_HLT*eff_Vtx*eff_dijetsSelection/nEventsAfterSel)*nEventsFullSelLastBin);
+      errVec.push_back((eff_HLT*eff_Vtx*eff_dijetsSelection/nEventsAfterSel)*sqrt(nEventsFullSelLastBin));
    }
 
    std::map<std::string,std::vector<double> >::const_iterator nEvents_end = nEvents.end();
@@ -159,8 +171,11 @@ void plot(){
       for(size_t idx = 0; idx < myvec.size(); ++idx){
          size_t idx_previous = idx ? (idx - 1) : 0;
          std::cout << idx << ": " << myvec[idx] << " +/- " << errVec[idx]
-                                  << "    wrt previous " << myvec[idx]/myvec[idx_previous]
-                                  << "    sigma " << sigmaMap[it->first]*myvec[idx] << std::endl;
+                                  << "    wrt previous "   << myvec[idx]/myvec[idx_previous]
+                                  << "    sigma "          << sigmaMap[it->first]*myvec[idx]
+                                  << "    Nr. events "     << Lum << "/pb "
+                                                           << Lum*sigmaMap[it->first]*myvec[idx]
+                                                           << " +/- " << Lum*sigmaMap[it->first]*errVec[idx] << std::endl;
       } 
    }
 }
