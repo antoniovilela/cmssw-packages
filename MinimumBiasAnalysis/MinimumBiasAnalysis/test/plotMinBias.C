@@ -65,26 +65,27 @@ void plot(const char* drawOption = "", int rebin = 1){
 
    //setDirsPYTHIAPHOJET(dirs,normFactors);
    //setDirsMCComponents(dirs,normFactors);
-   //setDirsDataMC(dirs,normFactors);
-   setDirsDataMCComponents(dirs,normFactors);
+   setDirsDataMC(dirs,normFactors);
+   //setDirsDataMCComponents(dirs,normFactors);
    //setDirsCompareData(dirs,normFactors);
 
    //Plotter<NumberEntriesNorm> plotter;
    Plotter<DefaultNorm> plotter;
+   int colors[] = {kBlack,kRed,kBlue};
    //int colors[] = {kBlack,kMagenta,kOrange,kBlue,kRed};
    //int colors[] = {kRed,kBlue};
-   int colors[] = {kBlue,kOrange,kRed};
+   //int colors[] = {kBlue,kOrange,kRed};
    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
-   //int linestyles[] = {kSolid,kDashed};
+   int linestyles[] = {kSolid,kDashed,kDashDotted};
    //int linestyles[] = {1,9,10,3,2};
-   int linestyles[] = {1,9,10};
+   //int linestyles[] = {1,9,10};
    std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
    plotter.SetColors(histColors);
    plotter.SetLineStyles(histLineStyles);
    plotter.SetRebin(rebin);
    //plotter.plot(variables,dirs,drawOption);
-   //plotter.plot(variables,dirs,normFactors,drawOption);
-   plotter.plotComponents(variables,dirs,normFactors,drawOption);
+   plotter.plot(variables,dirs,normFactors,drawOption);
+   //plotter.plotComponents(variables,dirs,normFactors,drawOption);
 
 }
 
@@ -141,24 +142,26 @@ void setDirsPYTHIAPHOJET(std::vector<std::pair<std::string,TDirectory*> >& dirs,
 }
 
 void setDirsDataMC(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
-   TFile* fileData = TFile::Open("analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_histos.root");
+   //TFile* fileData = TFile::Open("analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_histos.root");
+   TFile* fileData = TFile::Open("root/2360GeV/analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_histos.root");
    TH1F* h_EventSelectionData = static_cast<TH1F*>(fileData->Get("EventSelection"));
    double nEventsDataFullSel = h_EventSelectionData->GetBinContent(11);
 
-   TFile* fileMC_PYTHIA = TFile::Open("analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_All.root");
+   //TFile* fileMC_PYTHIA = TFile::Open("analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_All.root");
+   TFile* fileMC_PYTHIA = TFile::Open("root/2360GeV/analysisMinBiasTTree_PYTHIA_MinBias_2360GeV_eventSelectionMinBiasBSCOR_histos_All.root");
    TH1F* h_EventSelectionMC_PYTHIA = static_cast<TH1F*>(fileMC_PYTHIA->Get("EventSelection"));
    double nEventsMCFullSel_PYTHIA = h_EventSelectionMC_PYTHIA->GetBinContent(11);
 
-   /*TFile* fileMC_PHOJET = TFile::Open("");
+   TFile* fileMC_PHOJET = TFile::Open("root/2360GeV/analysisMinBiasTTree_PHOJET_MinBias_2360GeV_eventSelectionMinBiasBSCOR_histos_All.root");
    TH1F* h_EventSelectionMC_PHOJET = static_cast<TH1F*>(fileMC_PHOJET->Get("EventSelection"));
-   double nEventsMCFullSel_PHOJET = h_EventSelectionMC_PHOJET->GetBinContent(11);*/
+   double nEventsMCFullSel_PHOJET = h_EventSelectionMC_PHOJET->GetBinContent(11);
 
    dirs.push_back(std::make_pair("First collisions",fileData));
    dirs.push_back(std::make_pair("MinBias PYTHIA",fileMC_PYTHIA));
-   //dirs.push_back(std::make_pair("MinBias PHOJET",fileMC_PHOJET)); 
+   dirs.push_back(std::make_pair("MinBias PHOJET",fileMC_PHOJET)); 
    normFactors.push_back(1.);
    normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PYTHIA);
-   //normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PHOJET);
+   normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PHOJET);
 }
 
 void setDirsDataMCComponents(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){

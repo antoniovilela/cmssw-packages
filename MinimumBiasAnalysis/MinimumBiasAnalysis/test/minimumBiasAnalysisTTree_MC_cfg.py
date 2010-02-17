@@ -9,6 +9,7 @@ process.source = cms.Source("PoolSource",
 from fileNames_MinBias_STARTUP3X_V8P_900GeV_Jan29ReReco import fileNames
 process.source.fileNames = fileNames
 process.GlobalTag.globaltag = 'STARTUP3X_V8P::All'
+#process.GlobalTag.globaltag = 'STARTUP3X_V8O::All'
 """
 AnalysisModules = ['minimumBiasTTreeAnalysis_eventSelection',
                    'minimumBiasTTreeAnalysis_eventSelectionMinBiasBSCOR',

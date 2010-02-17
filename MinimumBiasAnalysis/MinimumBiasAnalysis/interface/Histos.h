@@ -60,9 +60,12 @@ namespace minimumBiasAnalysis {
      histos["MxGen"] = adaptor.template make<TH1F>("MxGen","MxGen",200,-10.,400.);
      histos["xiGenPlus"] = adaptor.template make<TH1F>("xiGenPlus","xiGenPlus",200,0.,1.);
      histos["xiGenMinus"] = adaptor.template make<TH1F>("xiGenMinus","xiGenMinus",200,0.,1.);
-     histos["ResMx"] = adaptor.template make<TH1F>("ResMx","ResMx",100,-50.,50.);
-     histos["ResXiPlus"] = adaptor.template make<TH1F>("ResXiPlus","ResXiPlus",100,-0.1,0.1);
-     histos["ResXiMinus"] = adaptor.template make<TH1F>("ResXiMinus","ResXiMinus",100,-0.1,0.1);
+     histos["ResMxFromTowers"] = adaptor.template make<TH1F>("ResMxFromTowers","ResMxFromTowers",100,-50.,50.);
+     histos["ResXiPlusFromTowers"] = adaptor.template make<TH1F>("ResXiPlusFromTowers","ResXiPlusFromTowers",100,-0.1,0.1);
+     histos["ResXiMinusFromTowers"] = adaptor.template make<TH1F>("ResXiMinusFromTowers","ResXiMinusFromTowers",100,-0.1,0.1);
+     histos["ResMxFromPFCands"] = adaptor.template make<TH1F>("ResMxFromPFCands","ResMxFromPFCands",100,-50.,50.);
+     histos["ResXiPlusFromPFCands"] = adaptor.template make<TH1F>("ResXiPlusFromPFCands","ResXiPlusFromPFCands",100,-0.1,0.1);
+     histos["ResXiMinusFromPFCands"] = adaptor.template make<TH1F>("ResXiMinusFromPFCands","ResXiMinusFromPFCands",100,-0.1,0.1);
 
      histos["BeamHaloId"] = adaptor.template make<TH1F>("BeamHaloId","BeamHaloId",2,0,2);
      histos["BeamHaloId"]->GetXaxis()->SetBinLabel(1,"BeamHaloLooseId");
@@ -91,6 +94,11 @@ namespace minimumBiasAnalysis {
   void bookHistos(HistoMapTH2F& histos, const Adaptor& adaptor){
      histos["iEtaVsHFCountPlus"] = adaptor.template make<TH2F>("iEtaVsHFCountPlus","iEtaVsHFCountPlus",13,29,42,20,0,20);
      histos["iEtaVsHFCountMinus"] = adaptor.template make<TH2F>("iEtaVsHFCountMinus","iEtaVsHFCountMinus",13,29,42,20,0,20);
+
+     histos["xiFromTowersVsxiGenPlus"] = adaptor.template make<TH2F>("xiFromTowersVsxiGenPlus","xiFromTowersVsxiGenPlus",100,0.,0.2,100,0.,0.2);
+     histos["xiFromTowersVsxiGenMinus"] = adaptor.template make<TH2F>("xiFromTowersVsxiGenMinus","xiFromTowersVsxiGenMinus",100,0.,0.2,100,0.,0.2);
+     histos["xiFromPFCandsVsxiGenPlus"] = adaptor.template make<TH2F>("xiFromPFCandsVsxiGenPlus","xiFromPFCandsVsxiGenPlus",100,0.,0.2,100,0.,0.2);
+     histos["xiFromPFCandsVsxiGenMinus"] = adaptor.template make<TH2F>("xiFromPFCandsVsxiGenMinus","xiFromPFCandsVsxiGenMinus",100,0.,0.2,100,0.,0.2); 
  
   }
 

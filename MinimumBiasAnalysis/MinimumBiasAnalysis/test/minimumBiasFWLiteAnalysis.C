@@ -127,6 +127,8 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    histosTH1F["hfTowerEnergy"] = new TH1F("hfTowerEnergy","hfTowerEnergy",200,-0.5,10.);
    histosTH1F["hfTowerMultPlus"] = new TH1F("hfTowerMultPlus","hfTowerMultPlus",20,0,20);
    histosTH1F["hfTowerMultMinus"] = new TH1F("hfTowerMultMinus","hfTowerMultMinus",20,0,20);
+   histosTH1F["heTowerEnergy"] = new TH1F("heTowerEnergy","heTowerEnergy",200,-0.5,10.);
+   histosTH1F["hbTowerEnergy"] = new TH1F("hbTowerEnergy","hbTowerEnergy",200,-0.5,10.);
 
    HistoMapTH2F histosTH2F;
    histosTH2F["iEtaVsHFCountPlus"] = new TH2F("iEtaVsHFCountPlus","iEtaVsHFCountPlus",13,29,42,20,0,20);
@@ -156,17 +158,17 @@ void minimumBiasFWLiteAnalysis(std::vector<std::string>& fileNames,
    //double Ebeam = 1180.;
    int thresholdHF = 15;// 0.2 GeV
    double energyThresholdHF = 3.0;
-   double energyThresholdHBHE = 1.5;
+   double energyThresholdHBHE = 0.7;
    //double ptThresholdTrk = 0.5;
    std::map<int,std::pair<double,double> > thresholds;
-   thresholds[reco::PFCandidate::X] = std::make_pair(-1.,1.0);
-   thresholds[reco::PFCandidate::h] = std::make_pair(0.5,-1.);
+   thresholds[reco::PFCandidate::X] = std::make_pair(-1.,0.5);
+   thresholds[reco::PFCandidate::h] = std::make_pair(0.5,0.5);
    thresholds[reco::PFCandidate::e] = std::make_pair(0.5,-1.); 
    thresholds[reco::PFCandidate::mu] = std::make_pair(0.5,-1.); 
-   thresholds[reco::PFCandidate::gamma] = std::make_pair(0.5,1.0);
-   thresholds[reco::PFCandidate::h0] = std::make_pair(-1.,1.5);
-   thresholds[reco::PFCandidate::h_HF] = std::make_pair(-1.,3.0);
-   thresholds[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,3.0);
+   thresholds[reco::PFCandidate::gamma] = std::make_pair(0.5,-1.);
+   thresholds[reco::PFCandidate::h0] = std::make_pair(-1.,0.7);
+   thresholds[reco::PFCandidate::h_HF] = std::make_pair(-1.,2.0);
+   thresholds[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,1.5);
 
    bool doTriggerSelection = true;
    std::vector<std::string> hltPaths;
@@ -437,7 +439,7 @@ std::endl;continue;}
      for(; caloTower != caloTower_end; ++caloTower){
         double energy = caloTower->energy();
         int ieta = caloTower->id().ieta();
-        if(fabs(ieta) > 29 && fabs(ieta) < 42){
+        if(abs(ieta) > 29 && abs(ieta) <= 41){
            histosTH1F["hfTowerEnergy"]->Fill(energy);
 
            double emEnergy = caloTower->emEnergy();
@@ -450,6 +452,10 @@ std::endl;continue;}
               if(ieta >= 0) ++nHFTowersPlus;
               else ++nHFTowersMinus;
            }  
+        } else if(abs(ieta) > 16 && abs(ieta) < 29){
+           histosTH1F["heTowerEnergy"]->Fill(energy);
+        } else if(abs(ieta) < 16){
+           histosTH1F["hbTowerEnergy"]->Fill(energy); 
         }
 
         if(energy < 1.0) continue;

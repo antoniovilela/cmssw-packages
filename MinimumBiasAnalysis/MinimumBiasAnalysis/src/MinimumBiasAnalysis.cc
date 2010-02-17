@@ -42,14 +42,14 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   genAllParticles_(0.,0.,0.,0.),genProtonPlus_(0.,0.,0.,0.),genProtonMinus_(0.,0.,0.,0.)
 {
   //FIXME
-  thresholdsPFlow_[reco::PFCandidate::X] = std::make_pair(-1.,-1.);
-  thresholdsPFlow_[reco::PFCandidate::h] = std::make_pair(0.5,-1.);
+  thresholdsPFlow_[reco::PFCandidate::X] = std::make_pair(-1.,0.5);
+  thresholdsPFlow_[reco::PFCandidate::h] = std::make_pair(0.5,0.5);
   thresholdsPFlow_[reco::PFCandidate::e] = std::make_pair(0.5,-1.);
   thresholdsPFlow_[reco::PFCandidate::mu] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::gamma] = std::make_pair(-1.,-1.);
-  thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,1.5);
-  thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,3.0);
-  thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,3.0);
+  thresholdsPFlow_[reco::PFCandidate::gamma] = std::make_pair(0.5,-1.);
+  thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,0.7);
+  thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,2.0);
+  thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,1.5);
 }
 
 MinimumBiasAnalysis::~MinimumBiasAnalysis(){}

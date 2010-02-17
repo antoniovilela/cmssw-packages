@@ -10,7 +10,7 @@ MinimumBiasAnalysis = cms.PSet(
     TriggerResultsTag = cms.InputTag("TriggerResults::HLT"),
     # Misc
     HFThresholdIndex = cms.uint32(15),
-    EnergyThresholdHBHE = cms.double(1.5),
+    EnergyThresholdHBHE = cms.double(0.7),
     EnergyThresholdHF = cms.double(3.0),
     # Options
     EBeam = cms.double(450.),

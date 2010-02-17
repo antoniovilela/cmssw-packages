@@ -8,15 +8,22 @@ process.maxEvents.input = 50000
 process.xiTower.comEnergy = 900.0
 process.xiFromCaloTowers.comEnergy = 900.0
 process.xiFromJets.comEnergy = 900.0
+"""
+process.xiTower.comEnergy = 2360.0
+process.xiFromCaloTowers.comEnergy = 2360.0
+process.xiFromJets.comEnergy = 2360.0
+"""
 
 # 900 GeV
-from fileNames_MinimumBias_Jan29ReReco_124023_Lumi_41_96 import fileNames
-process.source.fileNames = fileNames
+#from fileNames_MinimumBias_Jan29ReReco_124023_Lumi_41_96 import fileNames
+#process.source.fileNames = fileNames
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange('124030:2-124030:9999','124027:24-124027:9999','124025:5-124025:13','124024:2-124024:83','124023:38-124023:9999','124022:66-124022:179','124020:12-124020:94','124009:1-124009:68')
 # 2360 GeV
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange('124120:1-124120:9999')
 
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
+process.minimumBiasTTreeAnalysis.EBeam = 450.0
+#process.minimumBiasTTreeAnalysis.EBeam = 1180.0
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
 #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
@@ -24,6 +31,8 @@ makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR')
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel')
 #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoBPTX')
 #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoBPTX')
+#makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoColl')
+#makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoColl')
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisMinBias_TTree_MinimumBias.root")
