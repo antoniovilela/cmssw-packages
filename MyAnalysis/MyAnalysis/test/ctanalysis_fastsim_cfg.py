@@ -3,9 +3,9 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Analysis")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append('Analysis')
+#process.MessageLogger.categories.append('Analysis')
 #process.MessageLogger.cerr.INFO = cms.untracked.PSet(
 #    default = cms.untracked.PSet( limit = cms.untracked.int32(0)),
 #    Analysis = cms.untracked.PSet( limit = cms.untracked.int32(-1))
@@ -35,7 +35,7 @@ process.source = cms.Source("PoolSource",
 process.TFileService = cms.Service("TFileService",
     #fileName = cms.string('analysisHistos_QCD_FastSim_offset_reweighted.root')
     #fileName = cms.string('analysisHistos_SDPlusDijets_FastSim_raw_reweighted.root')
-    fileName = cms.string('analysisHistos_MinBias_FastSim.root')
+    fileName = cms.string('analysisHistos_FastSim.root')
 )
 
 process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
@@ -71,26 +71,28 @@ process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
         sigmaHFEnergy = cms.double(0.30)
     ),
     ReweightHFTower = cms.bool(False),
-    ReweightHistoName = cms.vstring("reweightHisto_QCD_raw.root","energyHFplusRatio")  
+    ReweightHistoName = cms.vstring("","")  
 )
 process.calotwranalysis_offset = process.calotwranalysis.clone()
 process.calotwranalysis_offset.ApplyEnergyOffset = True
 
 process.calotwranalysis_raw_reweight = process.calotwranalysis.clone()
 process.calotwranalysis_raw_reweight.ReweightHFTower = True
-#process.calotwranalysis_raw_reweight.ReweightHistoName = cms.vstring("reweightHisto_QCD_raw.root","energyHFplusRatio")
-process.calotwranalysis_raw_reweight.ReweightHistoName = cms.vstring("reweightHistos_MinBias_raw.root","energyHFplusRatio")
+#process.calotwranalysis_raw_reweight.ReweightHistoName = cms.vstring("reweightHistos_MinBias_raw.root","energyHFplusRatio")
+process.calotwranalysis_raw_reweight.ReweightHistoName = cms.vstring("reweightHistos_MinBias_raw.root","energyHFRatioAverage")
 
 process.calotwranalysis_offset_reweight = process.calotwranalysis.clone()
 process.calotwranalysis_offset_reweight.ApplyEnergyOffset = True 
 process.calotwranalysis_offset_reweight.ReweightHFTower = True
-#process.calotwranalysis_offset_reweight.ReweightHistoName = cms.vstring("reweightHisto_QCD_offset.root","energyHFplusRatio")
-process.calotwranalysis_offset_reweight.ReweightHistoName = cms.vstring("reweightHistos_MinBias_offset.root","energyHFplusRatio")
+#process.calotwranalysis_offset_reweight.ReweightHistoName = cms.vstring("reweightHistos_MinBias_offset.root","energyHFRatioAverage")
 
 #process.analysis = cms.Path(process.calotwranalysis+
 #                            process.calotwranalysis_offset)
 
 process.analysis = cms.Path(process.calotwranalysis+
-                            process.calotwranalysis_offset+
-                            process.calotwranalysis_raw_reweight+
-                            process.calotwranalysis_offset_reweight)
+                            process.calotwranalysis_raw_reweight)
+
+#process.analysis = cms.Path(process.calotwranalysis+
+#                            process.calotwranalysis_offset+
+#                            process.calotwranalysis_raw_reweight+
+#                            process.calotwranalysis_offset_reweight)
