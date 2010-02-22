@@ -101,9 +101,12 @@ void CaloTowerAnalyzer::beginJob(edm::EventSetup const&iSetup){
      sprintf(hname,"nhfhigh_%d",i);
      histosnhfhigh_.push_back(fs->make<TH1F>(hname,"Towers mult. HF high",nBinsHF_,0,nBinsHF_));
   }
-  histenergyHF_ = fs->make<TH1F>("energyHF","Tower Energy HF",100,0.,15.0);
-  histenergyHFplus_ = fs->make<TH1F>("energyHFplus","Tower Energy HF-plus",100,0.,15.0);
-  histenergyHFminus_ = fs->make<TH1F>("energyHFminus","Tower Energy HF-minus",100,0.,15.0);
+  histenergyHF_ = fs->make<TH1F>("energyHF","Tower Energy HF",200,0.,15.0);
+  histenergyHFplus_ = fs->make<TH1F>("energyHFplus","Tower Energy HF-plus",200,0.,15.0);
+  histenergyHFminus_ = fs->make<TH1F>("energyHFminus","Tower Energy HF-minus",200,0.,15.0);
+  histemEnergyHF_ = fs->make<TH1F>("emEnergyHF","EM Tower Energy HF",200,0.,15.0); 
+  histhadEnergyHF_ = fs->make<TH1F>("hadEnergyHF","HAD Tower Energy HF",200,0.,15.0);
+  histemFractionHF_ = fs->make<TH1F>("emFractionHF","EM energy fraction HF",200,0.,1.1);
   histenergyvseta_ = fs->make<TH1F>("energyvseta","Tower Energy vs eta",100,-5.1,5.1);
   histetavsphi_ = fs->make<TH2F>("etavsphi","etavsphi",100,-5.,5.,100,-3.1416,3.1416);
   histietavsiphi_ = fs->make<TH2F>("ietavsiphi","ietavsiphi",85,-42,43,75,0,75);
@@ -254,33 +257,41 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
      double phi = calotower->phi();
 
      double energy = calotower->energy();
-     //Valid for HF emEnergy = E(L) - E(S); hadEnergy = 2*E(S)
-     double energyShort = calotower->hadEnergy()/2.;
-     double energyLong = calotower->emEnergy() + energyShort;
-     if(applyEnergyOffset_){
-        /*energyShort += gauss_->fire(0.,sigmaShort_);
-        energyLong += gauss_->fire(0.,sigmaLong_);
-        energy = energyShort + energyLong;*/
-        //energy += nIncrements_*sigmaLong_; 
-        /*double deltaEShort = std::max(gauss_->fire(0.,sigmaShort_),0.);
-        double deltaELong = std::max(gauss_->fire(0.,sigmaLong_),0.);
-        energyShort += deltaEShort;
-        energyLong += deltaELong; 
-        energy = energyShort + energyLong;*/
-        double deltaEnergy = std::max(gauss_->fire(meanHFEnergy_,sigmaHFEnergy_),0.);
-        energy += deltaEnergy;
-     }
-
      double weight = 1.0;
-     if(reweightHFTower_){
-        int xbin = reweightHisto_.GetXaxis()->FindBin(energy);
-        int nBins = reweightHisto_.GetNbinsX(); // 1 <= xbin <= nBins
-        //weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : reweightHisto_.GetBinContent(nBins);
-        weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : 1.;
-     }
+     if(hasHF&&(!hasHE)){
+        //Valid for HF emEnergy = E(L) - E(S); hadEnergy = 2*E(S)
+        double energyShort = calotower->hadEnergy()/2.;
+        double energyLong = calotower->emEnergy() + energyShort;
+        if(applyEnergyOffset_){
+           /*energyShort += gauss_->fire(0.,sigmaShort_);
+           energyLong += gauss_->fire(0.,sigmaLong_);
+           energy = energyShort + energyLong;*/
+           //energy += nIncrements_*sigmaLong_; 
+           /*double deltaEShort = std::max(gauss_->fire(0.,sigmaShort_),0.);
+           double deltaELong = std::max(gauss_->fire(0.,sigmaLong_),0.);
+           energyShort += deltaEShort;
+           energyLong += deltaELong; 
+           energy = energyShort + energyLong;*/
+           double deltaEnergy = std::max(gauss_->fire(meanHFEnergy_,sigmaHFEnergy_),0.);
+           energy += deltaEnergy;
+        }
 
-     histhflongenergyFromTwr_->Fill(energyLong,weight);
-     histhfshortenergyFromTwr_->Fill(energyShort,weight);
+        if(reweightHFTower_){
+           int xbin = reweightHisto_.GetXaxis()->FindBin(energy);
+           int nBins = reweightHisto_.GetNbinsX(); // 1 <= xbin <= nBins
+           //weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : reweightHisto_.GetBinContent(nBins);
+           weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : 1.;
+        }
+ 
+        histhflongenergyFromTwr_->Fill(energyLong,weight);
+        histhfshortenergyFromTwr_->Fill(energyShort,weight);
+        double emEnergy = calotower->emEnergy();
+        double hadEnergy = calotower->hadEnergy(); 
+        double eTot = emEnergy + hadEnergy;
+        histemEnergyHF_->Fill(emEnergy);
+        histhadEnergyHF_->Fill(hadEnergy);
+        if(eTot*weight > 50.0) histemFractionHF_->Fill(fabs(emEnergy/hadEnergy));
+     }
 
      histenergyvseta_->Fill(eta,energy*weight);
      histetavsphi_->Fill(eta,phi,weight);

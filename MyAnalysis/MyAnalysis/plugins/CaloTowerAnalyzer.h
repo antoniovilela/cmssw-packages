@@ -41,7 +41,10 @@ class CaloTowerAnalyzer : public edm::EDAnalyzer
   TH1F *histNEvents_;
   TH1F *histenergyHF_;
   TH1F *histenergyHFplus_;
-  TH1F *histenergyHFminus_;	
+  TH1F *histenergyHFminus_;
+  TH1F *histemEnergyHF_;
+  TH1F *histhadEnergyHF_;
+  TH1F *histemFractionHF_; 
   TH1F *histenergyvseta_;
   TH2F *histetavsphi_;
   TH2F *histietavsiphi_;

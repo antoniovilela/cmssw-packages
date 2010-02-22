@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Analysis")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000 
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1000 
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
@@ -17,25 +17,25 @@ process.options = cms.untracked.PSet(
 #process.prefer("GlobalTag")
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(50000)
 )
 
 process.source = cms.Source("PoolSource",
-    #fileNames = cms.untracked.vstring('file:/data1/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_CMSSW22X_cff_py_RAW2DIGI_RECO.root')
-    #fileNames = cms.untracked.vstring('file:/data1/antoniov/QCD100to250-madgraph_IDEAL_V11_redigi_v1_GEN-SIM-RECO_383EB3A2-3A0A-DE11-82D9-001731A28BE1.root')
     fileNames = cms.untracked.vstring('file:/data1/antoniov/MinBias_Summer08_IDEAL_V11_redigi_v1_GEN-SIM-RECO_FE5226D6-F9CE-DD11-9000-001BFCDBD15E.root')
 )
+from fileNames_MinimumBias_Jan29ReReco_124023 import fileNames as fileNamesMinimumBias
+process.source.fileNames = fileNamesMinimumBias
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('analysisHistos_MinBias.root')
+    fileName = cms.string('analysisHistos_MinimumBias.root')
 )
 
 process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
     CaloTowersLabel = cms.InputTag("towerMaker"),
     AccessRecHits = cms.untracked.bool(True),
     HFRecHitsLabel = cms.untracked.InputTag("hfreco"),
-    NBinsHF = cms.untracked.int32(100),
-    NumberOfTresholds = cms.uint32(100),
+    NBinsHF = cms.untracked.int32(20),
+    NumberOfTresholds = cms.uint32(50),
     TowerEnergyTresholdHFMin = cms.double(0.0),
     TowerEnergyTresholdHFMax = cms.double(10.0),
     ReweightHFTower = cms.bool(False),
@@ -43,4 +43,7 @@ process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
     ApplyEnergyOffset = cms.bool(False) 
 )
 
-process.analysis = cms.Path(process.calotwranalysis)
+process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.analysisSequences_cff')
+
+#process.analysis = cms.Path(process.eventSelection+process.calotwranalysis)
+process.analysis = cms.Path(process.offlineSelection+process.calotwranalysis)
