@@ -9,9 +9,9 @@ MinimumBiasAnalysis = cms.PSet(
     ParticleFlowTag = cms.InputTag("particleFlow"),
     TriggerResultsTag = cms.InputTag("TriggerResults::HLT"),
     # Misc
-    HFThresholdIndex = cms.uint32(15),
-    EnergyThresholdHBHE = cms.double(0.7),
-    EnergyThresholdHF = cms.double(3.0),
+    HFThresholdIndex = cms.uint32(18),
+    EnergyThresholdHBHE = cms.double(1.5),
+    EnergyThresholdHF = cms.double(3.6),
     # Options
     EBeam = cms.double(450.),
     AccessMCInfo = cms.untracked.bool(False)

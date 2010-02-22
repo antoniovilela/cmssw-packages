@@ -17,7 +17,7 @@ process.options = cms.untracked.PSet(
 #process.prefer("GlobalTag")
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(50000)
+    input = cms.untracked.int32(80000)
 )
 
 process.source = cms.Source("PoolSource",
@@ -45,5 +45,5 @@ process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
 
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.analysisSequences_cff')
 
-#process.analysis = cms.Path(process.eventSelection+process.calotwranalysis)
-process.analysis = cms.Path(process.offlineSelection+process.calotwranalysis)
+process.analysis = cms.Path(process.eventSelection+process.calotwranalysis)
+#process.analysis = cms.Path(process.offlineSelection+process.calotwranalysis)

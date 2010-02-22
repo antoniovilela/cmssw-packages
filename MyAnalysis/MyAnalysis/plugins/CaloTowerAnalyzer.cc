@@ -81,6 +81,7 @@ CaloTowerAnalyzer::~CaloTowerAnalyzer()
 void CaloTowerAnalyzer::beginJob(edm::EventSetup const&iSetup){
 
   edm::Service<TFileService> fs;
+  TH1::SetDefaultSumw2(true);
 
   histNEvents_ = fs->make<TH1F>("NEvents","NEvents",1,0,1);
 
@@ -290,7 +291,7 @@ void CaloTowerAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
         double eTot = emEnergy + hadEnergy;
         histemEnergyHF_->Fill(emEnergy);
         histhadEnergyHF_->Fill(hadEnergy);
-        if(eTot*weight > 50.0) histemFractionHF_->Fill(fabs(emEnergy/hadEnergy));
+        if(eTot > 50.0) histemFractionHF_->Fill(fabs(emEnergy/eTot));
      }
 
      histenergyvseta_->Fill(eta,energy*weight);
