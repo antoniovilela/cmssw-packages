@@ -45,5 +45,9 @@ process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
 
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.analysisSequences_cff')
 
-process.analysis = cms.Path(process.eventSelection+process.calotwranalysis)
+process.calotwranalysisNoColl = process.calotwranalysis.clone()
+process.calotwranalysisNoSel = process.calotwranalysis.clone()
+process.analysis = cms.Path(process.preSelection+process.l1Coll+process.offlineSelection+process.calotwranalysis)
+process.analysisNoSel = cms.Path(process.preSelection+process.calotwranalysisNoSel)
+process.analysisNoColl = cms.Path(process.preSelection+process.l1NoColl+process.offlineSelection+process.calotwranalysisNoColl)
 #process.analysis = cms.Path(process.offlineSelection+process.calotwranalysis)

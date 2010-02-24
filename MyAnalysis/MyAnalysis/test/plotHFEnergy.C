@@ -28,6 +28,7 @@ void plot(const std::string& fileRef, const std::string& dirNameRef, const std::
     variables.push_back("energyHFminus");
     variables.push_back("emEnergyHF");
     variables.push_back("hadEnergyHF");
+    variables.push_back("emFractionHF");
     variables.push_back("hfhitenergy");
     variables.push_back("hflongenergy");
     variables.push_back("hfshortenergy");
@@ -38,7 +39,8 @@ void plot(const std::string& fileRef, const std::string& dirNameRef, const std::
     variables.push_back("hflongenergyminus");
     variables.push_back("hfshortenergyminus");
 
-    int indexes[] = {0,5,10,15,20,30};
+    //int indexes[] = {0,5,10,15,20,30};
+    int indexes[] = {5,15,20};
     std::vector<int> vec_indexes(indexes,indexes + sizeof(indexes)/sizeof(int));
     for(std::vector<int>::const_iterator idx = vec_indexes.begin(); idx != vec_indexes.end(); ++idx){
        char aux[20];
@@ -61,6 +63,14 @@ void plot(const std::string& fileRef, const std::string& dirNameRef, const std::
 
     //Plotter<NumberEntriesNorm> plotter;
     Plotter<DefaultNorm> plotter;
+    int colors[] = {kBlack,kBlue};
+    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
+    int linestyles[] = {kSolid,kSolid};
+    std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+    plotter.SetColors(histColors);
+    plotter.SetLineStyles(histLineStyles);
+    //plotter.SetRebin(rebin);
+
     std::vector<double> normFactors;
     normFactors.push_back(1./h_NEvents_ref->GetBinContent(1));
     normFactors.push_back(1./h_NEvents_rew->GetBinContent(1));
