@@ -31,8 +31,7 @@
         gSystem->Load("libDataFormatsFWLite.so");
         gSystem->Load("libDataFormatsPatCandidates.so");
         gSystem->Load("libDataFormatsMETReco.so");
-        //gSystem->Load("libExclusiveDijetsAnalysisExclusiveDijetsAnalysis.so");
-        gSystem->Load("libMinimumBiasAnalysisMinimumBiasAnalysis.so");
-        //gSystem->Load("libPlottingTools.so");
-        gSystem->Load("libUtilitiesPlottingTools.so");
+        //gSystem->Load("libExclusiveDijetsAnalysisExclusiveDijetsAnalysis");
+        gSystem->Load("libMinimumBiasAnalysisMinimumBiasAnalysis");
+        gSystem->Load("libUtilitiesPlottingTools");
 }

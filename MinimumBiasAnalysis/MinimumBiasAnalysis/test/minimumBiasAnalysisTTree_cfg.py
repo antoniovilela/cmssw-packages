@@ -5,6 +5,7 @@ from minimumBiasAnalysis_cfg import process
 if hasattr(process,'output'): del process.output
 if hasattr(process,'out_step'): del process.out_step
 process.maxEvents.input = 50000
+"""
 process.xiTower.comEnergy = 900.0
 process.xiFromCaloTowers.comEnergy = 900.0
 process.xiFromJets.comEnergy = 900.0
@@ -12,7 +13,6 @@ process.xiFromJets.comEnergy = 900.0
 process.xiTower.comEnergy = 2360.0
 process.xiFromCaloTowers.comEnergy = 2360.0
 process.xiFromJets.comEnergy = 2360.0
-"""
 
 # 900 GeV
 #from fileNames_MinimumBias_Jan29ReReco_124023_Lumi_41_96 import fileNames
@@ -22,8 +22,8 @@ process.xiFromJets.comEnergy = 2360.0
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange('124120:1-124120:9999')
 
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
-process.minimumBiasTTreeAnalysis.EBeam = 450.0
-#process.minimumBiasTTreeAnalysis.EBeam = 1180.0
+#process.minimumBiasTTreeAnalysis.EBeam = 450.0
+process.minimumBiasTTreeAnalysis.EBeam = 1180.0
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
 #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
