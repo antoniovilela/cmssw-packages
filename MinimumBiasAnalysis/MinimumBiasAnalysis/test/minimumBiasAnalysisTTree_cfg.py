@@ -1,18 +1,17 @@
 import FWCore.ParameterSet.Config as cms
 
+# Settings
+class config: pass
+config.comEnergy = 900.0
+
 # Skim sequences
 from minimumBiasAnalysis_cfg import process
 if hasattr(process,'output'): del process.output
 if hasattr(process,'out_step'): del process.out_step
 process.maxEvents.input = 50000
-"""
-process.xiTower.comEnergy = 900.0
-process.xiFromCaloTowers.comEnergy = 900.0
-process.xiFromJets.comEnergy = 900.0
-"""
-process.xiTower.comEnergy = 2360.0
-process.xiFromCaloTowers.comEnergy = 2360.0
-process.xiFromJets.comEnergy = 2360.0
+process.xiTower.comEnergy = config.comEnergy
+process.xiFromCaloTowers.comEnergy = config.comEnergy
+process.xiFromJets.comEnergy = config.comEnergy
 
 # 900 GeV
 #from fileNames_MinimumBias_Jan29ReReco_124023_Lumi_41_96 import fileNames
@@ -22,13 +21,15 @@ process.xiFromJets.comEnergy = 2360.0
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange('124120:1-124120:9999')
 
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
-#process.minimumBiasTTreeAnalysis.EBeam = 450.0
-process.minimumBiasTTreeAnalysis.EBeam = 1180.0
+process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2
+
+attributes = [{'HFThresholdIndex':15,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.0},
+              {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.6}]
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
-#makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
-makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR')
-makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel')
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR',attributes)
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel',attributes)
 #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoBPTX')
 #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoBPTX')
 #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoColl')

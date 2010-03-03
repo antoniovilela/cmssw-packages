@@ -47,9 +47,9 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   thresholdsPFlow_[reco::PFCandidate::e] = std::make_pair(0.5,-1.);
   thresholdsPFlow_[reco::PFCandidate::mu] = std::make_pair(0.5,-1.);
   thresholdsPFlow_[reco::PFCandidate::gamma] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,1.5);
-  thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,3.6);
-  thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,3.6);
+  thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,energyThresholdHBHE_);
+  thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,energyThresholdHF_);
+  thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,energyThresholdHF_);
 }
 
 MinimumBiasAnalysis::~MinimumBiasAnalysis(){}
