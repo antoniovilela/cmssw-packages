@@ -141,16 +141,21 @@ void minimumBiasTTreeAnalysis(TTree* data,
    // Prim. vertices
    bool doVertexSelection = false;
    double primVtxZMax = 10.0;
+   // HF
+   bool doHFSelection = false;
+   double sumEnergyHFPlusMax = 8.;
+   double sumEnergyHFMinusMax = 99999.;
+   // MET-SumET
    bool doSumETSelection = false;
    double sumETMin = 40.;
-   // Exclusivity
+   // Tracks
    //bool doTrackSelection = false;
+   // Mx
    bool doMxSelection = false;
    double MxMin = 100.;
    double MxMax = 999.;
-   bool doHFSelection = false; 
-   double sumEnergyHFMax = 10.; // from either side
 
+   double eventWeight = 1.0;
    //std::vector<std::pair<int,int> > selectedEvents;
    // Loop over the events
    for(int ientry = 0; ientry < nEntries; ++ientry){
@@ -169,7 +174,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
      }
      if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with event...skipping" << std::endl;continue;}
 
-     histosTH1F["EventSelection"]->Fill(0);
+     histosTH1F["EventSelection"]->Fill("All",eventWeight);
 
      if(accessMCInfo){
         int processId = eventData.processId_;
@@ -184,7 +189,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
      if(!accessMCInfo && selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
 
-     histosTH1F["EventSelection"]->Fill(1);
+     histosTH1F["EventSelection"]->Fill("ProcessIdOrRunSelection",eventWeight);
 
      if(doTriggerSelection){
         bool accept = true;
@@ -193,7 +198,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
         if(!accept) continue;
      }
 
-     histosTH1F["EventSelection"]->Fill(2);
+     histosTH1F["EventSelection"]->Fill("TriggerSelection",eventWeight);
 
      // Hcal noise
      bool passNoiseLoose = (eventData.LooseNoiseFilter_ == 1) ? true : false;
@@ -210,7 +215,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
      if(doHcalNoiseSelection && !passNoiseTight) continue;
 
-     histosTH1F["EventSelection"]->Fill(3);
+     histosTH1F["EventSelection"]->Fill("HcalNoise",eventWeight);
 
      // Beam Halo summary
      bool beamHaloLooseId = (eventData.BeamHaloLooseId_ == 1) ? true : false;
@@ -225,11 +230,11 @@ void minimumBiasTTreeAnalysis(TTree* data,
                   << "   Tight Halo id: " << beamHaloTightId << std::endl;
      }
 
-     histosTH1F["EventSelection"]->Fill(4);
+     histosTH1F["EventSelection"]->Fill("BeamHaloId",eventWeight);
  
      // Pre-selection
-     histosTH1F["EventSelection"]->Fill(5);
-     histosTH1F["EventSelection"]->Fill(6);
+     histosTH1F["EventSelection"]->Fill("GoodVertexFilter",eventWeight);
+     histosTH1F["EventSelection"]->Fill("HighQualityTracks",eventWeight);
  
      // Vertex Info
      int nGoodVertices = eventData.nVertex_;
@@ -246,32 +251,26 @@ void minimumBiasTTreeAnalysis(TTree* data,
      //histosTH1F["numberDOF"]->Fill();
 
      if(doVertexSelection && (fabs(posZPrimVtx) > primVtxZMax)) continue;
+     histosTH1F["EventSelection"]->Fill("VertexSelection",eventWeight);
 
-     histosTH1F["EventSelection"]->Fill(7);
+     // HF Selection
+     if(doHFSelection && ( eventData.sumEnergyHFPlus_ > sumEnergyHFPlusMax || eventData.sumEnergyHFMinus_ > sumEnergyHFMinusMax)) continue;
+     histosTH1F["EventSelection"]->Fill("HFSelection",eventWeight);
 
      // MET - SumET
-     double sumET = eventData.sumET_;
+     if(doSumETSelection && (eventData.sumET_ < sumETMin)) continue;
+     histosTH1F["EventSelection"]->Fill("SumETSelection",eventWeight);
 
+     // Mx
+     if(doMxSelection && ((eventData.MxFromPFCands_ < MxMin)||eventData.MxFromPFCands_ > MxMax)) continue;
+     histosTH1F["EventSelection"]->Fill("MxSelection",eventWeight);
+
+     // Fill Histos
+     // SumET
+     double sumET = eventData.sumET_;
      histosTH1F["sumET"]->Fill(sumET);
 
-     if(doSumETSelection && (sumET < sumETMin)) continue;
-
-     histosTH1F["EventSelection"]->Fill(8);
-
-     histosTH1F["EventSelection"]->Fill(9);
-
-     // Jets
-     double leadingJetPt = eventData.leadingJetPt_;
-     double leadingJetEta = eventData.leadingJetEta_;
-     double leadingJetPhi = eventData.leadingJetPhi_; 
-     if(leadingJetPt > 0.){     
-        histosTH1F["leadingJetPt"]->Fill(leadingJetPt);
-        histosTH1F["leadingJetEta"]->Fill(leadingJetEta);
-        histosTH1F["leadingJetPhi"]->Fill(leadingJetPhi);
-     }
- 
-     // Compute Mx
-     //double MxFromJets = eventData.
+     // Mx
      double MxFromTowers = eventData.MxFromTowers_;
      double MxFromPFCands = eventData.MxFromPFCands_;
 
@@ -285,11 +284,17 @@ void minimumBiasTTreeAnalysis(TTree* data,
         histosTH1F["ResMxFromPFCands"]->Fill(MxFromPFCands - MxGen);
      }
 
-     if(doMxSelection && ((MxFromPFCands < MxMin)||MxFromPFCands > MxMax)) continue;
+     // Jets
+     double leadingJetPt = eventData.leadingJetPt_;
+     double leadingJetEta = eventData.leadingJetEta_;
+     double leadingJetPhi = eventData.leadingJetPhi_;
+     if(leadingJetPt > 0.){
+        histosTH1F["leadingJetPt"]->Fill(leadingJetPt);
+        histosTH1F["leadingJetEta"]->Fill(leadingJetEta);
+        histosTH1F["leadingJetPhi"]->Fill(leadingJetPhi);
+     }
 
-     histosTH1F["EventSelection"]->Fill(10);
-
-     // Compute xi
+     // Xi
      /*double xiPlusFromJets =
      double xiMinusFromJets 
      histosTH1F["xiPlusFromJets"]->Fill();
@@ -367,12 +372,6 @@ void minimumBiasTTreeAnalysis(TTree* data,
      double sumE_minus = eventData.sumEnergyHFMinus_;
      histosTH1F["sumEnergyHFPlus"]->Fill(sumE_plus);
      histosTH1F["sumEnergyHFMinus"]->Fill(sumE_minus);
-
-     // Selection
-     bool energySumHFSelection = (sumE_plus < sumEnergyHFMax)||(sumE_minus < sumEnergyHFMax);
-     if(doHFSelection && !energySumHFSelection) continue;
-
-     histosTH1F["EventSelection"]->Fill(11);
 
      /*selectedEvents.push_back(std::make_pair(runNumber,eventNumber));
      if(verbose){

@@ -1,8 +1,24 @@
 #ifndef MinimumBiasAnalysis_RootTools_h
 #define MinimumBiasAnalysis_RootTools_h
 
+#include <string>
+#include <vector>
+
 enum generator_t {PYTHIA,PHOJET};
 enum process_category_t {All,SD,NonSD,Inelastic,DD,Diff};
+
+std::string getProcessCategoryName(int processCategory){
+   std::string processName;
+   switch (processCategory){
+      case All: processName = "All";break;
+      case SD: processName = "SD";break;
+      case NonSD: processName = "NonSD";break;
+      case Inelastic: processName = "Inelastic";break;
+      case DD: processName = "DD";break;
+      case Diff: processName = "Diff";break;
+   }
+   return processName;
+}
 
 void getProcessIdsPYTHIA(std::vector<int>& processIDs, std::vector<std::string>& processNames){
    processIDs.push_back(11); //f_i f_j -> f_i f_j (QCD)

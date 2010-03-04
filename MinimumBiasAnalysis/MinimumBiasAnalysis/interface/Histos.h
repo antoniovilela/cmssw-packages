@@ -75,7 +75,7 @@ namespace minimumBiasAnalysis {
      histos["HcalNoiseId"]->GetXaxis()->SetBinLabel(1,"LooseNoiseFilter");
      histos["HcalNoiseId"]->GetXaxis()->SetBinLabel(2,"TightNoiseFilter");
 
-     histos["EventSelection"] = adaptor.template make<TH1F>("EventSelection","EventSelection",12,0,12);
+     histos["EventSelection"] = adaptor.template make<TH1F>("EventSelection","EventSelection",11,0,11);
      histos["EventSelection"]->GetXaxis()->SetBinLabel(1,"All");
      histos["EventSelection"]->GetXaxis()->SetBinLabel(2,"ProcessIdOrRunSelection");
      histos["EventSelection"]->GetXaxis()->SetBinLabel(3,"TriggerSelection");
@@ -84,10 +84,9 @@ namespace minimumBiasAnalysis {
      histos["EventSelection"]->GetXaxis()->SetBinLabel(6,"GoodVertexFilter");
      histos["EventSelection"]->GetXaxis()->SetBinLabel(7,"HighQualityTracks");
      histos["EventSelection"]->GetXaxis()->SetBinLabel(8,"VertexSelection");
-     histos["EventSelection"]->GetXaxis()->SetBinLabel(9,"SumETSelection");
-     histos["EventSelection"]->GetXaxis()->SetBinLabel(10,"HcalTimingSelection");
+     histos["EventSelection"]->GetXaxis()->SetBinLabel(9,"HFSelection");
+     histos["EventSelection"]->GetXaxis()->SetBinLabel(10,"SumETSelection");
      histos["EventSelection"]->GetXaxis()->SetBinLabel(11,"MxSelection");
-     histos["EventSelection"]->GetXaxis()->SetBinLabel(12,"HFSelection");
   }
 
   template <class Adaptor>

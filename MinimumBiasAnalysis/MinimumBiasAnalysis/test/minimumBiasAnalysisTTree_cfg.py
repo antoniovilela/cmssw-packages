@@ -8,6 +8,7 @@ config.comEnergy = 900.0
 from minimumBiasAnalysis_cfg import process
 if hasattr(process,'output'): del process.output
 if hasattr(process,'out_step'): del process.out_step
+process.MessageLogger.cerr.threshold = 'WARNING'
 process.maxEvents.input = 50000
 process.xiTower.comEnergy = config.comEnergy
 process.xiFromCaloTowers.comEnergy = config.comEnergy
@@ -24,16 +25,20 @@ process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_c
 process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2
 
 attributes = [{'HFThresholdIndex':15,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.0},
-              {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.6}]
+              {'HFThresholdIndex':16,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.2},
+              {'HFThresholdIndex':17,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.4},
+              {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.6},
+              {'HFThresholdIndex':19,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.8},
+              {'HFThresholdIndex':20,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':4.0}]
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR',attributes)
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel',attributes)
-#makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoBPTX')
-#makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoBPTX')
-#makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoColl')
-#makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoColl')
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoBPTX')
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoBPTX')
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoColl')
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoColl')
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisMinBias_TTree_MinimumBias.root")
