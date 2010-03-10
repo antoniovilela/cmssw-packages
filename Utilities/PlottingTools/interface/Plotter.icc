@@ -146,6 +146,9 @@ TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var){
 
    double scaleFactor = (histo_new->GetSumOfWeights() > 0.) ? NormPolicy::GetNorm(histo_new)*normFactor/histo_new->GetSumOfWeights() : 1.;
    scaleHisto(histo_new,scaleFactor,1,1,rebin_);
+   /*double binWidth = histo_new->GetBinWidth(1);
+   char axisYTitle[50]; sprintf(axisYTitle,"/%f",binWidth);
+   histo_new->GetYaxis()->SetTitle(axisYTitle);*/
 
    return histo_new;
 }
