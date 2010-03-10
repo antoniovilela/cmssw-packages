@@ -16,7 +16,10 @@ void runMinimumBiasTTreeAnalysisMC(){
    generator_t genType = PYTHIA;
    //generator_t genType = PHOJET;
    std::string rootDir = "root/900GeV";
-   std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0";
+   //std::string outDir = "root/900GeV/NoSel";
+   //std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0";
+   //std::string outDir = "root/900GeV/SumEnergyMaxHFMinus_8_0";
+   std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0_HFMinus_8_0";
    bool verbose = false;
 
    std::string fileName,type;
@@ -49,15 +52,14 @@ void runMinimumBiasTTreeAnalysisMC(){
    }
 
    std::vector<std::string> selections;
-   selections.push_back("eventSelectionMinBiasBSCOR_HFThresholdIndex_15_EnergyThresholdHF_3_0_EnergyThresholdHBHE_1_5");
-   selections.push_back("eventSelectionMinBiasBSCOR_HFThresholdIndex_18_EnergyThresholdHF_3_6_EnergyThresholdHBHE_1_5");
-   selections.push_back("eventSelectionMinBiasPixel_HFThresholdIndex_15_EnergyThresholdHF_3_0_EnergyThresholdHBHE_1_5");
-   selections.push_back("eventSelectionMinBiasPixel_HFThresholdIndex_18_EnergyThresholdHF_3_6_EnergyThresholdHBHE_1_5");
+   selections.push_back("eventSelectionMinBiasBSCOR");
+   selections.push_back("eventSelectionMinBiasPixel");
 
    std::vector<int> processTypes;
    processTypes.push_back(All);
    processTypes.push_back(SD);
    processTypes.push_back(DD);
+   processTypes.push_back(Diff);
    processTypes.push_back(Inelastic);
 
    for(size_t isel = 0; isel < selections.size(); ++isel){

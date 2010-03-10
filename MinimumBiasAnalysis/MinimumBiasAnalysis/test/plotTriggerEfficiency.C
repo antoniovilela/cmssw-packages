@@ -52,25 +52,25 @@ void plotTriggerEfficiency(std::string const& fileName, std::string const& treeN
 
   std::vector<TH2F*> histosTH2F;
   // Track mult.
-  TH2F* hHLTBSCORVsTrackMult = new TH2F("HLTBSCORVsTrackMult","HLTBSCORVsTrackMult",30,0,30,300,0.,1.1);
+  TH2F* hHLTBSCORVsTrackMult = new TH2F("HLTBSCORVsTrackMult","HLTBSCORVsTrackMult",5,0,30,300,0.,1.1);
   data->Project("HLTBSCORVsTrackMult","HLT_MinBiasBSCOR:trackMultiplicityAssociatedToPV");
   histosTH2F.push_back(hHLTBSCORVsTrackMult);
 
   // HF mult.
-  TH2F* hHLTBSCORVsHFPlusMult = new TH2F("HLTBSCORVsHFPlusMult","HLTBSCORVsHFPlusMult",20,0,20,300,0.,1.1);
+  TH2F* hHLTBSCORVsHFPlusMult = new TH2F("HLTBSCORVsHFPlusMult","HLTBSCORVsHFPlusMult",5,0,20,300,0.,1.1);
   data->Project("HLTBSCORVsHFPlusMult","HLT_MinBiasBSCOR:multiplicityHFPlus");
   histosTH2F.push_back(hHLTBSCORVsHFPlusMult);
 
-  TH2F* hHLTBSCORVsHFMinusMult = new TH2F("HLTBSCORVsHFMinusMult","HLTBSCORVsHFMinusMult",20,0,20,300,0.,1.1);
+  TH2F* hHLTBSCORVsHFMinusMult = new TH2F("HLTBSCORVsHFMinusMult","HLTBSCORVsHFMinusMult",5,0,20,300,0.,1.1);
   data->Project("HLTBSCORVsHFMinusMult","HLT_MinBiasBSCOR:multiplicityHFMinus");
   histosTH2F.push_back(hHLTBSCORVsHFMinusMult);
 
   // HF energy sum
-  TH2F* hHLTBSCORVsSumEHFPlus = new TH2F("HLTBSCORVsSumEHFPlus","HLTBSCORVsSumEHFPlus",40,0.,100.,300,0.,1.1);
+  TH2F* hHLTBSCORVsSumEHFPlus = new TH2F("HLTBSCORVsSumEHFPlus","HLTBSCORVsSumEHFPlus",5,0.,100.,300,0.,1.1);
   data->Project("HLTBSCORVsSumEHFPlus","HLT_MinBiasBSCOR:sumEnergyHFPlus");
   histosTH2F.push_back(hHLTBSCORVsSumEHFPlus);
 
-  TH2F* hHLTBSCORVsSumEHFMinus = new TH2F("HLTBSCORVsSumEHFMinus","HLTBSCORVsSumEHFMinus",40,0.,100.,300,0.,1.1);
+  TH2F* hHLTBSCORVsSumEHFMinus = new TH2F("HLTBSCORVsSumEHFMinus","HLTBSCORVsSumEHFMinus",5,0.,100.,300,0.,1.1);
   data->Project("HLTBSCORVsSumEHFMinus","HLT_MinBiasBSCOR:sumEnergyHFMinus");
   histosTH2F.push_back(hHLTBSCORVsSumEHFMinus);
 

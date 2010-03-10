@@ -4,5 +4,5 @@ primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
     vertexCollection = cms.InputTag('offlinePrimaryVertices'),
     minimumNDOF = cms.uint32(2),
     maxAbsZ = cms.double(15),	
-    maxd0 = cms.double(-1)
+    maxd0 = cms.double(2)
 )

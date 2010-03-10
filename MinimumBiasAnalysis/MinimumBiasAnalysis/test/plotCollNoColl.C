@@ -35,8 +35,9 @@ void plot(const char* drawOption = "", int rebin = 1){
    variables.push_back("MxFromPFCands");
    variables.push_back("sumET");
  
-   TFile* fileColl = TFile::Open("root/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasPixel_histos.root");
-   TFile* fileNoColl = TFile::Open("root/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasPixelNoColl_histos.root");
+   TFile* fileColl = TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_HFThresholdIndex_18_EnergyThresholdHF_3_6_EnergyThresholdHBHE_1_5_histos.root");
+   TFile* fileNoColl = TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCORNoColl_histos.root");
+
    std::vector<std::pair<std::string,TDirectory*> > dirs;
    dirs.push_back(std::make_pair("Colliding Bx's",fileColl)); 
    dirs.push_back(std::make_pair("Non-colliding Bx's",fileNoColl));
@@ -54,5 +55,6 @@ void plot(const char* drawOption = "", int rebin = 1){
    plotter.SetLineStyles(histLineStyles);
    plotter.SetRebin(rebin);
    plotter.plot(variables,dirs,normFactors,drawOption);
+   //plotter.plot(variables,dirs,drawOption);
 }
 

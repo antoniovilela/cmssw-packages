@@ -11,17 +11,22 @@
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 #include "Utilities/PlottingTools/interface/Plotter.h"
 
+#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/RootTools.h"
+
 #include <iostream>
 #include <vector>
+
+std::string getDataFile(int runRange);
+std::string getMCFile(int genType,int runRange);
 
 void setDirsMCComponents(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors
 );
 void setDirsPYTHIAPHOJET(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
-void setDirsDataMC(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
+void setDirsDataMC(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsDataMCComponents(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsCompareData(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 
-void plot(const char* drawOption = "", int rebin = 1){
+void plot(const char* drawOption = "", std::string const& selection = "NoSel", int rebin = 1){
    std::vector<std::string> variables;
    variables.push_back("nVertex");
    variables.push_back("posXPrimVtx");
@@ -65,7 +70,7 @@ void plot(const char* drawOption = "", int rebin = 1){
 
    //setDirsPYTHIAPHOJET(dirs,normFactors);
    //setDirsMCComponents(dirs,normFactors);
-   setDirsDataMC(dirs,normFactors);
+   setDirsDataMC(selection,dirs,normFactors);
    //setDirsDataMCComponents(dirs,normFactors);
    //setDirsCompareData(dirs,normFactors);
 
@@ -141,31 +146,25 @@ void setDirsPYTHIAPHOJET(std::vector<std::pair<std::string,TDirectory*> >& dirs,
    normFactors.push_back(1./nEventsPreSelPHOJET);
 }
 
-void setDirsDataMC(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
-   //TFile* fileData = TFile::Open("root/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_histos.root");
-   //TFile* fileData = TFile::Open("root/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasPixel_histos.root");
-   //TFile* fileData = TFile::Open("root/analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_histos.root");
-   TFile* fileData = TFile::Open("root/analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasPixel_histos.root");
+void setDirsDataMC(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
+   run_range_t runRange = Data900GeV;
+   std::string dir = "root/900GeV/" + selection;
+   
+   TFile* fileData = TFile::Open((dir + "/" + getDataFile(runRange)).c_str());
    TH1F* h_EventSelectionData = static_cast<TH1F*>(fileData->Get("EventSelection"));
    double nEventsDataFullSel = h_EventSelectionData->GetBinContent(11);
 
-   //TFile* fileMC_PYTHIA = TFile::Open("root/analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_All.root");
-   //TFile* fileMC_PYTHIA = TFile::Open("root/analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasPixel_histos_All.root"); 
-   //TFile* fileMC_PYTHIA = TFile::Open("root/analysisMinBiasTTree_PYTHIA_MinBias_2360GeV_eventSelectionMinBiasBSCOR_histos_All.root");
-   TFile* fileMC_PYTHIA = TFile::Open("root/analysisMinBiasTTree_PYTHIA_MinBias_2360GeV_eventSelectionMinBiasPixel_histos_All.root");
+   TFile* fileMC_PYTHIA = TFile::Open((dir + "/" + getMCFile(PYTHIA,runRange)).c_str());
    TH1F* h_EventSelectionMC_PYTHIA = static_cast<TH1F*>(fileMC_PYTHIA->Get("EventSelection"));
    double nEventsMCFullSel_PYTHIA = h_EventSelectionMC_PYTHIA->GetBinContent(11);
 
-   //TFile* fileMC_PHOJET = TFile::Open("root/analysisMinBiasTTree_PHOJET_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_All.root");
-   //TFile* fileMC_PHOJET = TFile::Open("root/analysisMinBiasTTree_PHOJET_MinBias_900GeV_eventSelectionMinBiasPixel_histos_All.root");
-   //TFile* fileMC_PHOJET = TFile::Open("root/analysisMinBiasTTree_PHOJET_MinBias_2360GeV_eventSelectionMinBiasBSCOR_histos_All.root");
-   TFile* fileMC_PHOJET = TFile::Open("root/analysisMinBiasTTree_PHOJET_MinBias_2360GeV_eventSelectionMinBiasPixel_histos_All.root");
+   TFile* fileMC_PHOJET = TFile::Open((dir + "/" + getMCFile(PHOJET,runRange)).c_str());
    TH1F* h_EventSelectionMC_PHOJET = static_cast<TH1F*>(fileMC_PHOJET->Get("EventSelection"));
    double nEventsMCFullSel_PHOJET = h_EventSelectionMC_PHOJET->GetBinContent(11);
 
-   dirs.push_back(std::make_pair("First collisions",fileData));
-   dirs.push_back(std::make_pair("MinBias PYTHIA",fileMC_PYTHIA));
-   dirs.push_back(std::make_pair("MinBias PHOJET",fileMC_PHOJET)); 
+   dirs.push_back(std::make_pair("Data 900 GeV",fileData));
+   dirs.push_back(std::make_pair("MinBias PYTHIA 900 GeV",fileMC_PYTHIA));
+   dirs.push_back(std::make_pair("MinBias PHOJET 900 GeV",fileMC_PHOJET)); 
    normFactors.push_back(1.);
    normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PYTHIA);
    normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PHOJET);
@@ -260,4 +259,28 @@ void setDirsCompareData(std::vector<std::pair<std::string,TDirectory*> >& dirs, 
    dirs.push_back(std::make_pair("Run 124120 - 2360 GeV",file_Comp));
    normFactors.push_back(1./nEventsPreSel_Ref);
    normFactors.push_back(1./nEventsPreSel_Comp);
+}
+
+std::string getDataFile(int runRange){
+   std::string fileName;
+   if(runRange == Data900GeV) fileName = "analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_histos.root";
+   else if(runRange == Data2360GeV) fileName = "analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_histos.root";
+   else throw RootException("ERROR: Invalid option");
+
+   return fileName;
+}
+
+std::string getMCFile(int genType, int runRange){
+   std::string fileName;
+   if(genType == PYTHIA){
+      if(runRange == Data900GeV) fileName = "analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_All.root";
+      else if(runRange == Data2360GeV) fileName = "analysisMinBiasTTree_PYTHIA_MinBias_2360GeV_eventSelectionMinBiasBSCOR_histos_All.root";
+      else throw RootException("ERROR: Invalid option");
+   } else if(genType == PHOJET){
+      if(runRange == Data900GeV) fileName = "analysisMinBiasTTree_PHOJET_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_All.root";
+      else if(runRange == Data2360GeV) fileName = "analysisMinBiasTTree_PHOJET_MinBias_2360GeV_eventSelectionMinBiasBSCOR_histos_All.root";
+      else throw RootException("ERROR: Invalid option");
+   } else throw RootException("ERROR: Invalid option");      
+
+   return fileName;
 }

@@ -6,6 +6,7 @@
 
 enum generator_t {PYTHIA,PHOJET};
 enum process_category_t {All,SD,NonSD,Inelastic,DD,Diff};
+enum run_range_t {Data900GeV,Data2360GeV};
 
 std::string getProcessCategoryName(int processCategory){
    std::string processName;
