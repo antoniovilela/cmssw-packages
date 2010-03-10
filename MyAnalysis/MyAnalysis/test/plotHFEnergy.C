@@ -63,7 +63,7 @@ void plot(const std::string& fileRef, const std::string& dirNameRef, const std::
 
     //Plotter<NumberEntriesNorm> plotter;
     Plotter<DefaultNorm> plotter;
-    int colors[] = {kBlack,kBlue};
+    int colors[] = {kBlack,kRed};
     std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
     int linestyles[] = {kSolid,kSolid};
     std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
