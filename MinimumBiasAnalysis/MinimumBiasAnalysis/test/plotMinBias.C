@@ -16,14 +16,13 @@
 #include <iostream>
 #include <vector>
 
-std::string getDataFile(int runRange);
-std::string getMCFile(int genType,int runRange);
+//std::string getDataFile(int runRange);
+//std::string getMCFile(int genType,int runRange);
 
-void setDirsMCComponents(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors
-);
+void setDirsMCComponents(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsPYTHIAPHOJET(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsDataMC(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
-void setDirsDataMCComponents(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
+void setDirsDataMCComponents(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsCompareData(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 
 void plot(const char* drawOption = "", std::string const& selection = "NoSel", int rebin = 1){
@@ -32,9 +31,9 @@ void plot(const char* drawOption = "", std::string const& selection = "NoSel", i
    variables.push_back("posXPrimVtx");
    variables.push_back("posYPrimVtx");
    variables.push_back("posZPrimVtx");
-   variables.push_back("leadingJetPt");
-   variables.push_back("leadingJetEta");
-   variables.push_back("leadingJetPhi");
+   //variables.push_back("leadingJetPt");
+   //variables.push_back("leadingJetEta");
+   //variables.push_back("leadingJetPhi");
    variables.push_back("trackMultiplicity");
    variables.push_back("trackMultiplicityAssociatedToPV");
    variables.push_back("multiplicityHFPlus");
@@ -69,20 +68,20 @@ void plot(const char* drawOption = "", std::string const& selection = "NoSel", i
    std::vector<double> normFactors;
 
    //setDirsPYTHIAPHOJET(dirs,normFactors);
-   //setDirsMCComponents(dirs,normFactors);
+   //setDirsMCComponents(selection,dirs,normFactors);
    setDirsDataMC(selection,dirs,normFactors);
-   //setDirsDataMCComponents(dirs,normFactors);
+   //setDirsDataMCComponents(selection,dirs,normFactors);
    //setDirsCompareData(dirs,normFactors);
 
    //Plotter<NumberEntriesNorm> plotter;
    Plotter<DefaultNorm> plotter;
-   int colors[] = {kBlack,kRed,kBlue};
-   //int colors[] = {kBlack,kMagenta,kOrange,kBlue,kRed};
+   //int colors[] = {kBlack,kRed,kBlue};
+   int colors[] = {kBlack,kRed,kOrange,kMagenta,kYellow,kBlue};
    //int colors[] = {kRed,kBlue};
    //int colors[] = {kBlue,kOrange,kRed};
    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
-   int linestyles[] = {kSolid,kDashed,kDashDotted};
-   //int linestyles[] = {1,9,10,3,2};
+   //int linestyles[] = {kSolid,kDashed,kDashDotted,kSolid,kDashed,kDashDotted};
+   int linestyles[] = {1,2,3,9,10,2};
    //int linestyles[] = {1,9,10};
    std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
    plotter.SetColors(histColors);
@@ -94,38 +93,33 @@ void plot(const char* drawOption = "", std::string const& selection = "NoSel", i
 
 }
 
-void setDirsMCComponents(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
-   TFile* fileMC_All = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks.root");
-   //TFile* fileMC_All = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks.root");
+void setDirsMCComponents(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
+   run_range_t runRange = Data900GeV;
+   generator_t genType = PYTHIA;
+   std::string eventSelection = "eventSelectionMinBiasBSCOR";
+   std::string dir = "root/900GeV/" + selection;   
+
+   TFile* fileMC_All = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,All,eventSelection)).c_str());
    TH1F* h_EventSelection_All = static_cast<TH1F*>(fileMC_All->Get("EventSelection"));
    double nEvents_All = h_EventSelection_All->GetBinContent(1);
 
-   TFile* fileMC_Diff = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Diff.root");
-   TH1F* h_EventSelection_Diff = static_cast<TH1F*>(fileMC_Diff->Get("EventSelection"));
-   double nEvents_Diff = h_EventSelection_Diff->GetBinContent(1);
-
-   TFile* fileMC_SD = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_SD.root");
-   //TFile* fileMC_SD = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks_SD.root");
+   TFile* fileMC_SD = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,SD,eventSelection)).c_str());
    TH1F* h_EventSelection_SD = static_cast<TH1F*>(fileMC_SD->Get("EventSelection"));
    double nEvents_SD = h_EventSelection_SD->GetBinContent(1);
 
-   TFile* fileMC_DD = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_DD.root");
-   //TFile* fileMC_DD = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks_DD.root");
+   TFile* fileMC_DD = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,DD,eventSelection)).c_str());
    TH1F* h_EventSelection_DD = static_cast<TH1F*>(fileMC_DD->Get("EventSelection"));
    double nEvents_DD = h_EventSelection_DD->GetBinContent(1);
 
-   TFile* fileMC_QCD = TFile::Open("analysisMinBiasFWLite_histos_PYTHIA_MinBias_STARTUP3X_V8K_900GeV_new_highQualityTracks_Inelastic.root");
-   //TFile* fileMC_QCD = TFile::Open("root/analysisMinBiasFWLite_histos_MinBias_STARTUP3X_V8L_2360GeV_new_highQualityTracks_QCD.root");
+   TFile* fileMC_QCD = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,Inelastic,eventSelection)).c_str());
    TH1F* h_EventSelection_QCD = static_cast<TH1F*>(fileMC_QCD->Get("EventSelection"));
    double nEvents_QCD = h_EventSelection_QCD->GetBinContent(1);
 
-   dirs.push_back(std::make_pair("MinBias PYTHIA",fileMC_All));
-   dirs.push_back(std::make_pair("Diffractive",fileMC_Diff));
+   dirs.push_back(std::make_pair("MinBias PYTHIA 900 GeV",fileMC_All));
    dirs.push_back(std::make_pair("Single-diffractive",fileMC_SD));
    dirs.push_back(std::make_pair("Double-diffractive",fileMC_DD));
-   dirs.push_back(std::make_pair("QCD",fileMC_QCD));
+   dirs.push_back(std::make_pair("Inel. non-diffractive",fileMC_QCD));
    normFactors.push_back(1./nEvents_All);
-   normFactors.push_back(1./nEvents_Diff);
    normFactors.push_back(1./nEvents_SD);
    normFactors.push_back(1./nEvents_DD);
    normFactors.push_back(1./nEvents_QCD);
@@ -148,94 +142,82 @@ void setDirsPYTHIAPHOJET(std::vector<std::pair<std::string,TDirectory*> >& dirs,
 
 void setDirsDataMC(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
    run_range_t runRange = Data900GeV;
+   std::string eventSelection = "eventSelectionMinBiasBSCOR";
    std::string dir = "root/900GeV/" + selection;
    
-   TFile* fileData = TFile::Open((dir + "/" + getDataFile(runRange)).c_str());
+   TFile* fileData = TFile::Open((dir + "/" + getHistosFileName(runRange,eventSelection)).c_str());
    TH1F* h_EventSelectionData = static_cast<TH1F*>(fileData->Get("EventSelection"));
    double nEventsDataFullSel = h_EventSelectionData->GetBinContent(11);
 
-   TFile* fileMC_PYTHIA = TFile::Open((dir + "/" + getMCFile(PYTHIA,runRange)).c_str());
+   TFile* fileMC_PYTHIA = TFile::Open((dir + "/" + getHistosFileName(PYTHIA,runRange,All,eventSelection)).c_str());
    TH1F* h_EventSelectionMC_PYTHIA = static_cast<TH1F*>(fileMC_PYTHIA->Get("EventSelection"));
    double nEventsMCFullSel_PYTHIA = h_EventSelectionMC_PYTHIA->GetBinContent(11);
 
-   TFile* fileMC_PHOJET = TFile::Open((dir + "/" + getMCFile(PHOJET,runRange)).c_str());
+   TFile* fileMC_PHOJET = TFile::Open((dir + "/" + getHistosFileName(PHOJET,runRange,All,eventSelection)).c_str());
    TH1F* h_EventSelectionMC_PHOJET = static_cast<TH1F*>(fileMC_PHOJET->Get("EventSelection"));
    double nEventsMCFullSel_PHOJET = h_EventSelectionMC_PHOJET->GetBinContent(11);
 
+   TFile* fileMC_PYTHIADW = TFile::Open((dir + "/" + getHistosFileName(PYTHIADW,runRange,All,eventSelection)).c_str());
+   TH1F* h_EventSelectionMC_PYTHIADW = static_cast<TH1F*>(fileMC_PYTHIADW->Get("EventSelection"));
+   double nEventsMCFullSel_PYTHIADW = h_EventSelectionMC_PYTHIADW->GetBinContent(11);
+
+   TFile* fileMC_PYTHIAP0 = TFile::Open((dir + "/" + getHistosFileName(PYTHIAP0,runRange,All,eventSelection)).c_str());
+   TH1F* h_EventSelectionMC_PYTHIAP0 = static_cast<TH1F*>(fileMC_PYTHIAP0->Get("EventSelection"));
+   double nEventsMCFullSel_PYTHIAP0 = h_EventSelectionMC_PYTHIAP0->GetBinContent(11);
+
+   TFile* fileMC_PYTHIAProQ20 = TFile::Open((dir + "/" + getHistosFileName(PYTHIAProQ20,runRange,All,eventSelection)).c_str());
+   TH1F* h_EventSelectionMC_PYTHIAProQ20 = static_cast<TH1F*>(fileMC_PYTHIAProQ20->Get("EventSelection"));
+   double nEventsMCFullSel_PYTHIAProQ20 = h_EventSelectionMC_PYTHIAProQ20->GetBinContent(11);
+
    dirs.push_back(std::make_pair("Data 900 GeV",fileData));
-   dirs.push_back(std::make_pair("MinBias PYTHIA 900 GeV",fileMC_PYTHIA));
-   dirs.push_back(std::make_pair("MinBias PHOJET 900 GeV",fileMC_PHOJET)); 
+   dirs.push_back(std::make_pair("MinBias PYTHIA D6T 900 GeV",fileMC_PYTHIA));
+   dirs.push_back(std::make_pair("MinBias PYTHIA DW 900 GeV",fileMC_PYTHIADW));
+   dirs.push_back(std::make_pair("MinBias PYTHIA P0 900 GeV",fileMC_PYTHIAP0));
+   dirs.push_back(std::make_pair("MinBias PYTHIA ProQ20 900 GeV",fileMC_PYTHIAProQ20)); 
+   dirs.push_back(std::make_pair("MinBias PHOJET 900 GeV",fileMC_PHOJET));
    normFactors.push_back(1.);
    normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PYTHIA);
+   normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PYTHIADW);
+   normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PYTHIAP0);
+   normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PYTHIAProQ20);
    normFactors.push_back(nEventsDataFullSel/nEventsMCFullSel_PHOJET);
 }
 
-void setDirsDataMCComponents(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
-   //TFile* file_Data = TFile::Open("analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_histos.root"); 
-   TFile* file_Data = TFile::Open("root/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasPixel_histos.root");
+void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
+   run_range_t runRange = Data900GeV;
+   //generator_t genType = PYTHIA;
+   generator_t genType = PHOJET;
+   std::string eventSelection = "eventSelectionMinBiasBSCOR";
+   std::string dir = "root/900GeV/" + selection;
+
+   TFile* file_Data = TFile::Open((dir + "/" + getHistosFileName(runRange,eventSelection)).c_str());
    TH1F* h_EventSelection_Data = static_cast<TH1F*>(file_Data->Get("EventSelection"));
-   double nEventsRun_Data = h_EventSelection_Data->GetBinContent(2);
-   double nEventsTrig_Data = h_EventSelection_Data->GetBinContent(3);
-   double nEventsPreSel_Data = h_EventSelection_Data->GetBinContent(7);
    double nEventsFullSel_Data = h_EventSelection_Data->GetBinContent(11);
 
-   //TFile* fileMC_All = TFile::Open("analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_All.root");
-   TFile* fileMC_All = TFile::Open("root/analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasPixel_histos_All.root");
+   TFile* fileMC_All = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,All,eventSelection)).c_str());
    TH1F* h_EventSelection_All = static_cast<TH1F*>(fileMC_All->Get("EventSelection"));
-   double nEvents_All = h_EventSelection_All->GetBinContent(2);
-   double nEventsRun_All = h_EventSelection_All->GetBinContent(2);
-   double nEventsTrig_All = h_EventSelection_All->GetBinContent(3);
-   double nEventsPreSel_All = h_EventSelection_All->GetBinContent(7);
+   double nEvents_All = h_EventSelection_All->GetBinContent(1);
    double nEventsFullSel_All = h_EventSelection_All->GetBinContent(11);
 
-   /*TFile* fileMC_Diff = TFile::Open("");
-   TH1F* h_EventSelection_Diff = static_cast<TH1F*>(fileMC_Diff->Get("EventSelection"));
-   double nEvents_Diff = h_EventSelection_Diff->GetBinContent(1);
-   double nEventsRun_Diff = h_EventSelection_Diff->GetBinContent(2);
-   double nEventsPreSel_Diff = h_EventSelection_Diff->GetBinContent(7);
-   double nEventsFullSel_Diff = h_EventSelection_Diff->GetBinContent(11);
-
-   TFile* fileMC_Inel = TFile::Open("");
-   TH1F* h_EventSelection_Inel = static_cast<TH1F*>(fileMC_Inel->Get("EventSelection"));
-   double nEvents_Inel = h_EventSelection_Inel->GetBinContent(1);
-   double nEventsRun_Inel = h_EventSelection_Inel->GetBinContent(2);
-   double nEventsPreSel_Inel = h_EventSelection_Inel->GetBinContent(7);
-   double nEventsFullSel_Inel = h_EventSelection_Inel->GetBinContent(11);*/
-
-   //TFile* fileMC_SD = TFile::Open("analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_SD.root");
-   TFile* fileMC_SD = TFile::Open("root/analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasPixel_histos_SD.root");
+   TFile* fileMC_SD = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,SD,eventSelection)).c_str());
    TH1F* h_EventSelection_SD = static_cast<TH1F*>(fileMC_SD->Get("EventSelection"));
    double nEvents_SD = h_EventSelection_SD->GetBinContent(1);
-   double nEventsRun_SD = h_EventSelection_SD->GetBinContent(2);
-   double nEventsPreSel_SD = h_EventSelection_SD->GetBinContent(7);
 
-   //TFile* fileMC_DD = TFile::Open("analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_DD.root");
-   TFile* fileMC_DD = TFile::Open("root/analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasPixel_histos_DD.root");
+   TFile* fileMC_DD = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,DD,eventSelection)).c_str());
    TH1F* h_EventSelection_DD = static_cast<TH1F*>(fileMC_DD->Get("EventSelection"));
    double nEvents_DD = h_EventSelection_DD->GetBinContent(1);
-   double nEventsRun_DD = h_EventSelection_DD->GetBinContent(2);
-   double nEventsPreSel_DD = h_EventSelection_DD->GetBinContent(7);
 
-   //TFile* fileMC_QCD = TFile::Open("analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasBSCOR_histos_Inelastic.root");
-   TFile* fileMC_QCD = TFile::Open("root/analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasPixel_histos_Inelastic.root");
+   TFile* fileMC_QCD = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,Inelastic,eventSelection)).c_str());
    TH1F* h_EventSelection_QCD = static_cast<TH1F*>(fileMC_QCD->Get("EventSelection"));
    double nEvents_QCD = h_EventSelection_QCD->GetBinContent(1);
-   double nEventsRun_QCD = h_EventSelection_QCD->GetBinContent(2);
-   double nEventsPreSel_QCD = h_EventSelection_QCD->GetBinContent(7);
 
-   dirs.push_back(std::make_pair("First collisions",file_Data));
-   dirs.push_back(std::make_pair("MinBias PYTHIA - SD",fileMC_SD));
+   dirs.push_back(std::make_pair("Data 900 GeV",file_Data));
+   /*dirs.push_back(std::make_pair("MinBias PYTHIA - SD",fileMC_SD));
    dirs.push_back(std::make_pair("MinBias PYTHIA - DD",fileMC_DD)); 
-   dirs.push_back(std::make_pair("MinBias PYTHIA - QCD",fileMC_QCD));
-
-   /*double fracDiff = 0.30;
-   normFactors.push_back(1.);
-   normFactors.push_back(nEventsPreSel_Data*(nEvents_All/nEventsPreSel_All)*fracDiff/nEventsRun_Diff);
-   normFactors.push_back(nEventsPreSel_Data*(nEvents_All/nEventsPreSel_All)*(1. - fracDiff)/nEventsRun_Inel);*/
-
-   /*normFactors.push_back(1.);
-   normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_Diff));
-   normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_Inel));*/
+   dirs.push_back(std::make_pair("MinBias PYTHIA - Inel. non-diffractive",fileMC_QCD));*/
+   dirs.push_back(std::make_pair("MinBias PHOJET - SD",fileMC_SD));
+   dirs.push_back(std::make_pair("MinBias PHOJET - DD",fileMC_DD)); 
+   dirs.push_back(std::make_pair("MinBias PHOJET - Inel. non-diffractive",fileMC_QCD));
 
    normFactors.push_back(1.);
    normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_SD));
@@ -261,6 +243,7 @@ void setDirsCompareData(std::vector<std::pair<std::string,TDirectory*> >& dirs, 
    normFactors.push_back(1./nEventsPreSel_Comp);
 }
 
+/*
 std::string getDataFile(int runRange){
    std::string fileName;
    if(runRange == Data900GeV) fileName = "analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_histos.root";
@@ -284,3 +267,4 @@ std::string getMCFile(int genType, int runRange){
 
    return fileName;
 }
+*/

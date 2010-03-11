@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-enum run_range_t {Data900GeV,Data2360GeV};
+#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/RootTools.h"
 
 void runMinimumBiasTTreeAnalysis(){
    gROOT->ProcessLine(".L minimumBiasTTreeAnalysis.C+");
@@ -16,18 +16,9 @@ void runMinimumBiasTTreeAnalysis(){
    std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0_HFMinus_8_0";
    bool verbose = false;
 
-   std::string fileName,type;
-   if(runRange == Data900GeV){
-      fileName = rootDir + "/analysisMinBias_TTree_MinimumBias_Jan29ReReco_Runs124009-124030.root";
-      type = "MinimumBias_Runs124009-124030";
-   } else if(runRange == Data2360GeV){
-      fileName = rootDir + "/analysisMinBias_TTree_MinimumBias_Jan29ReReco_Run124120.root";
-      type = "MinimumBias_Run124120";
-   } else{
-      std::cout << "ERROR: Invalid option" << std::endl;
-      return;
-   }
-      
+   std::string fileName = rootDir + "/";
+   fileName += getTTreeFileName(runRange);
+
    std::vector<std::string> selections;
    selections.push_back("eventSelectionMinBiasBSCOR_HFThresholdIndex_15_EnergyThresholdHF_3_0_EnergyThresholdHBHE_1_5");
    selections.push_back("eventSelectionMinBiasBSCOR_HFThresholdIndex_16_EnergyThresholdHF_3_2_EnergyThresholdHBHE_1_5");
@@ -52,8 +43,8 @@ void runMinimumBiasTTreeAnalysis(){
 
    for(size_t k = 0; k < selections.size(); ++k){
       std::string treeName = "minimumBiasTTreeAnalysis_" + selections[k] + "/data";
-      std::string histosFileName = outDir + "/" + "analysisMinBiasTTree_" + type
-                                   + "_" + selections[k] + "_histos.root";
+      std::string histosFileName = outDir + "/";
+      histosFileName += getHistosFileName(runRange,selections[k]);
 
       minimumBiasTTreeAnalysis(fileName,treeName,histosFileName,false,false,-1,-1,-1,verbose);
 
