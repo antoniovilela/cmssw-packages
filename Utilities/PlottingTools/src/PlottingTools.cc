@@ -88,7 +88,7 @@ void scaleHisto(TH1F* histo, double scale, int line, int color, int rebin){
 
    //histo->GetYaxis()->SetTitle("a.u.");
    double binWidth = histo->GetBinWidth(1);
-   char axisYTitle[50]; sprintf(axisYTitle,"/%f",binWidth);
+   char axisYTitle[50]; sprintf(axisYTitle,"/ (%f)",binWidth);
    histo->GetYaxis()->SetTitle(axisYTitle);
 }
 
