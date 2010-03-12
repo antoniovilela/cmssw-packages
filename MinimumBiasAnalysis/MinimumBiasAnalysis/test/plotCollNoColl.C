@@ -35,7 +35,7 @@ void plot(const char* drawOption = "", int rebin = 1){
    variables.push_back("MxFromPFCands");
    variables.push_back("sumET");
  
-   TFile* fileColl = TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_HFThresholdIndex_18_EnergyThresholdHF_3_6_EnergyThresholdHBHE_1_5_histos.root");
+   TFile* fileColl = TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_histos.root");
    TFile* fileNoColl = TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCORNoColl_histos.root");
 
    std::vector<std::pair<std::string,TDirectory*> > dirs;

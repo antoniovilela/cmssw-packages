@@ -18,30 +18,37 @@ void setHistoStyle(TH1F* histWithError, int errorBandColor);
 void plotErrorBands(char const* drawOption = "", int rebin = 1){
 
   std::vector<std::string> variables;
-  variables.push_back("multiplicityHFPlus_errorBand");
-  variables.push_back("multiplicityHFMinus_errorBand");
-  variables.push_back("sumEnergyHFPlus_errorBand");
-  variables.push_back("sumEnergyHFMinus_errorBand");
-  variables.push_back("xiPlusFromTowers_errorBand");
-  variables.push_back("xiMinusFromTowers_errorBand");
-  variables.push_back("xiPlusFromPFCands_errorBand");
-  variables.push_back("xiMinusFromPFCands_errorBand");
-  variables.push_back("missingMassFromXiFromPFCands_errorBand");
-  variables.push_back("EPlusPzFromTowers_errorBand");
-  variables.push_back("EMinusPzFromTowers_errorBand");
-  variables.push_back("EPlusPzFromPFCands_errorBand");
-  variables.push_back("EMinusPzFromPFCands_errorBand");
-  variables.push_back("MxFromTowers_errorBand");
-  variables.push_back("MxFromPFCands_errorBand");
+  variables.push_back("nVertex");
+  variables.push_back("posXPrimVtx");
+  variables.push_back("posYPrimVtx");
+  variables.push_back("posZPrimVtx");
+  variables.push_back("trackMultiplicity");
+  variables.push_back("trackMultiplicityAssociatedToPV");
+  variables.push_back("multiplicityHFPlus");
+  variables.push_back("multiplicityHFMinus");
+  variables.push_back("sumEnergyHFPlus");
+  variables.push_back("sumEnergyHFMinus");
+  variables.push_back("xiPlusFromTowers");
+  variables.push_back("xiMinusFromTowers");
+  variables.push_back("xiPlusFromPFCands");
+  variables.push_back("xiMinusFromPFCands");
+  variables.push_back("missingMassFromXiFromPFCands");
+  variables.push_back("EPlusPzFromTowers");
+  variables.push_back("EMinusPzFromTowers");
+  variables.push_back("EPlusPzFromPFCands");
+  variables.push_back("EMinusPzFromPFCands");
+  variables.push_back("MxFromTowers");
+  variables.push_back("MxFromPFCands");
 
   std::vector<std::pair<std::string,TDirectory*> > dirs;
-  dirs.push_back(std::make_pair("All variations",TFile::Open("histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_All.root")));
-  dirs.push_back(std::make_pair("HF threshold",TFile::Open("histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_EnergyThresholdHFVar.root")));
+  dirs.push_back(std::make_pair("HF + HB/HE threshold",TFile::Open("root/900GeV/NoSel/histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_All.root")));
+  dirs.push_back(std::make_pair("HF threshold",TFile::Open("root/900GeV/NoSel/histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_EnergyThresholdHFVar.root")));
+  dirs.push_back(std::make_pair("Stat.",TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_histos.root")));
 
   Plotter<DefaultNorm> plotter;
-  int colors[] = {kOrange,kYellow};
+  int colors[] = {kOrange,kYellow,kRed};
   std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
-  int linestyles[] = {kSolid,kSolid};
+  int linestyles[] = {kSolid,kSolid,kSolid};
   std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
   plotter.SetColors(histColors);
   plotter.SetLineStyles(histLineStyles);
@@ -79,6 +86,12 @@ void plotVarError(std::vector<std::string> const& variables, int rebin = 1, int 
 
 void plotVarError(int rebin = 1, int errorBandColor = kYellow, bool saveHistos = false, std::string const& outFileName = ""){
   std::vector<std::string> variables;
+  variables.push_back("nVertex");
+  variables.push_back("posXPrimVtx");
+  variables.push_back("posYPrimVtx");
+  variables.push_back("posZPrimVtx");
+  variables.push_back("trackMultiplicity");
+  variables.push_back("trackMultiplicityAssociatedToPV");
   variables.push_back("multiplicityHFPlus");
   variables.push_back("multiplicityHFMinus");
   variables.push_back("sumEnergyHFPlus");
@@ -164,9 +177,14 @@ TH1F* histoWithVarError(std::string const& variable, std::string const& fileName
      std::vector<TH1F*>::const_iterator it_histos_end = histosVarError.end();
      std::vector<double> binVars;
      for(; it_histo != it_histos_end; ++it_histo){
-        binVars.push_back(fabs(histRef->GetBinContent(binNumber) - (*it_histo)->GetBinContent(binNumber)));
+        double diffBin = fabs(histRef->GetBinContent(binNumber) - (*it_histo)->GetBinContent(binNumber)); 
+        //std::cout << histRef->GetBinContent(binNumber) << ", " << (*it_histo)->GetBinContent(binNumber) << ", " << diffBin << std::endl;
+        binVars.push_back(diffBin);
      }
-     double binError = *std::max_element(binVars.begin(),binVars.end());
+     double binErrorVar = *std::max_element(binVars.begin(),binVars.end());
+     double originalBinError = histWithError->GetBinError(binNumber);
+     double binError = sqrt(originalBinError*originalBinError + binErrorVar*binErrorVar);
+     //std::cout << "Bin " << binNumber << " " << originalBinError << ", " << binErrorVar << ", " << binError << std::endl;
      histWithError->SetBinError(binNumber,binError);
   }
 

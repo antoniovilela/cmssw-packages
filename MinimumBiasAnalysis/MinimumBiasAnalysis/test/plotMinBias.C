@@ -145,8 +145,12 @@ void setDirsDataMC(std::string const& selection, std::vector<std::pair<std::stri
    std::string eventSelection = "eventSelectionMinBiasBSCOR";
    std::string dir = "root/900GeV/" + selection;
    
-   TFile* fileData = TFile::Open((dir + "/" + getHistosFileName(runRange,eventSelection)).c_str());
-   TH1F* h_EventSelectionData = static_cast<TH1F*>(fileData->Get("EventSelection"));
+   //TFile* fileData = TFile::Open((dir + "/" + getHistosFileName(runRange,eventSelection)).c_str());
+   TFile* fileDataRef = TFile::Open((dir + "/" + getHistosFileName(runRange,eventSelection)).c_str());
+   //TFile* fileData = TFile::Open("histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_EnergyThresholdHFVar.root");
+   TFile* fileData = fileDataRef; 
+   //TH1F* h_EventSelectionData = static_cast<TH1F*>(fileData->Get("EventSelection"));
+   TH1F* h_EventSelectionData = static_cast<TH1F*>(fileDataRef->Get("EventSelection"));
    double nEventsDataFullSel = h_EventSelectionData->GetBinContent(11);
 
    TFile* fileMC_PYTHIA = TFile::Open((dir + "/" + getHistosFileName(PYTHIA,runRange,All,eventSelection)).c_str());

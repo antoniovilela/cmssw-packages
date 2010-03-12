@@ -2,10 +2,11 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
-config.comEnergy = 900.0
+#config.comEnergy = 900.0
+config.comEnergy = 2360.0
 config.varyAttributes = False
-config.runNoBPTX = False
-config.runNoColl = False
+config.runNoBPTX = True
+config.runNoColl = True
 
 # Skim sequences
 from minimumBiasAnalysis_cfg import process
@@ -34,6 +35,8 @@ attributes = [{'HFThresholdIndex':15,'EnergyThresholdHBHE':1.5,'EnergyThresholdH
               {'HFThresholdIndex':19,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.8},
               {'HFThresholdIndex':20,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':4.0},
               {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.0,'EnergyThresholdHF':3.6},
+              {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.2,'EnergyThresholdHF':3.6},
+              {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.8,'EnergyThresholdHF':3.6},
               {'HFThresholdIndex':18,'EnergyThresholdHBHE':2.0,'EnergyThresholdHF':3.6}]
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
