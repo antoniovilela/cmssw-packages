@@ -5,8 +5,8 @@ class config: pass
 #config.comEnergy = 900.0
 config.comEnergy = 2360.0
 config.varyAttributes = False
-config.runNoBPTX = True
-config.runNoColl = True
+config.runNoBPTX = False
+config.runNoColl = False
 
 # Skim sequences
 from minimumBiasAnalysis_cfg import process
