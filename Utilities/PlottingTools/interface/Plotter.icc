@@ -234,7 +234,7 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
          //scaleHisto(histo,1,1,histColors_[index % histColors_.size()],rebin_);
          scaleHisto(histo,1.,histLineStyles_[index % histLineStyles_.size()],histColors_[index % histColors_.size()],rebin_);
 
-         legendsVar[catName]->AddEntry(histo,desc.c_str(),"L"); 
+         legendsVar[catName]->AddEntry(histo,desc.c_str(),"LPF"); 
          if(var == vars.begin()) histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor);
          else histo->DrawNormalized((option + "SAME").c_str(),NormPolicy::GetNorm(histo)*normFactor);
          //histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo));
