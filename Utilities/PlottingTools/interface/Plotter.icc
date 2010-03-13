@@ -246,7 +246,8 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
          histosVar[catName].push_back(histo);
       }
       legendsVar[catName]->SetFillColor(0);
-      legendsVar[catName]->Draw(option.c_str());
+      //legendsVar[catName]->Draw(option.c_str());
+      legendsVar[catName]->Draw("SAME");
       //histosVar[catName].back()->GetYaxis()->SetRangeUser(0.00000001,1.5*maxVal);
    }
 }
