@@ -8,11 +8,13 @@
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 #include "Utilities/PlottingTools/interface/Plotter.h"
 
+#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
 
-TH1F* createTH1F(TH1D const& hist, std::string const& name);
+using namespace minimumBiasAnalysis;
 
 void plotDataVsMC(std::string const& fileNameData,
                   std::string const& fileNameMC,
@@ -50,64 +52,89 @@ void plotTriggerEfficiency(std::string const& fileName, std::string const& treeN
 
   TTree* data = static_cast<TTree*>(file->Get(treeName.c_str()));
 
-  std::vector<TH2F*> histosTH2F;
-  // Track mult.
-  TH2F* hHLTBSCORVsTrackMult = new TH2F("HLTBSCORVsTrackMult","HLTBSCORVsTrackMult",5,0,30,300,0.,1.1);
-  data->Project("HLTBSCORVsTrackMult","HLT_MinBiasBSCOR:trackMultiplicityAssociatedToPV");
-  histosTH2F.push_back(hHLTBSCORVsTrackMult);
+  EventData eventData;
+  setTTreeBranches(*data,eventData);
+  int nEntries = data->GetEntries();
+ 
+  std::vector<TH1F*> histosAll;
+  TH1F* hTrackMult = new TH1F("HLTBSCORVsTrackMult","HLTBSCORVsTrackMult",5,0,30);
+  TH1F* hHFPlusMult = new TH1F("HLTBSCORVsHFPlusMult","HLTBSCORVsHFPlusMult",5,0,20);
+  TH1F* hHFMinusMult = new TH1F("HLTBSCORVsHFMinusMult","HLTBSCORVsHFMinusMult",5,0,20);
+  TH1F* hSumEHFPlus = new TH1F("HLTBSCORVsSumEHFPlus","HLTBSCORVsSumEHFPlus",5,0.,100.);
+  TH1F* hSumEHFMinus = new TH1F("HLTBSCORVsSumEHFMinus","HLTBSCORVsSumEHFMinus",5,0.,100.);
+  histosAll.push_back(hTrackMult);
+  histosAll.push_back(hHFPlusMult);
+  histosAll.push_back(hHFMinusMult);
+  histosAll.push_back(hSumEHFPlus);
+  histosAll.push_back(hSumEHFMinus); 
 
-  // HF mult.
-  TH2F* hHLTBSCORVsHFPlusMult = new TH2F("HLTBSCORVsHFPlusMult","HLTBSCORVsHFPlusMult",5,0,20,300,0.,1.1);
-  data->Project("HLTBSCORVsHFPlusMult","HLT_MinBiasBSCOR:multiplicityHFPlus");
-  histosTH2F.push_back(hHLTBSCORVsHFPlusMult);
-
-  TH2F* hHLTBSCORVsHFMinusMult = new TH2F("HLTBSCORVsHFMinusMult","HLTBSCORVsHFMinusMult",5,0,20,300,0.,1.1);
-  data->Project("HLTBSCORVsHFMinusMult","HLT_MinBiasBSCOR:multiplicityHFMinus");
-  histosTH2F.push_back(hHLTBSCORVsHFMinusMult);
-
-  // HF energy sum
-  TH2F* hHLTBSCORVsSumEHFPlus = new TH2F("HLTBSCORVsSumEHFPlus","HLTBSCORVsSumEHFPlus",5,0.,100.,300,0.,1.1);
-  data->Project("HLTBSCORVsSumEHFPlus","HLT_MinBiasBSCOR:sumEnergyHFPlus");
-  histosTH2F.push_back(hHLTBSCORVsSumEHFPlus);
-
-  TH2F* hHLTBSCORVsSumEHFMinus = new TH2F("HLTBSCORVsSumEHFMinus","HLTBSCORVsSumEHFMinus",5,0.,100.,300,0.,1.1);
-  data->Project("HLTBSCORVsSumEHFMinus","HLT_MinBiasBSCOR:sumEnergyHFMinus");
-  histosTH2F.push_back(hHLTBSCORVsSumEHFMinus);
-
-  std::vector<TH1F*> histosTH1F;
-  std::vector<TH2F*>::const_iterator it_histoTH2F = histosTH2F.begin();
-  std::vector<TH2F*>::const_iterator it_histosTH2F_end = histosTH2F.end();
-  for(; it_histoTH2F != it_histosTH2F_end; ++it_histoTH2F){
-     TH2F* histHLTBSCORVsVar = *it_histoTH2F;
-     TProfile* profileHLTBSCORVsVar = histHLTBSCORVsVar->ProfileX();
-     TH1F* hHLTBSCOREffVsVar = createTH1F(*profileHLTBSCORVsVar
-                                          ,(std::string(histHLTBSCORVsVar->GetName()) + "_eff"));
-     histosTH1F.push_back(hHLTBSCOREffVsVar);
-     TCanvas* canvas = new TCanvas(("canvas_" + std::string(histHLTBSCORVsVar->GetName())).c_str(),histHLTBSCORVsVar->GetName()); 
-     canvas->cd();
-     histosTH1F.back()->Draw(); 
+  std::vector<TH1F*> histosEff;
+  std::vector<TH1F*>::const_iterator it_histoAll = histosAll.begin();
+  std::vector<TH1F*>::const_iterator it_histosAll_end = histosAll.end();
+  for(; it_histoAll != it_histosAll_end; ++it_histoAll){
+     std::string hname = (*it_histoAll)->GetName();
+     hname += "_eff";
+     histosEff.push_back(static_cast<TH1F*>((*it_histoAll)->Clone(hname.c_str())));
   }
+
+  double nAcc = 0.;
+  double nAll = 0.;
+  // Loop over the events
+  for(int ientry = 0; ientry < nEntries; ++ientry){
+
+     data->GetEntry(ientry);
+     int trigBSCOR = eventData.HLT_MinBiasBSCOR_;
+     int trackMultiplicity = eventData.trackMultiplicityAssociatedToPV_;
+     int multiplicityHFPlus = eventData.multiplicityHFPlus_;
+     int multiplicityHFMinus = eventData.multiplicityHFMinus_;
+     double sumEnergyHFPlus = eventData.sumEnergyHFPlus_;
+     double sumEnergyHFMinus = eventData.sumEnergyHFMinus_;
+
+     ++nAll;
+     histosAll[0]->Fill(trackMultiplicity);
+     histosAll[1]->Fill(multiplicityHFPlus);
+     histosAll[2]->Fill(multiplicityHFMinus);
+     histosAll[3]->Fill(sumEnergyHFPlus);
+     histosAll[4]->Fill(sumEnergyHFMinus);
+     if(trigBSCOR == 1){
+        ++nAcc;
+        histosEff[0]->Fill(trackMultiplicity);
+        histosEff[1]->Fill(multiplicityHFPlus);
+        histosEff[2]->Fill(multiplicityHFMinus);
+        histosEff[3]->Fill(sumEnergyHFPlus);
+        histosEff[4]->Fill(sumEnergyHFMinus); 
+     }
+  }
+  double effAve = nAcc/nAll;
+  double effError = sqrt(nAll*effAve*(1. - effAve))/nAll;
+  std::cout << "Efficiency = " << effAve << " +/- " << effError << std::endl;
+   
+  for(size_t k = 0; k < histosAll.size(); ++k){
+     TH1F* hAll = histosAll[k];
+     TH1F* hEff = histosEff[k];
+     std::cout << "================================" << std::endl;
+     std::cout << " Histogram " << hAll->GetName() << std::endl;
+     for(int ibin = 0; ibin < hAll->GetNbinsX(); ++ibin){
+        int binNumber = ibin + 1;
+        double nAllBin = hAll->GetBinContent(binNumber);
+        double effBin = hEff->GetBinContent(binNumber)/nAllBin;
+        double errBin = sqrt(nAllBin*effBin*(1. - effBin))/nAllBin;
+
+        hEff->SetBinContent(binNumber,effBin);
+        hEff->SetBinError(binNumber,errBin);
+
+        std::cout << " Bin " << binNumber << ": " << effBin << " +/- " << errBin << std::endl;
+     }
+
+     TCanvas* canvas = new TCanvas(("canvas_" + std::string(hAll->GetName())).c_str(),hAll->GetName());
+     canvas->cd();
+     hEff->Draw();
+  }
+
   if(saveHistos){
      TFile* outFile = new TFile(outFileName.c_str(),"recreate");
      outFile->cd();
-     for(size_t k = 0; k < histosTH2F.size(); ++k) histosTH2F[k]->Write();
-     for(size_t k = 0; k < histosTH1F.size(); ++k) histosTH1F[k]->Write();
+     for(size_t k = 0; k < histosEff.size(); ++k) histosEff[k]->Write();
   }
 
-}
-
-TH1F* createTH1F(TH1D const& hist, std::string const& name){
-   int nBins = hist.GetNbinsX();
-   TH1F hist_tmp(name.c_str(),name.c_str(),nBins
-                                          ,hist.GetXaxis()->GetBinLowEdge(1)
-                                          ,hist.GetXaxis()->GetBinUpEdge(nBins));
-
-   for(int ibin = 0; ibin <= nBins + 1; ++ibin){
-      hist_tmp.SetBinContent(ibin,hist.GetBinContent(ibin));
-      hist_tmp.SetBinError(ibin,hist.GetBinError(ibin));
-   }
-
-   TH1F* hist_new = new TH1F(hist_tmp);
-
-   return hist_new; 
 }

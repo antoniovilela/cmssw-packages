@@ -69,27 +69,27 @@ void plot(const char* drawOption = "", std::string const& selection = "NoSel", i
 
    //setDirsPYTHIAPHOJET(dirs,normFactors);
    //setDirsMCComponents(selection,dirs,normFactors);
-   setDirsDataMC(selection,dirs,normFactors);
-   //setDirsDataMCComponents(selection,dirs,normFactors);
+   //setDirsDataMC(selection,dirs,normFactors);
+   setDirsDataMCComponents(selection,dirs,normFactors);
    //setDirsCompareData(dirs,normFactors);
 
    //Plotter<NumberEntriesNorm> plotter;
    Plotter<DefaultNorm> plotter;
    //int colors[] = {kBlack,kRed,kBlue};
-   int colors[] = {kBlack,kRed,kOrange,kMagenta,kYellow,kBlue};
+   //int colors[] = {kBlack,kRed,kOrange,kMagenta,kYellow,kBlue};
    //int colors[] = {kRed,kBlue};
-   //int colors[] = {kBlue,kOrange,kRed};
+   int colors[] = {kBlue,kOrange,kRed};
    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
    //int linestyles[] = {kSolid,kDashed,kDashDotted,kSolid,kDashed,kDashDotted};
-   int linestyles[] = {1,2,3,9,10,2};
-   //int linestyles[] = {1,9,10};
+   //int linestyles[] = {1,2,3,9,10,2};
+   int linestyles[] = {1,9,10};
    std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
    plotter.SetColors(histColors);
    plotter.SetLineStyles(histLineStyles);
    plotter.SetRebin(rebin);
    //plotter.plot(variables,dirs,drawOption);
-   plotter.plot(variables,dirs,normFactors,drawOption);
-   //plotter.plotComponents(variables,dirs,normFactors,drawOption);
+   //plotter.plot(variables,dirs,normFactors,drawOption);
+   plotter.plotComponents(variables,dirs,normFactors,drawOption);
 
 }
 
@@ -189,12 +189,13 @@ void setDirsDataMC(std::string const& selection, std::vector<std::pair<std::stri
 
 void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
    run_range_t runRange = Data900GeV;
-   //generator_t genType = PYTHIA;
-   generator_t genType = PHOJET;
+   generator_t genType = PYTHIA;
+   //generator_t genType = PHOJET;
    std::string eventSelection = "eventSelectionMinBiasBSCOR";
    std::string dir = "root/900GeV/" + selection;
 
    TFile* file_Data = TFile::Open((dir + "/" + getHistosFileName(runRange,eventSelection)).c_str());
+   //TFile* file_Data = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,All,eventSelection)).c_str());
    TH1F* h_EventSelection_Data = static_cast<TH1F*>(file_Data->Get("EventSelection"));
    double nEventsFullSel_Data = h_EventSelection_Data->GetBinContent(11);
 
@@ -215,13 +216,13 @@ void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair
    TH1F* h_EventSelection_QCD = static_cast<TH1F*>(fileMC_QCD->Get("EventSelection"));
    double nEvents_QCD = h_EventSelection_QCD->GetBinContent(1);
 
-   dirs.push_back(std::make_pair("Data 900 GeV",file_Data));
-   /*dirs.push_back(std::make_pair("MinBias PYTHIA - SD",fileMC_SD));
+   dirs.push_back(std::make_pair("Data",file_Data));
+   dirs.push_back(std::make_pair("MinBias PYTHIA - SD",fileMC_SD));
    dirs.push_back(std::make_pair("MinBias PYTHIA - DD",fileMC_DD)); 
-   dirs.push_back(std::make_pair("MinBias PYTHIA - Inel. non-diffractive",fileMC_QCD));*/
-   dirs.push_back(std::make_pair("MinBias PHOJET - SD",fileMC_SD));
+   dirs.push_back(std::make_pair("MinBias PYTHIA - Inel. non-diffractive",fileMC_QCD));
+   /*dirs.push_back(std::make_pair("MinBias PHOJET - SD",fileMC_SD));
    dirs.push_back(std::make_pair("MinBias PHOJET - DD",fileMC_DD)); 
-   dirs.push_back(std::make_pair("MinBias PHOJET - Inel. non-diffractive",fileMC_QCD));
+   dirs.push_back(std::make_pair("MinBias PHOJET - Inel. non-diffractive",fileMC_QCD));*/
 
    normFactors.push_back(1.);
    normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_SD));
