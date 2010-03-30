@@ -32,11 +32,14 @@ class MinimumBiasAnalysis {
      edm::InputTag caloTowerTag_;
      edm::InputTag particleFlowTag_;
      edm::InputTag triggerResultsTag_;
+     edm::InputTag hfTowerSummaryTag_;
 
      unsigned int thresholdHF_;
      double energyThresholdHBHE_;
      double energyThresholdHF_;
      double Ebeam_;
+     bool applyEnergyScaleHCAL_;
+     double energyScaleHCAL_;
      bool accessMCInfo_;
 
      std::map<int,std::pair<double,double> > thresholdsPFlow_;

@@ -2,9 +2,9 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
-#config.comEnergy = 900.0
-config.comEnergy = 2360.0
-config.varyAttributes = False
+config.comEnergy = 900.0
+#config.comEnergy = 2360.0
+config.varyAttributes = True
 config.runNoBPTX = False
 config.runNoColl = False
 
@@ -13,7 +13,7 @@ from minimumBiasAnalysis_cfg import process
 if hasattr(process,'output'): del process.output
 if hasattr(process,'out_step'): del process.out_step
 process.MessageLogger.cerr.threshold = 'WARNING'
-process.maxEvents.input = 50000
+process.maxEvents.input = 20000
 process.xiTower.comEnergy = config.comEnergy
 process.xiFromCaloTowers.comEnergy = config.comEnergy
 process.xiFromJets.comEnergy = config.comEnergy
@@ -39,13 +39,20 @@ attributes = [{'HFThresholdIndex':15,'EnergyThresholdHBHE':1.5,'EnergyThresholdH
               {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.8,'EnergyThresholdHF':3.6},
               {'HFThresholdIndex':18,'EnergyThresholdHBHE':2.0,'EnergyThresholdHF':3.6}]
 
+attributesEnergyScale = [{'ApplyEnergyScaleHCAL':False},
+                         {'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.9,'HFTowerSummaryTag':'hfTowerScale09'},
+                         {'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':1.1,'HFTowerSummaryTag':'hfTowerScale11'}]
+attributes = attributesEnergyScale
+
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
 if config.varyAttributes:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR',attributes)
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCAND',attributes)
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel',attributes)
 else:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCAND')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel')
 if config.runNoBPTX:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoBPTX')

@@ -142,9 +142,9 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doVertexSelection = false;
    double primVtxZMax = 10.0;
    // HF
-   bool doHFSelection = true;
+   bool doHFSelection = false;
    double sumEnergyHFPlusMax = 99999.;
-   double sumEnergyHFMinusMax = 8.0;
+   double sumEnergyHFMinusMax = 99999.;
    // MET-SumET
    bool doSumETSelection = false;
    double sumETMin = 40.;
