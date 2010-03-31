@@ -4,9 +4,11 @@ import FWCore.ParameterSet.Config as cms
 class config: pass
 config.comEnergy = 900.0
 #config.comEnergy = 2360.0
-config.varyAttributes = True
+config.varyAttributes = False
+config.runOfflineOnly = True
 config.runNoBPTX = False
 config.runNoColl = False
+config.runBPTX = True
 
 # Skim sequences
 from minimumBiasAnalysis_cfg import process
@@ -45,7 +47,6 @@ attributesEnergyScale = [{'ApplyEnergyScaleHCAL':False},
 attributes = attributesEnergyScale
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
-makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
 if config.varyAttributes:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR',attributes)
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCAND',attributes)
@@ -54,6 +55,11 @@ else:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCAND')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel')
+if config.runOfflineOnly:
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
+if config.runBPTX:
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBPTX')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionL1Tech4')
 if config.runNoBPTX:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoBPTX')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoBPTX')
