@@ -1,5 +1,6 @@
 #include <iostream>
 #include "fostream.h"
+#include <cstring>
 
 extern"C" {
   void f77opn_(int&,char*,int);
