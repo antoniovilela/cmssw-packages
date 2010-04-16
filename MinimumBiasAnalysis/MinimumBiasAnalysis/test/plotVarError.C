@@ -18,7 +18,7 @@ void setHistoStyle(TH1F* histWithError, int errorBandColor);
 void plotErrorBands(char const* drawOption = "", int rebin = 1){
 
   std::vector<std::string> variables;
-  variables.push_back("nVertex");
+  /*variables.push_back("nVertex");
   variables.push_back("posXPrimVtx");
   variables.push_back("posYPrimVtx");
   variables.push_back("posZPrimVtx");
@@ -38,26 +38,119 @@ void plotErrorBands(char const* drawOption = "", int rebin = 1){
   variables.push_back("EPlusPzFromPFCands");
   variables.push_back("EMinusPzFromPFCands");
   variables.push_back("MxFromTowers");
-  variables.push_back("MxFromPFCands");
+  variables.push_back("MxFromPFCands");*/
+  variables.push_back("EPlusPzFromTowersVarBin_dist");
+  variables.push_back("EMinusPzFromTowersVarBin_dist");
+  variables.push_back("sumEnergyHFPlusVarBin_dist");
+  variables.push_back("sumEnergyHFMinusVarBin_dist");
+  variables.push_back("multiplicityHFPlusVarBin_dist");
+  variables.push_back("multiplicityHFMinusVarBin_dist");  
 
   std::vector<std::pair<std::string,TDirectory*> > dirs;
   /*dirs.push_back(std::make_pair("HF + HB/HE threshold",TFile::Open("root/900GeV/NoSel/histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_All.root")));
   dirs.push_back(std::make_pair("HF threshold",TFile::Open("root/900GeV/NoSel/histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_EnergyThresholdHFVar.root")));
   dirs.push_back(std::make_pair("Stat.",TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_histos.root")));*/
-  dirs.push_back(std::make_pair("HCAL tower energy #pm10%",TFile::Open("histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_EnergyScale.root")));
-  dirs.push_back(std::make_pair("Stat.",TFile::Open("analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos.root")));
+
+  /*dirs.push_back(std::make_pair("HCAL tower energy #pm10%",TFile::Open("histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_EnergyScale.root")));
+  dirs.push_back(std::make_pair("Stat.",TFile::Open("analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos.root")));*/
+
+  dirs.push_back(std::make_pair("Energy scale #pm10%",TFile::Open("root/2360GeV/NoSel/histosErrorBand_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_EnergyScale.root")));
+  dirs.push_back(std::make_pair("Data 2360 GeV",TFile::Open("root/2360GeV/NoSel/analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos.root")));
+  //dirs.push_back(std::make_pair("Energy scale #pm10%",TFile::Open("root/2360GeV/NoSel/histosErrorBand_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_EnergyScale.root"))); 
 
   Plotter<DefaultNorm> plotter;
   //int colors[] = {kOrange,kYellow,kRed};
-  int colors[] = {kMagenta,kRed};
+  int colors[] = {kYellow,kBlack};
   std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
   //int linestyles[] = {kSolid,kSolid,kSolid};
   int linestyles[] = {kSolid,kSolid};
   std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+  int fillstyles[] = {0,1001};
+  std::vector<int> histFillStyles(fillstyles,fillstyles + sizeof(fillstyles)/sizeof(int));
   plotter.SetColors(histColors);
   plotter.SetLineStyles(histLineStyles);
-  plotter.SetRebin(rebin);
+  plotter.SetFillStyles(histFillStyles);
+  //plotter.SetRebin(rebin);
+  std::vector<double> normFactors(2,1.); 
   plotter.plot(variables,dirs,drawOption);
+  //plotter.plotStack(variables,dirs,normFactors,"NOSTACK");
+
+}
+
+void plotErrorBandsAll(){
+
+  std::vector<std::string> variables;
+  variables.push_back("EPlusPzFromTowersVarBin_dist");
+  variables.push_back("EMinusPzFromTowersVarBin_dist");
+  variables.push_back("sumEnergyHFPlusVarBin_dist");
+  variables.push_back("sumEnergyHFMinusVarBin_dist");
+  variables.push_back("multiplicityHFPlusVarBin_dist");
+  variables.push_back("multiplicityHFMinusVarBin_dist");
+
+  TFile* fileData = TFile::Open("root/2360GeV/NoSel/analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos.root");
+  TFile* fileErrorBands = TFile::Open("root/2360GeV/NoSel/histosErrorBand_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_EnergyScale.root");
+ 
+  std::string labelData = "Data 2360 GeV";
+  std::string labelErrorBands = "Energy scale #pm10%";
+  std::vector<TCanvas*> canvasVec;
+  std::vector<TLegend*> legendVec;
+     
+  std::vector<std::string>::const_iterator var = variables.begin();
+  std::vector<std::string>::const_iterator vars_end = variables.end();
+  for(; var != vars_end; ++var){
+     TH1F* h_var_data_tmp = static_cast<TH1F*>(fileData->Get(var->c_str()));
+     TH1F* h_var_err_tmp = static_cast<TH1F*>(fileErrorBands->Get(var->c_str())); 
+     std::string hname;
+     hname = *var;hname += "_data";
+     TH1F* h_var_data = static_cast<TH1F*>(h_var_data_tmp->Clone(hname.c_str()));
+     hname = *var;hname += "_error";
+     TH1F* h_var_err = static_cast<TH1F*>(h_var_err_tmp->Clone(hname.c_str()));
+
+     h_var_data->SetLineWidth(2);
+     h_var_data->SetMarkerStyle(22);
+     h_var_data->SetMarkerSize(1.2);
+
+     h_var_err->SetFillColor(kYellow);
+     h_var_err->SetFillStyle(1001);
+     h_var_err->SetMarkerSize(0);
+
+     TLegend* leg = new TLegend(0.4,0.7,0.95,0.8);
+     leg->AddEntry(h_var_data,labelData.c_str(),"LP");
+     leg->AddEntry(h_var_err,labelErrorBands.c_str(),"F");
+     leg->SetFillColor(0);    
+     legendVec.push_back(leg);
+     
+     std::string canvasName(*var);
+     canvasName += "_canvas";
+     TCanvas* canvas = new TCanvas(canvasName.c_str(),canvasName.c_str());  
+     canvasVec.push_back(canvas);
+     canvas->cd();
+    
+     h_var_err->Draw("E2");
+     h_var_data->Draw("EPSAME");
+     leg->Draw("SAME"); 
+  }
+
+  /*TH1F* h_var1_ref = static_cast<TH1F*>(fileRef->Get("EPlusPzFromTowersVarBin_dist")); 
+  TH1F* h_var1_err = static_cast<TH1F*>(fileErrorBands->Get("EPlusPzFromTowersVarBin_dist"));
+  TLegend* leg1 = new TLegend(0.4,0.7,0.95,0.8);
+  TCanvas* canvas1 = new TCanvas("canvas1","EPlusPzFromTowers");
+  canvas1->cd();
+  h_var1_err->SetFillColor(kYellow);
+  h_var1_err->SetFillStyle(1001);
+  //h_var1_err->SetFillStyle(4090);
+  h_var1_err->SetMarkerSize(0);
+
+  h_var1_ref->SetLineWidth(2);
+  h_var1_ref->SetMarkerStyle(22);
+  h_var1_ref->SetMarkerSize(1.2);
+
+  leg1->AddEntry(h_var1_ref,"Data 2360 GeV","LP");
+  leg1->AddEntry(h_var1_err,"Energy scale #pm10%","F");
+  leg1->SetFillColor(0);
+  h_var1_err->Draw("E2");
+  h_var1_ref->Draw("EPSAME");
+  leg1->Draw("SAME");*/
 }
 
 void getFileNames(std::string& fileNameRef, std::vector<std::string>& fileNamesError){
@@ -69,9 +162,14 @@ void getFileNames(std::string& fileNameRef, std::vector<std::string>& fileNamesE
   fileNamesError.push_back("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_HFThresholdIndex_20_EnergyThresholdHF_4_0_EnergyThresholdHBHE_1_5_histos.root");
   fileNamesError.push_back("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_HFThresholdIndex_18_EnergyThresholdHF_3_6_EnergyThresholdHBHE_1_0_histos.root");
   fileNamesError.push_back("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_HFThresholdIndex_18_EnergyThresholdHF_3_6_EnergyThresholdHBHE_2_0_histos.root");*/
-  fileNameRef = "analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos.root";
+
+  /*fileNameRef = "analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos.root";
   fileNamesError.push_back("analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_True_HFTowerSummaryTag_hfTowerScale09_EnergyScaleFactorHCAL_0_9_histos.root");
-  fileNamesError.push_back("analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_True_HFTowerSummaryTag_hfTowerScale11_EnergyScaleFactorHCAL_1_1_histos.root");
+  fileNamesError.push_back("analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_True_HFTowerSummaryTag_hfTowerScale11_EnergyScaleFactorHCAL_1_1_histos.root");*/
+
+  fileNameRef = "root/2360GeV/NoSel/analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos.root";
+  fileNamesError.push_back("root/2360GeV/NoSel/analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_True_HFTowerSummaryTag_hfTowerScale09_EnergyScaleFactorHCAL_0_9_histos.root");
+  fileNamesError.push_back("root/2360GeV/NoSel/analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_True_HFTowerSummaryTag_hfTowerScale11_EnergyScaleFactorHCAL_1_1_histos.root");
 }
 
 
@@ -93,7 +191,7 @@ void plotVarError(std::vector<std::string> const& variables, int rebin = 1, int 
 
 void plotVarError(int rebin = 1, int errorBandColor = kYellow, bool saveHistos = false, std::string const& outFileName = ""){
   std::vector<std::string> variables;
-  variables.push_back("nVertex");
+  /*variables.push_back("nVertex");
   variables.push_back("posXPrimVtx");
   variables.push_back("posYPrimVtx");
   variables.push_back("posZPrimVtx");
@@ -114,7 +212,13 @@ void plotVarError(int rebin = 1, int errorBandColor = kYellow, bool saveHistos =
   variables.push_back("EMinusPzFromPFCands");
   variables.push_back("MxFromTowers");
   variables.push_back("MxFromPFCands");
-  variables.push_back("sumET");
+  variables.push_back("sumET");*/
+  variables.push_back("EPlusPzFromTowersVarBin_dist");
+  variables.push_back("EMinusPzFromTowersVarBin_dist");
+  variables.push_back("sumEnergyHFPlusVarBin_dist");
+  variables.push_back("sumEnergyHFMinusVarBin_dist");
+  variables.push_back("multiplicityHFPlusVarBin_dist");
+  variables.push_back("multiplicityHFMinusVarBin_dist");
 
   plotVarError(variables,rebin,errorBandColor,saveHistos,outFileName);
 }
@@ -190,7 +294,8 @@ TH1F* histoWithVarError(std::string const& variable, std::string const& fileName
      }
      double binErrorVar = *std::max_element(binVars.begin(),binVars.end());
      double originalBinError = histWithError->GetBinError(binNumber);
-     double binError = sqrt(originalBinError*originalBinError + binErrorVar*binErrorVar);
+     //double binError = sqrt(originalBinError*originalBinError + binErrorVar*binErrorVar);
+     double binError = binErrorVar; 
      //std::cout << "Bin " << binNumber << " " << originalBinError << ", " << binErrorVar << ", " << binError << std::endl;
      histWithError->SetBinError(binNumber,binError);
   }

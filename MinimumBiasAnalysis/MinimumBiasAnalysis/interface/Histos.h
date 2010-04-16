@@ -52,6 +52,7 @@ namespace minimumBiasAnalysis {
      histos["energySumVsEcalTime"] = adaptor.template make<TH1F>("energySumVsEcalTime","energySumVsEcalTime",200,-100.,100.);
      histos["energySumVsHcalTime"] = adaptor.template make<TH1F>("energySumVsHcalTime","energySumVsHcalTime",200,-100.,100.);
      histos["sumET"] = adaptor.template make<TH1F>("sumET","sumET",200,0.,100.);
+    
      histos["EPlusPzFromTowers"] = adaptor.template make<TH1F>("EPlusPzFromTowers","EPlusPzFromTowers",200,0.,600.);  
      histos["EMinusPzFromTowers"] = adaptor.template make<TH1F>("EMinusPzFromTowers","EMinusPzFromTowers",200,0.,600.);
      histos["EPlusPzFromPFCands"] = adaptor.template make<TH1F>("EPlusPzFromPFCands","EPlusPzFromPFCands",200,0.,600.);

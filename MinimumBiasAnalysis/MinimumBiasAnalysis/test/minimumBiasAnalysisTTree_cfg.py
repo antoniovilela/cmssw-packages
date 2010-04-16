@@ -4,11 +4,13 @@ import FWCore.ParameterSet.Config as cms
 class config: pass
 config.comEnergy = 900.0
 #config.comEnergy = 2360.0
-config.varyAttributes = False
+config.varyAttributes = True
+config.runBSCAND = False
+config.runPixel = False
 config.runOfflineOnly = True
 config.runNoBPTX = False
 config.runNoColl = False
-config.runBPTX = True
+config.runBPTX = False
 
 # Skim sequences
 from minimumBiasAnalysis_cfg import process
@@ -30,42 +32,42 @@ process.xiFromJets.comEnergy = config.comEnergy
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
 process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2
 
-attributes = [{'HFThresholdIndex':15,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.0},
-              {'HFThresholdIndex':16,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.2},
-              {'HFThresholdIndex':17,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.4},
-              {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.6},
-              {'HFThresholdIndex':19,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':3.8},
-              {'HFThresholdIndex':20,'EnergyThresholdHBHE':1.5,'EnergyThresholdHF':4.0},
-              {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.0,'EnergyThresholdHF':3.6},
-              {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.2,'EnergyThresholdHF':3.6},
-              {'HFThresholdIndex':18,'EnergyThresholdHBHE':1.8,'EnergyThresholdHF':3.6},
-              {'HFThresholdIndex':18,'EnergyThresholdHBHE':2.0,'EnergyThresholdHF':3.6}]
-
 attributesEnergyScale = [{'ApplyEnergyScaleHCAL':False},
                          {'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.9,'HFTowerSummaryTag':'hfTowerScale09'},
                          {'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':1.1,'HFTowerSummaryTag':'hfTowerScale11'}]
+
+attributesThresholds = [{'HFThresholdIndex':18,'EnergyThresholdHBHE':3.0,'EnergyThresholdHF':3.6},
+                        {'HFThresholdIndex':30,'EnergyThresholdHBHE':3.0,'EnergyThresholdHF':6.0},
+                        {'HFThresholdIndex':40,'EnergyThresholdHBHE':3.0,'EnergyThresholdHF':8.0},
+                        {'HFThresholdIndex':20,'EnergyThresholdHBHE':2.0,'EnergyThresholdHF':4.0}]
+
 attributes = attributesEnergyScale
+attributes.extend(attributesThresholds)
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.analysisTools import *
 if config.varyAttributes:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR',attributes)
-    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCAND',attributes)
-    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel',attributes)
+    if config.runBSCAND: makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCAND',attributes)
+    if config.runPixel: makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel',attributes)
 else:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCOR')
-    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCAND')
-    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel')
+    if config.runBSCAND: makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCAND')
+    if config.runPixel: makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixel')
+
 if config.runOfflineOnly:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
+
 if config.runBPTX:
-    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBPTX')
+    #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBPTX')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionL1Tech4')
+
 if config.runNoBPTX:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoBPTX')
-    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoBPTX')
+    #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoBPTX')
+
 if config.runNoColl:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasBSCORNoColl')
-    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoColl')
+    #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionMinBiasPixelNoColl')
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisMinBias_TTree_MinimumBias.root")

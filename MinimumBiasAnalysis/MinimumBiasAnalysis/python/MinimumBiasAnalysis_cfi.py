@@ -11,7 +11,7 @@ MinimumBiasAnalysis = cms.PSet(
     HFTowerSummaryTag = cms.InputTag("hfTower"),
     # Misc
     HFThresholdIndex = cms.uint32(20),
-    EnergyThresholdHBHE = cms.double(1.5),
+    EnergyThresholdHBHE = cms.double(3.0),
     EnergyThresholdHF = cms.double(4.0),
     # Options
     EBeam = cms.double(450.),

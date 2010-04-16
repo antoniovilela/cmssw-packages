@@ -117,6 +117,18 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
    HistoMapTH1F histosTH1F;
    bookHistos(histosTH1F,StdAllocatorAdaptor());
+   Float_t binningEPlusPz[]={0.,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
+                             100.,120.,140.,160.,180.,200.,225.,250.,
+                             275.,300.,350.,400.};
+   Float_t binningESumHF[]={0.,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
+                            100.,120.,140.,160.,180.,200.};
+
+   histosTH1F["EPlusPzFromTowersVarBin"] = new TH1F("EPlusPzFromTowersVarBin","EPlusPzFromTowersVarBin",24,binningEPlusPz);
+   histosTH1F["EMinusPzFromTowersVarBin"] = new TH1F("EMinusPzFromTowersVarBin","EMinusPzFromTowersVarBin",24,binningEPlusPz);
+   histosTH1F["sumEnergyHFPlusVarBin"] = new TH1F("sumEnergyHFPlusVarBin","sumEnergyHFPlusVarBin",18,binningESumHF);
+   histosTH1F["sumEnergyHFMinusVarBin"] = new TH1F("sumEnergyHFMinusVarBin","sumEnergyHFMinusVarBin",18,binningESumHF);
+   histosTH1F["multiplicityHFPlusVarBin"] = new TH1F("multiplicityHFPlusVarBin","multiplicityHFPlusVarBin",20,-0.5,19.5);
+   histosTH1F["multiplicityHFMinusVarBin"] = new TH1F("multiplicityHFMinusVarBin","multiplicityHFMinusVarBin",20,-0.5,19.5);
 
    HistoMapTH2F histosTH2F;
    bookHistos(histosTH2F,StdAllocatorAdaptor());
@@ -314,7 +326,9 @@ void minimumBiasTTreeAnalysis(TTree* data,
      double EMinusPzFromTowers = eventData.EMinusPzFromTowers_;
      histosTH1F["EPlusPzFromTowers"]->Fill(EPlusPzFromTowers);
      histosTH1F["EMinusPzFromTowers"]->Fill(EMinusPzFromTowers);
-
+     histosTH1F["EPlusPzFromTowersVarBin"]->Fill(EPlusPzFromTowers);
+     histosTH1F["EMinusPzFromTowersVarBin"]->Fill(EMinusPzFromTowers);
+ 
      double EPlusPzFromPFCands = eventData.EPlusPzFromPFCands_;
      double EMinusPzFromPFCands = eventData.EMinusPzFromPFCands_;
      histosTH1F["EPlusPzFromPFCands"]->Fill(EPlusPzFromPFCands);
@@ -352,6 +366,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
      histosTH1F["multiplicityHFPlus"]->Fill(nHF_plus);
      histosTH1F["multiplicityHFMinus"]->Fill(nHF_minus);     
+     histosTH1F["multiplicityHFPlusVarBin"]->Fill(nHF_plus);
+     histosTH1F["multiplicityHFMinusVarBin"]->Fill(nHF_minus);
 
      for(unsigned int ieta = 29, index = 0; ieta <= 41; ++ieta,++index){
         int nHFPlus_ieta = eventData.multiplicityHFPlusVsiEta_[index];
@@ -372,6 +388,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
      double sumE_minus = eventData.sumEnergyHFMinus_;
      histosTH1F["sumEnergyHFPlus"]->Fill(sumE_plus);
      histosTH1F["sumEnergyHFMinus"]->Fill(sumE_minus);
+     histosTH1F["sumEnergyHFPlusVarBin"]->Fill(sumE_plus);
+     histosTH1F["sumEnergyHFMinusVarBin"]->Fill(sumE_minus);
 
      /*selectedEvents.push_back(std::make_pair(runNumber,eventNumber));
      if(verbose){
