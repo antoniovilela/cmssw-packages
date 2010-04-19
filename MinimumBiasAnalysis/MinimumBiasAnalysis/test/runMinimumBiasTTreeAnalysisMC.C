@@ -11,21 +11,21 @@ enum run_range_t {Data900GeV,Data2360GeV};
 void runMinimumBiasTTreeAnalysisMC(){
    gROOT->ProcessLine(".L minimumBiasTTreeAnalysis.C+");
 
-   //run_range_t runRange = Data900GeV;
-   run_range_t runRange = Data2360GeV;
-   //generator_t genType = PYTHIA;
-   //generator_t genTune = PYTHIA;
-   generator_t genType = PHOJET;
-   generator_t genTune = PHOJET;
-   //std::string rootDir = "root/900GeV";
-   std::string rootDir = "root/2360GeV";
-   //std::string outDir = "root/900GeV/NoSel";
+   run_range_t runRange = Data900GeV;
+   //run_range_t runRange = Data2360GeV;
+   generator_t genType = PYTHIA;
+   generator_t genTune = PYTHIA;
+   //generator_t genType = PHOJET;
+   //generator_t genTune = PHOJET;
+   std::string rootDir = "/tmp/antoniov/root/900GeV";
+   //std::string rootDir = "root/2360GeV";
+   std::string outDir = "root/900GeV/NoSel";
    //std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/900GeV/SumEnergyMaxHFMinus_8_0";
    //std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0_HFMinus_8_0";
    //std::string outDir = "root/2360GeV/NoSel";
    //std::string outDir = "root/2360GeV/SumEnergyMaxHFPlus_8_0";
-   std::string outDir = "root/2360GeV/SumEnergyMaxHFMinus_8_0";
+   //std::string outDir = "root/2360GeV/SumEnergyMaxHFMinus_8_0";
    bool verbose = false;
 
    // CINT is having some problems with operator+
@@ -33,9 +33,15 @@ void runMinimumBiasTTreeAnalysisMC(){
    fileName += getTTreeFileName(genTune,runRange);
 
    std::vector<std::string> selections;
-   selections.push_back("eventSelectionMinBiasBSCOR");
-   selections.push_back("eventSelectionMinBiasPixel");
-
+   selections.push_back("eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False");
+   /*selections.push_back("eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_True_HFTowerSummaryTag_hfTowerScale09_EnergyScaleFactorHCAL_0_9");
+   selections.push_back("eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_True_HFTowerSummaryTag_hfTowerScale11_EnergyScaleFactorHCAL_1_1");
+   selections.push_back("eventSelectionMinBiasBSCOR_HFThresholdIndex_18_EnergyThresholdHF_3_6_EnergyThresholdHBHE_3_0");
+   selections.push_back("eventSelectionMinBiasBSCOR_HFThresholdIndex_30_EnergyThresholdHF_6_0_EnergyThresholdHBHE_3_0");
+   selections.push_back("eventSelectionMinBiasBSCOR_HFThresholdIndex_40_EnergyThresholdHF_8_0_EnergyThresholdHBHE_3_0");
+   selections.push_back("eventSelectionMinBiasBSCOR_HFThresholdIndex_20_EnergyThresholdHF_4_0_EnergyThresholdHBHE_2_0");
+   selections.push_back("eventSelection");*/ 
+   
    std::vector<int> processTypes;
    processTypes.push_back(All);
    processTypes.push_back(SD);

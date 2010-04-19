@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
-config.comEnergy = 900.0
-#config.comEnergy = 2360.0
+#config.comEnergy = 900.0
+config.comEnergy = 2360.0
 config.varyAttributes = True
 config.runBSCAND = False
 config.runPixel = False
