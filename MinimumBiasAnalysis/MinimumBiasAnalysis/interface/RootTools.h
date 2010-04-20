@@ -6,7 +6,7 @@
 
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 
-enum generator_t {PYTHIA,PHOJET,PYTHIADW,PYTHIAP0,PYTHIAProQ20};
+enum generator_t {PYTHIA,PHOJET,PYTHIADW,PYTHIAP0,PYTHIAProQ20,PYTHIACW900A};
 enum process_category_t {All,SD,NonSD,Inelastic,DD,Diff};
 enum run_range_t {Data900GeV,Data2360GeV};
 
@@ -56,6 +56,10 @@ std::string getDataLabel(int genType, int runRange){
       if(runRange == Data900GeV) label = "PYTHIAProQ20_MinBias_900GeV";
       else if(runRange == Data2360GeV) label = "PYTHIAProQ20_MinBias_2360GeV";
       else throw RootException("ERROR: Invalid option");
+   } else if(genType == PYTHIACW900A){
+      if(runRange == Data900GeV) label = "PYTHIACW900A_MinBias_900GeV";
+      else if(runRange == Data2360GeV) label = "PYTHIACW900A_MinBias_2360GeV";
+      else throw RootException("ERROR: Invalid option");
    } else throw RootException("ERROR: Invalid option");
 
    return label;
@@ -91,6 +95,10 @@ std::string getTTreeFileName(int genType, int runRange){
    } else if(genType == PYTHIAProQ20){
       if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PYTHIAProQ20_MinBias_STARTUP3X_V8P_900GeV.root";
       else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PYTHIAProQ20_MinBias_STARTUP3X_V8O_2360GeV.root";
+      else throw RootException("ERROR: Invalid option");
+   } else if(genType == PYTHIACW900A){
+      if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PYTHIACW900A_MinBias_STARTUP3X_V8P_900GeV.root";
+      else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PYTHIACW900A_MinBias_STARTUP3X_V8O_2360GeV.root";
       else throw RootException("ERROR: Invalid option");
    } else throw RootException("ERROR: Invalid option");
 

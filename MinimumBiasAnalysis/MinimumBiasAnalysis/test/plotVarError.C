@@ -1,6 +1,7 @@
 #include "TH1F.h"
 #include "TFile.h"
 #include "TCanvas.h"
+#include "TPaveLabel.h"
 
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 #include "Utilities/PlottingTools/interface/Plotter.h"
@@ -104,12 +105,18 @@ void plotErrorBandsAll(){
   titlesX[5] = "tower multiplicity HF-minus";
 
   /*TFile* fileData = TFile::Open("root/2360GeV/NoSel/analysisMinBiasTTree_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos.root");
-  TFile* fileErrorBands = TFile::Open("root/2360GeV/NoSel/histosErrorBand_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_EnergyScale.root");*/
+  TFile* fileErrorBands = TFile::Open("root/2360GeV/NoSel/histosErrorBand_MinimumBias_Run124120_eventSelectionMinBiasBSCOR_EnergyScale.root");
+  std::vector<TFile*> filesMC;
+  filesMC.push_back(TFile::Open("root/2360GeV/NoSel/analysisMinBiasTTree_PYTHIA_MinBias_2360GeV_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos_All.root"));
+  filesMC.push_back(TFile::Open("root/2360GeV/NoSel/analysisMinBiasTTree_PHOJET_MinBias_2360GeV_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos_All.root"));*/
 
   TFile* fileData = TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos.root");
   TFile* fileErrorBands = TFile::Open("root/900GeV/NoSel/histosErrorBand_MinimumBias_Runs124009-124030_eventSelectionMinBiasBSCOR_EnergyScale.root");
   std::vector<TFile*> filesMC;
   filesMC.push_back(TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_PYTHIA_MinBias_900GeV_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos_All.root"));
+  filesMC.push_back(TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_PYTHIADW_MinBias_900GeV_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos_All.root"));
+  filesMC.push_back(TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_PYTHIACW900A_MinBias_900GeV_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos_All.root"));
+  filesMC.push_back(TFile::Open("root/900GeV/NoSel/analysisMinBiasTTree_PHOJET_MinBias_900GeV_eventSelectionMinBiasBSCOR_ApplyEnergyScaleHCAL_False_histos_All.root"));
  
   TH1F* h_EventSelectionData = static_cast<TH1F*>(fileData->Get("EventSelection"));
   double nEventsDataFullSel = h_EventSelectionData->GetBinContent(11);
@@ -119,10 +126,28 @@ void plotErrorBandsAll(){
   std::string labelData = "Data 900 GeV"; 
   std::string labelErrorBands = "Energy scale #pm10%";
   std::vector<std::string> labelsMC(filesMC.size());
+  /*labelsMC[0] = "PYTHIA D6T";
+  labelsMC[1] = "PHOJET";*/
   labelsMC[0] = "PYTHIA D6T";
+  labelsMC[1] = "PYTHIA DW";
+  labelsMC[2] = "PYTHIA CW900A"; 
+  labelsMC[3] = "PHOJET";
 
   std::vector<int> histColors(filesMC.size(),1);
-  histColors[0] = kRed;
+  /*histColors[0] = 2;
+  histColors[1] = 4;*/
+  histColors[0] = 2;
+  histColors[1] = 6;
+  histColors[2] = 12;
+  histColors[3] = 4; 
+
+  std::vector<int> histLineStyles(filesMC.size(),1);
+  /*histLineStyles[0] = 1;
+  histLineStyles[1] = 2;*/
+  histLineStyles[0] = 1;
+  histLineStyles[1] = 3;
+  histLineStyles[2] = 4;
+  histLineStyles[3] = 2;
 
   std::vector<TCanvas*> canvasVec;
   std::vector<TLegend*> legendVec;
@@ -151,7 +176,7 @@ void plotErrorBandsAll(){
      h_var_data->SetMarkerSize(1.5);
      h_var_data->SetStats(0);
 
-     h_var_err->SetFillColor(kYellow);
+     h_var_err->SetFillColor(5);
      h_var_err->SetFillStyle(1001);
      h_var_err->SetMarkerSize(0);
      h_var_err->SetXTitle(titlesX[index].c_str());
@@ -162,7 +187,7 @@ void plotErrorBandsAll(){
      h_var_err->SetTitleOffset(1.35,"Y");
      h_var_err->SetStats(0);
  
-     TLegend* leg = new TLegend(0.6,0.7,0.90,0.9);
+     TLegend* leg = new TLegend(0.60,0.55,0.95,0.80);
      leg->AddEntry(h_var_data,labelData.c_str(),"LP");
      leg->AddEntry(h_var_err,labelErrorBands.c_str(),"F");
  
@@ -185,6 +210,7 @@ void plotErrorBandsAll(){
         histosMC.back()->Scale(scaleMC);
         histosMC.back()->SetLineWidth(3);
         histosMC.back()->SetLineColor(histColors[idxMC]);
+        histosMC.back()->SetLineStyle(histLineStyles[idxMC]);
         histosMC.back()->SetStats(0); 
 
         leg->AddEntry(histosMC.back(),labelsMC[idxMC].c_str(),"LF");
@@ -198,13 +224,18 @@ void plotErrorBandsAll(){
      TCanvas* canvas = new TCanvas(canvasName.c_str(),canvasName.c_str());  
      canvasVec.push_back(canvas);
      canvas->cd();
+     //canvas->SetLogx();
     
      h_var_err->Draw("E2");
      h_var_data->Draw("EPSAME");
      std::vector<TH1F*>::const_iterator histo = histosMC.begin();
      std::vector<TH1F*>::const_iterator histosMC_end = histosMC.end();
-     for(; histo != histosMC_end; ++histo) (*histo)->Draw("SAME");
+     for(; histo != histosMC_end; ++histo) (*histo)->Draw("HIST][SAME");
      leg->Draw("SAME"); 
+
+     TPaveLabel* label = new TPaveLabel(0.60,0.80,0.95,0.90,"CMS Preliminary 2009","NDC");
+     label->SetFillColor(0);
+     label->Draw("SAME");
   }
 
   /*TH1F* h_var1_ref = static_cast<TH1F*>(fileRef->Get("EPlusPzFromTowersVarBin_dist")); 

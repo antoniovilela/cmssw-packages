@@ -6,24 +6,24 @@
 #include <string>
 #include <map>
 
-enum run_range_t {Data900GeV,Data2360GeV};
+//enum run_range_t {Data900GeV,Data2360GeV};
 
 void runMinimumBiasTTreeAnalysisMC(){
    gROOT->ProcessLine(".L minimumBiasTTreeAnalysis.C+");
 
-   run_range_t runRange = Data900GeV;
-   //run_range_t runRange = Data2360GeV;
-   generator_t genType = PYTHIA;
-   generator_t genTune = PYTHIA;
-   //generator_t genType = PHOJET;
-   //generator_t genTune = PHOJET;
-   std::string rootDir = "/tmp/antoniov/root/900GeV";
-   //std::string rootDir = "root/2360GeV";
-   std::string outDir = "root/900GeV/NoSel";
+   //run_range_t runRange = Data900GeV;
+   run_range_t runRange = Data2360GeV;
+   //generator_t genType = PYTHIA;
+   //generator_t genTune = PYTHIA;
+   generator_t genType = PHOJET;
+   generator_t genTune = PHOJET;
+   //std::string rootDir = "/tmp/antoniov/root/900GeV";
+   std::string rootDir = "/tmp/antoniov/root/2360GeV";
+   //std::string outDir = "root/900GeV/NoSel";
    //std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/900GeV/SumEnergyMaxHFMinus_8_0";
    //std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0_HFMinus_8_0";
-   //std::string outDir = "root/2360GeV/NoSel";
+   std::string outDir = "root/2360GeV/NoSel";
    //std::string outDir = "root/2360GeV/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/2360GeV/SumEnergyMaxHFMinus_8_0";
    bool verbose = false;
