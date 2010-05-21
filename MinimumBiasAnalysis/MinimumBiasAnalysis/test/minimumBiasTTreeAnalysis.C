@@ -117,10 +117,11 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
    HistoMapTH1F histosTH1F;
    bookHistos(histosTH1F,StdAllocatorAdaptor());
-   Float_t binningEPlusPz[]={0.,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
+   float minEVarBin = 0.; 
+   Float_t binningEPlusPz[]={minEVarBin,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
                              100.,120.,140.,160.,180.,200.,225.,250.,
                              275.,300.,350.,400.};
-   Float_t binningESumHF[]={0.,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
+   Float_t binningESumHF[]={minEVarBin,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
                             100.,120.,140.,160.,180.,200.};
 
    histosTH1F["EPlusPzFromTowersVarBin"] = new TH1F("EPlusPzFromTowersVarBin","EPlusPzFromTowersVarBin",24,binningEPlusPz);
@@ -154,9 +155,9 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doVertexSelection = false;
    double primVtxZMax = 10.0;
    // HF
-   bool doHFSelection = false;
+   bool doHFSelection = true;
    double sumEnergyHFPlusMax = 99999.;
-   double sumEnergyHFMinusMax = 99999.;
+   double sumEnergyHFMinusMax = 8.0;
    // MET-SumET
    bool doSumETSelection = false;
    double sumETMin = 40.;
@@ -326,6 +327,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
      double EMinusPzFromTowers = eventData.EMinusPzFromTowers_;
      histosTH1F["EPlusPzFromTowers"]->Fill(EPlusPzFromTowers);
      histosTH1F["EMinusPzFromTowers"]->Fill(EMinusPzFromTowers);
+     /*histosTH1F["EPlusPzFromTowersVarBin"]->Fill((EPlusPzFromTowers < minEVarBin) ? minEVarBin : EPlusPzFromTowers);
+     histosTH1F["EMinusPzFromTowersVarBin"]->Fill((EMinusPzFromTowers < minEVarBin) ? minEVarBin : EMinusPzFromTowers);*/
      histosTH1F["EPlusPzFromTowersVarBin"]->Fill(EPlusPzFromTowers);
      histosTH1F["EMinusPzFromTowersVarBin"]->Fill(EMinusPzFromTowers);
  
@@ -388,6 +391,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
      double sumE_minus = eventData.sumEnergyHFMinus_;
      histosTH1F["sumEnergyHFPlus"]->Fill(sumE_plus);
      histosTH1F["sumEnergyHFMinus"]->Fill(sumE_minus);
+     /*histosTH1F["sumEnergyHFPlusVarBin"]->Fill((sumE_plus < minEVarBin) ? minEVarBin : sumE_plus);
+     histosTH1F["sumEnergyHFMinusVarBin"]->Fill((sumE_minus < minEVarBin) ? minEVarBin: sumE_minus);*/
      histosTH1F["sumEnergyHFPlusVarBin"]->Fill(sumE_plus);
      histosTH1F["sumEnergyHFMinusVarBin"]->Fill(sumE_minus);
 

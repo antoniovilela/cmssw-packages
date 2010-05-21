@@ -17,10 +17,13 @@ void renameHistos(std::string const& fileName, std::string const& dirName, std::
   TKey *key;
   while((key=(TKey*)next())){
      std::string name(key->GetName());
+     if(name.find(str1) == string::npos) continue;
+
      TH1F* hist = dynamic_cast<TH1F*>(gDirectory->Get(name.c_str()));
      if(hist){
+        // I have just tested if it is TH1F
         name.replace(name.find(str1),str1.size(),str2);
-        // I have just tested if it is TH1F 
+        std::cout << "Creating histogram " << name << std::endl;
         histosTH1F.push_back(static_cast<TH1F*>(hist->Clone(name.c_str())));
      }
   }
