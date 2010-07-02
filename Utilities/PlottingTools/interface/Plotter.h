@@ -47,7 +47,7 @@ class Plotter{
       void plot(std::map<std::string,std::vector<std::string> >&, TDirectory*, const char* drawOption = "");
       void plot(VarMap& variablesMap, const char* drawOption = "");
 
-      void plotStack(VarMap const& variablesMap, const char* drawOption = "", bool firstAsRefHist);
+      void plotStack(VarMap const& variablesMap, const char* drawOption = "", bool firstAsRefHist = false);
 
       void plotStack(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, const std::vector<double>& normFactors, const char* drawOption = "");
       void plotComponents(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, const std::vector<double>& normFactors, const char* drawOption = "");
