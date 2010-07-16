@@ -8,11 +8,11 @@ import FWCore.ParameterSet.Config as cms
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsHLTPaths_cfi import *
 
-from JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff import *
+#from JetMETCorrections.Configuration.L2L3Corrections_Summer08Redigi_cff import *
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.leadingJets_cfi import *
 #leadingJets.src = "L2L3CorJetSC7PF"
-leadingJets.src = "sisCone7PFJets"
+leadingJets.src = "ak7PFJets"
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectGoodTracks_cfi import *
 selectGoodTracks.cut = "pt > 0.5 & numberOfValidHits > 7 & d0 <= 3.5"
@@ -51,7 +51,7 @@ analysisBeforeSelection = cms.EDAnalyzer("SimpleDijetsAnalyzer",
 analysisAfterSelection = analysisBeforeSelection.clone()
 
 hlt = cms.Sequence(exclusiveDijetsHLTFilter)
-jets = cms.Sequence(L2L3CorJetSC5PF+L2L3CorJetSC7PF*leadingJets)
+jets = cms.Sequence(leadingJets)
 tracks = cms.Sequence(selectGoodTracks*
                       selectTracksAssociatedToPV*
                       tracksOutsideJets+

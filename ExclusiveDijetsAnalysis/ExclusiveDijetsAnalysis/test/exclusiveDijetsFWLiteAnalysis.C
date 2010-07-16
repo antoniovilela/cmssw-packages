@@ -139,8 +139,6 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 
-   bool useHFTowerWeighted = true;
-
    // Event selection
    // Prim. vertices
    bool doVertexSelection = true;
@@ -458,13 +456,6 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      fwlite::Handle<std::vector<unsigned int> > nHFMinus;
      nHFMinus.getByLabel(ev,"hfTower","nHFminus");
 
-     fwlite::Handle<std::vector<double> > sumWeightsHFplus;
-     fwlite::Handle<std::vector<double> > sumWeightsHFminus;
-     if(useHFTowerWeighted){
-        sumWeightsHFplus.getByLabel(ev,"hfTower","sumWeightsHFplus");
-        sumWeightsHFminus.getByLabel(ev,"hfTower","sumWeightsHFminus");
-     }
-
      fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaPlus;
      mapThreshToiEtaPlus.getByLabel(ev,"hfTower","mapTreshToiEtaplus");
 
@@ -482,13 +473,6 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
 
      fwlite::Handle<std::vector<double> > sumEHFminus;
      sumEHFminus.getByLabel(ev,"hfTower","sumEHFminus");
-
-     fwlite::Handle<std::vector<double> > sumEWeightedHFplus;
-     fwlite::Handle<std::vector<double> > sumEWeightedHFminus; 
-     if(useHFTowerWeighted){
-        sumEWeightedHFplus.getByLabel(ev,"hfTower","sumEWeightedHFplus");
-        sumEWeightedHFminus.getByLabel(ev,"hfTower","sumEWeightedHFminus");
-     }
 
      fwlite::Handle<double> xiTowerPlus;
      xiTowerPlus.getByLabel(ev,"xiTower","xiTowerplus");
@@ -508,15 +492,11 @@ void exclusiveDijetsFWLiteAnalysis(std::vector<std::string>& fileNames,
      unsigned int nTracksOutsideJets = *trackMultiplicityOutsideJets;
      unsigned int nTracksTransverseRegion = *trackMultiplicityTransverseRegion; 
 
-     //unsigned int nHF_plus = (*nHFPlus)[thresholdHF];
-     //unsigned int nHF_minus = (*nHFMinus)[thresholdHF];
-     double nHF_plus = useHFTowerWeighted ? (*sumWeightsHFplus)[thresholdHF] : (*nHFPlus)[thresholdHF];
-     double nHF_minus = useHFTowerWeighted ? (*sumWeightsHFminus)[thresholdHF] : (*nHFMinus)[thresholdHF];
+     unsigned int nHF_plus = (*nHFPlus)[thresholdHF];
+     unsigned int nHF_minus = (*nHFMinus)[thresholdHF];
 
-     //double sumE_plus = (*sumEHFplus)[thresholdHF];
-     //double sumE_minus = (*sumEHFminus)[thresholdHF]; 
-     double sumE_plus = useHFTowerWeighted ? (*sumEWeightedHFplus)[thresholdHF] : (*sumEHFplus)[thresholdHF];
-     double sumE_minus = useHFTowerWeighted ? (*sumEWeightedHFminus)[thresholdHF] : (*sumEHFminus)[thresholdHF];
+     double sumE_plus = (*sumEHFplus)[thresholdHF];
+     double sumE_minus = (*sumEHFminus)[thresholdHF]; 
 
      double xiTower_plus = *xiTowerPlus;
      double xiTower_minus = *xiTowerMinus;

@@ -18,6 +18,7 @@ class ExclusiveDijetsFilter: public edm::EDFilter
     virtual bool filter(edm::Event&, const edm::EventSetup&);
   private:
     edm::InputTag jetTag_;
+    edm::InputTag trackMultiplicityTag_;
 
     double ptJetMin_;
     double etaJetMax_;
@@ -74,13 +75,14 @@ class ExclusiveDijetsFilter: public edm::EDFilter
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "TH1F.h"
 #include "TH2F.h"
 
 ExclusiveDijetsFilter::ExclusiveDijetsFilter(const edm::ParameterSet& pset):
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
+  trackMultiplicityTag_(pset.getParameter<edm::InputTag>("TrackMultiplicityTag")),
   ptJetMin_(pset.getParameter<double>("PtMinJet")),
   etaJetMax_(pset.getParameter<double>("EtaMaxJet")),
   deltaEtaMax_(pset.getParameter<double>("DeltaEtaMax")),
@@ -134,6 +136,8 @@ void ExclusiveDijetsFilter::beginRun(const edm::Run& run, const edm::EventSetup&
 bool ExclusiveDijetsFilter::filter(edm::Event& event, const edm::EventSetup& setup){
   edm::Handle<edm::View<reco::Jet> > jetCollectionH;
   event.getByLabel(jetTag_,jetCollectionH);
+
+  if(jetCollectionH->size() < 2) return false;
 
   const reco::Jet& jet1 = (*jetCollectionH)[0];// they come out ordered right?
   const reco::Jet& jet2 = (*jetCollectionH)[1];
@@ -194,7 +198,8 @@ bool ExclusiveDijetsFilter::filter(edm::Event& event, const edm::EventSetup& set
 
   // Access multiplicities
   edm::Handle<unsigned int> trackMultiplicity; 
-  event.getByLabel("trackMultiplicityTransverseRegion","trackMultiplicity",trackMultiplicity);
+  //event.getByLabel("trackMultiplicityTransverseRegion","trackMultiplicity",trackMultiplicity);
+  event.getByLabel(trackMultiplicityTag_,trackMultiplicity);
 
   edm::Handle<std::vector<unsigned int> > nHFPlus;
   event.getByLabel("hfTower","nHFplus",nHFPlus);

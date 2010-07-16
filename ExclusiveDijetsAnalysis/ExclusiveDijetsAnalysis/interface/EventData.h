@@ -25,12 +25,8 @@ namespace exclusiveDijetsAnalysis {
      int trackMultiplicity_;
      int multiplicityHFPlus_;
      int multiplicityHFMinus_;
-     double sumWeightsHFPlus_;
-     double sumWeightsHFMinus_;
      double sumEnergyHFPlus_;
      double sumEnergyHFMinus_;
-     double sumEnergyWeightedHFPlus_;
-     double sumEnergyWeightedHFMinus_;
      // 1-13 HF rings, 2.866 < |eta| < 5.205
      int multiplicityHFPlusVsiEta_[13];
      int multiplicityHFMinusVsiEta_[13];

@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 exclusiveDijetsFilter = cms.EDAnalyzer("ExclusiveDijetsFilter",
     # Input tags
     JetTag = cms.InputTag("selectedLayer1JetsSC7PF"),
+    TrackMultiplicityTag = cms.InputTag("trackMultiplicityTransverseRegion","trackMultiplicity"),
     # Selection cuts
     PtMinJet = cms.double(40.0),
     EtaMaxJet = cms.double(3.0),

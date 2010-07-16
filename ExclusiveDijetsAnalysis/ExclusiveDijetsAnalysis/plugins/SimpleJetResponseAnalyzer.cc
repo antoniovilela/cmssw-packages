@@ -41,7 +41,7 @@ class SimpleJetResponseAnalyzer: public edm::EDAnalyzer
 #include "DataFormats/Candidate/interface/CandMatchMap.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "TTree.h"
 

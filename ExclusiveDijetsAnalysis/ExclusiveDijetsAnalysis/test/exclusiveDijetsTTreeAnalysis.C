@@ -173,8 +173,6 @@ void exclusiveDijetsTTreeAnalysis(TTree* data,
    bool selectPileUp = false;
    int nEventsPUBx0 = 0;
 
-   bool useHFTowerWeighted = true;
-
    // Event selection
    // Prim. vertices
    bool doVertexSelection = false;
@@ -320,13 +318,10 @@ void exclusiveDijetsTTreeAnalysis(TTree* data,
       double thirdJetPt = (eventData.thirdJetPt_ > 0.) ? eventData.thirdJetPt_ : 0.;
 
       int nTracks = eventData.trackMultiplicity_;
-      //int nHF_plus = eventData.multiplicityHFPlus_;
-      //int nHF_minus = eventData.multiplicityHFMinus_;
-      double nHF_plus = useHFTowerWeighted ? eventData.sumWeightsHFPlus_ : eventData.multiplicityHFPlus_;
-      double nHF_minus = useHFTowerWeighted ? eventData.sumWeightsHFMinus_ : eventData.multiplicityHFMinus_;
- 
-      double sumE_plus = useHFTowerWeighted ? eventData.sumEnergyWeightedHFPlus_ : eventData.sumEnergyHFPlus_;
-      double sumE_minus = useHFTowerWeighted ? eventData.sumEnergyWeightedHFMinus_ : eventData.sumEnergyHFMinus_;
+      int nHF_plus = eventData.multiplicityHFPlus_;
+      int nHF_minus = eventData.multiplicityHFMinus_;
+      double sumE_plus = eventData.sumEnergyHFPlus_;
+      double sumE_minus = eventData.sumEnergyHFMinus_;
 
       histosTH1F["thirdJetPt"]->Fill(thirdJetPt);
       if(eventData.thirdJetPt_ > 0.) histosTH1F["thirdJetEta"]->Fill(eventData.thirdJetEta_);

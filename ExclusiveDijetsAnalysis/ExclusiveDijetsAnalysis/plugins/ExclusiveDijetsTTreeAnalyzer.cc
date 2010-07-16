@@ -50,7 +50,7 @@ class ExclusiveDijetsTTreeAnalyzer: public edm::EDAnalyzer
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "TTree.h"
 #include "TH1F.h"

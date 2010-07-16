@@ -42,7 +42,7 @@ class L1TriggerTestFilter: public edm::EDFilter
 #include <DataFormats/L1GlobalCaloTrigger/interface/L1GctJetCounts.h>
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "TH1F.h"
 

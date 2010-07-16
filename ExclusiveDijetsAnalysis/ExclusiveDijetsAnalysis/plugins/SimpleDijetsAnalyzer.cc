@@ -39,7 +39,7 @@ class SimpleDijetsAnalyzer: public edm::EDAnalyzer
 #include "DataFormats/JetReco/interface/PFJet.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "TTree.h"
 

@@ -3,7 +3,7 @@ import sys
 
 print sys.argv
 
-inputFields = ('fileIn','fileOut','accessPileUpInfo','reweightHFTower','reweightFileName','reweightHistoName')
+inputFields = ('fileIn','fileOut','accessPileUpInfo')
 
 class input: pass
 for item in sys.argv:
@@ -29,9 +29,6 @@ else:
 
 if not hasattr(input,'fileOut'): input.fileOut = 'exclusiveDijets.root'
 if not hasattr(input,'accessPileUpInfo'): input.accessPileUpInfo = False
-if not hasattr(input,'reweightHFTower'): input.reweightHFTower = False
-if not hasattr(input,'reweightFileName'): input.reweightFileName = 'reweightHistos.root'
-if not hasattr(input,'reweightHistoName'): input.reweightHistoName = 'energyHFplusRatio'
 
 # Print parameters
 #for attr in input.__dict__:
@@ -50,14 +47,6 @@ jetTypes = []
 process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.MessageLogger.debugModules = cms.untracked.vstring('')
-process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append('PATSummaryTables')
-process.MessageLogger.cerr.INFO = cms.untracked.PSet(
-    default          = cms.untracked.PSet( limit = cms.untracked.int32(0)  ),
-    PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) )
-)
-
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -69,7 +58,7 @@ process.source = cms.Source("PoolSource",
 process.load('Configuration/StandardSequences/GeometryPilot2_cff')
 process.load('Configuration/StandardSequences/MagneticField_38T_cff')
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = 'IDEAL_V12::All'
+process.GlobalTag.globaltag = 'MC_31X_V3::All'
 
 # PAT
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
@@ -88,9 +77,8 @@ for algo in jetAlgos:
         jetTools.addJetCollection(process,cms.InputTag(coll),label,
                                   doJTA=True,doBTagging=True,
                                   jetCorrLabel=(algo,type),
-                                  doType1MET=False,doL1Counters=False,
-                                  genJetCollection=cms.InputTag(genColl),
-                                  doTrigMatch=False)
+                                  doType1MET=False,doL1Cleaning=False,doL1Counters=False,
+                                  genJetCollection=cms.InputTag(genColl))
 
 jetTools.switchJetCollection(process,
                              cms.InputTag("sisCone7PFJets"),
@@ -100,23 +88,25 @@ jetTools.switchJetCollection(process,
                              doType1MET=False,
                              genJetCollection=cms.InputTag("sisCone7GenJets"))
 
+from PhysicsTools.PatAlgos.patTemplate_cfg import process as processPATtemplate
+process.out = processPATtemplate.out
 objs = ['Muons','Electrons','Taus','Photons']
-for item in objs: coreTools.removeSpecificPATObject(process,item)
-
+coreTools.removeSpecificPATObjects(process,objs)
 coreTools.removeCleaning(process)
 
 # Other analysis sequences
 process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
+#process.exclusiveDijetsHLTFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT8E29")
+process.exclusiveDijetsHLTFilter.HLTPaths = ['HLT_DiJetAve15U_1E31']
+#process.exclusiveDijetsHLTFilter.HLTPaths = ['HLT_DiJetAve30U_1E31']
+#process.exclusiveDijetsHLTFilter.HLTPaths = ['HLT_DiJetAve30U_8E29']
+#process.exclusiveDijetsHLTFilter.HLTPaths = ['HLT_Jet30U']
 
 if input.accessPileUpInfo:
     process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_cfi")
     process.pileUpInfo.AccessCrossingFramePlayBack = True
     process.pileUpInfo.BunchCrossings = cms.vint32(0)
     #process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
-
-if input.reweightHFTower:
-    process.hfTower.ReweightHFTower = True
-    process.hfTower.ReweightHistoName = cms.vstring(input.reweightFileName,input.reweightHistoName)
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent
 #from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_reduced as MyEventContent

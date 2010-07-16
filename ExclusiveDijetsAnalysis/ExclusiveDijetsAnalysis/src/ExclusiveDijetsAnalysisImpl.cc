@@ -23,13 +23,14 @@ ExclusiveDijetsAnalysisImpl::ExclusiveDijetsAnalysisImpl(const edm::ParameterSet
   jetNonCorrTag_(pset.getParameter<edm::InputTag>("JetNonCorrTag")), 
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
   vertexTag_(pset.getParameter<edm::InputTag>("VertexTag")),
+  trackMultiplicityTag_(pset.getParameter<edm::InputTag>("TrackMultiplicityTag")),
   doBtag_(pset.getParameter<bool>("DoBTag")),
   thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
   useJetCorrection_(pset.getParameter<bool>("UseJetCorrection")),
   accessPileUpInfo_(pset.getParameter<bool>("AccessPileUpInfo")),
   Ebeam_(pset.getUntrackedParameter<double>("EBeam",5000.)),
   usePAT_(pset.getUntrackedParameter<bool>("UsePAT",true)),
-  useHFTowerWeighted_(pset.getUntrackedParameter<bool>("UseHFTowerWeighted",false)),
+  runOnData_(pset.getUntrackedParameter<bool>("RunOnData",false)), 
   genProtonPlus_(0.,0.,0.,0.),
   genProtonMinus_(0.,0.,0.,0.),
   genAllParticles_(0.,0.,0.,0.)  
@@ -86,10 +87,10 @@ void ExclusiveDijetsAnalysisImpl::setGenInfo(const edm::Event& event, const edm:
 void ExclusiveDijetsAnalysisImpl::fillEventData(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
 
   // Set internal info
-  setGenInfo(event,setup);
+  if(!runOnData_) setGenInfo(event,setup);
 
   // Fill event data
-  if(accessPileUpInfo_){
+  if(!runOnData_ && accessPileUpInfo_){
      fillPileUpInfo(eventData,event,setup);
   } else {
      eventData.nPileUpBx0_ = -1;
@@ -167,7 +168,8 @@ void ExclusiveDijetsAnalysisImpl::fillJetInfo(EventData& eventData, const edm::E
   dijetSystem += jet2.p4();
   eventData.massDijets_ = dijetSystem.M();
 
-  eventData.MxGen_ = genAllParticles_.M();
+  if(!runOnData_) eventData.MxGen_ = genAllParticles_.M();
+  else eventData.MxGen_ = -1.;
 
   // M_{X}
   math::XYZTLorentzVector allJets(0.,0.,0.,0.);
@@ -196,16 +198,18 @@ void ExclusiveDijetsAnalysisImpl::fillJetInfo(EventData& eventData, const edm::E
      const pat::Jet* patJet2 = dynamic_cast<const pat::Jet*>(&jet2);
      if(!patJet1 || !patJet2) throw edm::Exception(edm::errors::Configuration) << "Expecting PATJet's as input";
 
-     const reco::GenJet* genJet1 = patJet1->genJet();
-     const reco::GenJet* genJet2 = patJet2->genJet();
-     if(genJet1&&genJet2){
-        math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
-        dijetGenSystem += genJet1->p4();
-        dijetGenSystem += genJet2->p4();
-        double massGen = dijetGenSystem.M();
-        eventData.massDijetsGen_ = massGen;
-
-        eventData.RjjGen_ = massGen/genAllParticles_.M();
+     if(!runOnData_){
+        const reco::GenJet* genJet1 = patJet1->genJet();
+        const reco::GenJet* genJet2 = patJet2->genJet();
+        if(genJet1&&genJet2){
+           math::XYZTLorentzVector dijetGenSystem(0.,0.,0.,0.);
+           dijetGenSystem += genJet1->p4();
+           dijetGenSystem += genJet2->p4();
+           double massGen = dijetGenSystem.M();
+           eventData.massDijetsGen_ = massGen;
+        }
+     } else{
+        eventData.massDijetsGen_ = -999.;
      }
 
      // B-tagging
@@ -227,20 +231,14 @@ void ExclusiveDijetsAnalysisImpl::fillJetInfo(EventData& eventData, const edm::E
 void ExclusiveDijetsAnalysisImpl::fillMultiplicities(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   // Access multiplicities
   edm::Handle<unsigned int> trackMultiplicity; 
-  event.getByLabel("trackMultiplicityTransverseRegion","trackMultiplicity",trackMultiplicity);
+  //event.getByLabel("trackMultiplicityTransverseRegion","trackMultiplicity",trackMultiplicity);
+  event.getByLabel(trackMultiplicityTag_,trackMultiplicity); 
 
   edm::Handle<std::vector<unsigned int> > nHFPlus;
   event.getByLabel("hfTower","nHFplus",nHFPlus);
   
   edm::Handle<std::vector<unsigned int> > nHFMinus;
   event.getByLabel("hfTower","nHFminus",nHFMinus);
-
-  edm::Handle<std::vector<double> > sumWeightsHFplus;
-  edm::Handle<std::vector<double> > sumWeightsHFminus;
-  if(useHFTowerWeighted_){
-     event.getByLabel("hfTower","sumWeightsHFplus",sumWeightsHFplus);
-     event.getByLabel("hfTower","sumWeightsHFminus",sumWeightsHFminus);
-  }
 
   edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaPlus;
   event.getByLabel("hfTower","mapTreshToiEtaplus",mapThreshToiEtaPlus);
@@ -254,38 +252,19 @@ void ExclusiveDijetsAnalysisImpl::fillMultiplicities(EventData& eventData, const
   edm::Handle<std::vector<double> > sumEHFminus;
   event.getByLabel("hfTower","sumEHFminus",sumEHFminus);
 
-  edm::Handle<std::vector<double> > sumEWeightedHFplus;
-  edm::Handle<std::vector<double> > sumEWeightedHFminus; 
-  if(useHFTowerWeighted_){
-     event.getByLabel("hfTower","sumEWeightedHFplus",sumEWeightedHFplus);
-     event.getByLabel("hfTower","sumEWeightedHFminus",sumEWeightedHFminus);
-  }
-
   unsigned int nTracks = *trackMultiplicity;
 
   unsigned int nHF_plus = (*nHFPlus)[thresholdHF_];
   unsigned int nHF_minus = (*nHFMinus)[thresholdHF_];
-  //double nHF_plus = useHFTowerWeighted_ ? (*sumWeightsHFplus)[thresholdHF_] : (*nHFPlus)[thresholdHF_];
-  //double nHF_minus = useHFTowerWeighted_ ? (*sumWeightsHFminus)[thresholdHF_] : (*nHFMinus)[thresholdHF_];
-  double sumWeights_plus = useHFTowerWeighted_ ? (*sumWeightsHFplus)[thresholdHF_] : -1.;
-  double sumWeights_minus = useHFTowerWeighted_ ? (*sumWeightsHFminus)[thresholdHF_] : -1.;
 
   double sumE_plus = (*sumEHFplus)[thresholdHF_];
   double sumE_minus = (*sumEHFminus)[thresholdHF_];
-  //double sumE_plus = useHFTowerWeighted_ ? (*sumEWeightedHFplus)[thresholdHF_] : (*sumEHFplus)[thresholdHF_];
-  //double sumE_minus = useHFTowerWeighted_ ? (*sumEWeightedHFminus)[thresholdHF_] : (*sumEHFminus)[thresholdHF_];
-  double sumEWeighted_plus = useHFTowerWeighted_ ? (*sumEWeightedHFplus)[thresholdHF_] : -1.;
-  double sumEWeighted_minus = useHFTowerWeighted_ ? (*sumEWeightedHFminus)[thresholdHF_] : -1.;
 
   eventData.trackMultiplicity_ = nTracks;
   eventData.multiplicityHFPlus_ = nHF_plus;
   eventData.multiplicityHFMinus_ = nHF_minus;
-  eventData.sumWeightsHFPlus_ = sumWeights_plus;
-  eventData.sumWeightsHFMinus_ = sumWeights_minus;
   eventData.sumEnergyHFPlus_ = sumE_plus;
   eventData.sumEnergyHFMinus_ = sumE_minus;
-  eventData.sumEnergyWeightedHFPlus_ = sumEWeighted_plus;
-  eventData.sumEnergyWeightedHFMinus_ = sumEWeighted_minus;
   
   for(unsigned int ieta = 29, index = 0; ieta <= 41; ++ieta,++index){
      unsigned int nHFPlus_ieta = nHFSlice(*mapThreshToiEtaPlus,thresholdHF_,ieta);
@@ -297,21 +276,35 @@ void ExclusiveDijetsAnalysisImpl::fillMultiplicities(EventData& eventData, const
 }
 
 void ExclusiveDijetsAnalysisImpl::fillXiInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+  if(!runOnData_){
+     // Gen particles
+     edm::Handle<edm::View<reco::GenParticle> > genParticlesCollectionH;
+     event.getByLabel("genParticles",genParticlesCollectionH);
+   
+     edm::View<reco::GenParticle>::const_iterator proton1 = genParticlesCollectionH->end();
+     edm::View<reco::GenParticle>::const_iterator proton2 = genParticlesCollectionH->end();
+     for(edm::View<reco::GenParticle>::const_iterator genpart = genParticlesCollectionH->begin();
+                                                   genpart != genParticlesCollectionH->end(); ++genpart){
+        if(genpart->status() != 1) continue;
+        double pz = genpart->pz();
+        if((proton1 == genParticlesCollectionH->end())&&(genpart->pdgId() == 2212)&&(pz > 0.75*Ebeam_)) proton1 = genpart;
+        else if((proton2 == genParticlesCollectionH->end())&&(genpart->pdgId() == 2212)&&(pz < -0.75*Ebeam_)) proton2 = genpart;
+     }
 
-  // Gen info
-  double xigen_plus = -1;
-  double xigen_minus = -1;
-  if(genProtonPlus_.pz() > 0.75*Ebeam_){
-     LogTrace("Analysis") << "Proton (z-plus): " << genProtonPlus_.pt() << "  " << genProtonPlus_.eta() << "  " << genProtonPlus_.phi() << std::endl;
-     xigen_plus = 1 - genProtonPlus_.pz()/Ebeam_;
+     double xigen_plus = -1.;
+     double xigen_minus = -1.;
+     if((proton1 != genParticlesCollectionH->end())&&(proton2 != genParticlesCollectionH->end())){
+        LogTrace("Analysis") << "Proton (z-plus): " << proton1->pt() << "  " << proton1->eta() << "  " << proton1->phi() << std::endl;
+        LogTrace("Analysis") << "Proton (z-minus): " << proton2->pt() << "  " << proton2->eta() << "  " << proton2->phi() << std::endl;
+        xigen_plus = 1 - proton1->pz()/Ebeam_;
+        xigen_minus = 1 + proton2->pz()/Ebeam_;
+     }
+     eventData.xiGenPlus_ = xigen_plus;
+     eventData.xiGenMinus_ = xigen_minus;
+  } else{
+     eventData.xiGenPlus_ = -1.;
+     eventData.xiGenMinus_ = -1.;
   }
-  if(genProtonMinus_.pz() < -0.75*Ebeam_){
-     LogTrace("Analysis") << "Proton (z-minus): " << genProtonMinus_.pt() << "  " << genProtonMinus_.eta() << "  " << genProtonMinus_.phi() << std::endl;
-     xigen_minus = 1 + genProtonMinus_.pz()/Ebeam_;
-  }
-
-  eventData.xiGenPlus_ = xigen_plus;
-  eventData.xiGenMinus_ = xigen_minus;
 
   edm::Handle<double> xiTowerPlus;
   event.getByLabel("xiTower","xiTowerplus",xiTowerPlus);
