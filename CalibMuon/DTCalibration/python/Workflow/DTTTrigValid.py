@@ -1,4 +1,4 @@
-from tools import replaceTemplate
+from workflow import replaceTemplate
 from CrabTask import *
 import os
 

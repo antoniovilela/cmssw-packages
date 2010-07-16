@@ -1,4 +1,4 @@
-from tools import replaceTemplate
+from workflow import replaceTemplate
 import os
 
 class CmsswTask:

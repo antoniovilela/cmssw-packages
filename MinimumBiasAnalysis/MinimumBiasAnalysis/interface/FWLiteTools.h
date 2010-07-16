@@ -3,8 +3,6 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
-#include "DataFormats/CaloTowers/interface/CaloTower.h"
-#include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 
 void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                                  math::XYZTLorentzVector& genAllParticles,
@@ -58,17 +56,6 @@ bool pflowThreshold(reco::PFCandidate const& part, std::map<int,std::pair<double
 
    return accept;
 }
-
-/*bool caloTowerNoiseAccept(CaloTower const& tower, double emFracThreshold = 1.){
-   bool accept = true;
-
-   double emEnergy = tower.emEnergy();
-   double hadEnergy = tower.hadEnergy();
-   double emFrac = fabs(emEnergy/(emEnergy+hadEnergy));
-   if(emFrac > emFracThreshold) accept = false;
-
-   return accept;
-}*/
 
 // FIXME: Generalize for any collection with changeable threshold scheme
 double MassColl(reco::PFCandidateCollection const& pflowCollection, std::map<int,std::pair<double,double> > const& thresholds){

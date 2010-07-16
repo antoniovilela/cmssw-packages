@@ -14,10 +14,6 @@
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
 #include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/interface/FWLiteTools.h"
@@ -33,29 +29,21 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
   caloTowerTag_(pset.getParameter<edm::InputTag>("CaloTowerTag")),
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
-  triggerResultsTag_(pset.getParameter<edm::InputTag>("TriggerResultsTag")),
-  hfTowerSummaryTag_(pset.getParameter<edm::InputTag>("HFTowerSummaryTag")),
   thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
   energyThresholdHBHE_(pset.getParameter<double>("EnergyThresholdHBHE")),
   energyThresholdHF_(pset.getParameter<double>("EnergyThresholdHF")),
   Ebeam_(pset.getParameter<double>("EBeam")),
-  applyEnergyScaleHCAL_(pset.getParameter<bool>("ApplyEnergyScaleHCAL")),
-  //energyScaleHCAL_(pset.getParameter<bool>("EnergyScaleFactorHCAL")),
-  energyScaleHCAL_(0.),
   accessMCInfo_(pset.getUntrackedParameter<bool>("AccessMCInfo",false)),
   genAllParticles_(0.,0.,0.,0.),genProtonPlus_(0.,0.,0.,0.),genProtonMinus_(0.,0.,0.,0.)
 {
-  //FIXME
-  thresholdsPFlow_[reco::PFCandidate::X] = std::make_pair(-1.,1.0);
-  thresholdsPFlow_[reco::PFCandidate::h] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::e] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::mu] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::gamma] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,energyThresholdHBHE_);
-  thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,energyThresholdHF_);
-  thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,energyThresholdHF_);
-
-  if(applyEnergyScaleHCAL_) energyScaleHCAL_ = pset.getParameter<double>("EnergyScaleFactorHCAL");
+  thresholdsPFlow_[reco::PFCandidate::X] = std::make_pair(-1.,-1.);
+  thresholdsPFlow_[reco::PFCandidate::h] = std::make_pair(-1.,-1.);
+  thresholdsPFlow_[reco::PFCandidate::e] = std::make_pair(-1.,-1.); 
+  thresholdsPFlow_[reco::PFCandidate::mu] = std::make_pair(-1.,-1.); 
+  thresholdsPFlow_[reco::PFCandidate::gamma] = std::make_pair(-1.,-1.);
+  thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,-1.);
+  thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,-1.);
+  thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,-1.);
 }
 
 MinimumBiasAnalysis::~MinimumBiasAnalysis(){}
@@ -63,42 +51,10 @@ MinimumBiasAnalysis::~MinimumBiasAnalysis(){}
 void MinimumBiasAnalysis::servicesBeginRun(const edm::Run& run, const edm::EventSetup& setup) {}
 
 void MinimumBiasAnalysis::fillEventData(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
-  fillEventInfo(eventData,event,setup);
   fillNoiseInfo(eventData,event,setup); 
-  fillTriggerInfo(eventData,event,setup);
   fillVertexInfo(eventData,event,setup);
   fillJetInfo(eventData,event,setup);
-  fillMETInfo(eventData,event,setup);
   fillEventVariables(eventData,event,setup);
-}
-
-void MinimumBiasAnalysis::fillEventInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
-  if(accessMCInfo_){
-     edm::Handle<GenEventInfoProduct> genEventInfo;
-     event.getByLabel("generator",genEventInfo);
-
-     int processId = -1;
-     if(genEventInfo.isValid()){
-        processId = genEventInfo->signalProcessID();
-     } else {
-        edm::Handle<edm::HepMCProduct> hepMCProduct;
-        event.getByLabel("source",hepMCProduct);
-        processId = hepMCProduct->getHepMCData().signal_process_id();
-     }
-     eventData.processId_ = processId;
-  } else{
-     eventData.processId_ = -1;
-  } 
-
-  unsigned int eventNumber = event.id().event();
-  unsigned int runNumber = event.id().run();
-  unsigned int lumiSection = event.luminosityBlock();
-  int bunchCrossing = event.bunchCrossing();
-
-  eventData.eventNumber_ = eventNumber;
-  eventData.runNumber_ = runNumber;
-  eventData.lumiSection_ = lumiSection;
-  eventData.bunchCrossing_ = bunchCrossing;
 }
 
 void MinimumBiasAnalysis::fillNoiseInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
@@ -119,27 +75,6 @@ void MinimumBiasAnalysis::fillNoiseInfo(EventData& eventData, const edm::Event& 
 
   eventData.BeamHaloLooseId_ = beamHaloLooseId ? 1 : 0;
   eventData.BeamHaloTightId_ = beamHaloTightId ? 1 : 0;
-}
-
-void MinimumBiasAnalysis::fillTriggerInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
-  //FIXME
-  edm::Handle<edm::TriggerResults> triggerResults;
-  event.getByLabel(triggerResultsTag_, triggerResults);
-
-  edm::TriggerNames triggerNames;
-  triggerNames.init(*triggerResults);
-
-  /*std::vector<std::string>::const_iterator pathName = triggerResultsPaths_.begin();
-  std::vector<std::string>::const_iterator pathNames_end = triggerResultsPaths_.end();
-  for(; pathName != pathNames_end; ++pathName){
-     int trigIdx = triggerNames.triggerIndex(*pathName);
-     bool wasrun = triggerResults->wasrun(trigIdx);
-     bool accept = triggerResults->accept(trigIdx);
-  }*/
-  int idx_HLT_MinBiasBSCOR = triggerNames.triggerIndex("HLT_MinBiasBSC_OR");
-  int idx_HLT_MinBiasPixel = triggerNames.triggerIndex("HLT_MinBiasPixel_SingleTrack"); 
-  eventData.HLT_MinBiasBSCOR_ = (triggerResults->wasrun(idx_HLT_MinBiasBSCOR) && triggerResults->accept(idx_HLT_MinBiasBSCOR)) ? 1 : 0;
-  eventData.HLT_MinBiasPixel_ = (triggerResults->wasrun(idx_HLT_MinBiasPixel) && triggerResults->accept(idx_HLT_MinBiasPixel)) ? 1 : 0; 
 }
 
 void MinimumBiasAnalysis::fillVertexInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
@@ -211,22 +146,22 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   event.getByLabel("trackMultiplicityAssociatedToPV","trackMultiplicity",trackMultiplicityAssociatedToPV);
 
   edm::Handle<std::vector<unsigned int> > nHFPlus;
-  event.getByLabel(edm::InputTag(hfTowerSummaryTag_.label(),"nHFplus"),nHFPlus);
+  event.getByLabel("hfTower","nHFplus",nHFPlus);
   
   edm::Handle<std::vector<unsigned int> > nHFMinus;
-  event.getByLabel(edm::InputTag(hfTowerSummaryTag_.label(),"nHFminus"),nHFMinus);
+  event.getByLabel("hfTower","nHFminus",nHFMinus);
 
   edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaPlus;
-  event.getByLabel(edm::InputTag(hfTowerSummaryTag_.label(),"mapThreshToiEtaplus"),mapThreshToiEtaPlus);
+  event.getByLabel("hfTower","mapTreshToiEtaplus",mapThreshToiEtaPlus);
 
   edm::Handle<std::map<unsigned int, std::vector<unsigned int> > > mapThreshToiEtaMinus;
-  event.getByLabel(edm::InputTag(hfTowerSummaryTag_.label(),"mapThreshToiEtaminus"),mapThreshToiEtaMinus);
+  event.getByLabel("hfTower","mapTreshToiEtaminus",mapThreshToiEtaMinus);
 
   edm::Handle<std::vector<double> > sumEHFplus;
-  event.getByLabel(edm::InputTag(hfTowerSummaryTag_.label(),"sumEHFplus"),sumEHFplus);
+  event.getByLabel("hfTower","sumEHFplus",sumEHFplus);
 
   edm::Handle<std::vector<double> > sumEHFminus;
-  event.getByLabel(edm::InputTag(hfTowerSummaryTag_.label(),"sumEHFminus"),sumEHFminus);
+  event.getByLabel("hfTower","sumEHFminus",sumEHFminus);
 
   unsigned int nTracks = *trackMultiplicity;
   unsigned int nTracksAssociatedToPV = *trackMultiplicityAssociatedToPV;
@@ -244,7 +179,7 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   eventData.sumEnergyHFPlus_ = sumE_plus;
   eventData.sumEnergyHFMinus_ = sumE_minus;
 
-  for(unsigned int ieta = 29, index = 0; ieta <= 41; ++ieta,++index){
+  for(unsigned int ieta = 30, index = 0; ieta <= 41; ++ieta,++index){
      unsigned int nHFPlus_ieta = nHFSlice(*mapThreshToiEtaPlus,thresholdHF_,ieta);
      eventData.multiplicityHFPlusVsiEta_[index] = nHFPlus_ieta;
 
@@ -286,15 +221,13 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
   event.getByLabel(particleFlowTag_,particleFlowCollectionH);
 
   //double MxFromJets = MassColl(*jetCollectionH,10.);
-  double MxFromTowers = (applyEnergyScaleHCAL_) ?
-                        MassColl(*caloTowerCollectionH,-1.,energyThresholdHBHE_,energyThresholdHF_,energyScaleHCAL_) : MassColl(*caloTowerCollectionH,-1.,energyThresholdHBHE_,energyThresholdHF_);
+  double MxFromTowers = MassColl(*caloTowerCollectionH,-1.,energyThresholdHBHE_,energyThresholdHF_);
   double MxFromPFCands = MassColl(*particleFlowCollectionH,thresholdsPFlow_);
   eventData.MxFromTowers_ = MxFromTowers;
   eventData.MxFromPFCands_ = MxFromPFCands;
 
   //std::pair<double,double> xiFromJets = xi(*jetCollectionH,Ebeam_,10.);
-  std::pair<double,double> xiFromTowers = (applyEnergyScaleHCAL_) ? 
-                           xi(*caloTowerCollectionH,Ebeam_,-1.,energyThresholdHBHE_,energyThresholdHF_,energyScaleHCAL_) : xi(*caloTowerCollectionH,Ebeam_,-1.,energyThresholdHBHE_,energyThresholdHF_);
+  std::pair<double,double> xiFromTowers = xi(*caloTowerCollectionH,Ebeam_,-1.,energyThresholdHBHE_,energyThresholdHF_);
   double xiFromTowers_plus = xiFromTowers.first;
   double xiFromTowers_minus = xiFromTowers.second;
   std::pair<double,double> xiFromPFCands = xi(*particleFlowCollectionH,Ebeam_,thresholdsPFlow_);
@@ -308,8 +241,7 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
   eventData.xiPlusFromPFCands_ = xiFromPFCands_plus;
   eventData.xiMinusFromPFCands_ = xiFromPFCands_minus;
 
-  std::pair<double,double> EPlusPzFromTowers = (applyEnergyScaleHCAL_) ? 
-                                               EPlusPz(*caloTowerCollectionH,-1.,energyThresholdHBHE_,energyThresholdHF_,energyScaleHCAL_) : EPlusPz(*caloTowerCollectionH,-1.,energyThresholdHBHE_,energyThresholdHF_);
+  std::pair<double,double> EPlusPzFromTowers = EPlusPz(*caloTowerCollectionH,-1.,energyThresholdHBHE_,energyThresholdHF_);
   eventData.EPlusPzFromTowers_ = EPlusPzFromTowers.first;
   eventData.EMinusPzFromTowers_ = EPlusPzFromTowers.second;
   std::pair<double,double> EPlusPzFromPFCands = EPlusPz(*particleFlowCollectionH,thresholdsPFlow_);

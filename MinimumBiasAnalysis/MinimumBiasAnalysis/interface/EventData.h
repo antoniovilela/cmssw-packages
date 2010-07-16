@@ -6,13 +6,6 @@ class TTree;
 namespace minimumBiasAnalysis {
   // Plain struct for event data
   struct EventData {
-     int processId_;
-     int runNumber_;
-     int eventNumber_;
-     int lumiSection_;
-     int bunchCrossing_;
-     int HLT_MinBiasBSCOR_;
-     int HLT_MinBiasPixel_;
      int nVertex_;
      double posXPrimVtx_;
      double posYPrimVtx_;

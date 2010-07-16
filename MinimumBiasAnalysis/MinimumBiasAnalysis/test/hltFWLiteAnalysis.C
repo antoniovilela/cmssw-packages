@@ -28,27 +28,12 @@ void bookHistos(std::map<int,std::vector<TH1F*> >&, int);
 void hltFWLiteAnalysis(std::vector<std::string>& fileNames,
                                    std::string const& outFileName = "analysisHLTFWLite_histos.root",
                                    int maxEvents = -1, bool verbose = false) {
- 
-   bool selectEventsInRuns = true;
-   std::vector<int> selectedRuns;
-   selectedRuns.push_back(124027);
-   //selectedRuns.push_back(124030);
-
    if(verbose){
      std::cout << ">>> Reading files: " << std::endl;
      for(std::vector<std::string>::const_iterator it = fileNames.begin(); it != fileNames.end(); ++it)
                std::cout << "  " << *it << std::endl; 
+   } 
 
-     std::cout << "Use only selected runs: " << selectEventsInRuns << std::endl;
-     if(selectEventsInRuns){
-        std::stringstream outstream;
-        outstream << "  Runs ";
-        for(std::vector<int>::const_iterator it = selectedRuns.begin(); it != selectedRuns.end(); ++it) outstream << *it << " ";
-        outstream << "\n";
-        std::cout << outstream.str();
-     }
-   }  
-   
    // Chain the input files
    fwlite::ChainEvent ev(fileNames);
    
@@ -72,29 +57,16 @@ void hltFWLiteAnalysis(std::vector<std::string>& fileNames,
      int eventNumber = ev.id().event();
      int runNumber = ev.id().run();
      int lumiSection = ev.luminosityBlock();
-     int bunchCrossing = ev.bunchCrossing();
      if(verbose){
-        std::cout << "File: " << ev.getTFile()->GetName() << std::endl;
         std::cout << "  Event number: " << eventNumber << std::endl
                   << "  Run number: " << runNumber << std::endl
-                  << "  Lumi section: " << lumiSection << std::endl
-                  << "  Bunch crossing: " << bunchCrossing << std::endl;
+                  << "  Lumi section: " << lumiSection << std::endl;
      }
-     if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with processed event " << nEvts << "...skipping" << std::endl;continue;}
-
-     if(selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
-
      if(histosPerRun.find(runNumber) == histosPerRun.end()) bookHistos(histosPerRun,runNumber);
      histosPerRun[runNumber][0]->Fill(lumiSection); 
-     histosPerRun[runNumber][1]->Fill(bunchCrossing);
 
      fwlite::Handle<edm::TriggerResults> triggerResults;
-     try{
-        triggerResults.getByLabel(ev,"TriggerResults","","HLT");
-     } catch(std::exception& e){
-        e.what();
-        continue;
-     }
+     triggerResults.getByLabel(ev,"TriggerResults","","HLT");
  
      if(!triggerResults.isValid()) continue;
 
@@ -128,10 +100,8 @@ void bookHistos(std::map<std::string,TH1F*>& histos, std::vector<std::string> co
 }
 
 void bookHistos(std::map<int,std::vector<TH1F*> >& histosPerRun, int runNumber){
-   histosPerRun.insert(std::make_pair(runNumber,std::vector<TH1F*>(2)));
+   histosPerRun.insert(std::make_pair(runNumber,std::vector<TH1F*>(1)));
    char hname[50];
    sprintf(hname,"Run%d_nEventVsLumiSection",runNumber);
    histosPerRun[runNumber][0] = new TH1F(hname,hname,200,0,200);
-   sprintf(hname,"Run%d_bunchCrossings",runNumber);
-   histosPerRun[runNumber][1] = new TH1F(hname,hname,3000,0,3000);
 }

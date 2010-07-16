@@ -65,10 +65,7 @@ bool LumiSectionSelection::filter( edm::Event& iEvent, const edm::EventSetup& iS
      unsigned int lumiMax = it_range->second.second;  
 
      if((ils >= lumiMin)&&(ils <= lumiMax)) accepted = true;
-     else accepted = false;
-  } else{
-     accepted = true;
-  }
+  } 
 
   if (applyfilter)
     return accepted;

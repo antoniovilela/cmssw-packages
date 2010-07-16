@@ -1,6 +1,6 @@
 /*
- *  $Date: 2009/12/30 14:06:18 $
- *  $Revision: 1.4 $
+ *  $Date: 2009/12/11 19:41:50 $
+ *  $Revision: 1.2 $
  *  
  */
 
@@ -31,16 +31,10 @@ extern"C" {
   void pho_pecms_(int&,double&,double&,double&,double&,double&);
   void initphojet_(int&,int&);
 }
+
 #define pho_event pho_event_
 #define pho_pecms pho_pecms_
 #define initphojet initphojet_
-
-extern "C" {
-  extern struct {
-     int IPROCE,IDNODF,IDIFR1,IDIFR2,IDDPOM,IPRON[4][15];
-  } poprcs_;
-}
-#define poprcs poprcs_
 
 HepMC::IO_HEPEVT conv;
 
@@ -207,7 +201,7 @@ PhojetSource::PhojetSource( const ParameterSet & pset,
 
   sigmaMax = sigmax;
   //cout << "Sigmax = " << sigmax << endl; 
-  //cout << endl; // Stetically add for the output
+  cout << endl; // Stetically add for the output
   //********                                      
   
   produces<HepMCProduct>();
@@ -279,13 +273,10 @@ bool PhojetSource::produce(Event & e) {
   int mode = 1;
   int irej;
   double sigcur; 	
-  while(1) {
-    pho_event(mode,p1,p2,sigcur,irej);
-    if(irej != 0){
-      LogWarning("") << "   Problem in event generation...skipping and retrying.\n";
-    } else {
-      break;
-    }
+  pho_event(mode,p1,p2,sigcur,irej);
+  if(irej != 0){
+     LogWarning("") << "   Problem in event generation...skipping.\n";
+     return true;
   }
 
   //cout << "Sigcur = " << sigcur << endl;		
@@ -318,8 +309,7 @@ bool PhojetSource::produce(Event & e) {
     
   evt->weights().push_back( pyint1.vint[96] );*/
 
-  //evt->set_signal_process_id(pypars.msti[0]);
-  evt->set_signal_process_id(poprcs.IPROCE);
+  evt->set_signal_process_id(pypars.msti[0]);
   evt->set_event_scale(pypars.pari[16]);
   evt->set_event_number(numberEventsInRun() - remainingEvents() - 1);
     

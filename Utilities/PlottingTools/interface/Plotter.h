@@ -1,5 +1,5 @@
-#ifndef UtilitiesPlottingTools_Plotter_h
-#define UtilitiesPlottingTools_Plotter_h
+#ifndef ExclusiveDijetsAnalysis_Plotter_h
+#define ExclusiveDijetsAnalysis_Plotter_h
 
 #include "TH1F.h"
 #include "TDirectory.h"
@@ -33,13 +33,10 @@ class Plotter{
       typedef std::pair<TH1F*,std::string> HistDesc;
       typedef std::map<std::string, std::vector<HistDesc> > HistMap;
 
-      Plotter();
+      Plotter(): verbose_(false),rebin_(1) {}
     
       void SetVerbose(bool verbose) {verbose_ = verbose;}
       void SetRebin(int rebin) {rebin_ = rebin;}
-      void SetColors(std::vector<int> const& colors) {histColors_ = colors;}
-      void SetLineStyles(std::vector<int> const& linestyles) {histLineStyles_ = linestyles;}
-      void SetFillStyles(std::vector<int> const& fillstyles) {histFillStyles_ = fillstyles;}
 
       void plot(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const char* drawOption = "");
       void plot(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const std::vector<double>&, const char* drawOption = "");
@@ -47,7 +44,7 @@ class Plotter{
       void plot(std::map<std::string,std::vector<std::string> >&, TDirectory*, const char* drawOption = "");
       void plot(VarMap& variablesMap, const char* drawOption = "");
 
-      void plotStack(VarMap const& variablesMap, const char* drawOption = "", bool firstAsRefHist = false);
+      void plotStack(VarMap const& variablesMap, const char* drawOption = "", bool firstAsRefHist);
 
       void plotStack(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, const std::vector<double>& normFactors, const char* drawOption = "");
       void plotComponents(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, const std::vector<double>& normFactors, const char* drawOption = "");
@@ -61,9 +58,6 @@ class Plotter{
 
       bool verbose_;
       int rebin_;
-      std::vector<int> histColors_;
-      std::vector<int> histLineStyles_;
-      std::vector<int> histFillStyles_;
       //NormPolicy norm_;
 };
 

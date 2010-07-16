@@ -1,115 +1,105 @@
-/** \class WMuNuAnalyzer
- *  Simple analyzer to make some W->MuNu plots
- *
- *  \author M.I. Josa
- */
-
+////////// Header section /////////////////////////////////////////////
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
+#include "CLHEP/Random/JamesRandom.h"
+#include "CLHEP/Random/RandGauss.h"
 
-class TFile;
-class TH1F;
-class TH2F;
+#include "TFile.h"
+#include "TTree.h"
 
 
-class WMuNuAnalyzer : public edm::EDAnalyzer {
+class WMuNuAnalyzer: public edm::EDAnalyzer {
 public:
+  /// Constructor
   WMuNuAnalyzer(const edm::ParameterSet& pset);
+
+  /// Destructor
   virtual ~WMuNuAnalyzer();
-  virtual void beginJob(const edm::EventSetup& eventSetup);
-  virtual void endJob();
-  virtual void analyze(const edm::Event & event, const edm::EventSetup& eventSetup);
+
+  // Operations
+
+  void analyze(const edm::Event & event, const edm::EventSetup& eventSetup);
+
+  virtual void beginJob(const edm::EventSetup& eventSetup) ;
+  virtual void endJob() ;
+
 private:
+  // Input from cfg file
+  edm::InputTag genParticleTag_;
   edm::InputTag muonTag_;
+  edm::InputTag isoTag_;
+  edm::InputTag genMETTag_;
   edm::InputTag metTag_;
-  edm::InputTag jetTag_;
-  bool useOnlyGlobalMuons_;
-  double ptCut_;
-  double etaCut_;
-  bool isRelativeIso_;
-  double isoCut03_;
-  double massTMin_;
-  double massTMax_;
-  double ptThrForZCount_;
-  double acopCut_;
-  double eJetMin_;
-  int nJetMax_;
 
-// Histograms
-  TH1F *hNMu;
-  TH1F *hPtMu;
-  TH1F *hEtaMu;
-  TH1F *hMET;
-  TH1F *hTMass;
-  TH1F *hAcop;
-  TH1F *hNjets;
-  TH1F *hPtSum;
-  TH1F *hPtSumN;
-  TH2F *hTMass_PtSum;
+  std::string CSA07WeightLabel;
 
-  TH1F *hNMu_sel;
-  TH1F *hPtMu_sel;
-  TH1F *hEtaMu_sel;
-  TH1F *hMET_sel;
-  TH1F *hTMass_sel;
-  TH1F *hAcop_sel;
-  TH1F *hNjets_sel;
-  TH1F *hPtSum_sel;
-  TH1F *hPtSumN_sel;
-  TH2F *hTMass_PtSum_sel;
+  double isoCone_;
 
-  unsigned int numberOfEvents;
-  unsigned int numberOfMuons;
+  //Use weighted events (for Alpgen)
+  bool runOnSoup_;
+  
+  // TTree 
+  TTree* data;
+  double tree_evtWeight;
+  double tree_muonIso;
+  double tree_muonNormIso;
+  double tree_muonPt;
+  double tree_muonEta;
+  double tree_muonPhi;
+  double tree_MT;
+  double tree_MET;
+  double tree_MEx;
+  double tree_MEy;
+  double tree_GenMET;
+  double tree_GenMEx;
+  double tree_GenMEy;
+  double tree_GenMT;
+  double tree_CaloMET;
+  double tree_CaloMEx;
+  double tree_CaloMEy;
+  double tree_CaloMETPhi;
+  double tree_genWPt;
+  double tree_genWEta;
+  double tree_genWPhi;
 };
 
+////////// Source code ////////////////////////////////////////////////
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/ESHandle.h"
+#include "DataFormats/Common/interface/Handle.h"
+
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuIsoDeposit.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/METReco/interface/CaloMET.h"
+#include "DataFormats/METReco/interface/GenMET.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "FWCore/Utilities/interface/EDMException.h"
-
-#include "DataFormats/METReco/interface/CaloMET.h"
-#include "DataFormats/METReco/interface/CaloMETFwd.h"
-#include "DataFormats/JetReco/interface/CaloJet.h"
-#include "DataFormats/MuonReco/interface/Muon.h"
-#include "DataFormats/MuonReco/interface/MuonFwd.h"
-#include "DataFormats/GeometryVector/interface/Phi.h"
-
-#include <FWCore/ServiceRegistry/interface/Service.h>
-#include <PhysicsTools/UtilAlgos/interface/TFileService.h>
-
-#include "TFile.h"
-#include "TH1F.h"
-#include "TH2F.h"
-
-#include <map>
-#include <vector>
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 
 using namespace std;
 using namespace edm;
 using namespace reco;
 
 /// Constructor
-WMuNuAnalyzer::WMuNuAnalyzer(const ParameterSet& pset) :
-      muonTag_(pset.getParameter<edm::InputTag> ("MuonTag")),
-      metTag_(pset.getParameter<edm::InputTag> ("METTag")),
-      jetTag_(pset.getParameter<edm::InputTag> ("JetTag")),
-      useOnlyGlobalMuons_(pset.getParameter<bool>("UseOnlyGlobalMuons")),
-      ptCut_(pset.getParameter<double>("PtCut")),
-      etaCut_(pset.getParameter<double>("EtaCut")),
-      isRelativeIso_(pset.getParameter<bool>("IsRelativeIso")),
-      isoCut03_(pset.getParameter<double>("IsoCut03")),
-      massTMin_(pset.getParameter<double>("MassTMin")),
-      massTMax_(pset.getParameter<double>("MassTMax")),
-      ptThrForZCount_(pset.getParameter<double>("PtThrForZCount")),
-      acopCut_(pset.getParameter<double>("AcopCut")),
-      eJetMin_(pset.getParameter<double>("EJetMin")),
-      nJetMax_(pset.getParameter<int>("NJetMax"))
-
+WMuNuAnalyzer::WMuNuAnalyzer(const ParameterSet& pset)
 {
-  LogVerbatim("Analysis") << " WMuNuAnalyzer constructor called";
+  genParticleTag_ = pset.getParameter<InputTag>("GenParticleTag");
+  muonTag_ = pset.getParameter<InputTag>("MuonTag");
+  isoTag_ = pset.getParameter<InputTag>("IsolationTag");
+  genMETTag_ = pset.getParameter<InputTag>("GenMETTag");
+  metTag_ = pset.getParameter<InputTag>("METTag");
+
+  isoCone_ = pset.getParameter<double>("IsoCone");
+
+  runOnSoup_ = pset.getUntrackedParameter<bool>("RunOnSoup",false);
+  if(runOnSoup_) CSA07WeightLabel=pset.getParameter<std::string>("CSA07WeightLabel");
 }
 
 /// Destructor
@@ -117,213 +107,172 @@ WMuNuAnalyzer::~WMuNuAnalyzer(){
 }
 
 void WMuNuAnalyzer::beginJob(const EventSetup& eventSetup){
-  // Book histograms
   edm::Service<TFileService> fs;
 
-  numberOfEvents = 0;
-  numberOfMuons = 0;
-
-  hNMu    = fs->make<TH1F>("NMu","Nb. muons in the event",10,0.,10.);
-  hPtMu   = fs->make<TH1F>("ptMu","Pt mu",100,0.,100.);
-  hEtaMu  = fs->make<TH1F>("etaMu","Eta mu",50,-2.5,2.5);
-  hMET    = fs->make<TH1F>("MET","Missing Transverse Energy (GeV)", 100,0.,200.);
-  hTMass  = fs->make<TH1F>("TMass","Rec. Transverse Mass (GeV)",150,0.,300.);
-  hAcop   = fs->make<TH1F>("Acop","Mu-MET acoplanarity",50,0.,M_PI);
-  hNjets  = fs->make<TH1F>("Njets","njets",25,0.,25.);
-  hPtSum  = fs->make<TH1F>("ptSum","Sum pT (GeV)",100,0.,50.);
-  hPtSumN = fs->make<TH1F>("ptSumN","Sum pT/pT",100,0.,50.);
-  hTMass_PtSum = fs->make<TH2F>("TMass_ptSum","Rec. Transverse Mass (GeV) vs Sum pT (GeV)",100,0.,50.,150,0.,300.);
-
-  hNMu_sel    = fs->make<TH1F>("NMu_sel","Nb. selected muons",10,0.,10.);
-  hPtMu_sel   = fs->make<TH1F>("ptMu_sel","Pt mu",100,0.,100.);
-  hEtaMu_sel  = fs->make<TH1F>("etaMu_sel","Eta mu",50,-2.5,2.5);
-  hMET_sel    = fs->make<TH1F>("MET_sel","Missing Transverse Energy (GeV)", 100,0.,200.);
-  hTMass_sel  = fs->make<TH1F>("TMass_sel","Rec. Transverse Mass (GeV)",150,0.,300.);
-  hAcop_sel   = fs->make<TH1F>("Acop_sel","Mu-MET acoplanarity",50,0.,M_PI);
-  hNjets_sel  = fs->make<TH1F>("Njets_sel","njets",25,0.,25.);
-  hPtSum_sel  = fs->make<TH1F>("ptSum_sel","Sum pT (GeV)",100,0.,50.);
-  hPtSumN_sel = fs->make<TH1F>("ptSumN_sel","Sum pT/pT ",100,0.,2.5);
-  hTMass_PtSum_sel = fs->make<TH2F>("TMass_ptSum_sel","Rec. Transverse Mass (GeV) vs Sum pT (GeV)",100,0.,50.,150,0.,300.);
-
+  
+  // Set output TTree
+  data = fs->make<TTree>("data","data");
+  data->Branch("evtWeight",&tree_evtWeight,"evtWeight/D");
+  data->Branch("muonIso",&tree_muonIso,"muonIso/D");
+  data->Branch("muonNormIso",&tree_muonNormIso,"muonNormIso/D");
+  data->Branch("muonPt",&tree_muonPt,"muonPt/D");
+  data->Branch("muonEta",&tree_muonEta,"muonEta/D");
+  data->Branch("muonPhi",&tree_muonPhi,"muonPhi/D");
+  data->Branch("MT",&tree_MT,"MT/D");
+  data->Branch("MET",&tree_MET,"MET/D");
+  data->Branch("MEx",&tree_MEx,"MEx/D");
+  data->Branch("MEy",&tree_MEy,"MEy/D");
+  data->Branch("GenMET",&tree_GenMET,"GenMET/D");
+  data->Branch("GenMEx",&tree_GenMEx,"GenMEx/D");
+  data->Branch("GenMEy",&tree_GenMEy,"GenMEy/D");
+  data->Branch("GenMT",&tree_GenMT,"GenMT/D");
+  data->Branch("CaloMET",&tree_CaloMET,"CaloMET/D");
+  data->Branch("CaloMEx",&tree_CaloMEx,"CaloMEx/D");
+  data->Branch("CaloMEy",&tree_CaloMEy,"CaloMEy/D");
+  data->Branch("CaloMETPhi",&tree_CaloMETPhi,"CaloMETPhi/D");
+  data->Branch("genWPt",&tree_genWPt,"genWPt/D");
+  data->Branch("genWEta",&tree_genWEta,"genWEta/D");
+  data->Branch("genWPhi",&tree_genWPhi,"genWPhi/D");
 }
 
-void WMuNuAnalyzer::endJob(){
-  LogVerbatim("Analysis") << "WMuNuAnalyzer>>> FINAL PRINTOUTS -> BEGIN";
-  LogVerbatim("Analysis") << "WMuNuAnalyzer>>> Number of analyzed events= " << numberOfEvents;
-  LogVerbatim("Analysis") << "WMuNuAnalyzer>>> Number of analyzed muons= " << numberOfMuons;
+void WMuNuAnalyzer::endJob(){}
 
-  LogVerbatim("Analysis") << "WMuNuAnalyzer>>> FINAL PRINTOUTS -> END";
-}
- 
+void WMuNuAnalyzer::analyze(const Event & ev, const EventSetup&){
+  //CSA07 event weight
+  edm::Handle<double> CSA07Weight;
+  if(runOnSoup_){
+	ev.getByLabel(CSA07WeightLabel,"weight",CSA07Weight);
+	tree_evtWeight = *CSA07Weight.product();
+  } else tree_evtWeight = 1.0;
 
-void WMuNuAnalyzer::analyze(const Event & event, const EventSetup& eventSetup){
+  // Get muon collection
+  edm::Handle<reco::MuonCollection> muonCollection;
+  ev.getByLabel(muonTag_, muonCollection);
+  assert(muonCollection->size() > 0);
+
+  // Get isolation collection
+  edm::Handle<reco::MuIsoDepositAssociationMap> isodepMap;
+  ev.getByLabel(isoTag_, isodepMap);
+
+  // Find highest pt muon
+  const reco::Muon* muon = 0;
+  double aux_muonpt = -1.;	 
+  for(reco::MuonCollection::const_iterator mu = muonCollection->begin(); mu != muonCollection->end(); ++mu) {
+	// Make sure it passes the selection cuts
+	if(mu->pt() < 25.0) continue;
+	if(fabs(mu->eta()) > 2.0) continue;
+
+	if(mu->pt() > aux_muonpt){
+		aux_muonpt = mu->pt();
+		muon = &(*mu);
+	}
+  }
+  if (muon == 0) {LogTrace("") << ">>>>>>> No muon found...skipping event";return;}
+  LogTrace("") << ">>>>>>> Selected muon px,py,pz,e= " << muon->px() << " , " << muon->py() << " , " << muon->pz() << " , " << muon->energy();
+
+  reco::TrackRef muTrack = muon->combinedMuon();
+  const reco::MuIsoDeposit dep = (*isodepMap)[muTrack];
+  float ptsum = dep.depositWithin(isoCone_);
+  float ptsumOverpt = ptsum/muon->pt();
+  LogTrace("") << "\t... Isol, Track pt, = " << muon->pt() << " GeV, " << " ptsum = " << ptsum << " ptsum/pt = " << ptsumOverpt;
+
+  tree_muonIso = ptsum;
+  tree_muonNormIso = ptsumOverpt;
+  tree_muonPt = muon->pt();
+  tree_muonEta = muon->eta();
+  tree_muonPhi = muon->phi();
+
+  //=================================================================  
+  // Generator Information
+  const GenParticle* genW = 0;
+  const GenParticle* genMuon = 0;
+  const GenParticle* genNeutrino = 0;	
+  edm::Handle<reco::GenParticleCollection> genParticles;
+  ev.getByLabel(genParticleTag_, genParticles);
+  for( size_t i = 0; i < genParticles->size(); ++ i ) {
+      		const reco::GenParticle& genpart = (*genParticles)[i];
+      		//LogTrace("") << ">>>>>>> pid,status,px,py,px,e= "  << genpart.pdgId() << " , " << genpart.status() << " , " << genpart.px() << " , " << genpart.py() << " , " << genpart.pz() << " , " << genpart.energy();	
+		
+		if(abs(genpart.pdgId()) != 24) continue;
+		if(genpart.status() != 3) continue;
+		genW = &(*genParticles)[i];
+		for(size_t j = 0; j < genpart.numberOfDaughters(); ++j) {
+                       	const Candidate* daughter = genpart.daughter(j);
+                       	if(abs(daughter->pdgId()) == 13) genMuon = dynamic_cast<const reco::GenParticle*>(daughter);
+                       	else if((abs(daughter->pdgId()) == 14)) genNeutrino = dynamic_cast<const reco::GenParticle*>(daughter);
+		}
+      		break;
+  }
+  if (genW == 0) {LogTrace("") << ">>>>>>> No generated W found...skipping event";return;}		
+  if (genNeutrino == 0) {LogTrace("") << ">>>>>>> No generated neutrino found...skipping event";return;}
+  if (genMuon == 0) {LogTrace("") << ">>>>>>> No generated muon found...skipping event";return;}
+  reco::Candidate::LorentzVector genW_p4 = genW->p4();
+  reco::Candidate::LorentzVector genMu_p4 = genMuon->p4();
+  reco::Candidate::LorentzVector genNu_p4 = genNeutrino->p4();
+  LogTrace("") << ">>>> Gen W px,py,pz,e= " << genW_p4.px() << " , " << genW_p4.py() << " , " << genW_p4.pz() << " , " << genW_p4.energy();
+  LogTrace("") << ">>>> Gen neutrino px,py,pz,e= " << genNu_p4.px() << " , " << genNu_p4.py() << " , " << genNu_p4.pz() << " , " << genNu_p4.energy();
+  LogTrace("") << ">>>> Gen muon px,py,pz,e= " << genMu_p4.px() << " , " << genMu_p4.py() << " , " << genMu_p4.pz() << " , " << genMu_p4.energy();
+
+  tree_genWPt = genW_p4.pt();
+  tree_genWEta = genW_p4.eta();
+  tree_genWPhi = genW_p4.phi();
+
+  //=================================================================
+  // Get MET collections (assumed corrected)
+  edm::Handle<reco::GenMETCollection> genMETCollection;
+  ev.getByLabel(genMETTag_, genMETCollection);
+  reco::GenMETCollection::const_iterator genMET = genMETCollection->begin();
+  LogTrace("") << ">>> GenMET_et, GenMET_px, GenMET_py= " << genMET->pt() << ", " << genMET->px() << ", " << genMET->py();
+
+  edm::Handle<reco::CaloMETCollection> METCollection;
+  ev.getByLabel(metTag_, METCollection);
+  reco::CaloMETCollection::const_iterator met = METCollection->begin();
+  LogTrace("") << ">>> MET_et, MET_px, MET_py= " << met->pt() << ", " << met->px() << ", " << met->py();
+
+  double CaloMET_Ex = met->px();
+  double CaloMET_Ey = met->py();
+
+  CaloMET_Ex += muon->px();
+  CaloMET_Ey += muon->py();
   
-   numberOfEvents++;
-
-   double pt_sel[5];
-   double eta_sel[5];
-   double acop_sel[5];
-   double massT_sel[5];
-   double iso_sel[5];
-   double isoN_sel[5];
-
-   bool event_sel = true;
+  double CaloMET_Et = sqrt(CaloMET_Ex*CaloMET_Ex + CaloMET_Ey*CaloMET_Ey);
+  math::XYZTLorentzVector myCaloMET(CaloMET_Ex,CaloMET_Ey,0.,CaloMET_Et);
+  LogTrace("") << ">>> CaloMET_et, MET_px, MET_py= " << myCaloMET.pt() << ", " << myCaloMET.px() << ", " << myCaloMET.py();
   
-   double met_px = 0.;
-   double met_py = 0.;
+  double w_et = muon->pt() + met->pt();
+  double w_px = muon->px() + met->px();
+  double w_py = muon->py() + met->py();
+  double massT = w_et*w_et - w_px*w_px - w_py*w_py;
+  massT = (massT>0) ? sqrt(massT) : 0;
+  LogTrace("") << "\t... W_pt, W_px, W_py= " << sqrt(w_px*w_px + w_py*w_py) << ", " << w_px << ", " << w_py << " GeV";
+  LogTrace("") << "\t... Invariant transverse mass= " << massT << " GeV";
 
-  // Get the Muon Track collection from the event
-   Handle<reco::MuonCollection> muonCollection;
-   event.getByLabel(muonTag_, muonCollection);
-   if (event.getByLabel(muonTag_, muonCollection)) {
-      LogTrace("Analysis") << "Reconstructed Muon tracks: " << muonCollection->size() << endl;
-   } else {
-      LogTrace("Analysis") << ">>> Muon collection does not exist !!!";
-      return;
-   }
+  tree_CaloMET = CaloMET_Et;
+  tree_CaloMEx = CaloMET_Ex;
+  tree_CaloMEy = CaloMET_Ey;
+  tree_CaloMETPhi =  myCaloMET.phi();
+  tree_MT = massT;
+  tree_MET = met->pt();
+  tree_MEx = met->px();
+  tree_MEy = met->py();
 
-   numberOfMuons+=muonCollection->size();
-  
-   for (unsigned int i=0; i<muonCollection->size(); i++) {
-      MuonRef mu(muonCollection,i);
-      if (useOnlyGlobalMuons_ && !mu->isGlobalMuon()) continue;
-      met_px -= mu->px();
-      met_py -= mu->py();
-   }
+  //=================================================================
+  //Gen MT
+  /*double w_et_gen = genMu_p4.pt() + genNu_p4.pt();
+  double w_px_gen = genMu_p4.px() + genNu_p4.px();
+  double w_py_gen = genMu_p4.py() + genNu_p4.py();*/
+  double w_et_gen = genMu_p4.pt() + genMET->pt();
+  double w_px_gen = genMu_p4.px() + genMET->px();
+  double w_py_gen = genMu_p4.py() + genMET->py();
+  double massT_gen = w_et_gen*w_et_gen - w_px_gen*w_px_gen - w_py_gen*w_py_gen;
+  massT_gen = (massT_gen>0) ? sqrt(massT_gen) : 0;
 
-  // Get the MET collection from the event
-   Handle<CaloMETCollection> metCollection;
-   if (!event.getByLabel(metTag_, metCollection)) {
-      LogTrace("Analysis") << ">>> MET collection does not exist !!!";
-      return;
-   }
+  tree_GenMT = massT_gen;
+  tree_GenMET = genMET->pt();
+  tree_GenMEx = genMET->px();
+  tree_GenMEy = genMET->py();
 
-   CaloMETCollection::const_iterator caloMET = metCollection->begin();
-   LogTrace("Analysis") << ">>> CaloMET_et, CaloMET_py, CaloMET_py= " << caloMET->et() << ", " << caloMET->px() << ", " << caloMET->py();;
-   met_px += caloMET->px();
-   met_py += caloMET->py();
-   double met_et = sqrt(met_px*met_px+met_py*met_py);
-   hMET->Fill(met_et);
-
-  // Get the Jet collection from the event
-   Handle<CaloJetCollection> jetCollection;
-   if (!event.getByLabel(jetTag_, jetCollection)) {
-      LogTrace("Analysis") << ">>> CALOJET collection does not exist !!!";
-      return;
-   }
-
-   CaloJetCollection::const_iterator jet = jetCollection->begin();
-   int njets = 0;
-   for (jet=jetCollection->begin(); jet!=jetCollection->end(); jet++) {
-         if (jet->et()>eJetMin_) njets++;
-   }
-   hNjets->Fill(njets);
-   LogTrace("Analysis") << ">>> Number of jets " << jetCollection->size() << "; above " << eJetMin_ << " GeV: " << njets;
-   LogTrace("Analysis") << ">>> Number of jets above " << eJetMin_ << " GeV: " << njets;
-
-   if (njets>nJetMax_) event_sel = false;
-
-   unsigned int nmuons = 0;
-   unsigned int nmuonsForZ = 0;
-
-   hNMu->Fill(muonCollection->size());
-   float max_pt = -9999.;
-   int i_max_pt = 0;
-   for (unsigned int i=0; i<muonCollection->size(); i++) {
-      bool muon_sel = true;
-
-      MuonRef mu(muonCollection,i);
-      if (useOnlyGlobalMuons_ && !mu->isGlobalMuon()) continue;
-      LogTrace("Analysis") << "> Processing (global) muon number " << i << "...";
-// pt
-      double pt = mu->pt();
-      hPtMu->Fill(pt);
-      LogTrace("Analysis") << "\t... pt= " << pt << " GeV";
-
-      if (pt>ptThrForZCount_) nmuonsForZ++;
-      if (pt<ptCut_) muon_sel = false;
-// eta
-      double eta = mu->eta();
-      hEtaMu->Fill(eta);
-      LogTrace("Analysis") << "\t... eta= " << eta;
-      if (fabs(eta)>etaCut_) muon_sel = false;
-
-// acoplanarity
-      Geom::Phi<double> deltaphi(mu->phi()-atan2(met_py,met_px));
-      double acop = deltaphi.value();
-      if (acop<0) acop = - acop;
-      acop = M_PI - acop;
-      hAcop->Fill(acop);
-      LogTrace("Analysis") << "\t... acop= " << acop;
-      if (acop>acopCut_) muon_sel = false;
-
-// transverse mass
-      double w_et = mu->pt() + met_et;
-      double w_px = mu->px() + met_px;
-      double w_py = mu->py() + met_py;
-      double massT = w_et*w_et - w_px*w_px - w_py*w_py;
-      massT = (massT>0) ? sqrt(massT) : 0;
-      hTMass->Fill(massT);
-      LogTrace("Analysis") << "\t... W_et, W_px, W_py= " << w_et << ", " << w_px << ", " << w_py << " GeV";
-      LogTrace("Analysis") << "\t... Invariant transverse mass= " << massT << " GeV";
-      if (massT<massTMin_) muon_sel = false;
-      if (massT>massTMax_) muon_sel = false;
-
-// Isolation
-      double ptsum = mu->isolationR03().sumPt;
-      hPtSum->Fill(ptsum);
-      hPtSumN->Fill(ptsum/pt);
-      hTMass_PtSum->Fill(ptsum,massT);
-      LogTrace("Analysis") << "\t... Isol, Track pt= " << mu->pt() << " GeV, " << " ptsum = " << ptsum;
-      if (ptsum/pt > isoCut03_) muon_sel = false;
-
-      if (muon_sel) {
-        nmuons++;
-        if (pt > max_pt) {  //and identify the highest pt muon
-           max_pt = pt;
-           i_max_pt = nmuons;
-        }
-        pt_sel[nmuons] = pt;
-        eta_sel[nmuons] = eta;
-        acop_sel[nmuons] = acop;
-        massT_sel[nmuons] = massT;
-        iso_sel[nmuons] = ptsum;
-        isoN_sel[nmuons] = ptsum/pt;
-      }
-   }
-
-
-      LogTrace("Analysis") << "> Muon counts to reject Z= " << nmuonsForZ;
-      if (nmuonsForZ>=2) {
-            LogTrace("Analysis") << ">>>> Event REJECTED";
-            event_sel = false;
-      }
-      LogTrace("Analysis") << "> Number of muons for W= " << nmuons;
-      if (nmuons<1) {
-            LogTrace("Analysis") << ">>>> Event REJECTED";
-            event_sel = false;
-      }
-
-      if (event_sel == true) {
-       LogTrace("Analysis") << ">>>> Event SELECTED!!!";
-
-// Fill histograms for selected events
-       hNMu_sel->Fill(nmuons);
-       hMET_sel->Fill(met_et); 
-       hNjets_sel->Fill(njets);
-
-// only the combination with highest pt
-       hPtMu_sel->Fill(pt_sel[i_max_pt]);
-       hEtaMu_sel->Fill(eta_sel[i_max_pt]);
-       hAcop_sel->Fill(acop_sel[i_max_pt]);
-       hTMass_sel->Fill(massT_sel[i_max_pt]);
-       hPtSum_sel->Fill(iso_sel[i_max_pt]);
-       hPtSumN_sel->Fill(isoN_sel[i_max_pt]);
-       hTMass_PtSum_sel->Fill(iso_sel[i_max_pt],massT_sel[i_max_pt]);
-
-      }
-
-  
+  data->Fill();
 }
 
 DEFINE_FWK_MODULE(WMuNuAnalyzer);

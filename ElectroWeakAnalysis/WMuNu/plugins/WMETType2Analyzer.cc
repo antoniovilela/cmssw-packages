@@ -37,7 +37,7 @@ private:
   // Input from cfg file
   edm::InputTag genParticleTag_;
   edm::InputTag muonTag_;
-  //edm::InputTag isoTag_;
+  edm::InputTag isoTag_;
   edm::InputTag genMETTag_;
   edm::InputTag metTag_;
 
@@ -50,7 +50,7 @@ private:
   TFile* theInputFile;
   TFile* theOutputFile;
 
-  //double isoCone_;
+  double isoCone_;
 
   //Nu smearing
   //bool applyNuPtSmearing_;
@@ -130,13 +130,10 @@ private:
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
-#include "DataFormats/MuonReco/interface/MuonFwd.h"
-//#include "DataFormats/MuonReco/interface/MuIsoDeposit.h"
+#include "DataFormats/MuonReco/interface/MuIsoDeposit.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
-#include "DataFormats/METReco/interface/CaloMETFwd.h"
 #include "DataFormats/METReco/interface/GenMET.h"
-#include "DataFormats/METReco/interface/GenMETFwd.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -154,11 +151,11 @@ WMETType2Analyzer::WMETType2Analyzer(const ParameterSet& pset)
 {
   genParticleTag_ = pset.getParameter<InputTag>("GenParticleTag");
   muonTag_ = pset.getParameter<InputTag>("MuonTag");
-  //isoTag_ = pset.getParameter<InputTag>("IsolationTag");
+  isoTag_ = pset.getParameter<InputTag>("IsolationTag");
   genMETTag_ = pset.getParameter<InputTag>("GenMETTag");
   metTag_ = pset.getParameter<InputTag>("METTag");
 
-  //isoCone_ = pset.getParameter<double>("IsoCone");
+  isoCone_ = pset.getParameter<double>("IsoCone");
 
   theInputRootFileName = pset.getUntrackedParameter<string>("InputRootFileName");
   theOutputRootFileName = pset.getUntrackedParameter<string>("OutputRootFileName");
@@ -286,16 +283,15 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
   ev.getByLabel(muonTag_, muonCollection);
   assert(muonCollection->size() > 0);
 
-  /*// Get isolation collection
+  // Get isolation collection
   edm::Handle<reco::MuIsoDepositAssociationMap> isodepMap;
-  ev.getByLabel(isoTag_, isodepMap);*/
+  ev.getByLabel(isoTag_, isodepMap);
 
   // Find highest pt muon
   const reco::Muon* muon = 0;
   double aux_muonpt = -1.;	 
   for(reco::MuonCollection::const_iterator mu = muonCollection->begin(); mu != muonCollection->end(); ++mu) {
 	// Make sure it passes the selection cuts
-        if(!mu->isGlobalMuon()) continue;
 	if(mu->pt() < 25.0) continue;
 	if(fabs(mu->eta()) > 2.0) continue;
 
@@ -308,9 +304,8 @@ void WMETType2Analyzer::analyze(const Event & ev, const EventSetup&){
   LogTrace("") << ">>>>>>> Selected muon px,py,pz,e= " << muon->px() << " , " << muon->py() << " , " << muon->pz() << " , " << muon->energy();
 
   reco::TrackRef muTrack = muon->combinedMuon();
-  //const reco::MuIsoDeposit dep = (*isodepMap)[muTrack];
-  //float ptsum = dep.depositWithin(isoCone_);
-  float ptsum = muon->isolationR03().sumPt;
+  const reco::MuIsoDeposit dep = (*isodepMap)[muTrack];
+  float ptsum = dep.depositWithin(isoCone_);
   float ptsumOverpt = ptsum/muon->pt();
   LogTrace("") << "\t... Isol, Track pt, = " << muon->pt() << " GeV, " << " ptsum = " << ptsum << " ptsum/pt = " << ptsumOverpt;
 

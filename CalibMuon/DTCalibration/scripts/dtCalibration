@@ -6,7 +6,7 @@ from CalibMuon.DTCalibration.Workflow.DTTTrigValid import DTTTrigValid
 from CalibMuon.DTCalibration.Workflow.DTTTrigResidualCorr import DTTTrigResidualCorr
 from CalibMuon.DTCalibration.Workflow.DTValidSummary import DTValidSummary
 from CalibMuon.DTCalibration.Workflow.CrabWatch import CrabWatch
-from CalibMuon.DTCalibration.Workflow.tools import haddInCastor,parseInput
+from CalibMuon.DTCalibration.Workflow.workflow import haddInCastor,crabWatch,getOutput
 import sys,os,time
 
 """
@@ -33,6 +33,7 @@ def runTtrigProd(run,runselection,trial,config):
 
     print "Sent production jobs with project",project_prod
 
+    #crabWatch(getOutput,project_prod) 
     crabProd = CrabWatch(project_prod)
     crabProd.start()
     crabProd.join()
@@ -66,6 +67,7 @@ def runTtrigValid(run,runselection,trial,input_file,config):
 
     print "Sent validation jobs with project",project_valid_first
 
+    #crabWatch(getOutput,project_valid_first)
     crabValidFirst = CrabWatch(project_valid_first)
     crabValidFirst.start()
     crabValidFirst.join()
@@ -98,6 +100,7 @@ def runTtrigValidResidCorr(run,runselection,trial,input_file,config):
 
     print "Sent validation jobs with project",project_valid_ResidCorr
 
+    #crabWatch(getOutput,project_valid_ResidCorr)
     crabValidResidCorr = CrabWatch(project_valid_ResidCorr)
     crabValidResidCorr.start()
     crabValidResidCorr.join()
@@ -119,9 +122,17 @@ if __name__ == '__main__':
     start = time.time()
     
     inputFields = ('run','runselection','trial','castorpath','datasetpath','globaltag','email','templatepath')
-    requiredFields = ('run','castorpath','datasetpath','globaltag','email','templatepath')
 
-    input = parseInput(inputFields,requiredFields)
+    class input: pass
+    for opt in sys.argv:
+        if opt.split('=')[0] in inputFields:
+            setattr(input,opt.split('=')[0],opt.split('=')[1])
+            print opt.split('=')[0],'=',opt.split('=')[1]
+
+    requiredFields = ('run','castorpath','datasetpath','globaltag','email','templatepath')
+    for item in requiredFields:
+        if not hasattr(input,item):
+            raise RuntimeError,'Need to set "%s"' % item
 
     run = input.run
     runselection = None
