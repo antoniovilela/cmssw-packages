@@ -5,6 +5,10 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 
+#include <vector>
+#include <string>
+#include <map>
+
 namespace minimumBiasAnalysis {
 
 struct EventData;
@@ -41,7 +45,9 @@ class MinimumBiasAnalysis {
      bool applyEnergyScaleHCAL_;
      double energyScaleHCAL_;
      bool accessMCInfo_;
-
+     //std::vector<std::string> > hltPathNames_;
+     std::string hltPathName_; 
+     
      std::map<int,std::pair<double,double> > thresholdsPFlow_;
 
      math::XYZTLorentzVector genAllParticles_;

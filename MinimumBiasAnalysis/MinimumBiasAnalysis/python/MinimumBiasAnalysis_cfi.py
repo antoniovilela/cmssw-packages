@@ -14,8 +14,9 @@ MinimumBiasAnalysis = cms.PSet(
     EnergyThresholdHBHE = cms.double(3.0),
     EnergyThresholdHF = cms.double(4.0),
     # Options
-    EBeam = cms.double(450.),
+    EBeam = cms.double(3500.),
     ApplyEnergyScaleHCAL = cms.bool(False),
     EnergyScaleFactorHCAL = cms.double(1.0),
+    HLTPath = cms.string("HLT_L1_BscMinBiasOR_BptxPlusORMinus"), 
     AccessMCInfo = cms.untracked.bool(False)
 )

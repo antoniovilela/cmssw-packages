@@ -15,7 +15,7 @@
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
+#include "FWCore/Common/interface/TriggerNames.h" 
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
@@ -43,6 +43,8 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   //energyScaleHCAL_(pset.getParameter<bool>("EnergyScaleFactorHCAL")),
   energyScaleHCAL_(0.),
   accessMCInfo_(pset.getUntrackedParameter<bool>("AccessMCInfo",false)),
+  //hltPathNames_(pset.getParameter<std::vector<std::string> >("HLTPathNames")),
+  hltPathName_(pset.getParameter<std::string>("HLTPath")),
   genAllParticles_(0.,0.,0.,0.),genProtonPlus_(0.,0.,0.,0.),genProtonMinus_(0.,0.,0.,0.)
 {
   //FIXME
@@ -126,8 +128,9 @@ void MinimumBiasAnalysis::fillTriggerInfo(EventData& eventData, const edm::Event
   edm::Handle<edm::TriggerResults> triggerResults;
   event.getByLabel(triggerResultsTag_, triggerResults);
 
-  edm::TriggerNames triggerNames;
-  triggerNames.init(*triggerResults);
+  //edm::TriggerNames triggerNames;
+  //triggerNames.init(*triggerResults);
+  const edm::TriggerNames& triggerNames = event.triggerNames(*triggerResults);
 
   /*std::vector<std::string>::const_iterator pathName = triggerResultsPaths_.begin();
   std::vector<std::string>::const_iterator pathNames_end = triggerResultsPaths_.end();
@@ -136,10 +139,12 @@ void MinimumBiasAnalysis::fillTriggerInfo(EventData& eventData, const edm::Event
      bool wasrun = triggerResults->wasrun(trigIdx);
      bool accept = triggerResults->accept(trigIdx);
   }*/
-  int idx_HLT_MinBiasBSCOR = triggerNames.triggerIndex("HLT_MinBiasBSC_OR");
+  /*int idx_HLT_MinBiasBSCOR = triggerNames.triggerIndex("HLT_MinBiasBSC_OR");
   int idx_HLT_MinBiasPixel = triggerNames.triggerIndex("HLT_MinBiasPixel_SingleTrack"); 
   eventData.HLT_MinBiasBSCOR_ = (triggerResults->wasrun(idx_HLT_MinBiasBSCOR) && triggerResults->accept(idx_HLT_MinBiasBSCOR)) ? 1 : 0;
-  eventData.HLT_MinBiasPixel_ = (triggerResults->wasrun(idx_HLT_MinBiasPixel) && triggerResults->accept(idx_HLT_MinBiasPixel)) ? 1 : 0; 
+  eventData.HLT_MinBiasPixel_ = (triggerResults->wasrun(idx_HLT_MinBiasPixel) && triggerResults->accept(idx_HLT_MinBiasPixel)) ? 1 : 0;*/
+  int idxHLT = triggerNames.triggerIndex(hltPathName_);
+  eventData.HLTPath_ = (triggerResults->wasrun(idxHLT) && triggerResults->accept(idxHLT)) ? 1 : 0; 
 }
 
 void MinimumBiasAnalysis::fillVertexInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){

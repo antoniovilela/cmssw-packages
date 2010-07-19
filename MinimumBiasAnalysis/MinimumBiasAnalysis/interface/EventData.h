@@ -11,8 +11,9 @@ namespace minimumBiasAnalysis {
      int eventNumber_;
      int lumiSection_;
      int bunchCrossing_;
-     int HLT_MinBiasBSCOR_;
-     int HLT_MinBiasPixel_;
+     //int HLT_MinBiasBSCOR_;
+     //int HLT_MinBiasPixel_;
+     int HLTPath_;
      int nVertex_;
      double posXPrimVtx_;
      double posYPrimVtx_;
