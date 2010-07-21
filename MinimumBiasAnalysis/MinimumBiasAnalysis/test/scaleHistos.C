@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 void scaleByWidthHistos(std::string const& fileName, std::string const& dirName, std::vector<std::string> variables, bool saveHistos);
 void scaleByWidth(TH1F*);

@@ -5,7 +5,7 @@ class config: pass
 config.comEnergy = 7000.0
 config.varyAttributes = True
 config.runOfflineOnly = True
-config.runNoColl = True
+config.runNoColl = False
 config.runBPTX = False
 
 # Skim sequences

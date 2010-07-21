@@ -16,6 +16,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 using namespace minimumBiasAnalysis;
 
@@ -82,10 +83,6 @@ void minimumBiasTTreeAnalysis(TTree* data,
              << ">>> Writing histograms to " << outFileName << std::endl;
 
    std::vector<int> selectedRuns;
-   selectedRuns.push_back(124020);
-   selectedRuns.push_back(124025);
-   selectedRuns.push_back(124027);
-   selectedRuns.push_back(124030);
 
    bool selectProcessIds = (accessMCInfo && (processCategory != All));
    std::vector<int> selectedProcIds;
@@ -155,9 +152,9 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doVertexSelection = false;
    double primVtxZMax = 10.0;
    // HF
-   bool doHFSelection = true;
+   bool doHFSelection = false;
    double sumEnergyHFPlusMax = 99999.;
-   double sumEnergyHFMinusMax = 8.0;
+   double sumEnergyHFMinusMax = 99999.;
    // MET-SumET
    bool doSumETSelection = false;
    double sumETMin = 40.;
@@ -191,16 +188,16 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
      if(accessMCInfo){
         int processId = eventData.processId_;
-        if(selectProcessIds && find(selectedProcIds.begin(),selectedProcIds.end(),processId) == selectedProcIds.end()) continue;
+        if(selectProcessIds && std::find(selectedProcIds.begin(),selectedProcIds.end(),processId) == selectedProcIds.end()) continue;
 
-        std::vector<int>::const_iterator it_processId = find(processIDs.begin(),processIDs.end(),processId);
+        std::vector<int>::const_iterator it_processId = std::find(processIDs.begin(),processIDs.end(),processId);
         if(it_processId != processIDs.end()){
            int idx_processId = it_processId - processIDs.begin();
            histosTH1F["ProcessId"]->Fill(idx_processId);
         }  
      }
 
-     if(!accessMCInfo && selectEventsInRuns && find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
+     if(!accessMCInfo && selectEventsInRuns && std::find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
 
      histosTH1F["EventSelection"]->Fill("ProcessIdOrRunSelection",eventWeight);
 

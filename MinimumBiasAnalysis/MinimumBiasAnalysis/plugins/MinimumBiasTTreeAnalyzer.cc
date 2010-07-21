@@ -16,7 +16,7 @@ class MinimumBiasTTreeAnalyzer: public edm::EDAnalyzer
     explicit MinimumBiasTTreeAnalyzer(const edm::ParameterSet&);
     ~MinimumBiasTTreeAnalyzer();
 
-    virtual void beginJob(const edm::EventSetup&);
+    virtual void beginJob();
     virtual void beginRun(const edm::Run&, const edm::EventSetup&);
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
   private:
@@ -51,7 +51,7 @@ MinimumBiasTTreeAnalyzer::MinimumBiasTTreeAnalyzer(const edm::ParameterSet& pset
 
 MinimumBiasTTreeAnalyzer::~MinimumBiasTTreeAnalyzer(){}
 
-void MinimumBiasTTreeAnalyzer::beginJob(const edm::EventSetup& setup){
+void MinimumBiasTTreeAnalyzer::beginJob(){
   edm::Service<TFileService> fs;
 
   if(saveTTree_){
