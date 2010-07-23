@@ -6,7 +6,7 @@
 
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 
-enum generator_t {PYTHIA,PHOJET,PYTHIADW,PYTHIAP0,PYTHIAProQ20,PYTHIACW};
+enum generator_t {PYTHIA,PHOJET,PYTHIADW,PYTHIAP0,PYTHIAProQ20,PYTHIACW,PYTHIA8};
 enum process_category_t {All,SD,NonSD,Inelastic,DD,Diff};
 enum run_range_t {Data900GeV,Data2360GeV,Data7TeV};
 
@@ -67,6 +67,11 @@ std::string getDataLabel(int genType, int runRange){
       else if(runRange == Data2360GeV) label = "PYTHIACW_MinBias_2360GeV";
       else if(runRange == Data7TeV) label = "PYTHIACW_MinBias_7TeV";
       else throw RootException("ERROR: Invalid option");
+   } else if(genType == PYTHIA8){
+      if(runRange == Data900GeV) label = "PYTHIA8_MinBias_900GeV";
+      else if(runRange == Data2360GeV) label = "PYTHIA8_MinBias_2360GeV";
+      else if(runRange == Data7TeV) label = "PYTHIA8_MinBias_7TeV";
+      else throw RootException("ERROR: Invalid option"); 
    } else throw RootException("ERROR: Invalid option");
 
    return label;

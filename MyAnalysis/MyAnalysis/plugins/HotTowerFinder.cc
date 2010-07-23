@@ -47,7 +47,7 @@ class HotTowerFinder : public edm::EDAnalyzer
 #include "Geometry/CaloTopology/interface/HcalTopology.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include <iostream>
 #include "TFile.h"

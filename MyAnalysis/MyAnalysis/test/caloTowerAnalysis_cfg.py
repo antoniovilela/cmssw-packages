@@ -21,21 +21,25 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/data1/antoniov/MinBias_Summer08_IDEAL_V11_redigi_v1_GEN-SIM-RECO_FE5226D6-F9CE-DD11-9000-001BFCDBD15E.root')
+    fileNames = cms.untracked.vstring()
 )
-from fileNames_MinimumBias_Jan29ReReco_124023 import fileNames as fileNamesMinimumBias
-process.source.fileNames = fileNamesMinimumBias
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('analysisHistos_MinimumBias.root')
+    fileName = cms.string('analysisHistos_CaloTowerAnalysis.root')
 )
 
 process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
     CaloTowersLabel = cms.InputTag("towerMaker"),
     AccessRecHits = cms.untracked.bool(True),
     HFRecHitsLabel = cms.untracked.InputTag("hfreco"),
+    NBinsHB = cms.untracked.int32(20),
+    NBinsHE = cms.untracked.int32(20),
     NBinsHF = cms.untracked.int32(20),
-    NumberOfTresholds = cms.uint32(50),
+    NumberOfTresholds = cms.uint32(10),
+    TowerEnergyTresholdHBMin = cms.double(0.0),
+    TowerEnergyTresholdHBMax = cms.double(10.0),
+    TowerEnergyTresholdHEMin = cms.double(0.0),
+    TowerEnergyTresholdHEMax = cms.double(10.0),
     TowerEnergyTresholdHFMin = cms.double(0.0),
     TowerEnergyTresholdHFMax = cms.double(10.0),
     ReweightHFTower = cms.bool(False),
@@ -44,10 +48,13 @@ process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
 )
 
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.analysisSequences_cff')
-
-process.calotwranalysisNoColl = process.calotwranalysis.clone()
 process.calotwranalysisNoSel = process.calotwranalysis.clone()
-process.analysis = cms.Path(process.preSelection+process.l1Coll+process.offlineSelection+process.calotwranalysis)
-process.analysisNoSel = cms.Path(process.preSelection+process.calotwranalysisNoSel)
-process.analysisNoColl = cms.Path(process.preSelection+process.l1NoColl+process.offlineSelection+process.calotwranalysisNoColl)
-#process.analysis = cms.Path(process.offlineSelection+process.calotwranalysis)
+process.calotwranalysisColl = process.calotwranalysis.clone()
+process.calotwranalysisNoColl = process.calotwranalysis.clone()
+process.calotwranalysisNoCollNoVtx = process.calotwranalysis.clone()
+
+process.analysisNoSel = cms.Path(process.calotwranalysisNoSel)
+process.analysisColl = cms.Path(process.eventSelectionBscMinBiasOR + process.calotwranalysisColl)
+process.analysisNoColl = cms.Path(process.l1NoColl + process.calotwranalysisNoColl)
+process.analysisNoCollNoVtx = cms.Path(process.l1NoColl + ~process.primaryVertexFilter + process.calotwranalysisNoCollNoVtx)
+
