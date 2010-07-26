@@ -78,7 +78,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
    std::cout << "Use only selected runs: " << selectEventsInRuns << std::endl
              << "Access MC Info: " << accessMCInfo << std::endl
-             << "Generator type (PYTHIA=0, PHOJET=1): " << genType << std::endl
+             << "Generator type (PYTHIA6=0, PHOJET=1, PYTHIA8=2): " << genType << std::endl
              << "Processes to analyze (All=0, SD=1, NonSD=2, Inelastic=3, DD=4, Diff=5): " << processCategory << std::endl
              << ">>> Writing histograms to " << outFileName << std::endl;
 
@@ -90,6 +90,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
       if(selectProcessIds){
          if(genType == PYTHIA) getSelectedProcIdsPYTHIA(processCategory,selectedProcIds);
          else if(genType == PHOJET) getSelectedProcIdsPHOJET(processCategory,selectedProcIds);
+         else if(genType == PYTHIA8) getSelectedProcIdsPYTHIA8(processCategory,selectedProcIds);
       }
       if(verbose){
          std::stringstream out_str;
@@ -136,6 +137,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    if(accessMCInfo){ 
       if(genType == PYTHIA) getProcessIdsPYTHIA(processIDs,processNames);
       else if(genType == PHOJET) getProcessIdsPHOJET(processIDs,processNames);
+      else if(genType == PYTHIA8) getProcessIdsPYTHIA8(processIDs,processNames);
       else {std::cout << ">>> ERROR: Need to set a generator type" << std::endl;return;}
 
       histosTH1F["ProcessId"] = new TH1F("ProcessId","ProcessId",processIDs.size(),0,processIDs.size());

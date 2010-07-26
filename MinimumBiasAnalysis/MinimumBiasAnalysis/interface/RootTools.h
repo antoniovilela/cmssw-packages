@@ -6,15 +6,17 @@
 
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 
-enum generator_t {PYTHIA,PHOJET,PYTHIADW,PYTHIAP0,PYTHIAProQ20,PYTHIACW,PYTHIA8};
+enum generator_t {PYTHIA,PHOJET,PYTHIA8,PYTHIADW,PYTHIAP0,PYTHIAProQ20,PYTHIACW};
 enum process_category_t {All,SD,NonSD,Inelastic,DD,Diff};
 enum run_range_t {Data900GeV,Data2360GeV,Data7TeV};
 
 std::string getProcessCategoryName(int processCategory);
 void getProcessIdsPYTHIA(std::vector<int>& processIDs, std::vector<std::string>& processNames);
 void getProcessIdsPHOJET(std::vector<int>& processIDs, std::vector<std::string>& processNames);
+void getProcessIdsPYTHIA8(std::vector<int>& processIDs, std::vector<std::string>& processNames);
 void getSelectedProcIdsPYTHIA(int processCategory,std::vector<int>& selectedProcIds);
 void getSelectedProcIdsPHOJET(int processCategory,std::vector<int>& selectedProcIds);
+void getSelectedProcIdsPYTHIA8(int processCategory,std::vector<int>& selectedProcIds);
 
 std::string getDataLabel(int runRange);
 std::string getDataLabel(int genType, int runRange);
@@ -190,6 +192,19 @@ void getProcessIdsPHOJET(std::vector<int>& processIDs, std::vector<std::string>&
    processNames.push_back("Double diffraction");
 }
 
+void getProcessIdsPYTHIA8(std::vector<int>& processIDs, std::vector<std::string>& processNames){
+   processIDs.push_back(101);
+   processNames.push_back("Inelastic");
+   processIDs.push_back(102);
+   processNames.push_back("Elastic");
+   processIDs.push_back(103);
+   processNames.push_back("SD AB #rightarrow XB");
+   processIDs.push_back(104);
+   processNames.push_back("SD AB #rightarrow AX");
+   processIDs.push_back(105);
+   processNames.push_back("DD AB #rightarrow X_{1}X_{2}");
+}
+
 void getSelectedProcIdsPYTHIA(int processCategory,std::vector<int>& selectedProcIds){
    switch (processCategory){
       case SD:
@@ -249,6 +264,30 @@ void getSelectedProcIdsPHOJET(int processCategory,std::vector<int>& selectedProc
          selectedProcIds.push_back(5);
          selectedProcIds.push_back(6);
          selectedProcIds.push_back(7);
+         break;
+   }
+}
+
+void getSelectedProcIdsPYTHIA8(int processCategory,std::vector<int>& selectedProcIds){
+   switch (processCategory){
+      case SD:
+         selectedProcIds.push_back(103);
+         selectedProcIds.push_back(104);
+         break;
+      case NonSD:
+         selectedProcIds.push_back(101);
+         selectedProcIds.push_back(105);
+         break;
+      case Inelastic:
+         selectedProcIds.push_back(101);
+         break;
+      case DD:
+         selectedProcIds.push_back(105);
+         break;
+      case Diff:
+         selectedProcIds.push_back(103);
+         selectedProcIds.push_back(104);
+         selectedProcIds.push_back(105);
          break;
    }
 }
