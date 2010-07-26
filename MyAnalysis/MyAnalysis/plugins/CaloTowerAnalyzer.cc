@@ -135,17 +135,17 @@ void CaloTowerAnalyzer::beginJob(){
      histosnhfhigh_.push_back(fs->make<TH1F>(hname,"Towers mult. HF high",nBinsHF_,0,nBinsHF_));*/
   }
 
-  histosTH1F_["energyHB"] = fs->make<TH1F>("energyHB","Tower Energy HB",200,0.,15.0);
-  histosTH1F_["energyHBplus"] = fs->make<TH1F>("energyHBplus","Tower Energy HB-plus",200,0.,15.0);
-  histosTH1F_["energyHBminus"] = fs->make<TH1F>("energyHBminus","Tower Energy HB-minus",200,0.,15.0);
-  histosTH1F_["emEnergyHB"] = fs->make<TH1F>("emEnergyHB","EM Tower Energy HB",200,0.,15.0);
-  histosTH1F_["hadEnergyHB"] = fs->make<TH1F>("hadEnergyHB","HAD Tower Energy HB",200,0.,15.0);
+  histosTH1F_["energyHB"] = fs->make<TH1F>("energyHB","Tower Energy HB",200,0.,8.0);
+  histosTH1F_["energyHBplus"] = fs->make<TH1F>("energyHBplus","Tower Energy HB-plus",200,0.,8.0);
+  histosTH1F_["energyHBminus"] = fs->make<TH1F>("energyHBminus","Tower Energy HB-minus",200,0.,8.0);
+  histosTH1F_["emEnergyHB"] = fs->make<TH1F>("emEnergyHB","EM Tower Energy HB",200,0.,8.0);
+  histosTH1F_["hadEnergyHB"] = fs->make<TH1F>("hadEnergyHB","HAD Tower Energy HB",200,0.,8.0);
   histosTH1F_["emFractionHB"] = fs->make<TH1F>("emFractionHB","EM energy fraction HB",200,0.,1.1);
-  histosTH1F_["energyHE"] = fs->make<TH1F>("energyHE","Tower Energy HE",200,0.,15.0);
-  histosTH1F_["energyHEplus"] = fs->make<TH1F>("energyHEplus","Tower Energy HE-plus",200,0.,15.0);
-  histosTH1F_["energyHEminus"] = fs->make<TH1F>("energyHEminus","Tower Energy HE-minus",200,0.,15.0);
-  histosTH1F_["emEnergyHE"] = fs->make<TH1F>("emEnergyHE","EM Tower Energy HE",200,0.,15.0);
-  histosTH1F_["hadEnergyHE"] = fs->make<TH1F>("hadEnergyHE","HAD Tower Energy HE",200,0.,15.0);
+  histosTH1F_["energyHE"] = fs->make<TH1F>("energyHE","Tower Energy HE",200,0.,10.0);
+  histosTH1F_["energyHEplus"] = fs->make<TH1F>("energyHEplus","Tower Energy HE-plus",200,0.,10.0);
+  histosTH1F_["energyHEminus"] = fs->make<TH1F>("energyHEminus","Tower Energy HE-minus",200,0.,10.0);
+  histosTH1F_["emEnergyHE"] = fs->make<TH1F>("emEnergyHE","EM Tower Energy HE",200,0.,10.0);
+  histosTH1F_["hadEnergyHE"] = fs->make<TH1F>("hadEnergyHE","HAD Tower Energy HE",200,0.,10.0);
   histosTH1F_["emFractionHE"] = fs->make<TH1F>("emFractionHE","EM energy fraction HE",200,0.,1.1);
   histosTH1F_["energyHF"] = fs->make<TH1F>("energyHF","Tower Energy HF",200,0.,15.0);
   histosTH1F_["energyHFplus"] = fs->make<TH1F>("energyHFplus","Tower Energy HF-plus",200,0.,15.0);

@@ -29,7 +29,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
-    CaloTowersLabel = cms.InputTag("towerMaker"),
+    CaloTowersTag = cms.InputTag("towerMaker"),
     AccessRecHits = cms.untracked.bool(True),
     HFRecHitsLabel = cms.untracked.InputTag("hfreco"),
     NBinsHB = cms.untracked.int32(20),
@@ -48,13 +48,35 @@ process.calotwranalysis = cms.EDAnalyzer("CaloTowerAnalyzer",
 )
 
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.analysisSequences_cff')
+
+process.generalTracksFilter = cms.EDFilter("TrackCountFilter",
+    src = cms.InputTag('generalTracks'),
+    minNumber = cms.uint32(1) 
+)
+#process.pixelLessTracksFilter = cms.EDFilter("TrackCountFilter",
+#    src = cms.InputTag('ctfPixelLess'),
+#    minNumber = cms.uint32(1) 
+#)
+process.pixelTracksFilter = cms.EDFilter("TrackCountFilter",
+    src = cms.InputTag('pixelTracks'),
+    minNumber = cms.uint32(1) 
+)
+
+process.vertexVeto = cms.Sequence(~process.primaryVertexFilter)
+process.trackVeto = cms.Sequence(~process.generalTracksFilter +
+                                 ~process.pixelTracksFilter) 
+
 process.calotwranalysisNoSel = process.calotwranalysis.clone()
 process.calotwranalysisColl = process.calotwranalysis.clone()
 process.calotwranalysisNoColl = process.calotwranalysis.clone()
 process.calotwranalysisNoCollNoVtx = process.calotwranalysis.clone()
+process.calotwranalysisNoCollNoTrk = process.calotwranalysis.clone()
 
 process.analysisNoSel = cms.Path(process.calotwranalysisNoSel)
 process.analysisColl = cms.Path(process.eventSelectionBscMinBiasOR + process.calotwranalysisColl)
 process.analysisNoColl = cms.Path(process.l1NoColl + process.calotwranalysisNoColl)
-process.analysisNoCollNoVtx = cms.Path(process.l1NoColl + ~process.primaryVertexFilter + process.calotwranalysisNoCollNoVtx)
+process.analysisNoCollNoVtx = cms.Path(process.l1NoColl + process.vertexVeto + 
+                                       process.calotwranalysisNoCollNoVtx)
+process.analysisNoCollNoTrk = cms.Path(process.l1NoColl + process.trackVeto +
+                                       process.calotwranalysisNoCollNoTrk)
 
