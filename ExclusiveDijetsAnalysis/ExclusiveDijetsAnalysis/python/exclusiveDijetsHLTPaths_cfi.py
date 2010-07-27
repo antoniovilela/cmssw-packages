@@ -1,7 +1,0 @@
-import FWCore.ParameterSet.Config as cms
-
-import copy
-from HLTrigger.HLTfilters.hltHighLevel_cfi import *
-exclusiveDijetsHLTFilter = copy.deepcopy(hltHighLevel)
-#exclusiveDijetsHLTFilter.HLTPaths = ['HLT_DiJetAve30']
-exclusiveDijetsHLTFilter.HLTPaths = ['HLT_Jet30']
