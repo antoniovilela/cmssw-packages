@@ -23,6 +23,10 @@ namespace minimumBiasAnalysis {
      double leadingJetPhi_;
      int trackMultiplicity_;
      int trackMultiplicityAssociatedToPV_;
+     int multiplicityHEPlus_;
+     int multiplicityHEMinus_;
+     double sumEnergyHEPlus_;
+     double sumEnergyHEMinus_;
      int multiplicityHFPlus_;
      int multiplicityHFMinus_;
      double sumEnergyHFPlus_;

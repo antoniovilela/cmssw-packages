@@ -73,16 +73,16 @@ trackMultiplicityAssociatedToPV = trackMultiplicity.clone(TracksTag = "selectTra
 trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
 trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
 
-from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.hfTower_cfi import *
-hfTower.DiscardFlaggedTowers = True
-hfTowerScale090 = hfTower.clone(ApplyEnergyScale = True,EnergyScaleFactor = 0.90)
-hfTowerScale092 = hfTower.clone(ApplyEnergyScale = True,EnergyScaleFactor = 0.92)
-hfTowerScale095 = hfTower.clone(ApplyEnergyScale = True,EnergyScaleFactor = 0.95)
-hfTowerScale098 = hfTower.clone(ApplyEnergyScale = True,EnergyScaleFactor = 0.98)
-hfTowerScale102 = hfTower.clone(ApplyEnergyScale = True,EnergyScaleFactor = 1.02)
-hfTowerScale105 = hfTower.clone(ApplyEnergyScale = True,EnergyScaleFactor = 1.05)
-hfTowerScale108 = hfTower.clone(ApplyEnergyScale = True,EnergyScaleFactor = 1.08)
-hfTowerScale110 = hfTower.clone(ApplyEnergyScale = True,EnergyScaleFactor = 1.10)
+from Utilities.AnalysisTools.hcalActivitySummary_cfi import *
+hcalActivitySummary.DiscardFlaggedTowers = True
+hcalActivitySummaryScale090 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.90,EnergyScaleFactorHE = 0.90,EnergyScaleFactorHF = 0.90)
+hcalActivitySummaryScale092 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.92,EnergyScaleFactorHE = 0.92,EnergyScaleFactorHF = 0.92)
+hcalActivitySummaryScale095 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.95,EnergyScaleFactorHE = 0.95,EnergyScaleFactorHF = 0.95)
+hcalActivitySummaryScale098 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.98,EnergyScaleFactorHE = 0.98,EnergyScaleFactorHF = 0.98)
+hcalActivitySummaryScale102 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.02,EnergyScaleFactorHE = 1.02,EnergyScaleFactorHF = 1.02)
+hcalActivitySummaryScale105 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.05,EnergyScaleFactorHE = 1.05,EnergyScaleFactorHF = 1.05)
+hcalActivitySummaryScale108 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.08,EnergyScaleFactorHE = 1.08,EnergyScaleFactorHF = 1.08)
+hcalActivitySummaryScale110 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.10,EnergyScaleFactorHE = 1.10,EnergyScaleFactorHF = 1.10)
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import *
@@ -125,6 +125,13 @@ eventSelectionBscMinBiasOR = cms.Sequence(hltBscMinBiasOR+offlineSelection)
 eventSelectionBscMinBiasORNoColl = cms.Sequence(hltBscMinBiasORNoColl+offlineSelection)
 eventSelectionBscMinBiasORBPTXOR = cms.Sequence(hltBscMinBiasORBPTXOR+offlineSelection) 
 
+from Utilities.AnalysisTools.hcalActivityFilter_cfi import hcalActivityFilter
+hcalActivityFilter.EnergyThresholdHB = 2.0
+hcalActivityFilter.EnergyThresholdHE = 2.0
+hcalActivityFilter.EnergyThresholdHF = 4.0
+hcalVetoHEHFPlus = hcalActivityFilter.clone(NTowersMaxHEPlus = 0, NTowersMaxHFPlus = 0)
+hcalVetoHEHFMinus = hcalActivityFilter.clone(NTowersMaxHEMinus = 0, NTowersMaxHFMinus = 0)
+
 #jets = cms.Sequence(leadingJets)
 #tracks = cms.Sequence(selectGoodTracks*
 #                      selectTracksAssociatedToPV*
@@ -135,10 +142,12 @@ tracks = cms.Sequence(selectGoodTracks*selectTracksAssociatedToPV)
 #                       trackMultiplicityAssociatedToPV+
 #                       trackMultiplicityOutsideJets+
 #                       trackMultiplicityTransverseRegion+
-#                       hfTower+
+#                       hcalActivitySummary+
 #                       xiTower)
 edmDump = cms.Sequence(trackMultiplicity+
                        trackMultiplicityAssociatedToPV+
-                       hfTower+hfTowerScale090+hfTowerScale092+hfTowerScale095+hfTowerScale098+
-                       hfTowerScale102+hfTowerScale105+hfTowerScale108+hfTowerScale110+
+                       hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
+                       hcalActivitySummaryScale095+hcalActivitySummaryScale098+
+                       hcalActivitySummaryScale102+hcalActivitySummaryScale105+
+                       hcalActivitySummaryScale108+hcalActivitySummaryScale110+
                        xiTower+xiFromCaloTowers+xiFromJets)

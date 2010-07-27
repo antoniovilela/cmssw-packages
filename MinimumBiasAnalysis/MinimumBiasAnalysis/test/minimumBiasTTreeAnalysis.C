@@ -267,7 +267,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
      // HF Selection
      if(doHFSelection && ( eventData.sumEnergyHFPlus_ > sumEnergyHFPlusMax || eventData.sumEnergyHFMinus_ > sumEnergyHFMinusMax)) continue;
-     histosTH1F["EventSelection"]->Fill("HFSelection",eventWeight);
+     histosTH1F["EventSelection"]->Fill("HCALSelection",eventWeight);
 
      // MET - SumET
      if(doSumETSelection && (eventData.sumET_ < sumETMin)) continue;
@@ -360,17 +360,24 @@ void minimumBiasTTreeAnalysis(TTree* data,
      unsigned int nTracks = eventData.trackMultiplicity_;
      unsigned int nTracksAssociatedToPV = eventData.trackMultiplicityAssociatedToPV_;
 
+     unsigned int nHE_plus = eventData.multiplicityHEPlus_;
+     unsigned int nHE_minus = eventData.multiplicityHEMinus_;
      unsigned int nHF_plus = eventData.multiplicityHFPlus_;
      unsigned int nHF_minus = eventData.multiplicityHFMinus_;
  
      histosTH1F["trackMultiplicity"]->Fill(nTracks);
      histosTH1F["trackMultiplicityAssociatedToPV"]->Fill(nTracksAssociatedToPV);
 
+     histosTH1F["multiplicityHEPlus"]->Fill(nHE_plus);
+     histosTH1F["multiplicityHEMinus"]->Fill(nHE_minus);
      histosTH1F["multiplicityHFPlus"]->Fill(nHF_plus);
      histosTH1F["multiplicityHFMinus"]->Fill(nHF_minus);     
      histosTH1F["multiplicityHFPlusVarBin"]->Fill(nHF_plus);
      histosTH1F["multiplicityHFMinusVarBin"]->Fill(nHF_minus);
 
+     histosTH2F["multiplicityHFvsHEPlus"]->Fill(nHF_plus,nHE_plus);
+     histosTH2F["multiplicityHFvsHEMinus"]->Fill(nHF_minus,nHE_minus);
+ 
      for(unsigned int ieta = 29, index = 0; ieta <= 41; ++ieta,++index){
         int nHFPlus_ieta = eventData.multiplicityHFPlusVsiEta_[index];
         histosTH2F["iEtaVsHFCountPlus"]->Fill(ieta,nHFPlus_ieta);

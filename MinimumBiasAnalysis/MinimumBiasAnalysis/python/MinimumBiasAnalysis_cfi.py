@@ -8,10 +8,10 @@ MinimumBiasAnalysis = cms.PSet(
     CaloTowerTag = cms.InputTag("towerMaker"), 
     ParticleFlowTag = cms.InputTag("particleFlow"),
     TriggerResultsTag = cms.InputTag("TriggerResults::HLT"),
-    HFTowerSummaryTag = cms.InputTag("hfTower"),
+    HCALTowerSummaryTag = cms.InputTag("hcalActivitySummary"),
     # Misc
-    HFThresholdIndex = cms.uint32(20),
-    EnergyThresholdHBHE = cms.double(3.0),
+    EnergyThresholdHB = cms.double(2.0),
+    EnergyThresholdHE = cms.double(2.0),
     EnergyThresholdHF = cms.double(4.0),
     # Options
     EBeam = cms.double(3500.),

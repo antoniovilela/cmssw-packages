@@ -21,6 +21,10 @@ namespace minimumBiasAnalysis {
      data.Branch("leadingJetPhi",&eventData.leadingJetPhi_,"leadingJetPhi/D");
      data.Branch("trackMultiplicity",&eventData.trackMultiplicity_,"trackMultiplicity/I");
      data.Branch("trackMultiplicityAssociatedToPV",&eventData.trackMultiplicityAssociatedToPV_,"trackMultiplicityAssociatedToPV/I");
+     data.Branch("multiplicityHEPlus",&eventData.multiplicityHEPlus_,"multiplicityHEPlus/I");
+     data.Branch("multiplicityHEMinus",&eventData.multiplicityHEMinus_,"multiplicityHEMinus/I");
+     data.Branch("sumEnergyHEPlus",&eventData.sumEnergyHEPlus_,"sumEnergyHEPlus/D");
+     data.Branch("sumEnergyHEMinus",&eventData.sumEnergyHEMinus_,"sumEnergyHEMinus/D");
      data.Branch("multiplicityHFPlus",&eventData.multiplicityHFPlus_,"multiplicityHFPlus/I");
      data.Branch("multiplicityHFMinus",&eventData.multiplicityHFMinus_,"multiplicityHFMinus/I");
      data.Branch("sumEnergyHFPlus",&eventData.sumEnergyHFPlus_,"sumEnergyHFPlus/D");
@@ -77,6 +81,10 @@ namespace minimumBiasAnalysis {
      data.SetBranchAddress("leadingJetPhi",&eventData.leadingJetPhi_);
      data.SetBranchAddress("trackMultiplicity",&eventData.trackMultiplicity_);
      data.SetBranchAddress("trackMultiplicityAssociatedToPV",&eventData.trackMultiplicityAssociatedToPV_);
+     data.SetBranchAddress("multiplicityHEPlus",&eventData.multiplicityHEPlus_);
+     data.SetBranchAddress("multiplicityHEMinus",&eventData.multiplicityHEMinus_);
+     data.SetBranchAddress("sumEnergyHEPlus",&eventData.sumEnergyHEPlus_);
+     data.SetBranchAddress("sumEnergyHEMinus",&eventData.sumEnergyHEMinus_);
      data.SetBranchAddress("multiplicityHFPlus",&eventData.multiplicityHFPlus_);
      data.SetBranchAddress("multiplicityHFMinus",&eventData.multiplicityHFMinus_);
      data.SetBranchAddress("sumEnergyHFPlus",&eventData.sumEnergyHFPlus_);
