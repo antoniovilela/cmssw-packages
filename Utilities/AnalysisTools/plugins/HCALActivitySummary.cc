@@ -61,7 +61,7 @@ HCALActivitySummary::HCALActivitySummary(edm::ParameterSet const& pset):
   eThresholdHEMax_(pset.getParameter<double>("TowerEnergyThresholdHEMax")),
   eThresholdHFMin_(pset.getParameter<double>("TowerEnergyThresholdHFMin")),
   eThresholdHFMax_(pset.getParameter<double>("TowerEnergyThresholdHFMax")),
-  nThresholdIter_(pset.getParameter<unsigned int>("NumberOfTresholds")),   
+  nThresholdIter_(pset.getParameter<unsigned int>("NumberOfThresholds")),   
   discardFlaggedTowers_(pset.getParameter<bool>("DiscardFlaggedTowers")),
   applyEnergyScale_(pset.getParameter<bool>("ApplyEnergyScale")),
   energyScaleHB_(1.0),

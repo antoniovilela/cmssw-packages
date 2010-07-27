@@ -10,7 +10,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring()
+    fileNames = cms.untracked.vstring('file:/tmp/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_CA78CDED-2E83-DF11-BDD8-0026189438A7.root')
 )
 
 process.load('Utilities.AnalysisTools.hcalActivitySummary_cfi')
