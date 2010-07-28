@@ -5,89 +5,108 @@ process = cms.Process("Analysis")
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.debugModules = cms.untracked.vstring('')
 process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append('PATSummaryTables')
-process.MessageLogger.cerr.INFO = cms.untracked.PSet(
-    default          = cms.untracked.PSet( limit = cms.untracked.int32(0)  ),
-    PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) )
-)
+process.MessageLogger.cerr.INFO.limit = -1
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/tmp/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_cff_py_RAW2DIGI_RECO.root')
+    fileNames = cms.untracked.vstring('file:/tmp/antoniov/ExHuME_CEPDijetsGG_M100_10TeV_cff_py_RAW2DIGI_RECO_1.root')
 )
 
-process.load('Configuration/StandardSequences/GeometryPilot2_cff')
-process.load('Configuration/StandardSequences/MagneticField_38T_cff')
-process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = 'IDEAL_V12::All'
+process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.exclusiveDijetsHLTPaths_cfi")
 
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
+process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer08_cff")
+#process.prefer("L2L3JetCorrectorSC7PF")
 
-import PhysicsTools.PatAlgos.tools.coreTools as coreTools
-import PhysicsTools.PatAlgos.tools.jetTools as jetTools
+process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.leadingJets_cfi")
+process.leadingJets.src = "L2L3CorJetSC7PF"
 
-#jetTools.switchJECSet(process,"Summer08Redigi","Summer08")
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectGoodTracks_cfi")
+process.selectGoodTracks.cut = "pt > 0.5 & numberOfValidHits > 7 & d0 <= 3.5"
+process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi")
+process.tracksOutsideJets.src = "selectGoodTracks" 
+process.tracksOutsideJets.JetTag = "leadingJets"
+process.tracksOutsideJets.JetConeSize = 0.7
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi")
+process.selectTracksAssociatedToPV.src = "tracksOutsideJets"
+process.selectTracksAssociatedToPV.MaxDistanceFromVertex = 0.2
 
-#jetAlgos = ['KT6','SC5','SC7']
-#jetTypes = ['Calo','PF']
-
-jetAlgos = ['SC5','SC7']
-jetTypes = ['PF']
-
-for algo in jetAlgos:
-    for type in jetTypes:
-        algo_full = (algo.replace('KT','kt')).replace('SC','sisCone')
-        label = algo+type
-        coll = algo_full+type+'Jets'
-        genColl = algo_full+'GenJets'
-        jetTools.addJetCollection(process,cms.InputTag(coll),label,
-                                  doJTA=True,doBTagging=True,
-                                  jetCorrLabel=(algo,type),
-                                  doType1MET=False,doL1Counters=False,
-                                  genJetCollection=cms.InputTag(genColl),
-                                  doTrigMatch=False)
-
-jetTools.switchJetCollection(process,
-                             cms.InputTag("sisCone7PFJets"),
-                             doJTA=True,
-                             doBTagging=True,
-                             jetCorrLabel=('SC7','PF'),
-                             doType1MET=False,
-                             genJetCollection=cms.InputTag("sisCone7GenJets"))
-
-objs = ['Muons','Electrons','Taus','Photons']
-for item in objs: coreTools.removeSpecificPATObject(process,item)
-
-coreTools.removeCleaning(process)
-
-process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.analysisSequences_cff")
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.trackMultiplicity_cfi") 
+process.trackMultiplicity.TracksTag = "selectGoodTracks"
+process.trackMultiplicityOutsideJets = process.trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
+process.trackMultiplicityAssociatedToPV = process.trackMultiplicity.clone(TracksTag = "selectTracksAssociatedToPV")
 
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpInfo_cfi")
-process.pileUpInfo.AccessCrossingFramePlayBack = True
-process.pileUpInfo.BunchCrossings = cms.vint32(0)
 process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.pileUpNumberFilter_cfi")
 
-from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.myEventContent_cff import MyEventContent_PAT as MyEventContent
-process.load("ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.outputModule_cfi")
-process.output.outputCommands = MyEventContent.outputCommands 
-process.output.fileName = 'edmDump_exclusiveDijets.root'
-process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.hfTower_cfi")
+process.load("DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi")
+process.xiTower.UseMETInfo = False
+
+process.l1filter = cms.EDFilter("L1TriggerTestFilter",
+  HFRingETSumThreshold = cms.int32(0),
+  L1TriggerNames = cms.vstring("L1_SingleJet30"),
+  AccessL1GctHFRingEtSums = cms.untracked.bool(True) 
+)
+
+process.analysisBeforeSelection = cms.EDAnalyzer("SimpleDijetsAnalyzer",
+    JetTag = cms.InputTag("L2L3CorJetSC7PF")
+)
+process.analysisAfterSelection = process.analysisBeforeSelection.clone()
+
+process.MyEventContent = cms.PSet(
+        outputCommands = cms.untracked.vstring('drop *')
+)
+process.MyEventContent.outputCommands.append('keep *_selectGoodTracks_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_tracksOutsideJets_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_selectTracksAssociatedToPV_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_iterativeCone5PFJets_*_*')
+process.MyEventContent.outputCommands.append('keep *_L2L3CorJetSC7PF_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_trackMultiplicity_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_trackMultiplicityOutsideJets_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_trackMultiplicityAssociatedToPV_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_pileUpInfo_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_hfTower_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_xiTower_*_Analysis')
+process.MyEventContent.outputCommands.append('keep *_genParticles_*_*')
+process.MyEventContent.outputCommands.append('keep recoTracks_generalTracks_*_*')
+process.MyEventContent.outputCommands.append('keep *_offlinePrimaryVertices_*_*')
+
+process.output = cms.OutputModule("PoolOutputModule",
+    process.MyEventContent,
+    fileName = cms.untracked.string('edmDump_CEPDijetsGG_10TeV.root'),
+    dataset = cms.untracked.PSet(
+        dataTier = cms.untracked.string('USER'),
+        filterName = cms.untracked.string('')
+    ),
+    SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('selection_step')
+    )
+)
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysis_histos.root")
 )
 
-#process.recoSequence = cms.Sequence(process.jets*process.btagging*process.tracks*process.edmDump+process.pileUpInfo)
-process.recoSequence = cms.Sequence(process.jets*process.tracks*process.edmDump+process.pileUpInfo)
+process.hlt = cms.Sequence(process.l1filter + process.exclusiveDijetsHLTFilter)
+process.jets = cms.Sequence(process.L2L3CorJetSC7PF*process.leadingJets)
+process.tracks = cms.Sequence(process.selectGoodTracks*process.tracksOutsideJets*process.selectTracksAssociatedToPV) 
+process.edmDump = cms.Sequence(process.trackMultiplicity+
+                               process.trackMultiplicityOutsideJets+
+                               process.trackMultiplicityAssociatedToPV+
+                               process.pileUpInfo+
+                               process.hfTower+
+                               process.xiTower)
+process.analysisBefore = cms.Sequence(process.analysisBeforeSelection)
+process.analysisAfter = cms.Sequence(process.hlt*process.analysisAfterSelection)
 
 process.selection_step = cms.Path(process.hlt)
-process.reco_step = cms.Path(process.hlt+process.recoSequence)
-process.pat_step = cms.Path(process.hlt+process.patDefaultSequence)
+process.reco_step = cms.Path(process.jets*process.tracks*process.edmDump)
 process.analysis_step = cms.Path(process.analysisBefore+
                                  process.analysisAfter)
 
 process.out_step = cms.EndPath(process.output)
 #process.schedule = cms.Schedule(process.hlt_step,process.reco_step,process.analysis_step,process.out_step)
+

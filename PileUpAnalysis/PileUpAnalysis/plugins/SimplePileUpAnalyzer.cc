@@ -25,7 +25,7 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
   virtual void beginJob(const edm::EventSetup & setup);
  private:
   edm::InputTag tracksTag_;
-  edm::InputTag vertexTag_;
+  edm::InputTag verticesTag_;
   edm::InputTag trackAssociatorTag_;
   edm::InputTag caloTowersTag_;
   edm::InputTag genParticlesTag_;
@@ -54,7 +54,7 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
     int nPileUp_[9];
     int nEventsBx0_;
     int processIdBx0_[20];
-    int nPrimVertexes_;
+    int nPrimVertices_;
     float fracTracksAwayPV_;
     float xiGen_;
     float xiFromTowersPlus_;
@@ -102,9 +102,9 @@ class SimplePileUpAnalyzer  : public edm::EDAnalyzer {
   TH2F* hFracTracksAwayPVvsNPUBx0_;
   TH2F* hFracTracksAwayPVvsNPUBx0SingleVtx_;
  
-  TH1F* hNPrimVertexes_;
-  TH1F* hNPrimVertexesSingleInt_;
-  TH1F* hNPrimVertexesPileUp_;
+  TH1F* hNPrimVertices_;
+  TH1F* hNPrimVerticesSingleInt_;
+  TH1F* hNPrimVerticesPileUp_;
 
   TProfile* profNPVvsNPUBx0_;
   TProfile* profNPUBx0vsNPV_;
@@ -182,7 +182,7 @@ typedef std::map<std::pair<int,int>,unsigned int> TrackMultMap;
 
 SimplePileUpAnalyzer::SimplePileUpAnalyzer(const edm::ParameterSet& conf):
   tracksTag_(conf.getParameter<edm::InputTag>("TracksTag")),
-  vertexTag_(conf.getParameter<edm::InputTag>("VertexTag")),
+  verticesTag_(conf.getParameter<edm::InputTag>("VerticesTag")),
   trackAssociatorTag_(conf.getParameter<edm::InputTag>("TrackAssociatorTag")),
   caloTowersTag_(conf.getParameter<edm::InputTag>("CaloTowersTag")),
   genParticlesTag_(conf.getParameter<edm::InputTag>("GenParticlesTag")),
@@ -209,17 +209,17 @@ void SimplePileUpAnalyzer::beginJob(const edm::EventSetup& setup) {
   data_->Branch("signalData",&signalData_,"trackDistPV_/F:primVtxPosX_:primVtxPosY_:primVtxPosZ_:trackMult_/I");
   data_->Branch("pileUpData",&pileUpData_,"trackDistPV_/F:primVtxPosX_:primVtxPosY_:primVtxPosZ_:trackMult_/I");
   data_->Branch("pileUpOutOfTimeData",&pileUpOutOfTimeData_,"trackDistPV_/F:primVtxPosX_:primVtxPosY_:primVtxPosZ_:trackMult_/I");
-  data_->Branch("eventData",&eventData_,"nPrimVertexes_/I:fracTracksAwayPV_/F:xiFromTowersPlus_:xiFromTowersMinus_:xiFromTracksPlus_:xiFromTracksMinus_");*/
+  data_->Branch("eventData",&eventData_,"nPrimVertices_/I:fracTracksAwayPV_/F:xiFromTowersPlus_:xiFromTowersMinus_:xiFromTracksPlus_:xiFromTracksMinus_");*/
   
   /*data_->Branch("nBunches",&tree_nBunches_,"nBunches/I");
   data_->Branch("nPileUp",tree_nPileUp_,"nPileUp[nBunches]/I");
-  data_->Branch("eventData",&eventData_,"nPrimVertexes_/I:fracTracksAwayPV_/F:xiFromTowersPlus_:xiFromTowersMinus_:xiFromTracksPlus_:xiFromTracksMinus_");*/
+  data_->Branch("eventData",&eventData_,"nPrimVertices_/I:fracTracksAwayPV_/F:xiFromTowersPlus_:xiFromTowersMinus_:xiFromTracksPlus_:xiFromTracksMinus_");*/
 
   data_->Branch("nBunches",&eventData_.nBunches_,"nBunches/I");
   data_->Branch("nPileUp",eventData_.nPileUp_,"nPileUp[nBunches]/I");
   data_->Branch("nEventsBx0",&eventData_.nEventsBx0_,"nEventsBx0/I");
   data_->Branch("processIdBx0",eventData_.processIdBx0_,"processIdBx0[nEventsBx0]/I");
-  data_->Branch("nPrimVertexes",&eventData_.nPrimVertexes_,"nPrimVertexes/I");
+  data_->Branch("nPrimVertices",&eventData_.nPrimVertices_,"nPrimVertices/I");
   data_->Branch("fracTracksAwayPV",&eventData_.fracTracksAwayPV_,"fracTracksAwayPV/F");
   data_->Branch("xiGen",&eventData_.xiGen_,"xiGen/F");
   data_->Branch("xiFromTowersPlus",&eventData_.xiFromTowersPlus_,"xiFromTowersPlus/F");
@@ -269,9 +269,9 @@ void SimplePileUpAnalyzer::beginJob(const edm::EventSetup& setup) {
   hFracTracksAwayPVvsNPUBx0_ = fs->make<TH2F>("FracTracksAwayPVvsNPUBx0","FracTracksAwayPVvsNPUBx0",10,0,10,100,0.,1.);
   hFracTracksAwayPVvsNPUBx0SingleVtx_ = fs->make<TH2F>("FracTracksAwayPVvsNPUBx0SingleVtx","FracTracksAwayPVvsNPUBx0SingleVtx",10,0,10,100,0.,1.);
 
-  hNPrimVertexes_ = fs->make<TH1F>("NPrimVertexes","NPrimVertexes",10,0,10);
-  hNPrimVertexesSingleInt_ = fs->make<TH1F>("NPrimVertexesSingleInt","NPrimVertexesSingleInt",10,0,10);
-  hNPrimVertexesPileUp_ = fs->make<TH1F>("NPrimVertexesPileUp","NPrimVertexesPileUp",10,0,10);
+  hNPrimVertices_ = fs->make<TH1F>("NPrimVertices","NPrimVertices",10,0,10);
+  hNPrimVerticesSingleInt_ = fs->make<TH1F>("NPrimVerticesSingleInt","NPrimVerticesSingleInt",10,0,10);
+  hNPrimVerticesPileUp_ = fs->make<TH1F>("NPrimVerticesPileUp","NPrimVerticesPileUp",10,0,10);
 
   profNPVvsNPUBx0_ = fs->make<TProfile>("profNPVvsNPUBx0","profNPVvsNPUBx0",10,0,10);
   profNPUBx0vsNPV_ = fs->make<TProfile>("profNPUBx0vsNPV","profNPUBx0vsNPV",10,0,10);
@@ -342,7 +342,7 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
     edm::LogVerbatim("Analysis") << "edm::HepMCProduct " << countHepMC << ": \n" 
                                   << "     Event number: " << genEvt->event_number() << "\n"
                                   << "     Process Id: " << genEvt->signal_process_id() << "\n"
-                                  << "     Number of vertexes: " << genEvt->vertices_size() << "\n"
+                                  << "     Number of vertices: " << genEvt->vertices_size() << "\n"
                                   << "     Number of particles: " << genEvt->particles_size() << "\n"
                                   << "     Bunch: " << it_hepmc.bunch() << "\n"
                                   << "     Source type: " << it_hepmc.getSourceType() << "\n"
@@ -363,12 +363,12 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
   event.getByLabel(tracksTag_,trackCollectionH);
   const reco::TrackCollection& trkColl = *(trackCollectionH.product());*/
 
-  // Get reconstructed vertexes
+  // Get reconstructed vertices
   /*edm::Handle<edm::View<reco::Vertex> > vertexCollectionH;
-  event.getByLabel(vertexTag_,vertexCollectionH);
+  event.getByLabel(verticesTag_,vertexCollectionH);
   const edm::View<reco::Vertex> vtxColl = *(vertexCollectionH.product());*/
   edm::Handle<reco::VertexCollection> vertexCollectionH;
-  event.getByLabel(vertexTag_,vertexCollectionH);
+  event.getByLabel(verticesTag_,vertexCollectionH);
   const reco::VertexCollection& vtxColl = *(vertexCollectionH.product());
 
   // Access primary vertex
@@ -419,19 +419,19 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
     //edm::RefToBase<reco::Vertex> vertex(vertexCollectionH, ivtx);
     reco::VertexRef vertex(vertexCollectionH,ivtx);
 
-    if(!vertex->isValid()) continue; // skip non-valid vertex
+    if(!vertex->isValid()) continue; // skip non-valid vertices
     if(vertex->isFake()) continue; // skip vertex from beam spot
 
     // Get TrackingVertex corresponding to reconstructed vertex
     if(vtxRecoToSim.find(vertex) != vtxRecoToSim.end()){
         std::vector<std::pair<TrackingVertexRef, double> > tv = vtxRecoToSim[vertex];
-        LogTrace("Analysis") << "Reco Vertex position: ("  << vertex->position().x() << ","
+        edm::LogVerbatim("Analysis") << "Reco Vertex position: ("  << vertex->position().x() << ","
                                      << vertex->position().y() << "," << vertex->position().z() << ")"
-                                     <<  " matched to " << tv.size() << " MC vertexes";
+                                     <<  " matched to " << tv.size() << " MC Vertices";
         for (std::vector<std::pair<TrackingVertexRef, double> >::const_iterator it = tv.begin(); it != tv.end(); ++it) {
              TrackingVertexRef tvtx = it->first;
              double assocQuality = it->second;
-             LogTrace("Analysis") << "\t\tMCVertex " << tvtx.index() << " position: ("
+             edm::LogVerbatim("Analysis") << "\t\tMCVertex " << tvtx.index() << " position: ("
                                           << tvtx->position().x() << "," << tvtx->position().y() << ","
                                           << tvtx->position().z() << ")" << " Quality: " << assocQuality;
         }
@@ -442,7 +442,7 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
              const EncodedEventId& evtId = tvtx->eventId();
              if(evtId.bunchCrossing() == 0){ // check if from signal bunch crossing
                  if(evtId.event() == 0){ // check if it comes from signal or pile-up
-                     LogTrace("Analysis") << "\t\tReco Vertex associated to MC Vertex " << tvtx.index()
+                     edm::LogVerbatim("Analysis") << "\t\tReco Vertex associated to MC Vertex " << tvtx.index()
                                                   << " position: (" << tvtx->position().x() << ","
                                                   << tvtx->position().y() << "," << tvtx->position().z() << ")"
                                                   << " comes from signal";
@@ -450,7 +450,7 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
                      hPrimVtxPosYBx0Signal_->Fill(tvtx->position().y());
                      hPrimVtxPosZBx0Signal_->Fill(tvtx->position().z());
                  } else { // comes from pile-up
-                     LogTrace("Analysis") << "\t\tReco Vertex associated to MC Vertex " << tvtx.index()
+                     edm::LogVerbatim("Analysis") << "\t\tReco Vertex associated to MC Vertex " << tvtx.index()
                                                   << " position: (" << tvtx->position().x() << ","
                                                   << tvtx->position().y() << "," << tvtx->position().z() << ")"
                                                   << " comes from pile-up";
@@ -459,7 +459,7 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
                      hPrimVtxPosZBx0PileUp_->Fill(tvtx->position().z());
                  }
              } else {// other bunch crossings
-                     LogTrace("Analysis") << "\t\tReco Vertex associated to MC Vertex " << tvtx.index()
+                     edm::LogVerbatim("Analysis") << "\t\tReco Vertex associated to MC Vertex " << tvtx.index()
                                                   << " position: (" << tvtx->position().x() << ","
                                                   << tvtx->position().y() << "," << tvtx->position().z() << ")"
                                                   << " comes from out-of-time bunch crossing";
@@ -471,36 +471,36 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
     }
   }
 
-  // Find number of good vertexes; match one closest to muon vertex 
-  int nGoodVertexes = 0;
+  // Find number of good vertices; match one closest to muon vertex 
+  int nGoodVertices = 0;
   //for(edm::View<reco::Vertex>::const_iterator vtx = vtxColl.begin(); vtx != vtxColl.end(); ++vtx){
   for(reco::VertexCollection::const_iterator vtx = vtxColl.begin(); vtx != vtxColl.end(); ++vtx){
-    if(!vtx->isValid()) continue; // skip non-valid vertex
+    if(!vtx->isValid()) continue; // skip non-valid vertices
     if(vtx->isFake()) continue; // skip vertex from beam spot
-    ++nGoodVertexes;
+    ++nGoodVertices;
   }
  
-  edm::LogVerbatim("Analysis") << " Number of reconstructed primary vertexes in event: " << nGoodVertexes;  
-  hNPrimVertexes_->Fill(nGoodVertexes);
-  eventData_.nPrimVertexes_ = nGoodVertexes;
-  if(singleInteraction) hNPrimVertexesSingleInt_->Fill(nGoodVertexes);
-  else hNPrimVertexesPileUp_->Fill(nGoodVertexes);
+  edm::LogVerbatim("Analysis") << " Number of reconstructed primary vertices in event: " << nGoodVertices;  
+  hNPrimVertices_->Fill(nGoodVertices);
+  eventData_.nPrimVertices_ = nGoodVertices;
+  if(singleInteraction) hNPrimVerticesSingleInt_->Fill(nGoodVertices);
+  else hNPrimVerticesPileUp_->Fill(nGoodVertices);
 
   // Number of events on bx 0
   //int nPUBx0 = playbackInfo->getNrEvents(0,0);
   int nPUBx0 = crossingFrameHepMCH->getNrPileups(0);
-  profNPVvsNPUBx0_->Fill(nPUBx0,nGoodVertexes);
-  profNPUBx0vsNPV_->Fill(nGoodVertexes,nPUBx0);
-  hNPUBx0vsNPV_->Fill(nGoodVertexes,nPUBx0);
+  profNPVvsNPUBx0_->Fill(nPUBx0,nGoodVertices);
+  profNPUBx0vsNPV_->Fill(nGoodVertices,nPUBx0);
+  hNPUBx0vsNPV_->Fill(nGoodVertices,nPUBx0);
 
   // Access TrackingVertex collection
-  LogTrace("Analysis") << " Tracking vertexes summary:";
+  edm::LogVerbatim("Analysis") << " Tracking vertices summary:";
   for(TrackingVertexCollection::const_iterator iVertex = mergedVH->begin(); iVertex != mergedVH->end(); ++iVertex) {
-    LogTrace("Analysis") << *iVertex; 
+    LogDebug("Analysis") << *iVertex; 
   }
  
   // Build map giving nr. of tracks vs (bx,evt)
-  //LogTrace("Analysis") << " Tracking particles summary:";
+  edm::LogVerbatim("Analysis") << " Tracking particles summary:";
   TrackMultMap trackMultMap;
   for(TrackingParticleCollection::const_iterator iTrack = mergedPH->begin(); iTrack != mergedPH->end(); ++iTrack) {
     //cout << *iTrack;
@@ -572,13 +572,13 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
     
     if(recoToSim.find(track) != recoToSim.end()){
         std::vector<std::pair<TrackingParticleRef, double> > tp = recoToSim[track];
-	LogTrace("Analysis") << "Reco Track pT: "  << track->pt() 
+	edm::LogVerbatim("Analysis") << "Reco Track pT: "  << track->pt() 
 	                             <<  " matched to " << tp.size() << " MC Tracks";
 	for (std::vector<std::pair<TrackingParticleRef, double> >::const_iterator it = tp.begin(); 
 	     it != tp.end(); ++it) {
 	     TrackingParticleRef tpr = it->first;
 	     double assocQuality = it->second;
-	     LogTrace("Analysis") << "\t\tMCTrack " << tpr.index() << " pT: " << tpr->pt() << " NShared: " << assocQuality;
+	     edm::LogVerbatim("Analysis") << "\t\tMCTrack " << tpr.index() << " pT: " << tpr->pt() << " NShared: " << assocQuality;
 	}
          
         // Check if best TP match comes from pile-up
@@ -588,7 +588,7 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
              const EncodedEventId& evtId = tpr->eventId();
 	     if(evtId.bunchCrossing() == 0){ // check if from signal bunch crossing
                  if(evtId.event() == 0){ // check if it comes from signal or pile-up
-	             LogTrace("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from signal";		
+	             edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from signal";		
                      //hTrackVzSignal_->Fill(fabs(track->vz()));
                      //hTrackDzSignal_->Fill(fabs(track->dz()));
                      hTrackVzSignal_->Fill(track->vz());
@@ -601,7 +601,7 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
                      //if(goodPrimaryVertex) hTrackDistPVBx0Signal_->Fill(sqrt(trackDistPV.mag2()));
                      hTrackDistPVBx0Signal_->Fill(sqrt(trackDistPV.mag2()));
                  } else {
-                     LogTrace("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from pile-up";
+                     edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from pile-up";
                      //hTrackVzPileUp_->Fill(fabs(track->vz()));
                      //hTrackDzPileUp_->Fill(fabs(track->dz()));
                      hTrackVzPileUp_->Fill(track->vz());
@@ -615,20 +615,20 @@ void SimplePileUpAnalyzer::analyze(const edm::Event& event, const edm::EventSetu
                      hTrackDistPVBx0PileUp_->Fill(sqrt(trackDistPV.mag2()));
                 }
 	     } else { // other bunch crossings
-                     LogTrace("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from out-of-time bunch crossing";
+                     edm::LogVerbatim("Analysis") << "\t\tReco Track associated to MCTrack " << tpr.index() << " pT: " << tpr->pt() << " comes from out-of-time bunch crossing";
                      //if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(track->vz() - primaryVertex.position().z());
                      //if(goodPrimaryVertex) hTrackDistPVOtherPileUp_->Fill(sqrt(trackDistPV.mag2()));
                      hTrackDistPVOtherPileUp_->Fill(sqrt(trackDistPV.mag2()));
              }
         }
-    } else LogTrace("Analysis") << "->   Track pT: " << track->pt() <<  " matched to 0  MC Tracks";
+    } else edm::LogVerbatim("Analysis") << "->   Track pT: " << track->pt() <<  " matched to 0  MC Tracks";
   }
   hNTracksAwayPV_->Fill(ntracks_away);
   double fracTracksAway = (float)ntracks_away/(float)trkColl.size();
   eventData_.fracTracksAwayPV_ = fracTracksAway;
   hFracTracksAwayPV_->Fill(fracTracksAway);
   hFracTracksAwayPVvsNPUBx0_->Fill(nPUBx0,fracTracksAway);
-  if(nGoodVertexes == 1) hFracTracksAwayPVvsNPUBx0SingleVtx_->Fill(nPUBx0,fracTracksAway);
+  if(nGoodVertices == 1) hFracTracksAwayPVvsNPUBx0SingleVtx_->Fill(nPUBx0,fracTracksAway);
 
   xiFromTracksPVPlus /= EBeam_;
   xiFromTracksPVMinus /= EBeam_;

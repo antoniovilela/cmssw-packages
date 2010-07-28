@@ -80,8 +80,6 @@ void exclusiveDijetsAnalysis(std::vector<std::string>& fileNames,int maxEvents =
    TH1F* h_xiMinusAfterSel = new TH1F("xiMinusAfterSel","xiMinusAfterSel",200,0.,1.);
    TH1F* h_RjjAfterSel = new TH1F("RjjAfterSel","RjjAfterSel",200,-0.1,1.5);
 
-   TH1F* h_forwardBackwardAsymmetryHFEnergy_ = new TH1F("forwardBackwardAsymmetryHFEnergy","forwardBackwardAsymmetryHFEnergy",200,-1.1,1.1);
-
    double Ebeam = 5000.;
    int thresholdHF = 10;// 2 GeV
 
@@ -182,7 +180,7 @@ void exclusiveDijetsAnalysis(std::vector<std::string>& fileNames,int maxEvents =
 
      // Access multiplicities
      fwlite::Handle<unsigned int> trackMultiplicity; 
-     trackMultiplicity.getByLabel(ev,"trackMultiplicityTransverseRegion","trackMultiplicity");
+     trackMultiplicity.getByLabel(ev,"trackMultiplicityAssociatedToPV","trackMultiplicity");
 
      fwlite::Handle<std::vector<unsigned int> > nHFPlus;
      nHFPlus.getByLabel(ev,"hfTower","nHFplus");
@@ -225,24 +223,6 @@ void exclusiveDijetsAnalysis(std::vector<std::string>& fileNames,int maxEvents =
      h_xiPlusAfterSel->Fill(xiTower_plus);
      h_xiMinusAfterSel->Fill(xiTower_minus);
      h_RjjAfterSel->Fill(RjjFromJets);
-
-     /*fwlite::Handle<std::vector<double> > forwardBackwardAsymmetryHFEnergy;
-     forwardBackwardAsymmetryHFEnergy.getByLabel(ev,"hfTower","FBAsymmetryFromHFEnergy");
-
-     double fbAsymmetryEnergy = (*forwardBackwardAsymmetryHFEnergy)[0];*/
- 
-     fwlite::Handle<std::vector<double> > sumEHFplus;
-     sumEHFplus.getByLabel(ev,"hfTower","sumEHFplus");
-   
-     fwlite::Handle<std::vector<double> > sumEHFminus;
-     sumEHFminus.getByLabel(ev,"hfTower","sumEHFminus");
-
-     double sumE_plus = (*sumEHFplus)[thresholdHF];
-     double sumE_minus = (*sumEHFminus)[thresholdHF];
-
-     double fbAsymmetryEnergy = ((sumE_plus + sumE_minus) > 0.)?((sumE_plus - sumE_minus)/(sumE_plus + sumE_minus)):0.;
-
-     h_forwardBackwardAsymmetryHFEnergy_->Fill(fbAsymmetryEnergy);
  
    }  // End loop over events
   
