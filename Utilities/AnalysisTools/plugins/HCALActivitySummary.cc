@@ -209,6 +209,7 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
            if(iEtaHBMultiplicity.find(ieta) == iEtaHBMultiplicity.end()){
               iEtaHBMultiplicity[ieta] = std::vector<unsigned int>(nThresholdIter_);
               iEtaHBEnergySum[ieta] = std::vector<double>(nThresholdIter_);
+              iEtaHBETSum[ieta] = std::vector<double>(nThresholdIter_);
            }
            ++iEtaHBMultiplicity[ieta][i_threshold];
            iEtaHBEnergySum[ieta][i_threshold] += energy;
@@ -219,6 +220,7 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
            if(iEtaHEMultiplicity.find(ieta) == iEtaHEMultiplicity.end()){
               iEtaHEMultiplicity[ieta] = std::vector<unsigned int>(nThresholdIter_);
               iEtaHEEnergySum[ieta] = std::vector<double>(nThresholdIter_);
+              iEtaHEETSum[ieta] = std::vector<double>(nThresholdIter_);
            }
            ++iEtaHEMultiplicity[ieta][i_threshold];
            iEtaHEEnergySum[ieta][i_threshold] += energy;
@@ -229,6 +231,7 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
            if(iEtaHFMultiplicity.find(ieta) == iEtaHFMultiplicity.end()){
               iEtaHFMultiplicity[ieta] = std::vector<unsigned int>(nThresholdIter_);
               iEtaHFEnergySum[ieta] = std::vector<double>(nThresholdIter_);
+              iEtaHFETSum[ieta] = std::vector<double>(nThresholdIter_);
            }
            ++iEtaHFMultiplicity[ieta][i_threshold];
            iEtaHFEnergySum[ieta][i_threshold] += energy;
