@@ -85,35 +85,50 @@ HCALActivitySummary::HCALActivitySummary(edm::ParameterSet const& pset):
     
   std::string alias;
   // HB
+  //FIXME: thresholds should be Run product
   produces<std::vector<double> >( alias = "thresholdsHB" ).setBranchAlias( alias );
   produces<std::vector<unsigned int> >( alias = "nHBplus" ).setBranchAlias( alias );
   produces<std::vector<unsigned int> >( alias = "nHBminus" ).setBranchAlias( alias );
   produces<std::vector<double> >( alias = "sumEHBplus" ).setBranchAlias( alias );
   produces<std::vector<double> >( alias = "sumEHBminus" ).setBranchAlias( alias );
+  produces<std::vector<double> >( alias = "sumETHBplus" ).setBranchAlias( alias );
+  produces<std::vector<double> >( alias = "sumETHBminus" ).setBranchAlias( alias );
   produces<std::map<unsigned int, std::vector<unsigned int> > >( alias = "iEtaHBMultiplicityPlus" ).setBranchAlias( alias );
   produces<std::map<unsigned int, std::vector<unsigned int> > >( alias = "iEtaHBMultiplicityMinus" ).setBranchAlias( alias );
   produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHBEnergySumPlus").setBranchAlias( alias );
   produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHBEnergySumMinus").setBranchAlias( alias );
+  produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHBETSumPlus").setBranchAlias( alias );
+  produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHBETSumMinus").setBranchAlias( alias );
   // HE
+  //FIXME: thresholds should be Run product
   produces<std::vector<double> >( alias = "thresholdsHE" ).setBranchAlias( alias );
   produces<std::vector<unsigned int> >( alias = "nHEplus" ).setBranchAlias( alias );
   produces<std::vector<unsigned int> >( alias = "nHEminus" ).setBranchAlias( alias );
   produces<std::vector<double> >( alias = "sumEHEplus" ).setBranchAlias( alias );
   produces<std::vector<double> >( alias = "sumEHEminus" ).setBranchAlias( alias );
+  produces<std::vector<double> >( alias = "sumETHEplus" ).setBranchAlias( alias );
+  produces<std::vector<double> >( alias = "sumETHEminus" ).setBranchAlias( alias );
   produces<std::map<unsigned int, std::vector<unsigned int> > >( alias = "iEtaHEMultiplicityPlus" ).setBranchAlias( alias );
   produces<std::map<unsigned int, std::vector<unsigned int> > >( alias = "iEtaHEMultiplicityMinus" ).setBranchAlias( alias );
   produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHEEnergySumPlus").setBranchAlias( alias );
   produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHEEnergySumMinus").setBranchAlias( alias );
+  produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHEETSumPlus").setBranchAlias( alias );
+  produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHEETSumMinus").setBranchAlias( alias );
   // HF
+  //FIXME: thresholds should be Run product
   produces<std::vector<double> >( alias = "thresholdsHF" ).setBranchAlias( alias );
   produces<std::vector<unsigned int> >( alias = "nHFplus" ).setBranchAlias( alias );
   produces<std::vector<unsigned int> >( alias = "nHFminus" ).setBranchAlias( alias );
   produces<std::vector<double> >( alias = "sumEHFplus" ).setBranchAlias( alias );
   produces<std::vector<double> >( alias = "sumEHFminus" ).setBranchAlias( alias );
+  produces<std::vector<double> >( alias = "sumETHFplus" ).setBranchAlias( alias );
+  produces<std::vector<double> >( alias = "sumETHFminus" ).setBranchAlias( alias );
   produces<std::map<unsigned int, std::vector<unsigned int> > >( alias = "iEtaHFMultiplicityPlus" ).setBranchAlias( alias );
   produces<std::map<unsigned int, std::vector<unsigned int> > >( alias = "iEtaHFMultiplicityMinus" ).setBranchAlias( alias );
   produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHFEnergySumPlus").setBranchAlias( alias );
   produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHFEnergySumMinus").setBranchAlias( alias );
+  produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHFETSumPlus").setBranchAlias( alias );
+  produces<std::map<unsigned int,std::vector<double> > >(alias = "iEtaHFETSumMinus").setBranchAlias( alias );
 }
 
 void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setup) {
@@ -125,10 +140,13 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   // Loop over CaloTowers
   std::map<int,std::vector<unsigned int> > iEtaHBMultiplicity;
   std::map<int,std::vector<double> > iEtaHBEnergySum;
+  std::map<int,std::vector<double> > iEtaHBETSum;
   std::map<int,std::vector<unsigned int> > iEtaHEMultiplicity;
   std::map<int,std::vector<double> > iEtaHEEnergySum;
+  std::map<int,std::vector<double> > iEtaHEETSum;
   std::map<int,std::vector<unsigned int> > iEtaHFMultiplicity;
   std::map<int,std::vector<double> > iEtaHFEnergySum;
+  std::map<int,std::vector<double> > iEtaHFETSum;
 
   CaloTowerCollection::const_iterator calotower = towerCollection.begin();
   CaloTowerCollection::const_iterator calotowers_end = towerCollection.end(); 
@@ -151,10 +169,14 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
         }	 	  
      }
 				 	
-     //int zside = calotower->id().zside();
+     //int zside = calotower->zside();
      //double eta = calotower->eta();
-     int ieta = calotower->id().ieta();
+     int ieta = calotower->ieta();
      double energy = calotower->energy();
+     // FIXME: Determine ET from vertex position
+     //double towerET = calotower->et(primVtx.position());
+     //double towerET = calotower->et(primVtx.z());
+     double towerET = calotower->et();  
 
      bool isHBTower = hasHB && (!hasHE);
      bool isHETower = hasHE && (!hasHB) && (!hasHF);
@@ -164,19 +186,19 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
         if(discardFlaggedTowers_ && checkTowerFlagsHB(*calotower)) acceptHBTower = false; 
         if(!acceptHBTower) continue;
 
-        if(applyEnergyScale_) energy *= energyScaleHB_;
+        if(applyEnergyScale_) { energy *= energyScaleHB_; towerET *= energyScaleHB_; }
      } else if(isHETower){
         bool acceptHETower = true;
         if(discardFlaggedTowers_ && checkTowerFlagsHE(*calotower)) acceptHETower = false;     
         if(!acceptHETower) continue;
 
-        if(applyEnergyScale_) energy *= energyScaleHE_;
+        if(applyEnergyScale_) { energy *= energyScaleHE_; towerET *= energyScaleHE_; }
      } else if(isHFTower){
         bool acceptHFTower = true; 
         if(discardFlaggedTowers_ && checkTowerFlagsHF(*calotower,0.99)) acceptHFTower = false;
         if(!acceptHFTower) continue;
 
-        if(applyEnergyScale_) energy *= energyScaleHF_;
+        if(applyEnergyScale_) { energy *= energyScaleHF_; towerET *= energyScaleHF_; } 
      }
  
      // Loop over tower thresholds
@@ -190,6 +212,7 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
            }
            ++iEtaHBMultiplicity[ieta][i_threshold];
            iEtaHBEnergySum[ieta][i_threshold] += energy;
+           iEtaHBETSum[ieta][i_threshold] += towerET;
         } else if(isHETower){
            if(energy < thresholdsHE_[i_threshold]) continue;
 
@@ -199,6 +222,7 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
            }
            ++iEtaHEMultiplicity[ieta][i_threshold];
            iEtaHEEnergySum[ieta][i_threshold] += energy;
+           iEtaHEETSum[ieta][i_threshold] += towerET;
         } else if(isHFTower){
            if(energy < thresholdsHF_[i_threshold]) continue;
 
@@ -208,6 +232,7 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
            }
            ++iEtaHFMultiplicity[ieta][i_threshold];
            iEtaHFEnergySum[ieta][i_threshold] += energy;
+           iEtaHFETSum[ieta][i_threshold] += towerET;
         }
 
      }
@@ -218,10 +243,14 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   std::vector<unsigned int> nHB_minus(nThresholdIter_,0);
   std::vector<double> sumEHB_plus(nThresholdIter_,0.);
   std::vector<double> sumEHB_minus(nThresholdIter_,0.);
+  std::vector<double> sumETHB_plus(nThresholdIter_,0.);
+  std::vector<double> sumETHB_minus(nThresholdIter_,0.);
   std::map<unsigned int,std::vector<unsigned int> > iEtaHBMultiplicity_plus;
   std::map<unsigned int,std::vector<unsigned int> > iEtaHBMultiplicity_minus;
   std::map<unsigned int,std::vector<double> > iEtaHBEnergySum_plus;
   std::map<unsigned int,std::vector<double> > iEtaHBEnergySum_minus;
+  std::map<unsigned int,std::vector<double> > iEtaHBETSum_plus;
+  std::map<unsigned int,std::vector<double> > iEtaHBETSum_minus; 
 
   std::map<int,std::vector<unsigned int> >::const_iterator itHBMult = iEtaHBMultiplicity.begin();
   std::map<int,std::vector<unsigned int> >::const_iterator itHBMult_end = iEtaHBMultiplicity.end();
@@ -229,13 +258,16 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
      int ieta = itHBMult->first;
      std::vector<unsigned int> const& vec_mult = iEtaHBMultiplicity[ieta];
      std::vector<double> const& vec_esum = iEtaHBEnergySum[ieta];  
+     std::vector<double> const& vec_etsum = iEtaHBETSum[ieta];
      for(size_t i_threshold = 0; i_threshold < nThresholdIter_; ++i_threshold){
         if(ieta >= 0){
            nHB_plus[i_threshold] += vec_mult[i_threshold];
            sumEHB_plus[i_threshold] += vec_esum[i_threshold];
+           sumETHB_plus[i_threshold] += vec_etsum[i_threshold];
         } else{
            nHB_minus[i_threshold] += vec_mult[i_threshold];
            sumEHB_minus[i_threshold] += vec_esum[i_threshold];
+           sumETHB_minus[i_threshold] += vec_etsum[i_threshold];
         } 
      }
 
@@ -243,9 +275,11 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
      if(ieta >= 0){
         iEtaHBMultiplicity_plus[abs_ieta] = vec_mult;
         iEtaHBEnergySum_plus[abs_ieta] = vec_esum;
+        iEtaHBETSum_plus[abs_ieta] = vec_etsum;
      } else{
         iEtaHBMultiplicity_minus[abs_ieta] = vec_mult;
         iEtaHBEnergySum_minus[abs_ieta] = vec_esum;
+        iEtaHBETSum_minus[abs_ieta] = vec_etsum;
      }
   }
 
@@ -254,10 +288,14 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   std::vector<unsigned int> nHE_minus(nThresholdIter_,0);
   std::vector<double> sumEHE_plus(nThresholdIter_,0.);
   std::vector<double> sumEHE_minus(nThresholdIter_,0.);
+  std::vector<double> sumETHE_plus(nThresholdIter_,0.);
+  std::vector<double> sumETHE_minus(nThresholdIter_,0.);
   std::map<unsigned int,std::vector<unsigned int> > iEtaHEMultiplicity_plus;
   std::map<unsigned int,std::vector<unsigned int> > iEtaHEMultiplicity_minus;
   std::map<unsigned int,std::vector<double> > iEtaHEEnergySum_plus;
   std::map<unsigned int,std::vector<double> > iEtaHEEnergySum_minus;
+  std::map<unsigned int,std::vector<double> > iEtaHEETSum_plus;
+  std::map<unsigned int,std::vector<double> > iEtaHEETSum_minus; 
 
   std::map<int,std::vector<unsigned int> >::const_iterator itHEMult = iEtaHEMultiplicity.begin();
   std::map<int,std::vector<unsigned int> >::const_iterator itHEMult_end = iEtaHEMultiplicity.end();
@@ -265,13 +303,16 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
      int ieta = itHEMult->first;
      std::vector<unsigned int> const& vec_mult = iEtaHEMultiplicity[ieta];
      std::vector<double> const& vec_esum = iEtaHEEnergySum[ieta];
+     std::vector<double> const& vec_etsum = iEtaHEETSum[ieta];
      for(size_t i_threshold = 0; i_threshold < nThresholdIter_; ++i_threshold){
         if(ieta >= 0){
            nHE_plus[i_threshold] += vec_mult[i_threshold];
            sumEHE_plus[i_threshold] += vec_esum[i_threshold];
+           sumETHE_plus[i_threshold] += vec_etsum[i_threshold];
         } else{
            nHE_minus[i_threshold] += vec_mult[i_threshold];
            sumEHE_minus[i_threshold] += vec_esum[i_threshold];
+           sumETHE_minus[i_threshold] += vec_etsum[i_threshold];
         }
      } 
 
@@ -279,9 +320,11 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
      if(ieta >= 0){
         iEtaHEMultiplicity_plus[abs_ieta] = vec_mult;
         iEtaHEEnergySum_plus[abs_ieta] = vec_esum;
+        iEtaHEETSum_plus[abs_ieta] = vec_etsum;
      } else{
         iEtaHEMultiplicity_minus[abs_ieta] = vec_mult;
         iEtaHEEnergySum_minus[abs_ieta] = vec_esum;
+        iEtaHEETSum_minus[abs_ieta] = vec_etsum;
      }
   }  
 
@@ -290,10 +333,14 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   std::vector<unsigned int> nHF_minus(nThresholdIter_,0);
   std::vector<double> sumEHF_plus(nThresholdIter_,0.);
   std::vector<double> sumEHF_minus(nThresholdIter_,0.);
+  std::vector<double> sumETHF_plus(nThresholdIter_,0.);
+  std::vector<double> sumETHF_minus(nThresholdIter_,0.);
   std::map<unsigned int,std::vector<unsigned int> > iEtaHFMultiplicity_plus;
   std::map<unsigned int,std::vector<unsigned int> > iEtaHFMultiplicity_minus;
   std::map<unsigned int,std::vector<double> > iEtaHFEnergySum_plus;
   std::map<unsigned int,std::vector<double> > iEtaHFEnergySum_minus;
+  std::map<unsigned int,std::vector<double> > iEtaHFETSum_plus;
+  std::map<unsigned int,std::vector<double> > iEtaHFETSum_minus;
 
   std::map<int,std::vector<unsigned int> >::const_iterator itHFMult = iEtaHFMultiplicity.begin();
   std::map<int,std::vector<unsigned int> >::const_iterator itHFMult_end = iEtaHFMultiplicity.end();
@@ -301,13 +348,16 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
      int ieta = itHFMult->first;
      std::vector<unsigned int> const& vec_mult = iEtaHFMultiplicity[ieta];
      std::vector<double> const& vec_esum = iEtaHFEnergySum[ieta];
+     std::vector<double> const& vec_etsum = iEtaHFETSum[ieta];
      for(size_t i_threshold = 0; i_threshold < nThresholdIter_; ++i_threshold){
         if(ieta >= 0){
            nHF_plus[i_threshold] += vec_mult[i_threshold];
            sumEHF_plus[i_threshold] += vec_esum[i_threshold];
+           sumETHF_plus[i_threshold] += vec_etsum[i_threshold];
         } else{
            nHF_minus[i_threshold] += vec_mult[i_threshold];
            sumEHF_minus[i_threshold] += vec_esum[i_threshold];
+           sumETHF_minus[i_threshold] += vec_etsum[i_threshold];
         }
      }
 
@@ -315,9 +365,11 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
      if(ieta >= 0){
         iEtaHFMultiplicity_plus[abs_ieta] = vec_mult;
         iEtaHFEnergySum_plus[abs_ieta] = vec_esum;
+        iEtaHFETSum_plus[abs_ieta] = vec_etsum;
      } else{
         iEtaHFMultiplicity_minus[abs_ieta] = vec_mult;
         iEtaHFEnergySum_minus[abs_ieta] = vec_esum;
+        iEtaHFETSum_minus[abs_ieta] = vec_etsum;
      } 
   }
 
@@ -330,6 +382,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   std::auto_ptr<std::map<unsigned int, std::vector<unsigned int> > > iEtaHBMultiplicityMinus_ptr( new std::map<unsigned int, std::vector<unsigned int> >(iEtaHBMultiplicity_minus) );
   std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHBEnergySumPlus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHBEnergySum_plus) );
   std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHBEnergySumMinus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHBEnergySum_minus) );
+  std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHBETSumPlus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHBETSum_plus) );
+  std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHBETSumMinus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHBETSum_minus) );
 
   std::auto_ptr<std::vector<double> > thresholdsHE_ptr( new std::vector<double>(thresholdsHE_) );
   std::auto_ptr<std::vector<unsigned int> > nHEplus_ptr( new std::vector<unsigned int>(nHE_plus) );
@@ -340,6 +394,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   std::auto_ptr<std::map<unsigned int, std::vector<unsigned int> > > iEtaHEMultiplicityMinus_ptr( new std::map<unsigned int, std::vector<unsigned int> >(iEtaHEMultiplicity_minus) );
   std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHEEnergySumPlus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHEEnergySum_plus) );
   std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHEEnergySumMinus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHEEnergySum_minus) );  
+  std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHEETSumPlus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHEETSum_plus) );
+  std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHEETSumMinus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHEETSum_minus) );
 
   std::auto_ptr<std::vector<double> > thresholdsHF_ptr( new std::vector<double>(thresholdsHF_) );
   std::auto_ptr<std::vector<unsigned int> > nHFplus_ptr( new std::vector<unsigned int>(nHF_plus) );
@@ -350,6 +406,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   std::auto_ptr<std::map<unsigned int, std::vector<unsigned int> > > iEtaHFMultiplicityMinus_ptr( new std::map<unsigned int, std::vector<unsigned int> >(iEtaHFMultiplicity_minus) );
   std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHFEnergySumPlus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHFEnergySum_plus) );
   std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHFEnergySumMinus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHFEnergySum_minus) );
+  std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHFETSumPlus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHFETSum_plus) );
+  std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHFETSumMinus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHFETSum_minus) ); 
 
   event.put( thresholdsHB_ptr, "thresholdsHB" );
   event.put( nHBplus_ptr, "nHBplus" );
@@ -360,6 +418,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   event.put( iEtaHBMultiplicityMinus_ptr, "iEtaHBMultiplicityMinus" );
   event.put( iEtaHBEnergySumPlus_ptr, "iEtaHBEnergySumPlus" );
   event.put( iEtaHBEnergySumMinus_ptr, "iEtaHBEnergySumMinus" );
+  event.put( iEtaHBETSumPlus_ptr, "iEtaHBETSumPlus" );
+  event.put( iEtaHBETSumMinus_ptr, "iEtaHBETSumMinus" );
 
   event.put( thresholdsHE_ptr, "thresholdsHE" );
   event.put( nHEplus_ptr, "nHEplus" );
@@ -370,6 +430,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   event.put( iEtaHEMultiplicityMinus_ptr, "iEtaHEMultiplicityMinus" );
   event.put( iEtaHEEnergySumPlus_ptr, "iEtaHEEnergySumPlus" );
   event.put( iEtaHEEnergySumMinus_ptr, "iEtaHEEnergySumMinus" );
+  event.put( iEtaHEETSumPlus_ptr, "iEtaHEETSumPlus" );
+  event.put( iEtaHEETSumMinus_ptr, "iEtaHEETSumMinus" );
 
   event.put( thresholdsHF_ptr, "thresholdsHF" );
   event.put( nHFplus_ptr, "nHFplus" );
@@ -380,6 +442,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   event.put( iEtaHFMultiplicityMinus_ptr, "iEtaHFMultiplicityMinus" );
   event.put( iEtaHFEnergySumPlus_ptr, "iEtaHFEnergySumPlus" );
   event.put( iEtaHFEnergySumMinus_ptr, "iEtaHFEnergySumMinus" );
+  event.put( iEtaHFETSumPlus_ptr, "iEtaHFETSumPlus" );
+  event.put( iEtaHFETSumMinus_ptr, "iEtaHFETSumMinus" );
 }
 
 bool HCALActivitySummary::checkTowerFlagsHB(CaloTower const& tower){ return false; }
