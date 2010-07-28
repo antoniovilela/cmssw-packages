@@ -381,6 +381,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   std::auto_ptr<std::vector<unsigned int> > nHBminus_ptr( new std::vector<unsigned int>(nHB_minus) );
   std::auto_ptr<std::vector<double> > sumEHBplus_ptr( new std::vector<double>(sumEHB_plus) );
   std::auto_ptr<std::vector<double> > sumEHBminus_ptr( new std::vector<double>(sumEHB_minus) );
+  std::auto_ptr<std::vector<double> > sumETHBplus_ptr( new std::vector<double>(sumETHB_plus) );
+  std::auto_ptr<std::vector<double> > sumETHBminus_ptr( new std::vector<double>(sumETHB_minus) ); 
   std::auto_ptr<std::map<unsigned int, std::vector<unsigned int> > > iEtaHBMultiplicityPlus_ptr( new std::map<unsigned int, std::vector<unsigned int> >(iEtaHBMultiplicity_plus) );
   std::auto_ptr<std::map<unsigned int, std::vector<unsigned int> > > iEtaHBMultiplicityMinus_ptr( new std::map<unsigned int, std::vector<unsigned int> >(iEtaHBMultiplicity_minus) );
   std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHBEnergySumPlus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHBEnergySum_plus) );
@@ -393,6 +395,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   std::auto_ptr<std::vector<unsigned int> > nHEminus_ptr( new std::vector<unsigned int>(nHE_minus) );
   std::auto_ptr<std::vector<double> > sumEHEplus_ptr( new std::vector<double>(sumEHE_plus) );
   std::auto_ptr<std::vector<double> > sumEHEminus_ptr( new std::vector<double>(sumEHE_minus) );
+  std::auto_ptr<std::vector<double> > sumETHEplus_ptr( new std::vector<double>(sumETHE_plus) );
+  std::auto_ptr<std::vector<double> > sumETHEminus_ptr( new std::vector<double>(sumETHE_minus) );
   std::auto_ptr<std::map<unsigned int, std::vector<unsigned int> > > iEtaHEMultiplicityPlus_ptr( new std::map<unsigned int, std::vector<unsigned int> >(iEtaHEMultiplicity_plus) );
   std::auto_ptr<std::map<unsigned int, std::vector<unsigned int> > > iEtaHEMultiplicityMinus_ptr( new std::map<unsigned int, std::vector<unsigned int> >(iEtaHEMultiplicity_minus) );
   std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHEEnergySumPlus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHEEnergySum_plus) );
@@ -405,6 +409,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   std::auto_ptr<std::vector<unsigned int> > nHFminus_ptr( new std::vector<unsigned int>(nHF_minus) );
   std::auto_ptr<std::vector<double> > sumEHFplus_ptr( new std::vector<double>(sumEHF_plus) );
   std::auto_ptr<std::vector<double> > sumEHFminus_ptr( new std::vector<double>(sumEHF_minus) );
+  std::auto_ptr<std::vector<double> > sumETHFplus_ptr( new std::vector<double>(sumETHF_plus) );
+  std::auto_ptr<std::vector<double> > sumETHFminus_ptr( new std::vector<double>(sumETHF_minus) );
   std::auto_ptr<std::map<unsigned int, std::vector<unsigned int> > > iEtaHFMultiplicityPlus_ptr( new std::map<unsigned int, std::vector<unsigned int> >(iEtaHFMultiplicity_plus) );
   std::auto_ptr<std::map<unsigned int, std::vector<unsigned int> > > iEtaHFMultiplicityMinus_ptr( new std::map<unsigned int, std::vector<unsigned int> >(iEtaHFMultiplicity_minus) );
   std::auto_ptr<std::map<unsigned int,std::vector<double> > > iEtaHFEnergySumPlus_ptr( new std::map<unsigned int,std::vector<double> >(iEtaHFEnergySum_plus) );
@@ -417,6 +423,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   event.put( nHBminus_ptr, "nHBminus" );
   event.put( sumEHBplus_ptr, "sumEHBplus" );
   event.put( sumEHBminus_ptr, "sumEHBminus" );
+  event.put( sumETHBplus_ptr, "sumETHBplus" );
+  event.put( sumETHBminus_ptr, "sumETHBminus" );
   event.put( iEtaHBMultiplicityPlus_ptr, "iEtaHBMultiplicityPlus" );
   event.put( iEtaHBMultiplicityMinus_ptr, "iEtaHBMultiplicityMinus" );
   event.put( iEtaHBEnergySumPlus_ptr, "iEtaHBEnergySumPlus" );
@@ -429,6 +437,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   event.put( nHEminus_ptr, "nHEminus" );
   event.put( sumEHEplus_ptr, "sumEHEplus" );
   event.put( sumEHEminus_ptr, "sumEHEminus" );
+  event.put( sumETHEplus_ptr, "sumETHEplus" );
+  event.put( sumETHEminus_ptr, "sumETHEminus" );
   event.put( iEtaHEMultiplicityPlus_ptr, "iEtaHEMultiplicityPlus" );
   event.put( iEtaHEMultiplicityMinus_ptr, "iEtaHEMultiplicityMinus" );
   event.put( iEtaHEEnergySumPlus_ptr, "iEtaHEEnergySumPlus" );
@@ -441,6 +451,8 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   event.put( nHFminus_ptr, "nHFminus" );
   event.put( sumEHFplus_ptr, "sumEHFplus" );
   event.put( sumEHFminus_ptr, "sumEHFminus" );
+  event.put( sumETHFplus_ptr, "sumETHFplus" );
+  event.put( sumETHFminus_ptr, "sumETHFminus" );
   event.put( iEtaHFMultiplicityPlus_ptr, "iEtaHFMultiplicityPlus" );
   event.put( iEtaHFMultiplicityMinus_ptr, "iEtaHFMultiplicityMinus" );
   event.put( iEtaHFEnergySumPlus_ptr, "iEtaHFEnergySumPlus" );
