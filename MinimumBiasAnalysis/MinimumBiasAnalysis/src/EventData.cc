@@ -25,10 +25,14 @@ namespace minimumBiasAnalysis {
      data.Branch("multiplicityHEMinus",&eventData.multiplicityHEMinus_,"multiplicityHEMinus/I");
      data.Branch("sumEnergyHEPlus",&eventData.sumEnergyHEPlus_,"sumEnergyHEPlus/D");
      data.Branch("sumEnergyHEMinus",&eventData.sumEnergyHEMinus_,"sumEnergyHEMinus/D");
+     data.Branch("sumETHEPlus",&eventData.sumETHEPlus_,"sumETHEPlus/D");
+     data.Branch("sumETHEMinus",&eventData.sumETHEMinus_,"sumETHEMinus/D");
      data.Branch("multiplicityHFPlus",&eventData.multiplicityHFPlus_,"multiplicityHFPlus/I");
      data.Branch("multiplicityHFMinus",&eventData.multiplicityHFMinus_,"multiplicityHFMinus/I");
      data.Branch("sumEnergyHFPlus",&eventData.sumEnergyHFPlus_,"sumEnergyHFPlus/D");
      data.Branch("sumEnergyHFMinus",&eventData.sumEnergyHFMinus_,"sumEnergyHFMinus/D");
+     data.Branch("sumETHFPlus",&eventData.sumETHFPlus_,"sumETHFPlus/D");
+     data.Branch("sumETHFMinus",&eventData.sumETHFMinus_,"sumETHFMinus/D");
      // 1-13 HF rings, 2.866 < |eta| < 5.205
      data.Branch("multiplicityHFPlusVsiEta",eventData.multiplicityHFPlusVsiEta_,"multiplicityHFPlusVsiEta[13]/I");
      data.Branch("multiplicityHFMinusVsiEta",eventData.multiplicityHFMinusVsiEta_,"multiplicityHFMinusVsiEta[13]/I");
@@ -85,10 +89,14 @@ namespace minimumBiasAnalysis {
      data.SetBranchAddress("multiplicityHEMinus",&eventData.multiplicityHEMinus_);
      data.SetBranchAddress("sumEnergyHEPlus",&eventData.sumEnergyHEPlus_);
      data.SetBranchAddress("sumEnergyHEMinus",&eventData.sumEnergyHEMinus_);
+     data.SetBranchAddress("sumETHEPlus",&eventData.sumETHEPlus_);
+     data.SetBranchAddress("sumETHEMinus",&eventData.sumETHEMinus_);
      data.SetBranchAddress("multiplicityHFPlus",&eventData.multiplicityHFPlus_);
      data.SetBranchAddress("multiplicityHFMinus",&eventData.multiplicityHFMinus_);
      data.SetBranchAddress("sumEnergyHFPlus",&eventData.sumEnergyHFPlus_);
      data.SetBranchAddress("sumEnergyHFMinus",&eventData.sumEnergyHFMinus_);
+     data.SetBranchAddress("sumETHFPlus",&eventData.sumETHFPlus_);
+     data.SetBranchAddress("sumETHFMinus",&eventData.sumETHFMinus_);
      // 1-13 HF rings, 2.866 < |eta| < 5.205
      data.SetBranchAddress("multiplicityHFPlusVsiEta",eventData.multiplicityHFPlusVsiEta_);
      data.SetBranchAddress("multiplicityHFMinusVsiEta",eventData.multiplicityHFMinusVsiEta_);

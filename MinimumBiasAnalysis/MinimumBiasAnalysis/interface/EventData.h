@@ -27,10 +27,14 @@ namespace minimumBiasAnalysis {
      int multiplicityHEMinus_;
      double sumEnergyHEPlus_;
      double sumEnergyHEMinus_;
+     double sumETHEPlus_;
+     double sumETHEMinus_;
      int multiplicityHFPlus_;
      int multiplicityHFMinus_;
      double sumEnergyHFPlus_;
      double sumEnergyHFMinus_;
+     double sumETHFPlus_;
+     double sumETHFMinus_;
      // 1-13 HF rings, 2.866 < |eta| < 5.205
      int multiplicityHFPlusVsiEta_[13];
      int multiplicityHFMinusVsiEta_[13];

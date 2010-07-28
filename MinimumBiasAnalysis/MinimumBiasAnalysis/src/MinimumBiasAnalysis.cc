@@ -247,12 +247,24 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   edm::Handle<std::vector<double> > sumEHEminus;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumEHEminus"),sumEHEminus);
 
+  edm::Handle<std::vector<double> > sumETHEplus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHEplus"),sumETHEplus);
+ 
+  edm::Handle<std::vector<double> > sumETHEminus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHEminus"),sumETHEminus);
+
   edm::Handle<std::vector<double> > sumEHFplus;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumEHFplus"),sumEHFplus);
 
   edm::Handle<std::vector<double> > sumEHFminus;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumEHFminus"),sumEHFminus);
 
+  edm::Handle<std::vector<double> > sumETHFplus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHFplus"),sumETHFplus);
+  
+  edm::Handle<std::vector<double> > sumETHFminus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHFminus"),sumETHFminus);
+ 
   // FIXME
   edm::Handle<std::vector<double> > thresholdsHE;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"thresholdsHE"),thresholdsHE);
@@ -274,9 +286,15 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   double sumEHE_plus = (*sumEHEplus)[indexThresholdHE];
   double sumEHE_minus = (*sumEHEminus)[indexThresholdHE];
 
+  double sumETHE_plus = (*sumETHEplus)[indexThresholdHE];
+  double sumETHE_minus = (*sumETHEminus)[indexThresholdHE];
+
   double sumEHF_plus = (*sumEHFplus)[indexThresholdHF];
   double sumEHF_minus = (*sumEHFminus)[indexThresholdHF];
 
+  double sumETHF_plus = (*sumETHFplus)[indexThresholdHF];
+  double sumETHF_minus = (*sumETHFminus)[indexThresholdHF];
+ 
   eventData.trackMultiplicity_ = nTracks;
   eventData.trackMultiplicityAssociatedToPV_ = nTracksAssociatedToPV;
   eventData.multiplicityHEPlus_ = nHE_plus;
@@ -285,8 +303,12 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   eventData.multiplicityHFMinus_ = nHF_minus;
   eventData.sumEnergyHEPlus_ = sumEHE_plus;
   eventData.sumEnergyHEMinus_ = sumEHE_minus;
+  eventData.sumETHEPlus_ = sumETHE_plus;
+  eventData.sumETHEMinus_ = sumETHE_minus;
   eventData.sumEnergyHFPlus_ = sumEHF_plus;
   eventData.sumEnergyHFMinus_ = sumEHF_minus;
+  eventData.sumETHFPlus_ = sumETHF_plus;
+  eventData.sumETHFMinus_ = sumETHF_minus;
 
   for(unsigned int ieta = 29, index = 0; ieta <= 41; ++ieta,++index){
      unsigned int nHFPlus_ieta = nHCALiEta(*iEtaHFMultiplicityPlus,indexThresholdHF,ieta);
