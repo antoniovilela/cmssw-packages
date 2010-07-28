@@ -28,9 +28,16 @@ void hcalActivitySummary(std::vector<std::string>& fileNames,
   // Book Histograms
   TH1::SetDefaultSumw2(true);
 
+  TH1F* h_nHFPlus = new TH1F("nHFPlus","nHFPlus",20,0,20);
+  TH1F* h_nHFMinus = new TH1F("nHFMinus","nHFMinus",20,0,20);
+
   double threshHB = 1.5;
   double threshHE = 2.0;
   double threshHF = 4.0; 
+
+  size_t indexHB = -1;
+  size_t indexHE = -1;
+  size_t indexHF = -1;
 
   int nEvts = 0;
   for( ev.toBegin(); ! ev.atEnd(); ++ev) {
@@ -70,6 +77,10 @@ void hcalActivitySummary(std::vector<std::string>& fileNames,
         size_t lowHF = std::lower_bound(thresholdsHF->begin(),thresholdsHF->end(),threshHF) - thresholdsHF->begin();
         size_t upHF = std::upper_bound(thresholdsHF->begin(),thresholdsHF->end(),threshHF) - thresholdsHF->begin();
         std::cout << "Index for HF threshold " << threshHF << ": (" << lowHF << "," << upHF << ")" << std::endl;
+
+        indexHB = lowHB;
+        indexHE = lowHE;
+        indexHF = lowHF;
      }
 
      fwlite::Handle<std::vector<unsigned int> > nHFPlus;
@@ -77,11 +88,31 @@ void hcalActivitySummary(std::vector<std::string>& fileNames,
   
      if(!nHFPlus.isValid()) {std::cout << ">>> ERROR: Product could not be accessed" << std::endl;continue;}
 
+     h_nHFPlus->Fill( (*nHFPlus)[indexHF] );
+
      fwlite::Handle<std::vector<unsigned int> > nHFMinus;
      nHFMinus.getByLabel(ev,"hcalActivitySummary","nHFminus");
 
      if(!nHFMinus.isValid()) {std::cout << ">>> ERROR: Product could not be accessed" << std::endl;continue;}
 
+     h_nHFMinus->Fill( (*nHFMinus)[indexHF] );
+
+     fwlite::Handle<std::map<unsigned int, std::vector<unsigned int> > > iEtaHEMultiplicityPlus;
+     iEtaHEMultiplicityPlus.getByLabel(ev,"hcalActivitySummary","iEtaHEMultiplicityPlus");
+
+     if(!iEtaHEMultiplicityPlus.isValid()) {std::cout << ">>> ERROR: Product could not be accessed" << std::endl;continue;}
+
+     std::cout << ">>>>>>>>>> iEta HE" << std::endl;
+     std::map<unsigned int, std::vector<unsigned int> >::const_iterator it_ieta = (*iEtaHEMultiplicityPlus).begin();
+     std::map<unsigned int, std::vector<unsigned int> >::const_iterator iEtaHEMultiplicityPlus_end = (*iEtaHEMultiplicityPlus).end();
+     for(; it_ieta != iEtaHEMultiplicityPlus_end; ++it_ieta){
+        int ieta = it_ieta->first;
+        int mult_ieta = (it_ieta->second)[indexHE];
+        std::cout << "iEta " << ieta << ": " << mult_ieta << std::endl;
+     } 
+     /*std::map<unsigned int, std::vector<unsigned int> >::const_iterator it_ieta = (*iEtaHEMultiplicityPlus).find(ieta);
+     unsigned int count_ieta = 0; 
+     if( it_ieta != iEtaMultiplicity.end() ) count_ieta = (it_ieta->second)[threshold];*/
   }
 
   hfile->Write();
