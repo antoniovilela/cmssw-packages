@@ -3,14 +3,14 @@ import FWCore.ParameterSet.Config as cms
 MinimumBiasAnalysis = cms.PSet(
     # Input tags
     VertexTag = cms.InputTag("offlinePrimaryVertices"),
-    JetTag = cms.InputTag("ak5CaloJets"),
+    JetTag = cms.InputTag("ak5PFJets"),
     METTag = cms.InputTag("met"),
     CaloTowerTag = cms.InputTag("towerMaker"), 
     ParticleFlowTag = cms.InputTag("particleFlow"),
     TriggerResultsTag = cms.InputTag("TriggerResults::HLT"),
     HCALTowerSummaryTag = cms.InputTag("hcalActivitySummary"),
     # Misc
-    EnergyThresholdHB = cms.double(2.0),
+    EnergyThresholdHB = cms.double(1.5),
     EnergyThresholdHE = cms.double(2.0),
     EnergyThresholdHF = cms.double(4.0),
     # Options

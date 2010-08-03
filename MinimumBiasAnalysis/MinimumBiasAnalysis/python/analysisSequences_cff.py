@@ -42,14 +42,14 @@ from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasHLTPaths_cfi import *
 hltBscMinBiasORBptxPlusORMinusFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_L1_BscMinBiasOR_BptxPlusORMinus'])
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.leadingJets_cfi import *
-leadingJets.src = "ak7PFJets"
+leadingJets.src = "ak5PFJets"
 
 #from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectGoodTracks_cfi import *
 #selectGoodTracks.cut = "pt > 0.5 & numberOfValidHits > 7 & d0 <= 3.5"
 from PhysicsTools.RecoAlgos.recoTrackSelector_cfi import *
 recoTrackSelector.src = "generalTracks"
-recoTrackSelector.minRapidity = -2.0
-recoTrackSelector.maxRapidity = 2.0
+recoTrackSelector.minRapidity = -2.5
+recoTrackSelector.maxRapidity = 2.5
 recoTrackSelector.ptMin = 0.5
 recoTrackSelector.quality = ["highPurity"]
 selectGoodTracks = recoTrackSelector
@@ -61,14 +61,14 @@ selectTracksAssociatedToPV.MaxDistanceFromVertex = 1.0
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
 tracksOutsideJets.src = "selectTracksAssociatedToPV" 
 tracksOutsideJets.JetTag = "leadingJets"
-tracksOutsideJets.JetConeSize = 0.7
+tracksOutsideJets.JetConeSize = 0.5
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksTransverseRegion_cfi import *
 tracksTransverseRegion.src = "selectTracksAssociatedToPV"
 tracksTransverseRegion.JetTag = "leadingJets"
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.trackMultiplicity_cfi import * 
-#trackMultiplicity.TracksTag = "selectGoodTracks"
+trackMultiplicity.TracksTag = "selectGoodTracks"
 trackMultiplicityAssociatedToPV = trackMultiplicity.clone(TracksTag = "selectTracksAssociatedToPV")
 trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
 trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
@@ -126,9 +126,11 @@ eventSelectionBscMinBiasORNoColl = cms.Sequence(hltBscMinBiasORNoColl+offlineSel
 eventSelectionBscMinBiasORBPTXOR = cms.Sequence(hltBscMinBiasORBPTXOR+offlineSelection) 
 
 from Utilities.AnalysisTools.hcalActivityFilter_cfi import hcalActivityFilter
-hcalActivityFilter.EnergyThresholdHB = 2.0
+hcalActivityFilter.EnergyThresholdHB = 1.5
 hcalActivityFilter.EnergyThresholdHE = 2.0
 hcalActivityFilter.EnergyThresholdHF = 4.0
+hcalVetoHFPlus = hcalActivityFilter.clone(NTowersMaxHFPlus = 0)
+hcalVetoHFMinus = hcalActivityFilter.clone(NTowersMaxHFMinus = 0)
 hcalVetoHEHFPlus = hcalActivityFilter.clone(NTowersMaxHEPlus = 0, NTowersMaxHFPlus = 0)
 hcalVetoHEHFMinus = hcalActivityFilter.clone(NTowersMaxHEMinus = 0, NTowersMaxHFMinus = 0)
 

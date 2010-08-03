@@ -38,6 +38,10 @@ namespace minimumBiasAnalysis {
      // 1-13 HF rings, 2.866 < |eta| < 5.205
      int multiplicityHFPlusVsiEta_[13];
      int multiplicityHFMinusVsiEta_[13];
+     double sumEnergyHEPlusGen_;
+     double sumEnergyHEMinusGen_;
+     double sumEnergyHFPlusGen_;
+     double sumEnergyHFMinusGen_; 
      double xiGenPlus_;
      double xiGenMinus_;
      double xiPlusFromTowers_;

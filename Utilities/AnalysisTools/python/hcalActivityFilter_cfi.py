@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 hcalActivityFilter = cms.EDProducer("HCALActivityFilter",
     HCALTowerSummaryTag = cms.InputTag("hcalActivitySummary"),
-    EnergyThresholdHB = cms.double(2.0),
+    EnergyThresholdHB = cms.double(1.5),
     EnergyThresholdHE = cms.double(2.0),
     EnergyThresholdHF = cms.double(4.0),
     NTowersMaxHBPlus = cms.int32(-1),
@@ -16,5 +16,11 @@ hcalActivityFilter = cms.EDProducer("HCALActivityFilter",
     SumEMaxHEPlus = cms.double(-1.),
     SumEMaxHEMinus = cms.double(-1.),
     SumEMaxHFPlus = cms.double(-1.),
-    SumEMaxHFMinus = cms.double(-1.)
+    SumEMaxHFMinus = cms.double(-1.),
+    SumETMaxHBPlus = cms.double(-1.),
+    SumETMaxHBMinus = cms.double(-1.),
+    SumETMaxHEPlus = cms.double(-1.),
+    SumETMaxHEMinus = cms.double(-1.),
+    SumETMaxHFPlus = cms.double(-1.),
+    SumETMaxHFMinus = cms.double(-1.)
 )

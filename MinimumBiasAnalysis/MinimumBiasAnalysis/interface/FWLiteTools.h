@@ -1,13 +1,21 @@
 #ifndef MinimumBiasAnalysis_FWLiteTools_h
 #define MinimumBiasAnalysis_FWLiteTools_h
 
+#if !defined(__CINT__) && !defined(__MAKECINT__)
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
+#endif
+
+namespace minimumBiasAnalysis {
 
 void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                                  math::XYZTLorentzVector& genAllParticles,
+                                                                 math::XYZTLorentzVector& genAllParticlesHEPlus,
+                                                                 math::XYZTLorentzVector& genAllParticlesHEMinus,
+                                                                 math::XYZTLorentzVector& genAllParticlesHFPlus,
+                                                                 math::XYZTLorentzVector& genAllParticlesHFMinus,
                                                                  math::XYZTLorentzVector& genProtonPlus,
                                                                  math::XYZTLorentzVector& genProtonMinus){
    /*fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
@@ -15,6 +23,10 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    const reco::GenParticleCollection& genParticles = *genParticlesCollection;*/
 
    math::XYZTLorentzVector allGenParticles(0.,0.,0.,0.);
+   math::XYZTLorentzVector allGenParticlesHEPlus(0.,0.,0.,0.);
+   math::XYZTLorentzVector allGenParticlesHEMinus(0.,0.,0.,0.);
+   math::XYZTLorentzVector allGenParticlesHFPlus(0.,0.,0.,0.);
+   math::XYZTLorentzVector allGenParticlesHFMinus(0.,0.,0.,0.);
    
    reco::GenParticleCollection::const_iterator proton1 = genParticles.end();
    reco::GenParticleCollection::const_iterator proton2 = genParticles.end();
@@ -22,6 +34,10 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
       if(genpart->status() != 1) continue;
       //histosTH1F["EnergyVsEta"]->Fill(genpart->eta(),genpart->energy());      
       if(fabs(genpart->eta()) < 5.0) allGenParticles += genpart->p4();
+      if( (genpart->eta() >= 1.3) && (genpart->eta() < 3.0) ) allGenParticlesHEPlus += genpart->p4();
+      if( (genpart->eta() > -3.0) && (genpart->eta() <= -1.3) ) allGenParticlesHEMinus += genpart->p4();
+      if( (genpart->eta() >= 3.0) && (genpart->eta() < 5.0) ) allGenParticlesHFPlus += genpart->p4();
+      if( (genpart->eta() > -5.0) && (genpart->eta() <= -3.0) ) allGenParticlesHFMinus += genpart->p4(); 
 
       double pz = genpart->pz();
       if((proton1 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz > 0.75*Ebeam)) proton1 = genpart;
@@ -32,12 +48,14 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    if(proton2 != genParticles.end()) allGenParticles -= proton2->p4();*/
 
    // Commit
-   genAllParticles.SetPxPyPzE(allGenParticles.px(),allGenParticles.py(),
-                              allGenParticles.pz(),allGenParticles.energy());
-   if(proton1 != genParticles.end()) genProtonPlus.SetPxPyPzE(proton1->px(),proton1->py(),
-                                                              proton1->pz(),proton1->energy());
-   if(proton2 != genParticles.end()) genProtonMinus.SetPxPyPzE(proton2->px(),proton2->py(),
-                                                               proton2->pz(),proton2->energy());
+   genAllParticles = allGenParticles;
+   genAllParticlesHEPlus = allGenParticlesHEPlus;
+   genAllParticlesHEMinus = allGenParticlesHEMinus;
+   genAllParticlesHFPlus = allGenParticlesHFPlus;
+   genAllParticlesHFMinus = allGenParticlesHFMinus;
+ 
+   if(proton1 != genParticles.end()) genProtonPlus = proton1->p4();
+   if(proton2 != genParticles.end()) genProtonMinus = proton2->p4();
 }
 
 bool pflowThreshold(reco::PFCandidate const& part, std::map<int,std::pair<double,double> > const& thresholds){
@@ -115,4 +133,6 @@ std::pair<double,double> EPlusPz(reco::PFCandidateCollection const& pflowCollect
 
    return std::make_pair(e_plus_pz,e_minus_pz);
 }
+
+} // namespace
 #endif

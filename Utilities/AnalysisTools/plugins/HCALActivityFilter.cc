@@ -29,6 +29,13 @@ class HCALActivityFilter : public edm::EDFilter {
        double sumEHEMaxMinus_; 
        double sumEHFMaxPlus_;
        double sumEHFMaxMinus_;
+
+       double sumETHBMaxPlus_;
+       double sumETHBMaxMinus_;
+       double sumETHEMaxPlus_;
+       double sumETHEMaxMinus_;
+       double sumETHFMaxPlus_;
+       double sumETHFMaxMinus_; 
 };
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -53,7 +60,13 @@ HCALActivityFilter::HCALActivityFilter(edm::ParameterSet const& pset):
   sumEHEMaxPlus_(pset.getParameter<double>("SumEMaxHEPlus")), 
   sumEHEMaxMinus_(pset.getParameter<double>("SumEMaxHEMinus")),
   sumEHFMaxPlus_(pset.getParameter<double>("SumEMaxHFPlus")), 
-  sumEHFMaxMinus_(pset.getParameter<double>("SumEMaxHFMinus")) {} 
+  sumEHFMaxMinus_(pset.getParameter<double>("SumEMaxHFMinus")),
+  sumETHBMaxPlus_(pset.getParameter<double>("SumETMaxHBPlus")),
+  sumETHBMaxMinus_(pset.getParameter<double>("SumETMaxHBMinus")),
+  sumETHEMaxPlus_(pset.getParameter<double>("SumETMaxHEPlus")),
+  sumETHEMaxMinus_(pset.getParameter<double>("SumETMaxHEMinus")),
+  sumETHFMaxPlus_(pset.getParameter<double>("SumETMaxHFPlus")),
+  sumETHFMaxMinus_(pset.getParameter<double>("SumETMaxHFMinus")) {} 
 
 HCALActivityFilter::~HCALActivityFilter() {}
 
@@ -109,6 +122,24 @@ bool HCALActivityFilter::filter(edm::Event& event, edm::EventSetup const& setup)
 
   edm::Handle<std::vector<double> > sumEHFminus;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumEHFminus"),sumEHFminus);
+ 
+  edm::Handle<std::vector<double> > sumETHBplus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHBplus"),sumETHBplus);
+
+  edm::Handle<std::vector<double> > sumETHBminus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHBminus"),sumETHBminus);
+
+  edm::Handle<std::vector<double> > sumETHEplus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHEplus"),sumETHEplus);
+
+  edm::Handle<std::vector<double> > sumETHEminus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHEminus"),sumETHEminus);
+
+  edm::Handle<std::vector<double> > sumETHFplus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHFplus"),sumETHFplus);
+
+  edm::Handle<std::vector<double> > sumETHFminus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHFminus"),sumETHFminus);
 
   int nHB_plus = (*nHBPlus)[indexThresholdHB];
   int nHB_minus = (*nHBMinus)[indexThresholdHB];
@@ -128,20 +159,34 @@ bool HCALActivityFilter::filter(edm::Event& event, edm::EventSetup const& setup)
   double sumEHF_plus = (*sumEHFplus)[indexThresholdHF];
   double sumEHF_minus = (*sumEHFminus)[indexThresholdHF];
 
-  bool accept = true;
-  if(nHBTowersMaxPlus_ >= 0 && nHB_plus > nHBTowersMaxPlus_) accept = false;
-  if(nHBTowersMaxMinus_ >= 0 && nHB_minus > nHBTowersMaxMinus_) accept = false;
-  if(nHETowersMaxPlus_ >= 0 && nHE_plus > nHETowersMaxPlus_) accept = false;
-  if(nHETowersMaxMinus_ >= 0 && nHE_minus > nHETowersMaxMinus_) accept = false;
-  if(nHFTowersMaxPlus_ >= 0 && nHF_plus > nHFTowersMaxPlus_) accept = false;
-  if(nHFTowersMaxMinus_ >= 0 && nHF_minus > nHFTowersMaxMinus_) accept = false; 
+  double sumETHB_plus = (*sumETHBplus)[indexThresholdHB];
+  double sumETHB_minus = (*sumETHBminus)[indexThresholdHB];
 
-  if(sumEHBMaxPlus_ >= 0. && sumEHB_plus > sumEHBMaxPlus_) accept = false;
-  if(sumEHBMaxMinus_ >= 0. && sumEHB_minus > sumEHBMaxMinus_) accept = false; 
-  if(sumEHEMaxPlus_ >= 0. && sumEHE_plus > sumEHEMaxPlus_) accept = false;
-  if(sumEHEMaxMinus_ >= 0. && sumEHE_minus > sumEHEMaxMinus_) accept = false;
-  if(sumEHFMaxPlus_ >= 0. && sumEHF_plus > sumEHFMaxPlus_) accept = false;
-  if(sumEHFMaxMinus_ >= 0. && sumEHF_minus > sumEHFMaxMinus_) accept = false;
+  double sumETHE_plus = (*sumETHEplus)[indexThresholdHE];
+  double sumETHE_minus = (*sumETHEminus)[indexThresholdHE];
+
+  double sumETHF_plus = (*sumETHFplus)[indexThresholdHF];
+  double sumETHF_minus = (*sumETHFminus)[indexThresholdHF];
+
+  bool accept = true;
+  if( (nHBTowersMaxPlus_ >= 0 && nHB_plus > nHBTowersMaxPlus_) ||
+      (nHBTowersMaxMinus_ >= 0 && nHB_minus > nHBTowersMaxMinus_) ||
+      (nHETowersMaxPlus_ >= 0 && nHE_plus > nHETowersMaxPlus_) ||
+      (nHETowersMaxMinus_ >= 0 && nHE_minus > nHETowersMaxMinus_) ||
+      (nHFTowersMaxPlus_ >= 0 && nHF_plus > nHFTowersMaxPlus_) ||
+      (nHFTowersMaxMinus_ >= 0 && nHF_minus > nHFTowersMaxMinus_) ||
+      (sumEHBMaxPlus_ >= 0. && sumEHB_plus > sumEHBMaxPlus_) ||
+      (sumEHBMaxMinus_ >= 0. && sumEHB_minus > sumEHBMaxMinus_) ||
+      (sumEHEMaxPlus_ >= 0. && sumEHE_plus > sumEHEMaxPlus_) ||
+      (sumEHEMaxMinus_ >= 0. && sumEHE_minus > sumEHEMaxMinus_) ||
+      (sumEHFMaxPlus_ >= 0. && sumEHF_plus > sumEHFMaxPlus_) ||
+      (sumEHFMaxMinus_ >= 0. && sumEHF_minus > sumEHFMaxMinus_) ||
+      (sumETHBMaxPlus_ >= 0. && sumETHB_plus > sumETHBMaxPlus_) ||
+      (sumETHBMaxMinus_ >= 0. && sumETHB_minus > sumETHBMaxMinus_) ||
+      (sumETHEMaxPlus_ >= 0. && sumETHE_plus > sumETHEMaxPlus_) ||
+      (sumETHEMaxMinus_ >= 0. && sumETHE_minus > sumETHEMaxMinus_) ||
+      (sumETHFMaxPlus_ >= 0. && sumETHF_plus > sumETHFMaxPlus_) ||
+      (sumETHFMaxMinus_ >= 0. && sumETHF_minus > sumETHFMaxMinus_) ) accept = false;
 
   return accept;
 }

@@ -36,6 +36,10 @@ namespace minimumBiasAnalysis {
      // 1-13 HF rings, 2.866 < |eta| < 5.205
      data.Branch("multiplicityHFPlusVsiEta",eventData.multiplicityHFPlusVsiEta_,"multiplicityHFPlusVsiEta[13]/I");
      data.Branch("multiplicityHFMinusVsiEta",eventData.multiplicityHFMinusVsiEta_,"multiplicityHFMinusVsiEta[13]/I");
+     data.Branch("sumEnergyHEPlusGen",&eventData.sumEnergyHEPlusGen_,"sumEnergyHEPlusGen/D");
+     data.Branch("sumEnergyHEMinusGen",&eventData.sumEnergyHEMinusGen_,"sumEnergyHEMinusGen/D"); 
+     data.Branch("sumEnergyHFPlusGen",&eventData.sumEnergyHFPlusGen_,"sumEnergyHFPlusGen/D");
+     data.Branch("sumEnergyHFMinusGen",&eventData.sumEnergyHFMinusGen_,"sumEnergyHFMinusGen/D");
      data.Branch("xiGenPlus",&eventData.xiGenPlus_,"xiGenPlus/D");
      data.Branch("xiGenMinus",&eventData.xiGenMinus_,"xiGenMinus/D");
      data.Branch("xiPlusFromTowers",&eventData.xiPlusFromTowers_,"xiPlusFromTowers/D");
@@ -100,6 +104,10 @@ namespace minimumBiasAnalysis {
      // 1-13 HF rings, 2.866 < |eta| < 5.205
      data.SetBranchAddress("multiplicityHFPlusVsiEta",eventData.multiplicityHFPlusVsiEta_);
      data.SetBranchAddress("multiplicityHFMinusVsiEta",eventData.multiplicityHFMinusVsiEta_);
+     data.SetBranchAddress("sumEnergyHEPlusGen",&eventData.sumEnergyHEPlusGen_);
+     data.SetBranchAddress("sumEnergyHEMinusGen",&eventData.sumEnergyHEMinusGen_);
+     data.SetBranchAddress("sumEnergyHFPlusGen",&eventData.sumEnergyHFPlusGen_);
+     data.SetBranchAddress("sumEnergyHFMinusGen",&eventData.sumEnergyHFMinusGen_);
      data.SetBranchAddress("xiGenPlus",&eventData.xiGenPlus_);
      data.SetBranchAddress("xiGenMinus",&eventData.xiGenMinus_);
      data.SetBranchAddress("xiPlusFromTowers",&eventData.xiPlusFromTowers_);

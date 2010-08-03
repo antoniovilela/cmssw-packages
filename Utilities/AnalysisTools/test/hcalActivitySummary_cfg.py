@@ -21,16 +21,18 @@ process.output = cms.OutputModule("PoolOutputModule",
     )
 )
 
+process.TFileService = cms.Service("TFileService",
+    fileName = cms.string("analysis_histos.root")
+)
+
 process.load('Utilities.AnalysisTools.hcalActivitySummary_cfi')
 process.load('Utilities.AnalysisTools.hcalActivityFilter_cfi')
-process.hcalActivityFilter.EnergyThresholdHB = 1.5
-process.hcalActivityFilter.EnergyThresholdHE = 1.5
+process.hcalActivityFilter.EnergyThresholdHB = 1.2
+process.hcalActivityFilter.EnergyThresholdHE = 1.7
 process.hcalActivityFilter.EnergyThresholdHF = 4.0
-process.hcalActivityFilter.NTowersMaxHEPlus = 0
 process.hcalActivityFilter.NTowersMaxHFPlus = 0
-#process.hcalActivityFilter.SumEMaxHFPlus = 8.0
-#process.hcalActivityFilter.SumEMaxHEPlus = 4.0
+process.load('Utilities.AnalysisTools.trackHistos_cfi')
 
 process.reco_step = cms.Path(process.hcalActivitySummary)
-process.analysis_step = cms.Path(process.hcalActivityFilter)
+process.analysis_step = cms.Path(process.hcalActivityFilter + process.trackHistos)
 process.out_step = cms.EndPath(process.output)
