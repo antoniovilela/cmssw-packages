@@ -16,11 +16,13 @@ namespace minimumBiasAnalysis {
      data.Branch("posXPrimVtx",&eventData.posXPrimVtx_,"posXPrimVtx/D");
      data.Branch("posYPrimVtx",&eventData.posYPrimVtx_,"posYPrimVtx/D");
      data.Branch("posZPrimVtx",&eventData.posZPrimVtx_,"posZPrimVtx/D");
+     data.Branch("multiplicityTracks",&eventData.multiplicityTracks_,"multiplicityTracks/I");
+     data.Branch("sumPtTracks",&eventData.sumPtTracks_,"sumPtTracks/D");
      data.Branch("leadingJetPt",&eventData.leadingJetPt_,"leadingJetPt/D");
      data.Branch("leadingJetEta",&eventData.leadingJetEta_,"leadingJetEta/D");
      data.Branch("leadingJetPhi",&eventData.leadingJetPhi_,"leadingJetPhi/D");
-     data.Branch("trackMultiplicity",&eventData.trackMultiplicity_,"trackMultiplicity/I");
-     data.Branch("trackMultiplicityAssociatedToPV",&eventData.trackMultiplicityAssociatedToPV_,"trackMultiplicityAssociatedToPV/I");
+     /*data.Branch("trackMultiplicity",&eventData.trackMultiplicity_,"trackMultiplicity/I");
+     data.Branch("trackMultiplicityAssociatedToPV",&eventData.trackMultiplicityAssociatedToPV_,"trackMultiplicityAssociatedToPV/I");*/
      data.Branch("multiplicityHEPlus",&eventData.multiplicityHEPlus_,"multiplicityHEPlus/I");
      data.Branch("multiplicityHEMinus",&eventData.multiplicityHEMinus_,"multiplicityHEMinus/I");
      data.Branch("sumEnergyHEPlus",&eventData.sumEnergyHEPlus_,"sumEnergyHEPlus/D");
@@ -84,11 +86,13 @@ namespace minimumBiasAnalysis {
      data.SetBranchAddress("posXPrimVtx",&eventData.posXPrimVtx_);
      data.SetBranchAddress("posYPrimVtx",&eventData.posYPrimVtx_);
      data.SetBranchAddress("posZPrimVtx",&eventData.posZPrimVtx_);
+     data.SetBranchAddress("multiplicityTracks",&eventData.multiplicityTracks_);
+     data.SetBranchAddress("sumPtTracks",&eventData.sumPtTracks_); 
      data.SetBranchAddress("leadingJetPt",&eventData.leadingJetPt_);
      data.SetBranchAddress("leadingJetEta",&eventData.leadingJetEta_);
      data.SetBranchAddress("leadingJetPhi",&eventData.leadingJetPhi_);
-     data.SetBranchAddress("trackMultiplicity",&eventData.trackMultiplicity_);
-     data.SetBranchAddress("trackMultiplicityAssociatedToPV",&eventData.trackMultiplicityAssociatedToPV_);
+     /*data.SetBranchAddress("trackMultiplicity",&eventData.trackMultiplicity_);
+     data.SetBranchAddress("trackMultiplicityAssociatedToPV",&eventData.trackMultiplicityAssociatedToPV_);*/
      data.SetBranchAddress("multiplicityHEPlus",&eventData.multiplicityHEPlus_);
      data.SetBranchAddress("multiplicityHEMinus",&eventData.multiplicityHEMinus_);
      data.SetBranchAddress("sumEnergyHEPlus",&eventData.sumEnergyHEPlus_);

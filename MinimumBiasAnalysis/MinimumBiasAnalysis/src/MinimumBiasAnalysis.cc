@@ -10,6 +10,8 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
@@ -27,21 +29,19 @@
 namespace minimumBiasAnalysis {
 
 MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
-  vertexTag_(pset.getParameter<edm::InputTag>("VertexTag")), 
+  vertexTag_(pset.getParameter<edm::InputTag>("VertexTag")),
+  trackTag_(pset.getParameter<edm::InputTag>("TrackTag")), 
   metTag_(pset.getParameter<edm::InputTag>("METTag")),
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
   caloTowerTag_(pset.getParameter<edm::InputTag>("CaloTowerTag")),
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
   triggerResultsTag_(pset.getParameter<edm::InputTag>("TriggerResultsTag")),
-  //hfTowerSummaryTag_(pset.getParameter<edm::InputTag>("HFTowerSummaryTag")),
   hcalTowerSummaryTag_(pset.getParameter<edm::InputTag>("HCALTowerSummaryTag")),
-  //thresholdHF_(pset.getParameter<unsigned int>("HFThresholdIndex")),
   energyThresholdHB_(pset.getParameter<double>("EnergyThresholdHB")),
   energyThresholdHE_(pset.getParameter<double>("EnergyThresholdHE")),
   energyThresholdHF_(pset.getParameter<double>("EnergyThresholdHF")),
   Ebeam_(pset.getParameter<double>("EBeam")),
   applyEnergyScaleHCAL_(pset.getParameter<bool>("ApplyEnergyScaleHCAL")),
-  //energyScaleHCAL_(pset.getParameter<bool>("EnergyScaleFactorHCAL")),
   energyScaleHCAL_(-1.),
   accessMCInfo_(pset.getUntrackedParameter<bool>("AccessMCInfo",false)),
   //hltPathNames_(pset.getParameter<std::vector<std::string> >("HLTPathNames")),
@@ -81,6 +81,7 @@ void MinimumBiasAnalysis::fillEventData(EventData& eventData, const edm::Event& 
   fillNoiseInfo(eventData,event,setup); 
   fillTriggerInfo(eventData,event,setup);
   fillVertexInfo(eventData,event,setup);
+  fillTrackInfo(eventData,event,setup);
   fillJetInfo(eventData,event,setup);
   fillMETInfo(eventData,event,setup);
   fillEventVariables(eventData,event,setup);
@@ -187,6 +188,24 @@ void MinimumBiasAnalysis::fillVertexInfo(EventData& eventData, const edm::Event&
 
 }
 
+void MinimumBiasAnalysis::fillTrackInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+  // Access collection
+  edm::Handle<edm::View<reco::Track> > trackCollectionH;
+  event.getByLabel(trackTag_,trackCollectionH);
+  const edm::View<reco::Track>& trackColl = *(trackCollectionH.product());
+
+  double ptSum = 0.;
+  edm::View<reco::Track>::const_iterator track = trackColl.begin();
+  edm::View<reco::Track>::const_iterator tracks_end = trackColl.end();
+  for(; track != tracks_end; ++track){
+     ptSum += track->pt();
+     // Other variables..
+  }
+
+  eventData.multiplicityTracks_ = trackColl.size();
+  eventData.sumPtTracks_ = ptSum;
+}
+
 void MinimumBiasAnalysis::fillMETInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   edm::Handle<edm::View<reco::MET> > metCollectionH;
   event.getByLabel(metTag_,metCollectionH);
@@ -221,11 +240,11 @@ void MinimumBiasAnalysis::fillJetInfo(EventData& eventData, const edm::Event& ev
 
 void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   // Access multiplicities
-  edm::Handle<unsigned int> trackMultiplicity; 
+  /*edm::Handle<unsigned int> trackMultiplicity; 
   event.getByLabel("trackMultiplicity","trackMultiplicity",trackMultiplicity);
   
   edm::Handle<unsigned int> trackMultiplicityAssociatedToPV;
-  event.getByLabel("trackMultiplicityAssociatedToPV","trackMultiplicity",trackMultiplicityAssociatedToPV);
+  event.getByLabel("trackMultiplicityAssociatedToPV","trackMultiplicity",trackMultiplicityAssociatedToPV);*/
 
   edm::Handle<std::vector<unsigned int> > nHEPlus;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"nHEplus"),nHEPlus);
@@ -284,8 +303,8 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"thresholdsHF"),thresholdsHF);
   size_t indexThresholdHF = std::lower_bound((*thresholdsHF).begin(),(*thresholdsHF).end(),energyThresholdHF_) - (*thresholdsHF).begin();
   
-  unsigned int nTracks = *trackMultiplicity;
-  unsigned int nTracksAssociatedToPV = *trackMultiplicityAssociatedToPV;
+  /*unsigned int nTracks = *trackMultiplicity;
+  unsigned int nTracksAssociatedToPV = *trackMultiplicityAssociatedToPV;*/
 
   unsigned int nHE_plus = (*nHEPlus)[indexThresholdHE];
   unsigned int nHE_minus = (*nHEMinus)[indexThresholdHE];
@@ -305,8 +324,8 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   double sumETHF_plus = (*sumETHFplus)[indexThresholdHF];
   double sumETHF_minus = (*sumETHFminus)[indexThresholdHF];
  
-  eventData.trackMultiplicity_ = nTracks;
-  eventData.trackMultiplicityAssociatedToPV_ = nTracksAssociatedToPV;
+  /*eventData.trackMultiplicity_ = nTracks;
+  eventData.trackMultiplicityAssociatedToPV_ = nTracksAssociatedToPV;*/
   eventData.multiplicityHEPlus_ = nHE_plus;
   eventData.multiplicityHEMinus_ = nHE_minus;
   eventData.multiplicityHFPlus_ = nHF_plus;

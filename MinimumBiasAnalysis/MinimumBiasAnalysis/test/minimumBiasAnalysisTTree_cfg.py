@@ -3,9 +3,9 @@ import FWCore.ParameterSet.Config as cms
 # Settings
 class config: pass
 config.comEnergy = 7000.0
-config.varyAttributes = False
+config.varyAttributes = True
 config.runOfflineOnly = True
-config.runNoColl = False
+config.runNoColl = True
 config.runBPTX = False
 config.runHCALFilter = True
 
@@ -64,14 +64,19 @@ if config.runNoColl:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORBPTXOR')
 
 if config.runHCALFilter:
-    process.eventSelectionBscMinBiasORHFVetoPlus = cms.Sequence(process.eventSelectionBscMinBiasOR+process.hcalVetoHFPlus)
-    process.eventSelectionBscMinBiasORHFVetoMinus = cms.Sequence(process.eventSelectionBscMinBiasOR+process.hcalVetoHFMinus)
-    process.eventSelectionBscMinBiasORHEHFVetoPlus = cms.Sequence(process.eventSelectionBscMinBiasOR+process.hcalVetoHEHFPlus)
-    process.eventSelectionBscMinBiasORHEHFVetoMinus = cms.Sequence(process.eventSelectionBscMinBiasOR+process.hcalVetoHEHFMinus)
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORHFVetoPlus')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORHFVetoMinus')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORHEHFVetoPlus')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORHEHFVetoMinus')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFPlus4')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFPlus8')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFPlus12')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFPlus16')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFMinus4')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFMinus8')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFMinus12')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFMinus16')    
+
     makeAnalysis(process,'trackHistos','eventSelectionBscMinBiasORHFVetoPlus')
     makeAnalysis(process,'trackHistos','eventSelectionBscMinBiasORHFVetoMinus')
     makeAnalysis(process,'trackHistos','eventSelectionBscMinBiasORHEHFVetoPlus')

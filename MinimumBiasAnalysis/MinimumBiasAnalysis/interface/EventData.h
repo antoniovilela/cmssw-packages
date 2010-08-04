@@ -18,11 +18,13 @@ namespace minimumBiasAnalysis {
      double posXPrimVtx_;
      double posYPrimVtx_;
      double posZPrimVtx_;
+     int multiplicityTracks_;
+     double sumPtTracks_;
      double leadingJetPt_;
      double leadingJetEta_;
      double leadingJetPhi_;
-     int trackMultiplicity_;
-     int trackMultiplicityAssociatedToPV_;
+     /*int trackMultiplicity_;
+     int trackMultiplicityAssociatedToPV_;*/
      int multiplicityHEPlus_;
      int multiplicityHEMinus_;
      double sumEnergyHEPlus_;

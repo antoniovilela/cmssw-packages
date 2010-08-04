@@ -23,6 +23,8 @@ namespace minimumBiasAnalysis {
      histos["posYPrimVtx"] = adaptor.template make<TH1F>("posYPrimVtx","y position of primary vertexes",100,-1.,1.);
      histos["posZPrimVtx"] = adaptor.template make<TH1F>("posZPrimVtx","z position of primary vertexes",100,-30.,30.);
      histos["posRPrimVtx"] = adaptor.template make<TH1F>("posRPrimVtx","rho position of primary vertexes",100,0.,5.);
+     histos["multiplicityTracks"] = adaptor.template make<TH1F>("multiplicityTracks","multiplicityTracks",40,0,40);
+     histos["sumPtTracks"] = adaptor.template make<TH1F>("sumPtTracks","sumPtTracks",100,0.,50.);
      histos["leadingJetPt"] = adaptor.template make<TH1F>("leadingJetPt","leadingJetPt",100,0.,100.);
      histos["leadingJetEta"] = adaptor.template make<TH1F>("leadingJetEta","leadingJetEta",100,-5.,5.);
      histos["leadingJetPhi"] = adaptor.template make<TH1F>("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);

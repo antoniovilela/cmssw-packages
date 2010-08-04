@@ -357,16 +357,20 @@ void minimumBiasTTreeAnalysis(TTree* data,
      }
 
      // Access multiplicities
-     unsigned int nTracks = eventData.trackMultiplicity_;
-     unsigned int nTracksAssociatedToPV = eventData.trackMultiplicityAssociatedToPV_;
+     /*unsigned int nTracks = eventData.trackMultiplicity_;
+     unsigned int nTracksAssociatedToPV = eventData.trackMultiplicityAssociatedToPV_;*/
+     int multiplicityTracks = eventData.multiplicityTracks_;
+     double sumPtTracks = eventData.sumPtTracks_;
 
      unsigned int nHE_plus = eventData.multiplicityHEPlus_;
      unsigned int nHE_minus = eventData.multiplicityHEMinus_;
      unsigned int nHF_plus = eventData.multiplicityHFPlus_;
      unsigned int nHF_minus = eventData.multiplicityHFMinus_;
  
-     histosTH1F["trackMultiplicity"]->Fill(nTracks);
-     histosTH1F["trackMultiplicityAssociatedToPV"]->Fill(nTracksAssociatedToPV);
+     //histosTH1F["trackMultiplicity"]->Fill(nTracks);
+     //histosTH1F["trackMultiplicityAssociatedToPV"]->Fill(nTracksAssociatedToPV);
+     histosTH1F["multiplicityTracks"]->Fill(multiplicityTracks); 
+     histosTH1F["sumPtTracks"]->Fill(sumPtTracks);
 
      histosTH1F["multiplicityHEPlus"]->Fill(nHE_plus);
      histosTH1F["multiplicityHEMinus"]->Fill(nHE_minus);

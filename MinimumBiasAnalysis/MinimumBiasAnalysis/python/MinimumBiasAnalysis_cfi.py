@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 MinimumBiasAnalysis = cms.PSet(
     # Input tags
     VertexTag = cms.InputTag("offlinePrimaryVertices"),
+    TrackTag = cms.InputTag("selectGoodTracks"),
     JetTag = cms.InputTag("ak5PFJets"),
     METTag = cms.InputTag("met"),
     CaloTowerTag = cms.InputTag("towerMaker"), 
