@@ -397,15 +397,22 @@ void minimumBiasTTreeAnalysis(TTree* data,
      double missingMassFromXiFromPFCands = eventData.missingMassFromXiFromPFCands_;
      histosTH1F["missingMassFromXiFromPFCands"]->Fill(missingMassFromXiFromPFCands);
 
-     double sumE_plus = eventData.sumEnergyHFPlus_;
-     double sumE_minus = eventData.sumEnergyHFMinus_;
-     histosTH1F["sumEnergyHFPlus"]->Fill(sumE_plus);
-     histosTH1F["sumEnergyHFMinus"]->Fill(sumE_minus);
+     double sumEHF_plus = eventData.sumEnergyHFPlus_;
+     double sumEHF_minus = eventData.sumEnergyHFMinus_;
+     histosTH1F["sumEnergyHFPlus"]->Fill(sumEHF_plus);
+     histosTH1F["sumEnergyHFMinus"]->Fill(sumEHF_minus);
      /*histosTH1F["sumEnergyHFPlusVarBin"]->Fill((sumE_plus < minEVarBin) ? minEVarBin : sumE_plus);
      histosTH1F["sumEnergyHFMinusVarBin"]->Fill((sumE_minus < minEVarBin) ? minEVarBin: sumE_minus);*/
-     histosTH1F["sumEnergyHFPlusVarBin"]->Fill(sumE_plus);
-     histosTH1F["sumEnergyHFMinusVarBin"]->Fill(sumE_minus);
+     histosTH1F["sumEnergyHFPlusVarBin"]->Fill(sumEHF_plus);
+     histosTH1F["sumEnergyHFMinusVarBin"]->Fill(sumEHF_minus);
 
+     if(accessMCInfo){
+        double sumEHFGen_plus = eventData.sumEnergyHFPlusGen_;
+        double sumEHFGen_minus = eventData.sumEnergyHFMinusGen_;
+        histosTH1F["sumEnergyHFPlusGen"]->Fill(sumEHFGen_plus);
+        histosTH1F["sumEnergyHFMinusGen"]->Fill(sumEHFGen_minus);
+     }
+     
      /*selectedEvents.push_back(std::make_pair(runNumber,eventNumber));
      if(verbose){
         std::cout << "======== Selected event ========" << std::endl

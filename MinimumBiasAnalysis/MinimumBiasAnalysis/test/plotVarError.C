@@ -123,17 +123,22 @@ void plotErrorBandsAll(){
   //std::string rootDir = "root/900GeV/SumEnergyMaxHFPlus_8_0";
   //std::string rootDir = "root/900GeV/SumEnergyMaxHFMinus_8_0";
   std::string rootDir = "root/7TeV/NoSel"; 
-  
+  //std::string rootDirMC = "root/7TeV/Pythia8/NoSel";
+
   std::string fileNameData = rootDir + "/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_False_histos.root";
   TFile* fileData = TFile::Open(fileNameData.c_str());
   std::string fileNameErrorBands = rootDir + "/histosErrorBand_MinimumBias_7TeV_eventSelectionBscMinBiasOR.root";
   TFile* fileErrorBands = TFile::Open(fileNameErrorBands.c_str());
   std::vector<TFile*> filesMC;
   std::vector<TFile*> filesMCComponent;
-  std::string fileNameMC = rootDir + "/";
-  std::string fileNameMCComponent = rootDir + "/";
-  //filesMC.push_back(TFile::Open(fileNameMC.c_str()));
-  //filesMCComponent.push_back(TFile::Open(fileNameMCComponent.c_str()));
+  //std::string fileNameMC = rootDirMC + "/";
+  filesMC.push_back(TFile::Open("root/7TeV/Pythia8/NoSel/analysisMinBiasTTree_PYTHIA8_MinBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_False_histos_All.root"));
+  filesMC.push_back(TFile::Open("root/7TeV/Pythia6/NoSel/analysisMinBiasTTree_PYTHIA_MinBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_False_histos_All.root"));
+
+  //std::string fileNameMCComponent = rootDirMC + "/";
+  filesMCComponent.push_back(TFile::Open("root/7TeV/Pythia8/NoSel/analysisMinBiasTTree_PYTHIA8_MinBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_False_histos_Inelastic.root"));
+  filesMCComponent.push_back(TFile::Open("root/7TeV/Pythia6/NoSel/analysisMinBiasTTree_PYTHIA_MinBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_False_histos_Inelastic.root"));
+   
   
   std::cout << "Using: " << std::endl
             << fileData->GetName() << std::endl
@@ -153,19 +158,25 @@ void plotErrorBandsAll(){
 
   std::string labelErrorBands = "Energy scale #pm10%";
   std::vector<std::string> labelsMC(filesMC.size());
-  //labelsMC[0] = "PYTHIA 8";
+  labelsMC[0] = "PYTHIA 8";
+  labelsMC[1] = "PYTHIA 6 D6T";
   std::vector<std::string> labelsMCComponent(filesMCComponent.size());
-  //labelsMCComponent[0] = "PYTHIA Non-diffractive";
+  labelsMCComponent[0] = "PYTHIA 8 Non-diffractive";
+  labelsMCComponent[1] = "PYTHIA 6 Non-diffractive";
 
   std::vector<int> histColors(filesMC.size(),1);
-  //histColors[0] = 2;
+  histColors[0] = 2;
+  histColors[1] = 4;
   std::vector<int> histColorsComponent(filesMCComponent.size(),1);
-  //histColorsComponent[0] = 43;
+  histColorsComponent[0] = 43;
+  histColorsComponent[1] = 38;
 
   std::vector<int> histLineStyles(filesMC.size(),1);
-  //histLineStyles[0] = 1;
+  histLineStyles[0] = 1;
+  histLineStyles[1] = 2;
   std::vector<int> histLineStylesComponent(filesMCComponent.size(),1);
-  //histLineStylesComponent[0] = 9;
+  histLineStylesComponent[0] = 9;
+  histLineStylesComponent[1] = 10; 
 
   std::vector<TCanvas*> canvasVec;
   std::vector<TLegend*> legendVec;
@@ -351,8 +362,6 @@ void plotVarError(std::string const& variable,int rebin = 1, int errorBandColor 
 
 void plotVarError(std::vector<std::string> const& variables, std::string const& fileNameRef, std::vector<std::string> const& fileNamesVarError, int rebin, int errorBandColor, bool saveHistos, std::string const& outFileName){
 
-  //TH1::SetDefaultSumw2(true);
-
   std::vector<TH1F*> histosWithError;
   std::vector<std::string>::const_iterator it_var = variables.begin();
   std::vector<std::string>::const_iterator it_vars_end = variables.end();
@@ -384,8 +393,8 @@ TH1F* histoWithVarError(std::string const& variable, std::string const& fileName
   histRef->Rebin(rebin);
 
   // Get number of events passing cuts
-  int iBinSelection = 11;
   TH1F* hEventSelectionRef = getHisto(fileRef,"EventSelection"); 
+  int iBinSelection = hEventSelectionRef->GetNbinsX();
   double nEventsRef = hEventSelectionRef->GetBinContent(iBinSelection);
   std::cout << "=====================================" << std::endl;
   std::cout << "Number of events in reference sample= " << nEventsRef << std::endl; 
