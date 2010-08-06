@@ -25,6 +25,6 @@ def customise(process):
         process.LHCTransport.HepMCProductLabel = "source"
         process.mix.mixObjects.mixHepMC.input = cms.VInputTag(cms.InputTag("source"))
 
-        customiseEventContent(process)
+        process = customiseEventContent(process)
 
 	return(process)
