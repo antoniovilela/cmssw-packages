@@ -14,13 +14,13 @@ extern"C" {
 #define f77cls f77cls_
 #define f77rwd f77rwd_
 
-fostream::fostream(int funit, char* filename)
+fostream::fostream(int funit, const char* filename)
 {
    if(filename){
-      f77opn(funit,filename,strlen(filename));
+      f77opn(funit,(char*)filename,strlen(filename));
    } else{
-      char* filename = "stdout.txt";
-      f77opn(funit,filename,strlen(filename));
+      const char* filename = "stdout.txt";
+      f77opn(funit,(char*)filename,strlen(filename));
    }
 }
 

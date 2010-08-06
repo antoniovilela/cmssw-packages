@@ -11,7 +11,7 @@
 class fostream {
 public:
     //fostream(int funit=6, char* filename=NULL);
-    fostream(int funit=6, char* filename="");	
+    fostream(int funit=6, const char* filename="");	
     fostream& operator <<(const char  ch);
     fostream& operator <<(const char* txt);
     void rewind();
