@@ -99,14 +99,14 @@ void SimpleTrackAnalyzer::analyze(const edm::Event& event, const edm::EventSetup
      histosTH1F_["TrackPt"]->Fill( track->pt() );
      histosTH1F_["TrackEta"]->Fill( track->eta() );
   }
-  histosTH1F_["PtSum"]->Fill( ptSum );
+  histosTH1F_["TrackPtSum"]->Fill( ptSum );
   histosTH1F_["NTracks"]->Fill( nTracks ); 
 }
 
 void SimpleTrackAnalyzer::bookHistos(HistoMapTH1F& histos, edm::Service<TFileService> const& fs){
   histos["TrackPt"] = fs->make<TH1F>("TrackPt","TrackPt",nBinsPt_,minPt_,maxPt_);
   histos["TrackEta"] = fs->make<TH1F>("TrackEta","TrackEta",nBinsEta_,minEta_,maxEta_);
-  histos["PtSum"] = fs->make<TH1F>("TrackPtSum","TrackPtSum",nBinsPtSum_,minPtSum_,maxPtSum_);
+  histos["TrackPtSum"] = fs->make<TH1F>("TrackPtSum","TrackPtSum",nBinsPtSum_,minPtSum_,maxPtSum_);
   histos["NTracks"] = fs->make<TH1F>("NTracks","NTracks",nBinsNTracks_,minNTracks_,maxNTracks_);
 }
 
