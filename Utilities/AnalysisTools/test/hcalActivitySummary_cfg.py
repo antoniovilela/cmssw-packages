@@ -32,7 +32,8 @@ process.hcalActivityFilter.EnergyThresholdHE = 1.7
 process.hcalActivityFilter.EnergyThresholdHF = 4.0
 process.hcalActivityFilter.NTowersMaxHFPlus = 0
 process.load('Utilities.AnalysisTools.trackHistos_cfi')
+process.load('Utilities.AnalysisTools.trackHistoAnalyzer_cfi')
 
 process.reco_step = cms.Path(process.hcalActivitySummary)
-process.analysis_step = cms.Path(process.hcalActivityFilter + process.trackHistos)
+process.analysis_step = cms.Path(process.hcalActivityFilter + process.trackHistos + process.trackHistoAnalyzer)
 process.out_step = cms.EndPath(process.output)
