@@ -3,9 +3,10 @@ import FWCore.ParameterSet.Config as cms
 # Settings
 class config: pass
 config.comEnergy = 7000.0
+config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.varyAttributes = True
 config.runOfflineOnly = True
-config.runNoColl = True
+config.runNoColl = False
 config.runBPTX = False
 config.runHCALFilter = True
 
@@ -24,7 +25,9 @@ process.xiFromJets.comEnergy = config.comEnergy
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
 process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2.
 process.load('Utilities.AnalysisTools.trackHistos_cfi')
-process.trackHistos.src = 'selectGoodTracks'
+process.trackHistos.src = 'selectGoodTracks' 
+process.load('Utilities.AnalysisTools.trackHistoAnalyzer_cfi')
+process.trackHistoAnalyzer.TrackTag = 'selectGoodTracks'
 
 attributesEnergyScale = [{'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.90,'HCALTowerSummaryTag':'hcalActivitySummaryScale090'},
                          {'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.92,'HCALTowerSummaryTag':'hcalActivitySummaryScale092'},
@@ -47,7 +50,7 @@ attributes.extend(attributesThresholds)
 from Utilities.PyConfigTools.analysisTools import *
 
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR')
-makeAnalysis(process,'trackHistos','eventSelectionBscMinBiasOR')
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR')
 
 if config.varyAttributes:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR',attributes)
@@ -77,10 +80,18 @@ if config.runHCALFilter:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFMinus12')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORSumEMaxHFMinus16')    
 
-    makeAnalysis(process,'trackHistos','eventSelectionBscMinBiasORHFVetoPlus')
-    makeAnalysis(process,'trackHistos','eventSelectionBscMinBiasORHFVetoMinus')
-    makeAnalysis(process,'trackHistos','eventSelectionBscMinBiasORHEHFVetoPlus')
-    makeAnalysis(process,'trackHistos','eventSelectionBscMinBiasORHEHFVetoMinus')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoPlus')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoMinus')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoPlus')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoMinus')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus4')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus8')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus12')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus16')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus4')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus8')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus12')
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus16')
     
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("analysisMinBias_TTree_MinimumBias.root")

@@ -74,7 +74,7 @@ trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsid
 trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
 
 from Utilities.AnalysisTools.hcalActivitySummary_cfi import *
-hcalActivitySummary.DiscardFlaggedTowers = True
+hcalActivitySummary.DiscardFlaggedTowers = False
 hcalActivitySummaryScale090 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.90,EnergyScaleFactorHE = 0.90,EnergyScaleFactorHF = 0.90)
 hcalActivitySummaryScale092 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.92,EnergyScaleFactorHE = 0.92,EnergyScaleFactorHF = 0.92)
 hcalActivitySummaryScale095 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.95,EnergyScaleFactorHE = 0.95,EnergyScaleFactorHF = 0.95)
@@ -103,9 +103,9 @@ hltMinBiasPixelNoColl = cms.Sequence(l1NoColl+hltMinBiasPixelSingleTrackFilter)
 hltMinBiasBSCORNoBPTX = cms.Sequence(l1NoBPTXBscOr)
 hltMinBiasPixelNoBPTX = cms.Sequence(l1NoBPTX+hltMinBiasPixelSingleTrackFilter)
 """
-hltBscMinBiasOR = cms.Sequence(l1Coll+hltBscMinBiasORBptxPlusORMinusFilter)
-hltBscMinBiasORNoColl = cms.Sequence(l1NoColl+hltBscMinBiasORBptxPlusORMinusFilter)
-hltBscMinBiasORBPTXOR = cms.Sequence(l1NoBPTX+hltBscMinBiasORBptxPlusORMinusFilter)
+hltBscMinBiasOR = cms.Sequence(l1CollBscOr + hltBscMinBiasORBptxPlusORMinusFilter)
+hltBscMinBiasORNoColl = cms.Sequence(l1NoCollBscOr + hltBscMinBiasORBptxPlusORMinusFilter)
+hltBscMinBiasORBPTXOR = cms.Sequence(l1NoBPTXBscOr + hltBscMinBiasORBptxPlusORMinusFilter)
 
 #preSelection = cms.Sequence()
 offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping)
