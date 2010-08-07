@@ -54,7 +54,7 @@ class Plotter{
       //void plotComponents(VarMap const& variablesMap, const char* drawOption = "");
 
    private:
-      TH1F* loadHisto(VarDesc const&);
+      TH1F* loadHisto(VarDesc const&,unsigned int);
       std::map<std::string,std::vector<HistDesc> > loadHistos(VarMap const&);
       THStack* buildTHStack(std::string const&, std::vector<HistDesc> const&);
       VarMap makeVarMap(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const std::vector<double>&);

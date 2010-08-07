@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <sstream>
 
 template <class NormPolicy>
 Plotter<NormPolicy>::Plotter(): verbose_(false),rebin_(1){
@@ -54,13 +55,20 @@ void Plotter<NormPolicy>::plotStack(VarMap const& variablesMap, const char* draw
          std::copy(histos.begin(), histos.end(), stackedHistos.begin());
       }
       THStack* stack = buildTHStack(setName,stackedHistos);
-      stack->Draw(option.c_str());
+      //stack->Draw(option.c_str());
 
       if(firstAsRefHist){
          HistDesc const& histoFirst = histos[0];
-         histoFirst.first->SetMarkerSize(0.9);
-         histoFirst.first->Draw("SAME");
-      }     
+         histoFirst.first->SetMarkerStyle(20);
+         histoFirst.first->SetMarkerSize(1.2);
+         histoFirst.first->SetStats(0);
+         stack->Draw(option.c_str());
+         histoFirst.first->Draw("SAME][");
+         //histoFirst.first->Draw(); 
+         //stack->Draw( ( option + "SAME" ).c_str() );
+      } else {
+         stack->Draw(option.c_str());
+      }  
 
       std::vector<HistDesc>::const_iterator histo = histos.begin();
       std::vector<HistDesc>::const_iterator histos_end = histos.end();
@@ -86,6 +94,7 @@ THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<
    std::reverse(fillstyles.begin(),fillstyles.end());
  
    THStack* stack = new THStack(("stack_" + name).c_str(),name.c_str());
+   if(verbose_) std::cout << " Created THStack " << stack->GetName() << std::endl;
    size_t index = 0;
    std::vector<HistDesc>::const_iterator it_histo = reversedHistos.begin();
    std::vector<HistDesc>::const_iterator histos_end = reversedHistos.end();
@@ -121,7 +130,7 @@ typename Plotter<NormPolicy>::HistMap Plotter<NormPolicy>::loadHistos(VarMap con
       std::vector<VarDesc> const& vars = cat->second;
       size_t index = 0;
       for(std::vector<VarDesc>::const_iterator var = vars.begin(); var != vars.end(); ++var,++index){
-         TH1F* histo_new = loadHisto(*var);
+         TH1F* histo_new = loadHisto(*var,index);
          std::string const& desc = var->label();
    
          histos[catName].push_back(std::make_pair(histo_new,desc));
@@ -132,7 +141,7 @@ typename Plotter<NormPolicy>::HistMap Plotter<NormPolicy>::loadHistos(VarMap con
 }
 
 template <class NormPolicy>
-TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var){
+TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var, unsigned int index){
    std::string const& name = var.name();
    TDirectory const* dir = var.dir();
    //std::string const& desc = var.label();
@@ -142,7 +151,9 @@ TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var){
 
    TH1F* histo = getHisto(dir,name);
    // Clone histogram
-   TH1F* histo_new = static_cast<TH1F*>(histo->Clone((name + "_scaled").c_str()));
+   std::stringstream label;
+   label << name << "_scaled_" << index; 
+   TH1F* histo_new = static_cast<TH1F*>(histo->Clone(label.str().c_str()));
 
    double scaleFactor = (histo_new->GetSumOfWeights() > 0.) ? NormPolicy::GetNorm(histo_new)*normFactor/histo_new->GetSumOfWeights() : 1.;
    scaleHisto(histo_new,scaleFactor,1,1,rebin_);
@@ -229,24 +240,24 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
   
          TH1F* histo = getHisto(dir,name);
 
-         //scaleHisto(histo,1,1,(index + 1));
-         //scaleHisto(histo,1,1,(index + 1),rebin_); 
-         //scaleHisto(histo,1,1,histColors_[index % histColors_.size()],rebin_);
          scaleHisto(histo,1.,histLineStyles_[index % histLineStyles_.size()],histColors_[index % histColors_.size()],rebin_);
 
-         legendsVar[catName]->AddEntry(histo,desc.c_str(),"LPF"); 
+         /*legendsVar[catName]->AddEntry(histo,desc.c_str(),"LPF"); 
          if(var == vars.begin()) histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor);
-         else histo->DrawNormalized((option + "SAME").c_str(),NormPolicy::GetNorm(histo)*normFactor);
-         //histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo));
+         else histo->DrawNormalized((option + "SAME").c_str(),NormPolicy::GetNorm(histo)*normFactor);*/
+         TH1F* histo_new = static_cast<TH1F*>(
+                  ( var == vars.begin() ) ? 
+                  histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor) : 
+                  histo->DrawNormalized((option + "SAME").c_str(),NormPolicy::GetNorm(histo)*normFactor) );
+         legendsVar[catName]->AddEntry(histo_new,desc.c_str(),"LPF");
 
          /*if(var == vars.begin()) maxVal = histo->GetMaximum();
          else {
             if(histo->GetMaximum() > maxVal) maxVal = histo->GetMaximum();
          }*/  
-         histosVar[catName].push_back(histo);
+         histosVar[catName].push_back(histo_new);
       }
       legendsVar[catName]->SetFillColor(0);
-      //legendsVar[catName]->Draw(option.c_str());
       legendsVar[catName]->Draw("SAME");
       //histosVar[catName].back()->GetYaxis()->SetRangeUser(0.00000001,1.5*maxVal);
    }
