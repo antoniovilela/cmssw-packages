@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 from minimumBiasAnalysisTTree_cfg import process,config
 #process.source.fileNames = ['file:/tmp/antoniov/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F63DF090-6879-DF11-9E7D-0030487CDA68.root']
-#process.source.fileNames = ['file:/tmp/antoniov/MinBias_TuneCW_7TeV-pythia6_START36_V10-v1_GEN-SIM-RECODEBUG_F65EF1B2-4887-DF11-9A50-001EC9AAA38C.root']
-process.source.fileNames = ['file:/tmp/antoniov/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
+process.source.fileNames = ['file:/tmp/antoniov/MinBias_TuneCW_7TeV-pythia6_START36_V10-v1_GEN-SIM-RECODEBUG_F65EF1B2-4887-DF11-9A50-001EC9AAA38C.root']
+#process.source.fileNames = ['file:/tmp/antoniov/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
 #process.source.fileNames = ['file:/tmp/antoniov/PHOJET_MinBias_7TeV_START36_V10_362-HLT-v1_PrivateProd-START36_V10_362_RECO-v1_step2_RAW2DIGI_L1Reco_RECO_VALIDATION_5_1_5XQ.root']
 process.MessageLogger.cerr.threshold = 'INFO'
 process.maxEvents.input = -1
@@ -15,7 +15,7 @@ for analyzerName in process.analyzers:
         module = getattr(process,analyzerName)
         module.AccessMCInfo = True
         #module.HLTPath = 'HLT_MinBiasBSC_OR'
-        module.TriggerResultsTag = cms.InputTag("TriggerResults::REDIGI36")
+        #module.TriggerResultsTag = cms.InputTag("TriggerResults::REDIGI36")
 for pathName in process.paths:
     getattr(process,pathName).remove(getattr(process,'bptx'))
     getattr(process,pathName).remove(getattr(process,'hltBscMinBiasORBptxPlusORMinusFilter'))
@@ -44,8 +44,8 @@ filtersProcessIdsPythia8 = ['processIdPythia8_SD','processIdPythia8_DD',
                             'processIdPythia8_Diff','processIdPythia8_ND']
 filtersProcessIdsPhojet = ['processIdPhojet_SD','processIdPhojet_DD',
                             'processIdPhojet_Diff','processIdPhojet_ND']
-#filtersProcessIds = filtersProcessIdsPythia6
-filtersProcessIds = filtersProcessIdsPythia8
+filtersProcessIds = filtersProcessIdsPythia6
+#filtersProcessIds = filtersProcessIdsPythia8
 #filtersProcessIds = filtersProcessIdsPhojet
 
 from Utilities.PyConfigTools.analysisTools import *

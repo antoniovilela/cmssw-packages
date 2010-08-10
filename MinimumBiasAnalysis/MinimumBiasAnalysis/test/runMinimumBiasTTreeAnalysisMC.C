@@ -8,106 +8,106 @@
 #include <map>
 
 void setFileNamesPythia8(std::vector<std::string>& fileNames){
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_10_1_wQS.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_11_1_bR9.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_12_1_ZSZ.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_13_1_w1k.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_14_1_ESr.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_15_1_a5u.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_16_1_fDp.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_17_1_kMn.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_18_1_QB9.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_19_1_Spy.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_1_1_aMI.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_20_1_X0X.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_2_1_P6l.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_3_1_F7s.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_4_1_Rzi.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_5_1_4wQ.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_6_1_s4z.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_7_1_YwC.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_8_1_vVs.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_9_1_uP5.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_10_1_wQS.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_11_1_bR9.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_12_1_ZSZ.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_13_1_w1k.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_14_1_ESr.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_15_1_a5u.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_16_1_fDp.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_17_1_kMn.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_18_1_QB9.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_19_1_Spy.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_1_1_aMI.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_20_1_X0X.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_2_1_P6l.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_3_1_F7s.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_4_1_Rzi.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_5_1_4wQ.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_6_1_s4z.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_7_1_YwC.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_8_1_vVs.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_9_1_uP5.root");
 }
 
 void setFileNamesPhojet(std::vector<std::string>& fileNames){
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/PHOJET_MinBias_7TeV_START36_V10_362-HLT-v1_antoniov-PrivateProd-START36_V10_362_RECO-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_1_1_nhR.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/PHOJET_MinBias_7TeV_START36_V10_362-HLT-v1_antoniov-PrivateProd-START36_V10_362_RECO-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_2_1_jvH.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/PHOJET_MinBias_7TeV_START36_V10_362-HLT-v1_antoniov-PrivateProd-START36_V10_362_RECO-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_3_1_Pjn.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/PHOJET_MinBias_7TeV_START36_V10_362-HLT-v1_antoniov-PrivateProd-START36_V10_362_RECO-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_1_1_nhR.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/PHOJET_MinBias_7TeV_START36_V10_362-HLT-v1_antoniov-PrivateProd-START36_V10_362_RECO-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_2_1_jvH.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/PHOJET_MinBias_7TeV_START36_V10_362-HLT-v1_antoniov-PrivateProd-START36_V10_362_RECO-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_3_1_Pjn.root");
 }
 
 void setFileNamesPythia6D6T(std::vector<std::string>& fileNames){
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_10_1_VvD.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_11_1_j5D.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_12_1_BkD.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_13_1_cAK.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_14_1_PWq.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_15_1_cWy.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_16_1_T0x.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_17_1_mVb.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_18_1_IXf.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_19_1_dji.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_1_1_bY6.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_20_1_nsZ.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_2_1_LTs.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_3_1_481.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_4_1_Ec1.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_5_1_dcg.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_6_1_J5g.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_7_1_Zbp.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_8_1_RJY.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_9_1_yhE.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_10_1_VvD.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_11_1_j5D.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_12_1_BkD.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_13_1_cAK.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_14_1_PWq.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_15_1_cWy.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_16_1_T0x.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_17_1_mVb.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_18_1_IXf.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_19_1_dji.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_1_1_bY6.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_20_1_nsZ.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_2_1_LTs.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_3_1_481.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_4_1_Ec1.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_5_1_dcg.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_6_1_J5g.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_7_1_Zbp.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_8_1_RJY.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinBias_9_1_yhE.root");
 }
 
 void setFileNamesPythia6CW(std::vector<std::string>& fileNames){
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_10_1_Stc.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_11_1_LlL.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_12_1_mP2.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_13_1_4V2.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_14_1_If2.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_1_1_N0Z.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_2_1_m69.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_3_1_EjG.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_4_1_JUO.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_5_1_exe.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_6_1_wLi.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_7_1_Xax.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_8_1_dmj.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_9_1_Cyq.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_10_1_Stc.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_11_1_LlL.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_12_1_mP2.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_13_1_4V2.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_14_1_If2.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_1_1_N0Z.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_2_1_m69.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_3_1_EjG.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_4_1_JUO.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_5_1_exe.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_6_1_wLi.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_7_1_Xax.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_8_1_dmj.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_9_1_Cyq.root");
 }
 
 void setFileNamesPythia6P0(std::vector<std::string>& fileNames){
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_10_1_Cck.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_11_1_33C.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_12_1_9ZR.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_13_1_wtD.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_14_1_dF1.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_1_1_cwI.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_2_1_Wvr.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_3_1_i8h.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_4_1_S2Z.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_5_1_R5A.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_6_1_uLa.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_7_1_KId.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_8_1_PyB.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_9_1_anL.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_10_1_Cck.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_11_1_33C.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_12_1_9ZR.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_13_1_wtD.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_14_1_dF1.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_1_1_cwI.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_2_1_Wvr.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_3_1_i8h.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_4_1_S2Z.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_5_1_R5A.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_6_1_uLa.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_7_1_KId.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_8_1_PyB.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_9_1_anL.root");
 }
 
 void setFileNamesPythia6Z1(std::vector<std::string>& fileNames){
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_10_1_TGE.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_11_1_F9K.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_12_1_7Xj.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_13_1_jcw.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_14_1_qB1.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_1_1_Sqb.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_2_1_80O.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_3_1_DCa.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_4_1_UKW.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_5_1_RNR.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_6_1_1QN.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_7_1_5PB.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_8_1_i1c.root");
-   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_9_1_nEc.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_10_1_TGE.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_11_1_F9K.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_12_1_7Xj.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_13_1_jcw.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_14_1_qB1.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_1_1_Sqb.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_2_1_80O.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_3_1_DCa.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_4_1_UKW.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_5_1_RNR.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_6_1_1QN.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_7_1_5PB.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_8_1_i1c.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_9_1_nEc.root");
 }
 
 void runMinimumBiasTTreeAnalysisMC(){
@@ -117,23 +117,23 @@ void runMinimumBiasTTreeAnalysisMC(){
    //run_range_t runRange = Data2360GeV;
    run_range_t runRange = Data7TeV;
    generator_t genType = PYTHIA;
-   generator_t genTune = PYTHIAD6T;
+   generator_t genTune = PYTHIACW;
    //generator_t genType = PHOJET;
    //generator_t genTune = PHOJET;
 
    //std::string outDir = "root/7TeV/Pythia8";
    //std::string outDir = "root/7TeV/Phojet";
-   std::string outDir = "root/7TeV/Pythia6D6T";
+   //std::string outDir = "root/7TeV/Pythia6D6T";
    //std::string outDir = "root/7TeV/Pythia6DW";
-   //std::string outDir = "root/7TeV/Pythia6CW";
+   std::string outDir = "root/7TeV/Pythia6CW";
    //std::string outDir = "root/7TeV/Pythia6P0";
    //std::string outDir = "root/7TeV/Pythia6Z1";
 
    std::vector<std::string> fileNames(0);
    //setFileNamesPythia8(fileNames);
    //setFileNamesPhojet(fileNames);
-   setFileNamesPythia6D6T(fileNames);
-   //setFileNamesPythia6CW(fileNames);
+   //setFileNamesPythia6D6T(fileNames);
+   setFileNamesPythia6CW(fileNames);
    //setFileNamesPythia6P0(fileNames);
    //setFileNamesPythia6Z1(fileNames);
 
