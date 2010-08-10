@@ -6,7 +6,7 @@
 
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 
-enum generator_t {PYTHIA,PHOJET,PYTHIA8,PYTHIADW,PYTHIAP0,PYTHIAProQ20,PYTHIACW};
+enum generator_t {PYTHIA,PHOJET,PYTHIA8,PYTHIAD6T,PYTHIADW,PYTHIAP0,PYTHIAProQ20,PYTHIACW,PYTHIAZ1};
 enum process_category_t {All,SD,NonSD,Inelastic,DD,Diff};
 enum run_range_t {Data900GeV,Data2360GeV,Data7TeV};
 
@@ -49,6 +49,16 @@ std::string getDataLabel(int genType, int runRange){
       else if(runRange == Data2360GeV) label = "PHOJET_MinBias_2360GeV";
       else if(runRange == Data7TeV) label = "PHOJET_MinBias_7TeV"; 
       else throw RootException("ERROR: Invalid option");
+   } else if(genType == PYTHIA8){
+      if(runRange == Data900GeV) label = "PYTHIA8_MinBias_900GeV";
+      else if(runRange == Data2360GeV) label = "PYTHIA8_MinBias_2360GeV";
+      else if(runRange == Data7TeV) label = "PYTHIA8_MinBias_7TeV";
+      else throw RootException("ERROR: Invalid option");
+   } else if(genType == PYTHIAD6T){
+      if(runRange == Data900GeV) label = "PYTHIAD6T_MinBias_900GeV";
+      else if(runRange == Data2360GeV) label = "PYTHIAD6T_MinBias_2360GeV";
+      else if(runRange == Data7TeV) label = "PYTHIAD6T_MinBias_7TeV";
+      else throw RootException("ERROR: Invalid option");
    } else if(genType == PYTHIADW){
       if(runRange == Data900GeV) label = "PYTHIADW_MinBias_900GeV";
       else if(runRange == Data2360GeV) label = "PYTHIADW_MinBias_2360GeV";
@@ -69,11 +79,11 @@ std::string getDataLabel(int genType, int runRange){
       else if(runRange == Data2360GeV) label = "PYTHIACW_MinBias_2360GeV";
       else if(runRange == Data7TeV) label = "PYTHIACW_MinBias_7TeV";
       else throw RootException("ERROR: Invalid option");
-   } else if(genType == PYTHIA8){
-      if(runRange == Data900GeV) label = "PYTHIA8_MinBias_900GeV";
-      else if(runRange == Data2360GeV) label = "PYTHIA8_MinBias_2360GeV";
-      else if(runRange == Data7TeV) label = "PYTHIA8_MinBias_7TeV";
-      else throw RootException("ERROR: Invalid option"); 
+   } else if(genType == PYTHIAZ1){
+      if(runRange == Data900GeV) label = "PYTHIAZ1_MinBias_900GeV";
+      else if(runRange == Data2360GeV) label = "PYTHIAZ1_MinBias_2360GeV";
+      else if(runRange == Data7TeV) label = "PYTHIAZ1_MinBias_7TeV";
+      else throw RootException("ERROR: Invalid option");
    } else throw RootException("ERROR: Invalid option");
 
    return label;
@@ -92,28 +102,19 @@ std::string getTTreeFileName(int runRange){
 std::string getTTreeFileName(int genType, int runRange){
    std::string fileName;
    if(genType == PYTHIA){
-      if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PYTHIA_MinBias_STARTUP3X_V8P_900GeV.root";
-      else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PYTHIA_MinBias_STARTUP3X_V8O_2360GeV.root";
+      if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PYTHIA_MinBias_900GeV.root";
+      else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PYTHIA_MinBias_2360GeV.root";
+      else if(runRange == Data7TeV) fileName = "analysisMinBias_TTree_PYTHIA_MinBias_7TeV.root";
       else throw RootException("ERROR: Invalid option");
    } else if(genType == PHOJET){ 
       if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PHOJET_MinBias_STARTUP3X_V8P_900GeV.root";
       else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PHOJET_MinBias_STARTUP3X_V8O_2360GeV.root";
+      else if(runRange == Data7TeV) fileName = "analysisMinBias_TTree_PHOJET_MinBias_STARTUP3X_V8O_7TeV.root";
       else throw RootException("ERROR: Invalid option");
-   } else if(genType == PYTHIADW){
-      if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PYTHIADW_MinBias_STARTUP3X_V8P_900GeV.root";
-      else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PYTHIADW_MinBias_STARTUP3X_V8O_2360GeV.root";
-      else throw RootException("ERROR: Invalid option");
-   } else if(genType == PYTHIAP0){
-      if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PYTHIAP0_MinBias_STARTUP3X_V8P_900GeV.root";
-      else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PYTHIAP0_MinBias_STARTUP3X_V8O_2360GeV.root";
-      else throw RootException("ERROR: Invalid option");
-   } else if(genType == PYTHIAProQ20){
-      if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PYTHIAProQ20_MinBias_STARTUP3X_V8P_900GeV.root";
-      else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PYTHIAProQ20_MinBias_STARTUP3X_V8O_2360GeV.root";
-      else throw RootException("ERROR: Invalid option");
-   } else if(genType == PYTHIACW){
-      if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PYTHIACW_MinBias_STARTUP3X_V8P_900GeV.root";
-      else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PYTHIACW_MinBias_STARTUP3X_V8O_2360GeV.root";
+   } else if(genType == PYTHIA8){ 
+      if(runRange == Data900GeV) fileName = "analysisMinBias_TTree_PYTHIA8_MinBias_STARTUP3X_V8P_900GeV.root";
+      else if(runRange == Data2360GeV) fileName = "analysisMinBias_TTree_PYTHIA8_MinBias_STARTUP3X_V8O_2360GeV.root";   
+      else if(runRange == Data7TeV) fileName = "analysisMinBias_TTree_PYTHIA8_MinBias_STARTUP3X_V8O_7TeV.root";
       else throw RootException("ERROR: Invalid option");
    } else throw RootException("ERROR: Invalid option");
 

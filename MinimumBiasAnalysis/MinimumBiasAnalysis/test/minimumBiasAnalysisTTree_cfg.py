@@ -41,8 +41,8 @@ attributesEnergyScale = [{'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.
 attributesThresholds = [{'EnergyThresholdHF':3.6},
                         {'EnergyThresholdHF':6.0},
                         {'EnergyThresholdHF':8.0},
-                        {'EnergyThresholdHB':1.0,'EnergyThresholdHE':1.5},
-                        {'EnergyThresholdHB':2.0,'EnergyThresholdHE':2.5}]
+                        {'EnergyThresholdHB':1.2,'EnergyThresholdHE':1.6},
+                        {'EnergyThresholdHB':1.8,'EnergyThresholdHE':2.4}]
 
 attributes = attributesEnergyScale
 attributes.extend(attributesThresholds)

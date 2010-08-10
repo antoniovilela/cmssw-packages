@@ -7,12 +7,31 @@
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/RootTools.h"
 
 void setFileNamesRun132440(std::vector<std::string>& fileNames){
-   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v4/analysisMinBias_TTree_MinimumBias_1_1_NT8.root");
-   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v4/analysisMinBias_TTree_MinimumBias_2_1_beL.root");
-   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v4/analysisMinBias_TTree_MinimumBias_3_1_zcq.root");
-   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v4/analysisMinBias_TTree_MinimumBias_4_1_BFm.root");
-   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v4/analysisMinBias_TTree_MinimumBias_5_1_HMy.root");
-   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v4/analysisMinBias_TTree_MinimumBias_6_1_pjB.root");
+   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v5/analysisMinBias_TTree_MinimumBias_1_1_5jD.root");
+   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v5/analysisMinBias_TTree_MinimumBias_2_1_Qtq.root");
+   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v5/analysisMinBias_TTree_MinimumBias_3_1_fNo.root");
+   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v5/analysisMinBias_TTree_MinimumBias_4_1_t42.root");
+   fileNames.push_back("rfio:/castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132440/minimumBiasAnalysisTTree-v5/analysisMinBias_TTree_MinimumBias_5_1_YYU.root");
+}
+
+void setFileNamesRun132605(std::vector<std::string>& fileNames){
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_10_1_YQs.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_11_1_ISa.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_12_1_wBY.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_13_2_2qL.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_14_1_uBF.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_15_1_gSL.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_16_1_pLM.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_17_1_Djx.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_1_1_tmT.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_2_1_0aq.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_3_1_nvL.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_4_1_4xh.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_5_1_cMI.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_6_1_YPo.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_7_1_WvI.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_8_2_gxd.root");
+   fileNames.push_back("rfio:/castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_9_1_oak.root");
 }
 
 void runMinimumBiasTTreeAnalysis(){
@@ -25,8 +44,9 @@ void runMinimumBiasTTreeAnalysis(){
    //std::string rootDir = "/tmp/antoniov/root/2360GeV";
    //std::string rootDir = "/tmp/antoniov/root/7TeV";
    std::vector<std::string> fileNames(0);
-   setFileNamesRun132440(fileNames);
-
+   //setFileNamesRun132440(fileNames);
+   setFileNamesRun132605(fileNames);
+ 
    //std::string outDir = "root/900GeV/NoSel";
    //std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/900GeV/SumEnergyMaxHFMinus_8_0";
@@ -34,7 +54,8 @@ void runMinimumBiasTTreeAnalysis(){
    //std::string outDir = "root/2360GeV/NoSel";
    //std::string outDir = "root/2360GeV/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/2360GeV/SumEnergyMaxHFMinus_8_0";
-   std::string outDir = "root/7TeV/Data/Run132440";
+   //std::string outDir = "root/7TeV/Data/Run132440";
+   std::string outDir = "root/7TeV/Data/Run132605";
    bool verbose = false;
 
    /*std::string fileName = rootDir + "/";
@@ -53,8 +74,8 @@ void runMinimumBiasTTreeAnalysis(){
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_3_6");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_6_0");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_8_0");
-   selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_1_5_EnergyThresholdHB_1_0");
-   selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_2_5_EnergyThresholdHB_2_0");
+   selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_1_6_EnergyThresholdHB_1_2");
+   selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_2_4_EnergyThresholdHB_1_8");
    selections.push_back("eventSelection");
    selections.push_back("eventSelectionBscMinBiasORNoColl");
    selections.push_back("eventSelectionBscMinBiasORBPTXOR");

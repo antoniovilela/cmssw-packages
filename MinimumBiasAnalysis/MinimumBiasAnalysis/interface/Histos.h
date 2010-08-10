@@ -67,6 +67,8 @@ namespace minimumBiasAnalysis {
      histos["MxGen"] = adaptor.template make<TH1F>("MxGen","MxGen",200,-10.,400.);
      histos["xiGenPlus"] = adaptor.template make<TH1F>("xiGenPlus","xiGenPlus",200,0.,1.);
      histos["xiGenMinus"] = adaptor.template make<TH1F>("xiGenMinus","xiGenMinus",200,0.,1.);
+     histos["sumEnergyHEPlusGen"] = adaptor.template make<TH1F>("sumEnergyHEPlusGen","sumEnergyHEPlusGen",100,0.,100.);
+     histos["sumEnergyHEMinusGen"] = adaptor.template make<TH1F>("sumEnergyHEMinusGen","sumEnergyHEMinusGen",100,0.,100.);
      histos["sumEnergyHFPlusGen"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen","sumEnergyHFPlusGen",100,0.,100.);
      histos["sumEnergyHFMinusGen"] = adaptor.template make<TH1F>("sumEnergyHFMinusGen","sumEnergyHFMinusGen",100,0.,100.);
      histos["ResMxFromTowers"] = adaptor.template make<TH1F>("ResMxFromTowers","ResMxFromTowers",100,-50.,50.);

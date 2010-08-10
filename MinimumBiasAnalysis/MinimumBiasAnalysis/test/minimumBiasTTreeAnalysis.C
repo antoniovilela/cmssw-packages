@@ -397,8 +397,12 @@ void minimumBiasTTreeAnalysis(TTree* data,
      double missingMassFromXiFromPFCands = eventData.missingMassFromXiFromPFCands_;
      histosTH1F["missingMassFromXiFromPFCands"]->Fill(missingMassFromXiFromPFCands);
 
+     double sumEHE_plus = eventData.sumEnergyHEPlus_;
+     double sumEHE_minus = eventData.sumEnergyHEMinus_;
      double sumEHF_plus = eventData.sumEnergyHFPlus_;
      double sumEHF_minus = eventData.sumEnergyHFMinus_;
+     histosTH1F["sumEnergyHEPlus"]->Fill(sumEHE_plus);
+     histosTH1F["sumEnergyHEMinus"]->Fill(sumEHE_minus);
      histosTH1F["sumEnergyHFPlus"]->Fill(sumEHF_plus);
      histosTH1F["sumEnergyHFMinus"]->Fill(sumEHF_minus);
      /*histosTH1F["sumEnergyHFPlusVarBin"]->Fill((sumE_plus < minEVarBin) ? minEVarBin : sumE_plus);
@@ -407,8 +411,12 @@ void minimumBiasTTreeAnalysis(TTree* data,
      histosTH1F["sumEnergyHFMinusVarBin"]->Fill(sumEHF_minus);
 
      if(accessMCInfo){
+        double sumEHEGen_plus = eventData.sumEnergyHEPlusGen_;
+        double sumEHEGen_minus = eventData.sumEnergyHEMinusGen_;
         double sumEHFGen_plus = eventData.sumEnergyHFPlusGen_;
         double sumEHFGen_minus = eventData.sumEnergyHFMinusGen_;
+        histosTH1F["sumEnergyHEPlusGen"]->Fill(sumEHEGen_plus);
+        histosTH1F["sumEnergyHEMinusGen"]->Fill(sumEHEGen_minus);
         histosTH1F["sumEnergyHFPlusGen"]->Fill(sumEHFGen_plus);
         histosTH1F["sumEnergyHFMinusGen"]->Fill(sumEHFGen_minus);
      }
@@ -428,6 +436,13 @@ void minimumBiasTTreeAnalysis(TTree* data,
    for(std::vector<std::pair<int,int> >::const_iterator it = selectedEvents.begin(); it != selectedEvents.end(); ++it){
       std::cout << " Run " << it->first << " Event " << it->second << std::endl;
    }*/
+   
+   /*histosTH1F["EPlusPzFromTowersVarBin"]->Scale(1.,"width");
+   histosTH1F["EMinusPzFromTowersVarBin"]->Scale(1.,"width");
+   histosTH1F["sumEnergyHFPlusVarBin"]->Scale(1.,"width");
+   histosTH1F["sumEnergyHFMinusVarBin"]->Scale(1.,"width");
+   histosTH1F["multiplicityHFPlusVarBin"]->Scale(1.,"width");
+   histosTH1F["multiplicityHFMinusVarBin"]->Scale(1.,"width");*/
 
    hfile->Write();
    hfile->Close();
