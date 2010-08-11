@@ -419,6 +419,12 @@ void minimumBiasTTreeAnalysis(TTree* data,
         histosTH1F["sumEnergyHEMinusGen"]->Fill(sumEHEGen_minus);
         histosTH1F["sumEnergyHFPlusGen"]->Fill(sumEHFGen_plus);
         histosTH1F["sumEnergyHFMinusGen"]->Fill(sumEHFGen_minus);
+        // Histos as a function of Ntrk
+        if(multiplicityTracks >= 0 && multiplicityTracks <= 5) histosTH1F["sumEnergyHFPlusGen_Ntrk0_5"]->Fill(sumEHFGen_plus);
+        else if(multiplicityTracks > 5 && multiplicityTracks <= 10) histosTH1F["sumEnergyHFPlusGen_Ntrk6_10"]->Fill(sumEHFGen_plus);
+        else if(multiplicityTracks > 10 && multiplicityTracks <= 15) histosTH1F["sumEnergyHFPlusGen_Ntrk11_15"]->Fill(sumEHFGen_plus);
+        else if(multiplicityTracks > 15 && multiplicityTracks <= 25) histosTH1F["sumEnergyHFPlusGen_Ntrk16_25"]->Fill(sumEHFGen_plus);
+        else if(multiplicityTracks > 25 && multiplicityTracks <= 100) histosTH1F["sumEnergyHFPlusGen_Ntrk26_100"]->Fill(sumEHFGen_plus);
      }
      
      /*selectedEvents.push_back(std::make_pair(runNumber,eventNumber));

@@ -70,6 +70,11 @@ namespace minimumBiasAnalysis {
      histos["sumEnergyHEPlusGen"] = adaptor.template make<TH1F>("sumEnergyHEPlusGen","sumEnergyHEPlusGen",100,0.,100.);
      histos["sumEnergyHEMinusGen"] = adaptor.template make<TH1F>("sumEnergyHEMinusGen","sumEnergyHEMinusGen",100,0.,100.);
      histos["sumEnergyHFPlusGen"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen","sumEnergyHFPlusGen",100,0.,100.);
+     histos["sumEnergyHFPlusGen_Ntrk0_5"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk0_5","sumEnergyHFPlusGen_Ntrk0_5",100,0.,100.);
+     histos["sumEnergyHFPlusGen_Ntrk6_10"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk6_10","sumEnergyHFPlusGen_Ntrk6_10",100,0.,100.);
+     histos["sumEnergyHFPlusGen_Ntrk11_15"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk11_15","sumEnergyHFPlusGen_Ntrk11_15",100,0.,100.);
+     histos["sumEnergyHFPlusGen_Ntrk16_25"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk16_25","sumEnergyHFPlusGen_Ntrk16_25",100,0.,100.);
+     histos["sumEnergyHFPlusGen_Ntrk26_100"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk26_100","sumEnergyHFPlusGen_Ntrk26_100",100,0.,100.);
      histos["sumEnergyHFMinusGen"] = adaptor.template make<TH1F>("sumEnergyHFMinusGen","sumEnergyHFMinusGen",100,0.,100.);
      histos["ResMxFromTowers"] = adaptor.template make<TH1F>("ResMxFromTowers","ResMxFromTowers",100,-50.,50.);
      histos["ResXiPlusFromTowers"] = adaptor.template make<TH1F>("ResXiPlusFromTowers","ResXiPlusFromTowers",100,-0.1,0.1);

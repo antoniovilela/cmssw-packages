@@ -79,7 +79,7 @@ void runMinimumBiasTTreeAnalysis(){
    selections.push_back("eventSelection");
    selections.push_back("eventSelectionBscMinBiasORNoColl");
    selections.push_back("eventSelectionBscMinBiasORBPTXOR");
-   selections.push_back("eventSelectionBscMinBiasORHFVetoPlus");
+   /*selections.push_back("eventSelectionBscMinBiasORHFVetoPlus");
    selections.push_back("eventSelectionBscMinBiasORHFVetoMinus");
    selections.push_back("eventSelectionBscMinBiasORHEHFVetoPlus");
    selections.push_back("eventSelectionBscMinBiasORHEHFVetoMinus");
@@ -90,7 +90,7 @@ void runMinimumBiasTTreeAnalysis(){
    selections.push_back("eventSelectionBscMinBiasORSumEMaxHFMinus4");
    selections.push_back("eventSelectionBscMinBiasORSumEMaxHFMinus8");
    selections.push_back("eventSelectionBscMinBiasORSumEMaxHFMinus12");
-   selections.push_back("eventSelectionBscMinBiasORSumEMaxHFMinus16");
+   selections.push_back("eventSelectionBscMinBiasORSumEMaxHFMinus16");*/
 
    for(size_t k = 0; k < selections.size(); ++k){
       std::string treeName = "minimumBiasTTreeAnalysis_" + selections[k] + "/data";

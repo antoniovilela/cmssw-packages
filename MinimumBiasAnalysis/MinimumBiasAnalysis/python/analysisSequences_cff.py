@@ -53,23 +53,25 @@ recoTrackSelector.maxRapidity = 2.5
 recoTrackSelector.ptMin = 0.5
 recoTrackSelector.quality = ["highPurity"]
 selectGoodTracks = recoTrackSelector
+from MinimumBiasAnalysis.MinimumBiasAnalysis.analysisTracks_cfi import *
+analysisTracks.src = "selectGoodTracks"
 
-from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import *
-selectTracksAssociatedToPV.src = "selectGoodTracks"
-selectTracksAssociatedToPV.MaxDistanceFromVertex = 1.0
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import selectTracksAssociatedToPV as tracksAssociatedToPV
+tracksAssociatedToPV.src = "analysisTracks"
+tracksAssociatedToPV.MaxDistanceFromVertex = 1.0
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
-tracksOutsideJets.src = "selectTracksAssociatedToPV" 
+tracksOutsideJets.src = "analysisTracks" 
 tracksOutsideJets.JetTag = "leadingJets"
 tracksOutsideJets.JetConeSize = 0.5
 
 from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksTransverseRegion_cfi import *
-tracksTransverseRegion.src = "selectTracksAssociatedToPV"
+tracksTransverseRegion.src = "analysisTracks"
 tracksTransverseRegion.JetTag = "leadingJets"
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.trackMultiplicity_cfi import * 
-trackMultiplicity.TracksTag = "selectGoodTracks"
-trackMultiplicityAssociatedToPV = trackMultiplicity.clone(TracksTag = "selectTracksAssociatedToPV")
+trackMultiplicity.TracksTag = "analysisTracks"
+trackMultiplicityAssociatedToPV = trackMultiplicity.clone(TracksTag = "tracksAssociatedToPV")
 trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
 trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
 
@@ -159,18 +161,11 @@ eventSelectionBscMinBiasORSumEMaxHFMinus16 = cms.Sequence(eventSelectionBscMinBi
 
 #jets = cms.Sequence(leadingJets)
 #tracks = cms.Sequence(selectGoodTracks*
-#                      selectTracksAssociatedToPV*
+#                      tracksAssociatedToPV*
 #                      tracksOutsideJets+
 #                      tracksTransverseRegion) 
-tracks = cms.Sequence(selectGoodTracks*selectTracksAssociatedToPV)
-#edmDump = cms.Sequence(trackMultiplicity+
-#                       trackMultiplicityAssociatedToPV+
-#                       trackMultiplicityOutsideJets+
-#                       trackMultiplicityTransverseRegion+
-#                       hcalActivitySummary+
-#                       xiTower)
+tracks = cms.Sequence(selectGoodTracks*analysisTracks)
 edmDump = cms.Sequence(trackMultiplicity+
-                       trackMultiplicityAssociatedToPV+
                        hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
                        hcalActivitySummaryScale095+hcalActivitySummaryScale098+
                        hcalActivitySummaryScale102+hcalActivitySummaryScale105+

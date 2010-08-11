@@ -25,9 +25,9 @@ process.xiFromJets.comEnergy = config.comEnergy
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
 process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2.
 process.load('Utilities.AnalysisTools.trackHistos_cfi')
-process.trackHistos.src = 'selectGoodTracks' 
+process.trackHistos.src = 'analysisTracks' 
 process.load('Utilities.AnalysisTools.trackHistoAnalyzer_cfi')
-process.trackHistoAnalyzer.TrackTag = 'selectGoodTracks'
+process.trackHistoAnalyzer.TrackTag = 'analysisTracks'
 
 attributesEnergyScale = [{'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.90,'HCALTowerSummaryTag':'hcalActivitySummaryScale090'},
                          {'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.92,'HCALTowerSummaryTag':'hcalActivitySummaryScale092'},
