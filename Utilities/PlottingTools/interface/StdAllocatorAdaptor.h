@@ -1,7 +1,5 @@
-#ifndef ExclusiveDijetsAnalysis_StdAllocatorAdaptor_h
-#define ExclusiveDijetsAnalysis_StdAllocatorAdaptor_h
-
-namespace exclusiveDijetsAnalysis {
+#ifndef UtilitiesPlottingTools_StdAllocatorAdaptor_h
+#define UtilitiesPlottingTools_StdAllocatorAdaptor_h
 
 class StdAllocatorAdaptor {
   public:
@@ -21,7 +19,5 @@ class StdAllocatorAdaptor {
         return new T(a1,a2,a3,a4,a5,a6,a7,a8);
      }
 };
-
-} // namespace
 
 #endif

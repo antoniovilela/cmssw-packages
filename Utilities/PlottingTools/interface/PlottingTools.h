@@ -1,5 +1,5 @@
-#ifndef PlottingTools_h
-#define PlottingTools_h
+#ifndef UtilitiesPlottingTools_PlottingTools_h
+#define UtilitiesPlottingTools_PlottingTools_h
 
 class TFile;
 class TDirectory;
