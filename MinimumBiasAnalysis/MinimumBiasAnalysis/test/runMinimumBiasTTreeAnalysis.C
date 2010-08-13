@@ -19,7 +19,7 @@ void setFileNamesRun132605(std::vector<std::string>& fileNames){
    fileNames.push_back("rfio://castorcms//castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_11_1_ISa.root");
    fileNames.push_back("rfio://castorcms//castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_12_1_wBY.root");
    fileNames.push_back("rfio://castorcms//castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_13_2_2qL.root");
-   //fileNames.push_back("rfio://castorcms//castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_14_1_uBF.root");
+   fileNames.push_back("rfio://castorcms//castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_14_1_uBF.root");
    fileNames.push_back("rfio://castorcms//castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_15_1_gSL.root");
    fileNames.push_back("rfio://castorcms//castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_16_1_pLM.root");
    fileNames.push_back("rfio://castorcms//castor/cern.ch/user/a/antoniov/crab_output/AnalysisResults/MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim/Run132605/minimumBiasAnalysisTTree-v2/analysisMinBias_TTree_MinimumBias_17_1_Djx.root");
@@ -54,7 +54,7 @@ void runMinimumBiasTTreeAnalysis(){
    //std::string outDir = "root/2360GeV/NoSel";
    //std::string outDir = "root/2360GeV/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/2360GeV/SumEnergyMaxHFMinus_8_0";
-   //std::string outDir = "root/7TeV/Data/Run132440";
+   //std::string outDir = "root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0";
    std::string outDir = "root/7TeV/Data/Run132605";
    bool verbose = false;
 
@@ -71,14 +71,14 @@ void runMinimumBiasTTreeAnalysis(){
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale105_EnergyScaleFactorHCAL_1_05");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale108_EnergyScaleFactorHCAL_1_08");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale110_EnergyScaleFactorHCAL_1_1");
-   selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_3_6");
+   /*selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_3_6");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_6_0");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_8_0");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_1_6_EnergyThresholdHB_1_2");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_2_4_EnergyThresholdHB_1_8");
    selections.push_back("eventSelection");
    selections.push_back("eventSelectionBscMinBiasORNoColl");
-   selections.push_back("eventSelectionBscMinBiasORBPTXOR");
+   selections.push_back("eventSelectionBscMinBiasORBPTXOR");*/
    /*selections.push_back("eventSelectionBscMinBiasORHFVetoPlus");
    selections.push_back("eventSelectionBscMinBiasORHFVetoMinus");
    selections.push_back("eventSelectionBscMinBiasORHEHFVetoPlus");

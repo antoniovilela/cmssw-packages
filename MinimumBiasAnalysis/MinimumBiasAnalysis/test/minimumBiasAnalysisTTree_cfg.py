@@ -4,6 +4,8 @@ import FWCore.ParameterSet.Config as cms
 class config: pass
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
+config.trackTagName = 'selectGoodTracks'
+#config.trackTagName = 'analysisTracks'
 config.varyAttributes = True
 config.runOfflineOnly = True
 config.runNoColl = False
@@ -24,10 +26,11 @@ process.xiFromJets.comEnergy = config.comEnergy
 
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
 process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2.
+process.minimumBiasTTreeAnalysis.TrackTag = config.trackTagName
 process.load('Utilities.AnalysisTools.trackHistos_cfi')
-process.trackHistos.src = 'analysisTracks' 
+process.trackHistos.src = config.trackTagName
 process.load('Utilities.AnalysisTools.trackHistoAnalyzer_cfi')
-process.trackHistoAnalyzer.TrackTag = 'analysisTracks'
+process.trackHistoAnalyzer.TrackTag = config.trackTagName
 
 attributesEnergyScale = [{'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.90,'HCALTowerSummaryTag':'hcalActivitySummaryScale090'},
                          {'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.92,'HCALTowerSummaryTag':'hcalActivitySummaryScale092'},
