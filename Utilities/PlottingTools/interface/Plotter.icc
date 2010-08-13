@@ -21,8 +21,9 @@ Plotter<NormPolicy>::Plotter(): verbose_(false),rebin_(1){
    int fillstyles[] = {3004,3006,3005,3007,3013};
    std::vector<int> vec_fillstyles(fillstyles,fillstyles + sizeof(fillstyles)/sizeof(int)); 
 
-   SetColors(vec_colors);
+   SetLineColors(vec_colors);
    SetLineStyles(vec_linestyles);
+   SetFillColors(vec_colors);
    SetFillStyles(vec_fillstyles);
 }
 
@@ -86,10 +87,12 @@ THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<
    std::reverse(reversedHistos.begin(),reversedHistos.end());
 
    // Get reversed colors/styles as well
-   std::vector<int> colors(histColors_);
-   std::reverse(colors.begin(),colors.end());
+   std::vector<int> linecolors(histLineColors_);
+   std::reverse(linecolors.begin(),linecolors.end());
    std::vector<int> linestyles(histLineStyles_);
    std::reverse(linestyles.begin(),linestyles.end());
+   std::vector<int> fillcolors(histFillColors_);
+   std::reverse(fillcolors.begin(),fillcolors.end());
    std::vector<int> fillstyles(histFillStyles_);
    std::reverse(fillstyles.begin(),fillstyles.end());
  
@@ -101,9 +104,9 @@ THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<
    //std::vector<HistDesc>::const_iterator histos_last = reversedHistos.end() - 1;
    for(; it_histo != histos_end; ++it_histo, ++index){
       TH1F* histo = it_histo->first;
-      histo->SetLineColor(colors[index % colors.size()]);
+      histo->SetLineColor(linecolors[index % linecolors.size()]);
       histo->SetLineStyle(linestyles[index % linestyles.size()]);
-      histo->SetFillColor(colors[index % colors.size()]);
+      histo->SetFillColor(fillcolors[index % fillcolors.size()]);
       histo->SetFillStyle(fillstyles[index % fillstyles.size()]);
       /*if(it_histo == histos_last){
          histo->SetLineStyle(1);
@@ -240,7 +243,12 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
   
          TH1F* histo = getHisto(dir,name);
 
-         scaleHisto(histo,1.,histLineStyles_[index % histLineStyles_.size()],histColors_[index % histColors_.size()],rebin_);
+         //scaleHisto(histo,1.,histLineStyles_[index % histLineStyles_.size()],histColors_[index % histColors_.size()],rebin_);
+         scaleHisto(histo,1.,1,1,rebin_);
+         histo->SetLineColor(histLineColors_[index % histLineColors_.size()]);
+         histo->SetLineStyle(histLineStyles_[index % histLineStyles_.size()]);
+         histo->SetFillColor(histFillColors_[index % histFillColors_.size()]);
+         histo->SetFillStyle(histFillStyles_[index % histFillStyles_.size()]);
 
          /*legendsVar[catName]->AddEntry(histo,desc.c_str(),"LPF"); 
          if(var == vars.begin()) histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor);

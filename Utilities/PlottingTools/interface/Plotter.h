@@ -37,7 +37,9 @@ class Plotter{
     
       void SetVerbose(bool verbose) {verbose_ = verbose;}
       void SetRebin(int rebin) {rebin_ = rebin;}
-      void SetColors(std::vector<int> const& colors) {histColors_ = colors;}
+      void SetColors(std::vector<int> const& colors) {histLineColors_ = colors; histFillColors_ = colors;}
+      void SetLineColors(std::vector<int> const& colors) {histLineColors_ = colors;}
+      void SetFillColors(std::vector<int> const& colors) {histFillColors_ = colors;}
       void SetLineStyles(std::vector<int> const& linestyles) {histLineStyles_ = linestyles;}
       void SetFillStyles(std::vector<int> const& fillstyles) {histFillStyles_ = fillstyles;}
 
@@ -61,8 +63,9 @@ class Plotter{
 
       bool verbose_;
       int rebin_;
-      std::vector<int> histColors_;
+      std::vector<int> histLineColors_;
       std::vector<int> histLineStyles_;
+      std::vector<int> histFillColors_;
       std::vector<int> histFillStyles_;
       //NormPolicy norm_;
 };
