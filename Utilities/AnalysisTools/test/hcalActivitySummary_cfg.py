@@ -27,8 +27,8 @@ process.TFileService = cms.Service("TFileService",
 
 process.load('Utilities.AnalysisTools.hcalActivitySummary_cfi')
 process.load('Utilities.AnalysisTools.hcalActivityFilter_cfi')
-process.hcalActivityFilter.EnergyThresholdHB = 1.2
-process.hcalActivityFilter.EnergyThresholdHE = 1.7
+process.hcalActivityFilter.EnergyThresholdHB = 1.3
+process.hcalActivityFilter.EnergyThresholdHE = 1.9
 process.hcalActivityFilter.EnergyThresholdHF = 4.0
 process.hcalActivityFilter.NTowersMaxHFPlus = 0
 process.load('Utilities.AnalysisTools.trackHistos_cfi')
