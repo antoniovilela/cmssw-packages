@@ -60,6 +60,7 @@ class Plotter{
       std::map<std::string,std::vector<HistDesc> > loadHistos(VarMap const&);
       THStack* buildTHStack(std::string const&, std::vector<HistDesc> const&);
       VarMap makeVarMap(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const std::vector<double>&);
+      void plotHistos(std::vector<HistDesc> const&, std::string const&);
 
       bool verbose_;
       int rebin_;
