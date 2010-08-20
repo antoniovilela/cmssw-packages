@@ -23,10 +23,20 @@ process.output = cms.OutputModule("PoolOutputModule",
     #)
 )
 
-process.lumiWeightProducer = cms.EDProducer("LuminosityWeightProducer",
+process.TFileService = cms.Service("TFileService",
+    fileName = cms.string("analysis_histos.root")
+)
+
+process.lumiWeight = cms.EDProducer("LuminosityWeightProducer",
     rootFileName = cms.string("out_Cert_132440-142664_7TeV_StreamExpress_Collisions10_v2.root"),
     prefix = cms.untracked.string("instLumi")
 )
 
-process.reco_step = cms.Path(process.lumiWeightProducer)
+process.lumiAnalyzer = cms.EDAnalyzer("SimpleLumiAnalyzer",
+    VertexTag = cms.InputTag("offlinePrimaryVertices"),
+    LumiWeightTag = cms.InputTag("lumiWeight")
+)
+
+process.reco_step = cms.Path(process.lumiWeight)
+process.analysis_step = cms.Path(process.lumiAnalyzer)
 process.out_step = cms.EndPath(process.output)

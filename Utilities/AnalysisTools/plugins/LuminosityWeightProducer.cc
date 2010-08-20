@@ -37,7 +37,8 @@ LuminosityWeightProducer::LuminosityWeightProducer(edm::ParameterSet const& pset
   rootFile_ = TFile::Open(rootFileName_.c_str(),"read");
   edm::LogVerbatim("LuminosityWeightProducer") << "[LuminosityWeightProducer]: Opened file " << rootFile_->GetName();
 
-  produces<double>("luminosityWeight");
+  //produces<double>("luminosityWeight");
+  produces<double>(); 
 }
 
 LuminosityWeightProducer::~LuminosityWeightProducer(){
@@ -70,7 +71,8 @@ void LuminosityWeightProducer::produce(edm::Event& event, edm::EventSetup const&
   }
   edm::LogVerbatim("LuminosityWeightProducer") << "[LuminosityWeightProducer]: Lumi weight " << *luminosityWeight; 
 
-  event.put( luminosityWeight, "luminosityWeight" );
+  //event.put( luminosityWeight, "luminosityWeight" );
+  event.put( luminosityWeight ); 
 }
 
 DEFINE_FWK_MODULE(LuminosityWeightProducer);
