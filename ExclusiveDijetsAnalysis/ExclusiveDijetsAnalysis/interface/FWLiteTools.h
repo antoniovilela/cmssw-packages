@@ -144,11 +144,21 @@ double Rjj(JetColl& jetCollection,PartColl& partCollection){
    return (dijetSystem.M()/Mx);
 }
 
-unsigned int nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& mapTreshToiEta, unsigned int thresholdHF, unsigned int ieta){
-   const std::vector<unsigned int>& vec_iEta = mapTreshToiEta.find(thresholdHF)->second;
+unsigned int nHFSlice(const std::map<unsigned int, std::vector<unsigned int> >& mapThreshToiEta, unsigned int thresholdHF, unsigned int ieta){
+   const std::vector<unsigned int>& vec_iEta = mapThreshToiEta.find(thresholdHF)->second;
 
    // Count number of ieta entries in vector 
    int count_ieta = (int)std::count(vec_iEta.begin(),vec_iEta.end(),ieta);
+
+   return count_ieta;
+}
+
+unsigned int nHCALiEta(const std::map<unsigned int, std::vector<unsigned int> >& iEtaMultiplicity, unsigned int threshold, unsigned int ieta){
+
+   //if(iEtaMultiplicity.find(ieta) != iEtaMultiplicity.end()) count_ieta = iEtaMultiplicity[ieta];
+   std::map<unsigned int, std::vector<unsigned int> >::const_iterator it_ieta = iEtaMultiplicity.find(ieta);
+   unsigned int count_ieta = 0; 
+   if( it_ieta != iEtaMultiplicity.end() ) count_ieta = (it_ieta->second)[threshold];
 
    return count_ieta;
 }
