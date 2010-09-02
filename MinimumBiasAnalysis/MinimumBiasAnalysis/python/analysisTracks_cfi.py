@@ -15,6 +15,6 @@ analysisTracks = cms.EDFilter("TrackAnalysisSelector",
     etaMax = cms.double(2.4),
     dxySigMax = cms.double(3.0),
     dzSigMax = cms.double(3.0),
-    sigPtMax = cms.double(0.01), # sigma(pt)/pt
+    sigPtMax = cms.double(0.10), # sigma(pt)/pt
     quality = cms.string("highPurity")
 )

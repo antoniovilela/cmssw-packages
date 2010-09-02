@@ -38,6 +38,8 @@ process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 #                                   fileName = cms.string("analysisMinBias_histos.root")
 #)
 
+# HCAL reflagging
+
 process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
 
 """

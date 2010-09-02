@@ -35,6 +35,8 @@ from MinimumBiasAnalysis.MinimumBiasAnalysis.primaryVertexFilter_cfi import *
 
 from MinimumBiasAnalysis.MinimumBiasAnalysis.filterScraping_cfi import *
 
+from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import *
+
 from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasHLTPaths_cfi import *
 #hltPhysicsDeclared = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_PhysicsDeclared'])
 #hltMinBiasBSCORFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_MinBiasBSC_OR'])
@@ -54,7 +56,7 @@ recoTrackSelector.ptMin = 0.5
 recoTrackSelector.quality = ["highPurity"]
 selectGoodTracks = recoTrackSelector
 from MinimumBiasAnalysis.MinimumBiasAnalysis.analysisTracks_cfi import *
-analysisTracks.src = "selectGoodTracks"
+#analysisTracks.src = "selectGoodTracks"
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import selectTracksAssociatedToPV as tracksAssociatedToPV
 tracksAssociatedToPV.src = "analysisTracks"
@@ -110,7 +112,7 @@ hltBscMinBiasORNoColl = cms.Sequence(l1NoCollBscOr + hltBscMinBiasORBptxPlusORMi
 hltBscMinBiasORBPTXOR = cms.Sequence(l1NoBPTXBscOr + hltBscMinBiasORBptxPlusORMinusFilter)
 
 #preSelection = cms.Sequence()
-offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping)
+offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping+HBHENoiseFilter)
 eventSelection = cms.Sequence(offlineSelection)
 eventSelectionBPTX = cms.Sequence(bptx+offlineSelection)
 eventSelectionL1Tech4 = cms.Sequence(l1Tech4+offlineSelection)
@@ -164,7 +166,8 @@ eventSelectionBscMinBiasORSumEMaxHFMinus16 = cms.Sequence(eventSelectionBscMinBi
 #                      tracksAssociatedToPV*
 #                      tracksOutsideJets+
 #                      tracksTransverseRegion) 
-tracks = cms.Sequence(selectGoodTracks*analysisTracks)
+#tracks = cms.Sequence(selectGoodTracks*analysisTracks)
+tracks = cms.Sequence(analysisTracks)
 edmDump = cms.Sequence(trackMultiplicity+
                        hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
                        hcalActivitySummaryScale095+hcalActivitySummaryScale098+

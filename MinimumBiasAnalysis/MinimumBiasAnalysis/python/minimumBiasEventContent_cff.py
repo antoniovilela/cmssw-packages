@@ -3,8 +3,9 @@ import FWCore.ParameterSet.Config as cms
 MinimumBiasEventContent = cms.PSet(
     outputCommands = cms.untracked.vstring(
         'drop *',
+        'keep *_*_*_Analysis',
         # Tracks custom
-        'keep *_selectTracksAssociatedToPV_*_Analysis',
+        #'keep *_selectTracksAssociatedToPV_*_Analysis',
         # Jets
         'keep *_kt6CaloJets_*_*',
         'keep *_ak5CaloJets_*_*',
@@ -18,14 +19,14 @@ MinimumBiasEventContent = cms.PSet(
         'keep *_sisCone5PFJets_*_*', 
         'keep *_sisCone7PFJets_*_*',
         # User variables
-        'keep *_trackMultiplicity_*_Analysis',
-        'keep *_trackMultiplicityAssociatedToPV_*_Analysis',
-        'keep *_trackMultiplicityOutsideJets_*_Analysis',
-        'keep *_trackMultiplicityTransverseRegion_*_Analysis',
-        'keep *_hfTower_*_Analysis',
-        'keep *_xiTower_*_Analysis',
-        'keep *_xiFromCaloTowers_*_Analysis',
-        'keep *_xiFromJets_*_Analysis',
+        #'keep *_trackMultiplicity_*_Analysis',
+        #'keep *_trackMultiplicityAssociatedToPV_*_Analysis',
+        #'keep *_trackMultiplicityOutsideJets_*_Analysis',
+        #'keep *_trackMultiplicityTransverseRegion_*_Analysis',
+        #'keep *_hfTower_*_Analysis',
+        #'keep *_xiTower_*_Analysis',
+        #'keep *_xiFromCaloTowers_*_Analysis',
+        #'keep *_xiFromJets_*_Analysis',
         # RECO
         'keep *_EventAuxilary_*_*',
         'keep edmTriggerResults_TriggerResults_*_*',

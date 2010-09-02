@@ -1,4 +1,5 @@
 {
+        std::cout << "Loading rootlogon.C" << std::endl;
 	gROOT->ProcessLine(".L ~antoniov/tdrstyle.C");
 	setTDRStyle();
         gStyle->SetOptStat(1111111);

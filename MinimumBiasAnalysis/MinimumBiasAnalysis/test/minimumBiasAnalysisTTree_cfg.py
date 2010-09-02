@@ -4,18 +4,19 @@ import FWCore.ParameterSet.Config as cms
 class config: pass
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
-config.trackTagName = 'selectGoodTracks'
-#config.trackTagName = 'analysisTracks'
+#config.trackTagName = 'selectGoodTracks'
+config.trackTagName = 'analysisTracks'
 config.varyAttributes = True
 config.runOfflineOnly = True
-config.runNoColl = False
+config.runNoColl = True
 config.runBPTX = False
 config.runHCALFilter = True
 
 # Skim sequences
 from minimumBiasAnalysis_cfg import process
-if hasattr(process,'output'): del process.output
-if hasattr(process,'out_step'): del process.out_step
+#if hasattr(process,'output'): del process.output
+#if hasattr(process,'out_step'): del process.out_step
+process.output.fileName = '/tmp/antoniov/minimumBias.root'
 process.MessageLogger.cerr.threshold = 'INFO'
 process.maxEvents.input = 20000
 process.source.fileNames = ['file:/tmp/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_CA78CDED-2E83-DF11-BDD8-0026189438A7.root']

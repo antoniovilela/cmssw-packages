@@ -19,21 +19,21 @@ void drawVarError(TH1F* histWithError);
 void setHistoStyle(TH1F* histWithError, int errorBandColor);
 
 void getFileNames(std::string& fileNameRef, std::vector<std::string>& fileNamesError){
-  fileNameRef = "root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root";
-  fileNamesError.push_back("root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale090_EnergyScaleFactorHCAL_0_9_histos.root");
-  fileNamesError.push_back("root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale092_EnergyScaleFactorHCAL_0_92_histos.root");
-  fileNamesError.push_back("root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale095_EnergyScaleFactorHCAL_0_95_histos.root");
-  fileNamesError.push_back("root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale098_EnergyScaleFactorHCAL_0_98_histos.root");
-  fileNamesError.push_back("root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale102_EnergyScaleFactorHCAL_1_02_histos.root");
-  fileNamesError.push_back("root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale105_EnergyScaleFactorHCAL_1_05_histos.root");
-  fileNamesError.push_back("root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale108_EnergyScaleFactorHCAL_1_08_histos.root");
-  fileNamesError.push_back("root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale110_EnergyScaleFactorHCAL_1_1_histos.root"); 
+  fileNameRef = "root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root";
+  fileNamesError.push_back("root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale090_EnergyScaleFactorHCAL_0_9_histos.root");
+  fileNamesError.push_back("root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale092_EnergyScaleFactorHCAL_0_92_histos.root");
+  fileNamesError.push_back("root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale095_EnergyScaleFactorHCAL_0_95_histos.root");
+  fileNamesError.push_back("root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale098_EnergyScaleFactorHCAL_0_98_histos.root");
+  fileNamesError.push_back("root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale102_EnergyScaleFactorHCAL_1_02_histos.root");
+  fileNamesError.push_back("root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale105_EnergyScaleFactorHCAL_1_05_histos.root");
+  fileNamesError.push_back("root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale108_EnergyScaleFactorHCAL_1_08_histos.root");
+  fileNamesError.push_back("root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale110_EnergyScaleFactorHCAL_1_1_histos.root"); 
 }
 
 void plotErrorBands(char const* drawOption = "", int rebin = 1){
 
   std::vector<std::string> variables;
-  /*variables.push_back("nVertex");
+  variables.push_back("nVertex");
   variables.push_back("posXPrimVtx");
   variables.push_back("posYPrimVtx");
   variables.push_back("posZPrimVtx");
@@ -53,7 +53,7 @@ void plotErrorBands(char const* drawOption = "", int rebin = 1){
   variables.push_back("EPlusPzFromPFCands");
   variables.push_back("EMinusPzFromPFCands");
   variables.push_back("MxFromTowers");
-  variables.push_back("MxFromPFCands");*/
+  variables.push_back("MxFromPFCands");
   variables.push_back("EPlusPzFromTowersVarBin_dist_newBinning");
   variables.push_back("EMinusPzFromTowersVarBin_dist_newBinning");
   variables.push_back("sumEnergyHFPlusVarBin_dist_newBinning");
@@ -63,26 +63,29 @@ void plotErrorBands(char const* drawOption = "", int rebin = 1){
 
   std::vector<std::pair<std::string,TDirectory*> > dirs;
 
-  dirs.push_back(std::make_pair("Energy scale #pm10%",TFile::Open("root/7TeV/Data/Run132440/histosErrorBands_MinimumBias_7TeV_eventSelectionBscMinBiasOR_EnergyScaleHCAL.root")));
-  dirs.push_back(std::make_pair("p+p (7 TeV) BSC OR and Vertex",TFile::Open("root/7TeV/Data/Run132440/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root")));
-  //dirs.push_back(std::make_pair("Pythia-6 D6T",TFile::Open("root/7TeV/Pythia6DW/analysisMinBiasTTree_PYTHIADW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root")));
-  dirs.push_back(std::make_pair("Pythia-6 P0",TFile::Open("root/7TeV/Pythia6P0/analysisMinBiasTTree_PYTHIAP0_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root")));
+  //dirs.push_back(std::make_pair("Energy scale #pm10%",TFile::Open("root/7TeV/Data/Run132605/histosErrorBands_MinimumBias_7TeV_eventSelectionBscMinBiasOR_EnergyScaleHCAL.root")));
+  dirs.push_back(std::make_pair("p+p (7 TeV) BSC OR and Vertex",TFile::Open("root/7TeV/Data/Run132605/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root")));
+  dirs.push_back(std::make_pair("Pythia-6 DW",TFile::Open("root/7TeV/Pythia6DW/analysisMinBiasTTree_PYTHIADW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root")));
+  dirs.push_back(std::make_pair("PHOJET",TFile::Open("root/7TeV/Phojet/analysisMinBiasTTree_PHOJET_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root")));
 
-  TH1F* h_EventSelectionData = static_cast<TH1F*>((dirs[1].second)->Get("EventSelection"));
+  TH1F* h_EventSelectionData = static_cast<TH1F*>((dirs[0].second)->Get("EventSelection"));
   double nEventsData = h_EventSelectionData->GetBinContent(h_EventSelectionData->GetNbinsX());
-  TH1F* h_EventSelectionMC = static_cast<TH1F*>((dirs[2].second)->Get("EventSelection"));
-  double nEventsMC = h_EventSelectionMC->GetBinContent(h_EventSelectionMC->GetNbinsX());
-  std::vector<double> normFactors(3,1.); 
-  normFactors[2] = nEventsData/nEventsMC;
+  TH1F* h_EventSelectionMC_0 = static_cast<TH1F*>((dirs[1].second)->Get("EventSelection"));
+  double nEventsMC_0 = h_EventSelectionMC_0->GetBinContent(h_EventSelectionMC_0->GetNbinsX());
+  TH1F* h_EventSelectionMC_1 = static_cast<TH1F*>((dirs[2].second)->Get("EventSelection"));
+  double nEventsMC_1 = h_EventSelectionMC_1->GetBinContent(h_EventSelectionMC_1->GetNbinsX());
+  std::vector<double> normFactors(3,1.);
+  normFactors[1] = nEventsData/nEventsMC_0;   
+  normFactors[2] = nEventsData/nEventsMC_1;
 
   Plotter<DefaultNorm> plotter;
-  int linecolors[] = {kBlack,kBlack,kRed};
+  int linecolors[] = {kBlack,kBlack,kRed,kBlue};
   std::vector<int> histLineColors(linecolors,linecolors + sizeof(linecolors)/sizeof(int));
-  int fillcolors[] = {kYellow,0,0};
+  int fillcolors[] = {kYellow,0,0,0};
   std::vector<int> histFillColors(fillcolors,fillcolors + sizeof(fillcolors)/sizeof(int));
-  int linestyles[] = {0,kSolid,kSolid};
+  int linestyles[] = {0,kSolid,kSolid,kDashed};
   std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
-  int fillstyles[] = {1001,0,0};
+  int fillstyles[] = {1001,0,0,0};
   std::vector<int> histFillStyles(fillstyles,fillstyles + sizeof(fillstyles)/sizeof(int));
   plotter.SetLineColors(histLineColors);
   plotter.SetFillColors(histFillColors);
@@ -102,20 +105,20 @@ void plotErrorBandsAll(){
   variables.push_back("multiplicityHFPlusVarBin_dist");
   variables.push_back("multiplicityHFMinusVarBin_dist");
   std::vector<std::string> titlesY(variables.size());
-  titlesY[0] = "dN/d(#sumE+pz) (GeV^{-1})";
-  titlesY[1] = "dN/d(#sumE-pz) (GeV^{-1})";
-  titlesY[2] = "dN/dE_{HF} (GeV^{-1})";
-  titlesY[3] = "dN/dE_{HF} (GeV^{-1})";
-  titlesY[4] = "dN/dN_{HF}";
-  titlesY[5] = "dN/dN_{HF}";
+  titlesY[0] = "(1/N)dN/d(#sumE+pz) (GeV^{-1})";
+  titlesY[1] = "(1/N)dN/d(#sumE-pz) (GeV^{-1})";
+  titlesY[2] = "(1/N)dN/dE_{HF} (GeV^{-1})";
+  titlesY[3] = "(1/N)dN/dE_{HF} (GeV^{-1})";
+  titlesY[4] = "(1/N)dN/dN_{HF}";
+  titlesY[5] = "(1/N)dN/dN_{HF}";
 
   std::vector<std::string> titlesX(variables.size());
   titlesX[0] = "#sum(E+pz) (GeV)"; 
   titlesX[1] = "#sum(E-pz) (GeV)";
-  titlesX[2] = "#sum E (HF-plus) (GeV)";
-  titlesX[3] = "#sum E (HF-minus) (GeV)";
-  titlesX[4] = "tower multiplicity HF-plus";
-  titlesX[5] = "tower multiplicity HF-minus";
+  titlesX[2] = "#sum E (HF+) (GeV)";
+  titlesX[3] = "#sum E (HF-) (GeV)";
+  titlesX[4] = "N(HF+)";
+  titlesX[5] = "N(HF-)";
 
   //std::string rootDir = "root/2360GeV/NoSel";
   //std::string rootDir = "root/2360GeV/SumEnergyMaxHFPlus_8_0";
@@ -125,24 +128,30 @@ void plotErrorBandsAll(){
   //std::string rootDir = "root/7TeV/NoSel"; 
   //std::string rootDirMC = "root/7TeV/Pythia8/NoSel";
 
-  std::string fileNameData = "root/7TeV/Data/Run132440/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root";
+  //std::string fileNameData = "root/7TeV/Data/Run132440/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root";
+  std::string fileNameData = "root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root";
   TFile* fileData = TFile::Open(fileNameData.c_str());
-  std::string fileNameErrorBands = "root/7TeV/Data/Run132440/histosErrorBands_MinimumBias_7TeV_eventSelectionBscMinBiasOR_EnergyScaleHCAL.root";
+  std::string fileNameErrorBands = "root/7TeV/Data/Run132605/SumEnergyMaxHFPlus_8_0/histosErrorBands_MinimumBias_7TeV_eventSelectionBscMinBiasOR_EnergyScaleHCAL.root";
   TFile* fileErrorBands = TFile::Open(fileNameErrorBands.c_str());
   std::vector<TFile*> filesMC;
   std::vector<TFile*> filesMCComponent;
   //std::string fileNameMC = rootDirMC + "/";
-  filesMC.push_back(TFile::Open("root/7TeV/Data/Run132605/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root")); 
-  /*filesMC.push_back(TFile::Open("root/7TeV/Pythia8/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIA8_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));
-  filesMC.push_back(TFile::Open("root/7TeV/Pythia6D6T/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIAD6T_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));
-  //filesMC.push_back(TFile::Open("root/7TeV/Pythia6CW/analysisMinBiasTTree_PYTHIACW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));
-  filesMC.push_back(TFile::Open("root/7TeV/Pythia6DW/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIADW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));*/
+  //filesMC.push_back(TFile::Open("root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root"));
+  filesMC.push_back(TFile::Open("root/7TeV/Pythia6D6T/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIAD6T_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root")); 
+  /*filesMC.push_back(TFile::Open("root/7TeV/Pythia6DW/analysisMinBiasTTree_PYTHIADW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));
+  filesMC.push_back(TFile::Open("root/7TeV/Pythia6CW/analysisMinBiasTTree_PYTHIACW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));
+  filesMC.push_back(TFile::Open("root/7TeV/Pythia6P0/analysisMinBiasTTree_PYTHIAP0_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));
+  filesMC.push_back(TFile::Open("root/7TeV/Pythia6Z1/analysisMinBiasTTree_PYTHIAZ1_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));*/ 
+  filesMC.push_back(TFile::Open("root/7TeV/Pythia8/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIA8_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));
+  filesMC.push_back(TFile::Open("root/7TeV/Phojet/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PHOJET_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root"));
+
 
   //std::string fileNameMCComponent = rootDirMC + "/";
-  /*filesMCComponent.push_back(TFile::Open("root/7TeV/Pythia8/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIA8_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_Inelastic.root"));
   filesMCComponent.push_back(TFile::Open("root/7TeV/Pythia6D6T/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIAD6T_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_Inelastic.root"));
+  filesMCComponent.push_back(TFile::Open("root/7TeV/Pythia8/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIA8_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_Inelastic.root"));
+  filesMCComponent.push_back(TFile::Open("root/7TeV/Phojet/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PHOJET_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_Inelastic.root"));
   //filesMCComponent.push_back(TFile::Open("root/7TeV/Pythia6CW/analysisMinBiasTTree_PYTHIACW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_Inelastic.root"));
-  filesMCComponent.push_back(TFile::Open("root/7TeV/Pythia6DW/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIADW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_Inelastic.root"));*/
+  //filesMCComponent.push_back(TFile::Open("root/7TeV/Pythia6DW/SumEnergyMaxHFPlus_8_0/analysisMinBiasTTree_PYTHIADW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_Inelastic.root"));
    
   std::cout << "Using: " << std::endl
             << fileData->GetName() << std::endl
@@ -151,51 +160,74 @@ void plotErrorBandsAll(){
   for(size_t ifile = 0; ifile < filesMCComponent.size(); ++ifile) std::cout << filesMCComponent[ifile]->GetName() << std::endl; 
 
   TH1F* h_EventSelectionData = static_cast<TH1F*>(fileData->Get("EventSelection"));
-  double nEventsDataFullSel = h_EventSelectionData->GetBinContent(11);
+  double nEventsDataFullSel = h_EventSelectionData->GetBinContent(h_EventSelectionData->GetNbinsX());
   std::cout << "N events in data= " << nEventsDataFullSel << std::endl;
 
   //std::string labelData = "p+p (2.36 TeV) BSC OR and Vertex";
   //std::string labelData = "p+p (0.9 TeV) BSC OR and Vertex";
-  std::string labelData = "p+p (7 TeV) BSC OR and Vertex";
+  //std::string labelData = "p+p (7 TeV) BSC OR and Vertex";
+  std::string labelData = "p+p (BSC OR and Vertex)";
   std::string labelCMSPrel = "CMS Preliminary 2010";
-  std::string labelLum = "Run 132440 L=3.5 #mub^{-1}";  
+  //std::string labelLum = "Run 132440 (L = 3.5#mub^{-1})";
+  std::string labelLum = "#sqrt{s} = 7 TeV  L = 20#mub^{-1} (Run 132605)";  
 
   std::string labelErrorBands = "Energy scale #pm10%";
   std::vector<std::string> labelsMC(filesMC.size());
-  /*labelsMC[0] = "PYTHIA-8";
-  labelsMC[1] = "PYTHIA-6 D6T";
-  labelsMC[2] = "PYTHIA-6 DW"; 
-  //labelsMC[3] = "PYTHIA-6 CW";*/
-  labelsMC[0] = "p+p (7 TeV) Run 132605";
+  /*labelsMC[0] = "PYTHIA-6 D6T";
+  labelsMC[1] = "PYTHIA-6 DW"; 
+  labelsMC[2] = "PYTHIA-6 CW";
+  labelsMC[3] = "PYTHIA-6 P0";
+  labelsMC[4] = "PYTHIA-6 Z1";
+  labelsMC[5] = "PYTHIA-8";
+  labelsMC[6] = "PHOJET";*/
+  labelsMC[0] = "PYTHIA-6 D6T";
+  labelsMC[1] = "PYTHIA-8";
+  labelsMC[2] = "PHOJET";
+  //labelsMC[0] = "p+p (Run 132440) (L = 3.5#mub^{-1})";
   std::vector<std::string> labelsMCComponent(filesMCComponent.size());
-  /*labelsMCComponent[0] = "PYTHIA-8 Non-diffractive";
-  labelsMCComponent[1] = "PYTHIA-6 D6T Non-diffractive";
-  labelsMCComponent[2] = "PYTHIA-6 DW Non-diffractive";
-  //labelsMCComponent[3] = "PYTHIA-6 DW Non-diffractive";*/ 
+  labelsMCComponent[0] = "PYTHIA-6 D6T Non-diffractive";
+  labelsMCComponent[1] = "PYTHIA-8 Non-diffractive";
+  labelsMCComponent[2] = "PHOJET Non-diffractive";
+  /*labelsMCComponent[2] = "PYTHIA-6 DW Non-diffractive";
+  labelsMCComponent[3] = "PYTHIA-6 CW Non-diffractive";*/ 
 
   std::vector<int> histColors(filesMC.size(),1);
   /*histColors[0] = 2;
+  histColors[1] = 42;
+  histColors[2] = 46;
+  histColors[3] = 34;
+  histColors[4] = 38;
+  histColors[5] = 4;
+  histColors[6] = 12;*/
+  histColors[0] = 2;
   histColors[1] = 4;
-  histColors[2] = 6;
-  //histColors[3] = 12;*/
-  histColors[0] = 1; 
+  histColors[2] = 12;
+  //histColors[0] = 1; 
   std::vector<int> histColorsComponent(filesMCComponent.size(),1);
-  /*histColorsComponent[0] = 38;
-  histColorsComponent[1] = 47;
-  histColorsComponent[2] = 51;
-  //histColorsComponent[3] = 59;*/
+  histColorsComponent[0] = 46;
+  histColorsComponent[1] = 38;
+  histColorsComponent[2] = 27;
+  /*histColorsComponent[2] = 51;
+  histColorsComponent[3] = 59;*/
    
   std::vector<int> histLineStyles(filesMC.size(),1);
   /*histLineStyles[0] = 1;
+  histLineStyles[1] = 4;
+  histLineStyles[2] = 5;
+  histLineStyles[3] = 6;
+  histLineStyles[4] = 7;
+  histLineStyles[5] = 2;
+  histLineStyles[6] = 3;*/
+  histLineStyles[0] = 1;
   histLineStyles[1] = 2;
   histLineStyles[2] = 3;
-  //histLineStyles[3] = 4;*/
-  histLineStyles[0] = 2; 
+  //histLineStyles[0] = 2; 
   std::vector<int> histLineStylesComponent(filesMCComponent.size(),1);
-  /*histLineStylesComponent[0] = 9;
-  histLineStylesComponent[1] = 10; 
-  histLineStylesComponent[2] = 9;
-  //histLineStylesComponent[3] = 10;*/
+  histLineStylesComponent[0] = 9;
+  histLineStylesComponent[1] = 10;
+  histLineStylesComponent[2] = 8; 
+  /*histLineStylesComponent[2] = 9;
+  histLineStylesComponent[3] = 10;*/
 
   std::vector<TCanvas*> canvasVec;
   std::vector<TLegend*> legendVec;
@@ -218,12 +250,16 @@ void plotErrorBandsAll(){
      TH1F* h_var_data = static_cast<TH1F*>(h_var_data_tmp->Clone(hname.c_str()));
      hname = *var;hname += "_error";
      TH1F* h_var_err = static_cast<TH1F*>(h_var_err_tmp->Clone(hname.c_str()));
-
+ 
+     double scaleData = 1./nEventsDataFullSel;
+     std::cout << "Scaling Data by " << scaleData << std::endl;
+     h_var_data->Scale(scaleData);
      h_var_data->SetLineWidth(3);
      h_var_data->SetMarkerStyle(20);
      h_var_data->SetMarkerSize(1.5);
      h_var_data->SetStats(0);
 
+     h_var_err->Scale(scaleData);
      h_var_err->SetFillColor(5);
      h_var_err->SetFillStyle(1001);
      h_var_err->SetMarkerSize(0);
@@ -253,8 +289,9 @@ void plotErrorBandsAll(){
         std::cout << hnameMC.str() << std::endl;
         histosMC.push_back(static_cast<TH1F*>(h_var_mc_tmp->Clone(hnameMC.str().c_str())));
         TH1F* h_EventSelectionMC = static_cast<TH1F*>((*fileMC)->Get("EventSelection"));
-        double nEventsMCFullSel = h_EventSelectionMC->GetBinContent(11);
-        scaleFactors.push_back(nEventsDataFullSel/nEventsMCFullSel); 
+        double nEventsMCFullSel = h_EventSelectionMC->GetBinContent(h_EventSelectionMC->GetNbinsX());
+        //scaleFactors.push_back(nEventsDataFullSel/nEventsMCFullSel); 
+        scaleFactors.push_back(1./nEventsMCFullSel);
         std::cout << "Scaling MC by " << scaleFactors.back() << std::endl;
         histosMC.back()->Scale(scaleFactors.back());
         histosMC.back()->SetLineWidth(3);
@@ -306,18 +343,19 @@ void plotErrorBandsAll(){
      histo = histosMCComponent.begin();
      histosMC_end = histosMCComponent.end();
      for(; histo != histosMC_end; ++histo) (*histo)->Draw("HIST][SAME");
+     leg->SetHeader(labelLum.c_str());
      leg->Draw("SAME"); 
 
      TPaveLabel* paveLabel = new TPaveLabel(0.45,0.80,0.80,0.90,labelCMSPrel.c_str(),"NDC");
      paveLabel->SetFillColor(0);
      paveLabel->Draw("SAME");
 
-     TLatex* latexLum = new TLatex(0.80,0.85,labelLum.c_str());
+     /*TLatex* latexLum = new TLatex(0.80,0.85,labelLum.c_str());
      //TLatex* latexLum = new TLatex(0.45,0.75,labelLum.c_str());
      latexLum->SetNDC();
      latexLum->SetTextAlign(12);
      latexLum->SetTextSize(0.04);
-     latexLum->Draw("SAME");
+     latexLum->Draw("SAME");*/
      
   }
 }

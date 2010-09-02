@@ -47,9 +47,9 @@ void plot(const char* eventSelection = "", const char* drawOption = "", int rebi
 
    //Plotter<NumberEntriesNorm> plotter;
    Plotter<DefaultNorm> plotter;
-   int colors[] = {1,2,6,12,4,43,38};
+   int colors[] = {1,2,6,12,4,43,38,57};
    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
-   int linestyles[] = {1,1,2,3,4,9,10};
+   int linestyles[] = {1,1,2,3,4,9,10,2};
    std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
    plotter.SetLineColors(histColors);
    plotter.SetLineStyles(histLineStyles);
@@ -145,7 +145,9 @@ void setDirsDataMCDiff(std::string const& eventSelection,std::vector<std::pair<s
 }
 
 void setDirsDataMCTunes(std::string const& eventSelection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
-   TFile* file_data = TFile::Open("root/7TeV/analysisMinBias_TTree_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132440_minimumBiasAnalysisTTree-v5.root");
+   //TFile* file_data = TFile::Open("root/7TeV/analysisMinBias_TTree_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132440_minimumBiasAnalysisTTree-v5.root");
+   TFile* file_data = TFile::Open("root/7TeV/analysisMinBias_TTree_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132605_minimumBiasAnalysisTTree-v2.root");
+
    std::vector<TFile*> filesMC;
    filesMC.resize(7);
    filesMC[0] = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1_minimumBiasAnalysisTTree-v2.root");
