@@ -98,5 +98,5 @@ if config.runHCALFilter:
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus16')
     
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("analysisMinBias_TTree_MinimumBias.root")
+                                   fileName = cms.string("/tmp/antoniov/analysisMinBias_TTree_MinimumBias.root")
 )

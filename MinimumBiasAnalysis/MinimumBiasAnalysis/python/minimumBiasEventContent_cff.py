@@ -49,6 +49,8 @@ MinimumBiasEventContent = cms.PSet(
         'keep *_caloTowers_*_*', 
         'keep *_towerMaker_*_*',
         'keep *_siPixelRecHits_*_*',
+        'keep *_hfrecoReflagged_*_*',
+        'keep *_hbherecoReflagged_*_*',
         'keep GenRunInfoProduct_*_*_*',
         'keep GenEventInfoProduct_*_*_*',
         'keep edmHepMCProduct_*_*_*'
