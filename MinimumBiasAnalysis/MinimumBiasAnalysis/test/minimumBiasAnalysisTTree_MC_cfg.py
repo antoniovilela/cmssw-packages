@@ -7,7 +7,7 @@ from minimumBiasAnalysisTTree_cfg import process,config
 #process.source.fileNames = ['file:/tmp/antoniov/PHOJET_MinBias_7TeV_START36_V10_362-HLT-v1_PrivateProd-START36_V10_362_RECO-v1_step2_RAW2DIGI_L1Reco_RECO_VALIDATION_5_1_5XQ.root']
 process.source.fileNames = ['file:/tmp/antoniov/MinBias_7TeV-phojet_START36_V10_362-HLT-v1_PrivateProd-START36_V10_362_RECO-v1_step2_RAW2DIGI_L1Reco_RECO_VALIDATION_80_1_dtB.root']
 process.MessageLogger.cerr.threshold = 'INFO'
-process.maxEvents.input = -1
+process.maxEvents.input = 5000
 process.GlobalTag.globaltag = 'START36_V10::All'
 
 analyzerPrefix = 'minimumBiasTTreeAnalysis'
