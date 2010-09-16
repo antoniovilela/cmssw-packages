@@ -44,7 +44,7 @@ process.output.SelectEvents.SelectEvents = cms.vstring('selection_step')
 ###################################################################################
 # HCAL reflagging
 # HF RecHit reflagger -- specify type of HF cleaning to use
-from MinimumBiasAnalysis.MinimumBiasAnalysis.addHcalReflagging import addHFReflagging,addHBHEReflagging
+from Utilities.AnalysisTools.addHcalReflagging import addHFReflagging,addHBHEReflagging
 process = addHFReflagging(process,version=10,isMC=False)
 # HBHE RecHit reflagger
 process = addHBHEReflagging(process)
