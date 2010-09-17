@@ -173,5 +173,14 @@ unsigned int nHCALiEta(const std::map<unsigned int, std::vector<unsigned int> >&
    return count_ieta;
 }
 
+double sumEHCALiEta(const std::map<unsigned int, std::vector<double> >& iEtaSumE, unsigned int threshold, unsigned int ieta){
+
+   std::map<unsigned int, std::vector<double> >::const_iterator it_ieta = iEtaSumE.find(ieta);
+   double sumE_ieta = 0;
+   if( it_ieta != iEtaSumE.end() ) sumE_ieta = (it_ieta->second)[threshold];
+
+   return sumE_ieta;
+}
+
 }
 #endif

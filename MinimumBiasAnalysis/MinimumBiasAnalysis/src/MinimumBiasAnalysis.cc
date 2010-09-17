@@ -46,6 +46,7 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   accessMCInfo_(pset.getUntrackedParameter<bool>("AccessMCInfo",false)),
   //hltPathNames_(pset.getParameter<std::vector<std::string> >("HLTPathNames")),
   hltPathName_(pset.getParameter<std::string>("HLTPath")),
+  selectionPathName_(pset.getParameter<std::string>("SelectionPath")),
   genAllParticles_(0.,0.,0.,0.),
   genAllParticlesHEPlus_(0.,0.,0.,0.),genAllParticlesHEMinus_(0.,0.,0.,0.),
   genAllParticlesHFPlus_(0.,0.,0.,0.),genAllParticlesHFMinus_(0.,0.,0.,0.),
@@ -158,6 +159,15 @@ void MinimumBiasAnalysis::fillTriggerInfo(EventData& eventData, const edm::Event
   eventData.HLT_MinBiasPixel_ = (triggerResults->wasrun(idx_HLT_MinBiasPixel) && triggerResults->accept(idx_HLT_MinBiasPixel)) ? 1 : 0;*/
   int idxHLT = triggerNames.triggerIndex(hltPathName_);
   eventData.HLTPath_ = (triggerResults->wasrun(idxHLT) && triggerResults->accept(idxHLT)) ? 1 : 0; 
+}
+
+void MinimumBiasAnalysis::fillSelectionInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+  edm::Handle<edm::TriggerResults> triggerResults;
+  event.getByLabel("TriggerResults", triggerResults);
+
+  const edm::TriggerNames& triggerNames = event.triggerNames(*triggerResults);
+  int idxPath = triggerNames.triggerIndex(selectionPathName_);
+  eventData.SelectionPath_ = (triggerResults->wasrun(idxPath) && triggerResults->accept(idxPath)) ? 1 : 0;
 }
 
 void MinimumBiasAnalysis::fillVertexInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
@@ -288,12 +298,24 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   edm::Handle<std::vector<double> > sumEHFminus;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumEHFminus"),sumEHFminus);
 
+  edm::Handle<std::map<unsigned int, std::vector<double> > > iEtaHFEnergySumPlus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"iEtaHFEnergySumPlus"),iEtaHFEnergySumPlus);
+
+  edm::Handle<std::map<unsigned int, std::vector<double> > > iEtaHFEnergySumMinus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"iEtaHFEnergySumMinus"),iEtaHFEnergySumMinus);
+
   edm::Handle<std::vector<double> > sumETHFplus;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHFplus"),sumETHFplus);
   
   edm::Handle<std::vector<double> > sumETHFminus;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"sumETHFminus"),sumETHFminus);
  
+  edm::Handle<std::map<unsigned int, std::vector<double> > > iEtaHFETSumPlus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"iEtaHFETSumPlus"),iEtaHFETSumPlus);
+
+  edm::Handle<std::map<unsigned int, std::vector<double> > > iEtaHFETSumMinus;
+  event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"iEtaHFETSumMinus"),iEtaHFETSumMinus);
+
   // FIXME
   edm::Handle<std::vector<double> > thresholdsHE;
   event.getByLabel(edm::InputTag(hcalTowerSummaryTag_.label(),"thresholdsHE"),thresholdsHE);
@@ -342,9 +364,17 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   for(unsigned int ieta = 29, index = 0; ieta <= 41; ++ieta,++index){
      unsigned int nHFPlus_ieta = analysisTools::nHCALiEta(*iEtaHFMultiplicityPlus,indexThresholdHF,ieta);
      eventData.multiplicityHFPlusVsiEta_[index] = nHFPlus_ieta;
+     double sumEHFPlus_ieta = analysisTools::sumEHCALiEta(*iEtaHFEnergySumPlus,indexThresholdHF,ieta);
+     eventData.sumEHFPlusVsiEta_[index] = sumEHFPlus_ieta;
+     double sumETHFPlus_ieta = analysisTools::sumEHCALiEta(*iEtaHFETSumPlus,indexThresholdHF,ieta);
+     eventData.sumETHFPlusVsiEta_[index] = sumETHFPlus_ieta; 
 
      unsigned int nHFMinus_ieta = analysisTools::nHCALiEta(*iEtaHFMultiplicityMinus,indexThresholdHF,ieta);
      eventData.multiplicityHFMinusVsiEta_[index] = nHFMinus_ieta;
+     double sumEHFMinus_ieta = analysisTools::sumEHCALiEta(*iEtaHFEnergySumMinus,indexThresholdHF,ieta);
+     eventData.sumEHFMinusVsiEta_[index] = sumEHFMinus_ieta;     
+     double sumETHFMinus_ieta = analysisTools::sumEHCALiEta(*iEtaHFETSumMinus,indexThresholdHF,ieta);
+     eventData.sumETHFMinusVsiEta_[index] = sumETHFMinus_ieta;
   }
 }
 
