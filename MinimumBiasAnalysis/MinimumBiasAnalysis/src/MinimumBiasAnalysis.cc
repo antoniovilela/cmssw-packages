@@ -4,6 +4,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/Utilities/interface/Exception.h"
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/JetReco/interface/Jet.h"
@@ -46,7 +47,7 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   accessMCInfo_(pset.getUntrackedParameter<bool>("AccessMCInfo",false)),
   //hltPathNames_(pset.getParameter<std::vector<std::string> >("HLTPathNames")),
   hltPathName_(pset.getParameter<std::string>("HLTPath")),
-  selectionPathName_(pset.getParameter<std::string>("SelectionPath")),
+  //selectionPathName_(pset.getParameter<std::string>("SelectionPath")),
   genAllParticles_(0.,0.,0.,0.),
   genAllParticlesHEPlus_(0.,0.,0.,0.),genAllParticlesHEMinus_(0.,0.,0.,0.),
   genAllParticlesHFPlus_(0.,0.,0.,0.),genAllParticlesHFMinus_(0.,0.,0.,0.),
@@ -81,6 +82,7 @@ void MinimumBiasAnalysis::fillEventData(EventData& eventData, const edm::Event& 
   fillEventInfo(eventData,event,setup);
   fillNoiseInfo(eventData,event,setup); 
   fillTriggerInfo(eventData,event,setup);
+  //fillSelectionInfo(eventData,event,setup);
   fillVertexInfo(eventData,event,setup);
   fillTrackInfo(eventData,event,setup);
   fillJetInfo(eventData,event,setup);
@@ -110,6 +112,15 @@ void MinimumBiasAnalysis::fillEventInfo(EventData& eventData, const edm::Event& 
   unsigned int runNumber = event.id().run();
   unsigned int lumiSection = event.luminosityBlock();
   int bunchCrossing = event.bunchCrossing();
+
+  edm::Handle<double> lumiWeight;
+  event.getByLabel("lumiWeight",lumiWeight);
+  if(lumiWeight.isValid()){
+     double lumi = *lumiWeight;
+     eventData.lumiWeight_ = lumi;
+  } else{
+     eventData.lumiWeight_ = -1.; 
+  }
 
   eventData.eventNumber_ = eventNumber;
   eventData.runNumber_ = runNumber;
@@ -157,18 +168,25 @@ void MinimumBiasAnalysis::fillTriggerInfo(EventData& eventData, const edm::Event
   int idx_HLT_MinBiasPixel = triggerNames.triggerIndex("HLT_MinBiasPixel_SingleTrack"); 
   eventData.HLT_MinBiasBSCOR_ = (triggerResults->wasrun(idx_HLT_MinBiasBSCOR) && triggerResults->accept(idx_HLT_MinBiasBSCOR)) ? 1 : 0;
   eventData.HLT_MinBiasPixel_ = (triggerResults->wasrun(idx_HLT_MinBiasPixel) && triggerResults->accept(idx_HLT_MinBiasPixel)) ? 1 : 0;*/
-  int idxHLT = triggerNames.triggerIndex(hltPathName_);
+  unsigned int idxHLT = triggerNames.triggerIndex(hltPathName_);
   eventData.HLTPath_ = (triggerResults->wasrun(idxHLT) && triggerResults->accept(idxHLT)) ? 1 : 0; 
 }
 
+/*
 void MinimumBiasAnalysis::fillSelectionInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   edm::Handle<edm::TriggerResults> triggerResults;
   event.getByLabel("TriggerResults", triggerResults);
 
   const edm::TriggerNames& triggerNames = event.triggerNames(*triggerResults);
-  int idxPath = triggerNames.triggerIndex(selectionPathName_);
-  eventData.SelectionPath_ = (triggerResults->wasrun(idxPath) && triggerResults->accept(idxPath)) ? 1 : 0;
+  unsigned int idxPath = triggerNames.triggerIndex(selectionPathName_);
+  if(idxPath >= triggerNames.size()) throw cms::Exception("Configuration") << "Could not find path with name "
+                                                    << selectionPathName_ << " from "
+                                                    << triggerResults.provenance()->moduleLabel() << "::"
+                                                    << triggerResults.provenance()->processName() << "\n"; 
+  //eventData.SelectionPath_ = (triggerResults->wasrun(idxPath) && triggerResults->accept(idxPath)) ? 1 : 0;
+  eventData.SelectionPath_ = -1.; 
 }
+*/
 
 void MinimumBiasAnalysis::fillVertexInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   // Access vertex collection

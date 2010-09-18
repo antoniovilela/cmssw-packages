@@ -7,12 +7,12 @@ config.runOnMC = False
 config.globalTagNameData = 'GR_R_36X_V12A::All'
 config.globalTagNameMC = 'START36_V10::All'
 config.outputEdmFile = '/tmp/antoniov/minimumBias.root'
-config.outputTTreeFile = "/tmp/antoniov/analysisMinBias_TTree_MinimumBias.root"
+config.outputTTreeFile = '/tmp/antoniov/analysisMinBias_TTree_MinimumBias.root'
+config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_StreamExpress_Collisions10_V2_sub_132440.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 #config.trackTagName = 'selectGoodTracks'
 config.trackTagName = 'analysisTracks'
-config.selectionPath = 'l1Selection_step'
 config.varyAttributes = True
 config.runOfflineOnly = True
 config.runNoColl = True
@@ -29,7 +29,10 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/tmp/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_CA78CDED-2E83-DF11-BDD8-0026189438A7.root')
+    fileNames = cms.untracked.vstring(
+        #'file:/tmp/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_CA78CDED-2E83-DF11-BDD8-0026189438A7.root'
+        'file:/tmp/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root'
+    )
 )
 # Import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -74,10 +77,15 @@ process.towerMakerWithHO.hbheInput = "hbherecoReflagged"
 
 ###################################################################################
 
+process.lumiWeight = cms.EDProducer("LuminosityWeightProducer",
+    rootFileName = cms.string(config.instLumiROOTFile),
+    prefix = cms.untracked.string("instLumi")
+)
+
 process.xiTower.comEnergy = config.comEnergy
 process.xiFromCaloTowers.comEnergy = config.comEnergy
 process.xiFromJets.comEnergy = config.comEnergy
-process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
+process.recoSequence = cms.Sequence(process.tracks*process.edmDump+process.lumiWeight)
 # Reflagging and re-reco
 process.reflagging_step = cms.Path(process.hfrecoReflagged+process.hbherecoReflagged)
 process.rereco_step = cms.Path(process.caloTowersRec
@@ -86,8 +94,8 @@ process.rereco_step = cms.Path(process.caloTowersRec
                                *process.metreco
                                ) # re-reco jets and met
 
-process.l1Selection_step = cms.Path(process.l1CollBscOr)
-process.hltSelection_step = cms.Path(process.hltBscMinBiasOR)
+#process.l1Selection_step = cms.Path(process.l1CollBscOr)
+#process.hltSelection_step = cms.Path(process.hltBscMinBiasOR)
 process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
 process.reco_step = cms.Path(process.eventSelection+process.recoSequence)
 
@@ -99,7 +107,6 @@ if config.writeEdmOutput: process.out_step = cms.EndPath(process.output)
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
 process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2.
 process.minimumBiasTTreeAnalysis.TrackTag = config.trackTagName
-process.minimumBiasTTreeAnalysis.SelectionPath = config.selectionPath
 process.minimumBiasTTreeAnalysisNoCleaning = process.minimumBiasTTreeAnalysis.clone(
     CaloTowerTag = cms.InputTag("towerMaker::RECO")
 )

@@ -24,7 +24,7 @@ class MinimumBiasAnalysis {
      void fillEventInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillNoiseInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillTriggerInfo(EventData&, const edm::Event&, const edm::EventSetup&);
-     void fillSelectionInfo(EventData&, const edm::Event&, const edm::EventSetup&);
+     //void fillSelectionInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillVertexInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillTrackInfo(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillMETInfo(EventData&, const edm::Event&, const edm::EventSetup&);
@@ -50,7 +50,7 @@ class MinimumBiasAnalysis {
      bool accessMCInfo_;
      //std::vector<std::string> > hltPathNames_;
      std::string hltPathName_; 
-     std::string selectionPathName_;     
+     //std::string selectionPathName_;     
 
      std::map<int,std::pair<double,double> > thresholdsPFlow_;
 
