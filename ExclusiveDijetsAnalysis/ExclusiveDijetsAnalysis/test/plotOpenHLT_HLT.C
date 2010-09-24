@@ -30,8 +30,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    TH1F* h_L1CenJetEt = new TH1F("L1CenJetEt","L1CenJetEt",100,0.,100.);
    TH1F* h_L1ForJetEt = new TH1F("L1ForJetEt","L1ForJetEt",100,0.,100.);
    TH1F* h_L1TauEt = new TH1F("L1TauEt","L1TauEt",100,0.,100.);
-   TH1F* h_L1MetHad = new TH1F("L1MetHad","L1MetHad",100,0.,100.);
-   TH1F* h_L1MetTot = new TH1F("L1MetTot","L1MetTot",100,0.,100.);
+   /*TH1F* h_L1MetHad = new TH1F("L1MetHad","L1MetHad",100,0.,100.);
+   TH1F* h_L1MetTot = new TH1F("L1MetTot","L1MetTot",100,0.,100.);*/
+   TH1F* h_L1Met = new TH1F("L1Met","L1Met",100,0.,100.);
+   TH1F* h_L1EtHad = new TH1F("L1EtHad","L1EtHad",100,0.,100.);
+   TH1F* h_L1EtTot = new TH1F("L1EtTot","L1EtTot",100,0.,100.);
 
    TH1F* h_L1LeadingJetEt = new TH1F("L1LeadingJetEt","L1LeadingJetEt",100,0.,100.);
    TH1F* h_L1FracEt_HT = new TH1F("L1FracEt_HT","L1FracEt_HT",100,0.,5.);
@@ -54,13 +57,14 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    float sumEtMin = 0.;
    float sumEtMax = 500.;
 
-   TH1F* h_EffVsThreshold = new TH1F("EffVsThreshold","EffVsThreshold",nThresholds,sumEtMin,sumEtMax);
+   TH1F* h_NevtsVsThreshold = new TH1F("NevtsVsThreshold","NevtsVsThreshold",nThresholds,sumEtMin,sumEtMax);
    TF1* func_effTrig = new TF1("effTrig","[0]",sumEtMin,sumEtMax);
    TF1* func_effTrigL1 = new TF1("effTrigL1","[0]",sumEtMin,sumEtMax);
    
-   std::string trigName = "HLT_DiJetAve30";
-   //std::string trigName = "L1_SingleJet30";
+   std::string trigName = "HLT_Jet30U";
+   //std::string trigName = "L1_SingleJet20";
 
+   int runNumber,lumiBlock,bunchCrossing;
    int trigBit;
    int nL1CenJet;
    float l1CenJetEt[4];
@@ -68,8 +72,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    float l1ForJetEt[4];
    int nL1Tau;
    float l1TauEt[4];
-   float l1MetHad;
-   float l1MetTot;
+   /*float l1MetHad;
+   float l1MetTot;*/
+   float l1Met;
+   float l1EtHad;
+   float l1EtTot;
    
    int L1HfRing1EtSumNegativeEta;
    int L1HfRing2EtSumNegativeEta;
@@ -87,14 +94,20 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    float jetCalEta[100];
 
    chain.SetBranchAddress(trigName.c_str(),&trigBit);
+   chain.SetBranchAddress("Run",&runNumber);
+   chain.SetBranchAddress("LumiBlock",&lumiBlock);
+   chain.SetBranchAddress("Bx",&bunchCrossing);
    chain.SetBranchAddress("NL1CenJet",&nL1CenJet);
    chain.SetBranchAddress("L1CenJetEt",l1CenJetEt);
    chain.SetBranchAddress("NL1ForJet",&nL1ForJet);
    chain.SetBranchAddress("L1ForJetEt",l1ForJetEt); 
    chain.SetBranchAddress("NL1Tau",&nL1Tau);
    chain.SetBranchAddress("L1TauEt",l1TauEt);
-   chain.SetBranchAddress("L1MetHad",&l1MetHad);
-   chain.SetBranchAddress("L1MetTot",&l1MetTot);
+   /*chain.SetBranchAddress("L1MetHad",&l1MetHad);
+   chain.SetBranchAddress("L1MetTot",&l1MetTot);*/
+   chain.SetBranchAddress("L1Met",&l1Met);
+   chain.SetBranchAddress("L1EtHad",&l1EtHad);
+   chain.SetBranchAddress("L1EtTot",&l1EtTot);
    chain.SetBranchAddress("L1HfRing1EtSumNegativeEta",&L1HfRing1EtSumNegativeEta);
    chain.SetBranchAddress("L1HfRing2EtSumNegativeEta",&L1HfRing2EtSumNegativeEta);
    chain.SetBranchAddress("L1HfRing1EtSumPositiveEta",&L1HfRing1EtSumPositiveEta);
@@ -110,12 +123,14 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    
    int nEvents = chain.GetEntries();
    double etaMin = 3.0;
-   double towerThreshold = 2.5; //energy
+   double towerThreshold = 4.0; //energy
    int L1EtSumThreshold = 1;
  
    int nPassedTrigBit = 0;
    int nPassedTrigBitAndL1EtSum = 0;
    int countEvts = 0;
+   int lumiMin = -1;
+   int lumiMax = -1;
    for(int entry = 0; entry < nEvents; ++entry){
       if((maxEvents > 0)&&(entry == maxEvents)) break;
       if(entry%2000 == 0) std::cout << ">>> Analysing " << entry << "th event" << std::endl;
@@ -123,6 +138,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       chain.GetEntry(entry);
       //size_t index = 0;
       ++countEvts;
+      if(lumiMin < 0) lumiMin = lumiBlock;
+      if(lumiMin >= 0 && lumiBlock < lumiMin) lumiMin = lumiBlock;
+
+      if(lumiMax < 0) lumiMax = lumiBlock;
+      if(lumiMax >= 0 && lumiBlock > lumiMax) lumiMax = lumiBlock;
 
       h_trigBit->Fill(trigBit);
 
@@ -133,8 +153,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       h_L1CenJetEt->Fill(l1CenJetEt[0]);
       h_L1ForJetEt->Fill(l1ForJetEt[0]);
       h_L1TauEt->Fill(l1TauEt[0]);
-      h_L1MetHad->Fill(l1MetHad);
-      h_L1MetTot->Fill(l1MetTot);
+      /*h_L1MetHad->Fill(l1MetHad);
+      h_L1MetTot->Fill(l1MetTot);*/
+      h_L1Met->Fill(l1Met);
+      h_L1EtHad->Fill(l1EtHad);
+      h_L1EtTot->Fill(l1EtTot);
 
       // Find leading L1 jet Et
       float leadingJetEt = (l1CenJetEt[0] > l1ForJetEt[0]) ? l1CenJetEt[0] : l1ForJetEt[0];
@@ -143,24 +166,24 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       h_L1LeadingJetEt->Fill(leadingJetEt);
 
       // Compute Et fractions
-      float l1FracEt_HT = 2*leadingJetEt/l1MetHad;
-      float l1FracEt_EtTot = 2*leadingJetEt/l1MetTot;
+      float l1FracEt_HT = 2*leadingJetEt/l1EtHad;
+      float l1FracEt_EtTot = 2*leadingJetEt/l1EtTot;
     
       h_L1FracEt_HT->Fill(l1FracEt_HT); 
       h_L1FracEt_EtTot->Fill(l1FracEt_EtTot);
 
-      h_L1ResHT->Fill((2*leadingJetEt - l1MetHad)/(2*leadingJetEt));
-      h_L1ResEtTot->Fill((2*leadingJetEt - l1MetTot)/(2*leadingJetEt));
+      h_L1ResHT->Fill((2*leadingJetEt - l1EtHad)/(2*leadingJetEt));
+      h_L1ResEtTot->Fill((2*leadingJetEt - l1EtTot)/(2*leadingJetEt));
 
       h_L1HfRing1EtSumNegativeEta->Fill(L1HfRing1EtSumNegativeEta);
       h_L1HfRing2EtSumNegativeEta->Fill(L1HfRing2EtSumNegativeEta);
       h_L1HfRing1EtSumPositiveEta->Fill(L1HfRing1EtSumPositiveEta);
       h_L1HfRing2EtSumPositiveEta->Fill(L1HfRing2EtSumPositiveEta);
 
-      /*if((L1HfRing1EtSumNegativeEta > L1EtSumThreshold)||
+      if((L1HfRing1EtSumNegativeEta > L1EtSumThreshold)||
          (L1HfRing2EtSumNegativeEta > L1EtSumThreshold)||
          (L1HfRing1EtSumPositiveEta > L1EtSumThreshold)||
-         (L1HfRing2EtSumPositiveEta > L1EtSumThreshold)) continue;*/
+         (L1HfRing2EtSumPositiveEta > L1EtSumThreshold)) continue;
 
       ++nPassedTrigBitAndL1EtSum;
 
@@ -195,25 +218,35 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       h_fracEt->Fill(fracEt);
 
       // Check if passes energy sum cut vs threshold
-      for(int i_bin = 0; i_bin < h_EffVsThreshold->GetXaxis()->GetNbins(); ++i_bin){
-         float threshold = h_EffVsThreshold->GetXaxis()->GetBinLowEdge(i_bin + 1);
-         float bin_center = h_EffVsThreshold->GetXaxis()->GetBinCenter(i_bin + 1);
+      for(int i_bin = 0; i_bin < h_NevtsVsThreshold->GetXaxis()->GetNbins(); ++i_bin){
+         float threshold = h_NevtsVsThreshold->GetXaxis()->GetBinLowEdge(i_bin + 1);
+         float bin_center = h_NevtsVsThreshold->GetXaxis()->GetBinCenter(i_bin + 1);
          // Apply veto
-         if((sumEHF_plus < threshold)&&(sumEHF_minus < threshold)) h_EffVsThreshold->Fill(bin_center);
+         if((sumEHF_plus < threshold)&&(sumEHF_minus < threshold)) h_NevtsVsThreshold->Fill(bin_center);
       } 
    }
-
+   std::cout << "Analyzed " << countEvts << " events" << std::endl
+             << "Min and max lumi section: (" << lumiMin << "," << lumiMax << ")" << std::endl
+             << "  Nr. events passing trigger " << trigName << ": " << nPassedTrigBit << std::endl
+             << "  Nr. events passing L1 HF Et-sum selection: " << nPassedTrigBitAndL1EtSum << std::endl;
+            
    float effTrigBit = (float)nPassedTrigBit/countEvts;
    func_effTrig->SetParameter(0,effTrigBit);
    
    float effTrigBitL1 = (float)nPassedTrigBitAndL1EtSum/countEvts;
    func_effTrigL1->SetParameter(0,effTrigBitL1); 
 
+   TH1F* h_EffVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("EffVsThreshold"));
    h_EffVsThreshold->Scale(1./countEvts);
 
-   TH1F* h_RateVsThreshold = static_cast<TH1F*>(h_EffVsThreshold->Clone("RateVsThreshold"));
-   double Lum = 1.;//10^31cms-2s-2
-   h_RateVsThreshold->Scale(Lum*crossSection*10000.);
+   TH1F* h_RateVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("RateVsThreshold"));
+   double lumiLength = 23.3; //s
+   double deltaLumi = lumiMax - lumiMin;
+   h_RateVsThreshold->Scale(1./(deltaLumi*lumiLength));
+
+   TH1F* h_RateXSectionVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("RateXSectionVsThreshold"));
+   double Lum = 1.;//10^31cms-2s-1
+   h_RateXSectionVsThreshold->Scale(Lum*crossSection*10000.);
 
    func_effTrig->Write();
    func_effTrigL1->Write();
