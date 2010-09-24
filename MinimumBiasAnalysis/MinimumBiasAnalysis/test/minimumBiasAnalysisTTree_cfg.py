@@ -7,7 +7,7 @@ config.runOnMC = False
 config.globalTagNameData = 'GR_R_36X_V12A::All'
 config.globalTagNameMC = 'START36_V10::All'
 config.outputEdmFile = '/tmp/antoniov/minimumBias.root'
-config.outputTTreeFile = '/tmp/antoniov/analysisMinBias_TTree_MinimumBias.root'
+config.outputTTreeFile = 'analysisMinBias_TTree_MinimumBias.root'
 config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_StreamExpress_Collisions10_V2_sub_132440.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
@@ -30,8 +30,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        #'file:/tmp/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_CA78CDED-2E83-DF11-BDD8-0026189438A7.root'
-        'file:/tmp/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root'
+        'file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root'
     )
 )
 # Import of standard configurations
@@ -81,11 +80,14 @@ process.lumiWeight = cms.EDProducer("LuminosityWeightProducer",
     rootFileName = cms.string(config.instLumiROOTFile),
     prefix = cms.untracked.string("instLumi")
 )
+#countsAnalyzer = cms.EDAnalyzer("NCountsAnalyzer", weightTag = cms.InputTag("lumiWeight"))
+countsAnalyzer = cms.EDAnalyzer("NCountsAnalyzer")
 
 process.xiTower.comEnergy = config.comEnergy
 process.xiFromCaloTowers.comEnergy = config.comEnergy
 process.xiFromJets.comEnergy = config.comEnergy
-process.recoSequence = cms.Sequence(process.tracks*process.edmDump+process.lumiWeight)
+process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
+process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
 process.reflagging_step = cms.Path(process.hfrecoReflagged+process.hbherecoReflagged)
 process.rereco_step = cms.Path(process.caloTowersRec
@@ -94,10 +96,27 @@ process.rereco_step = cms.Path(process.caloTowersRec
                                *process.metreco
                                ) # re-reco jets and met
 
-#process.l1Selection_step = cms.Path(process.l1CollBscOr)
-#process.hltSelection_step = cms.Path(process.hltBscMinBiasOR)
 process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
+process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.eventSelection+process.recoSequence)
+# Path for event counting  
+process.countsAll = countsAnalyzer.clone()
+process.countsL1CollBscOr = countsAnalyzer.clone()
+process.countshltBscMinBiasORBptxPlusORMinus = countsAnalyzer.clone()
+process.countsVertexFilter = countsAnalyzer.clone()
+process.countsFilterScraping = countsAnalyzer.clone()
+process.countsHBHENoiseFilter = countsAnalyzer.clone()
+process.countEvents_step = cms.Path(process.countsAll +
+                                    process.l1CollBscOr +
+                                    process.countsL1CollBscOr +
+                                    process.hltBscMinBiasORBptxPlusORMinusFilter +
+                                    process.countshltBscMinBiasORBptxPlusORMinus +
+                                    process.primaryVertexFilter +
+                                    process.countsVertexFilter +  
+                                    process.filterScraping +
+                                    process.countsFilterScraping + 
+                                    process.HBHENoiseFilter +
+                                    process.countsHBHENoiseFilter)  
 
 if config.writeEdmOutput: process.out_step = cms.EndPath(process.output)
 
