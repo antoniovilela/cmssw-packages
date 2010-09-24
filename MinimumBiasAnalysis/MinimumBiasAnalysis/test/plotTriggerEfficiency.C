@@ -1,6 +1,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TProfile.h"
+#include "TChain.h"
 #include "TTree.h"
 #include "TFile.h"
 #include "TCanvas.h"
@@ -10,11 +11,14 @@
 
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
 
+#include <cmath>
 #include <iostream>
 #include <string>
 #include <vector>
 
 using namespace minimumBiasAnalysis;
+
+void plotTriggerEfficiency(TTree*,bool,std::string const&);
 
 void plotDataVsMC(std::string const& fileNameData,
                   std::string const& fileNameMC,
@@ -35,23 +39,35 @@ void plotDataVsMC(std::string const& fileNameData,
   dirs.push_back(std::make_pair(labelData,fileData)); 
   dirs.push_back(std::make_pair(labelMC,fileMC));
 
-   Plotter<DefaultNorm> plotter;
-   int colors[] = {kBlack,kRed};
-   std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
-   int linestyles[] = {kSolid,kSolid};
-   std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
-   plotter.SetColors(histColors);
-   plotter.SetLineStyles(histLineStyles);
-   plotter.SetRebin(rebin);
-   plotter.plot(variables,dirs);
+  Plotter<DefaultNorm> plotter;
+  int colors[] = {kBlack,kRed};
+  std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
+  int linestyles[] = {kSolid,kSolid};
+  std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+  plotter.SetColors(histColors);
+  plotter.SetLineStyles(histLineStyles);
+  plotter.SetRebin(rebin);
+  plotter.plot(variables,dirs);
 }
 
 void plotTriggerEfficiency(std::string const& fileName, std::string const& treeName, bool saveHistos = false, std::string const& outFileName = ""){
 
   TFile* file = TFile::Open(fileName.c_str());
-
   TTree* data = static_cast<TTree*>(file->Get(treeName.c_str()));
 
+  plotTriggerEfficiency(data,saveHistos,outFileName);
+}
+
+void plotTriggerEfficiency(std::vector<std::string> const& fileNames, std::string const& treeName, bool saveHistos = false, std::string const& outFileName = ""){
+
+  TChain* chain = new TChain(treeName.c_str());
+  for(size_t ifile = 0; ifile < fileNames.size(); ++ifile) {std::cout << "Adding " << fileNames[ifile] << std::endl; chain->Add(fileNames[ifile].c_str());}
+
+  plotTriggerEfficiency(chain,saveHistos,outFileName);
+}
+
+void plotTriggerEfficiency(TTree* data, bool saveHistos, std::string const& outFileName){
+  
   EventData eventData;
   setTTreeBranches(*data,eventData);
   int nEntries = data->GetEntries();
@@ -83,8 +99,8 @@ void plotTriggerEfficiency(std::string const& fileName, std::string const& treeN
   for(int ientry = 0; ientry < nEntries; ++ientry){
 
      data->GetEntry(ientry);
-     int trigBSCOR = eventData.HLT_MinBiasBSCOR_;
-     int trackMultiplicity = eventData.trackMultiplicityAssociatedToPV_;
+     int trigBSCOR = eventData.HLTPath_;
+     int trackMultiplicity = eventData.multiplicityTracks_;
      int multiplicityHFPlus = eventData.multiplicityHFPlus_;
      int multiplicityHFMinus = eventData.multiplicityHFMinus_;
      double sumEnergyHFPlus = eventData.sumEnergyHFPlus_;
@@ -132,9 +148,10 @@ void plotTriggerEfficiency(std::string const& fileName, std::string const& treeN
   }
 
   if(saveHistos){
-     TFile* outFile = new TFile(outFileName.c_str(),"recreate");
-     outFile->cd();
+     TFile outFile(outFileName.c_str(),"recreate");
+     outFile.cd();
      for(size_t k = 0; k < histosEff.size(); ++k) histosEff[k]->Write();
+     outFile.Close();
   }
 
 }
