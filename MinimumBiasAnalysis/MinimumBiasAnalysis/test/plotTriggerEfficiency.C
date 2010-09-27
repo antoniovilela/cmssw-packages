@@ -18,7 +18,7 @@
 
 using namespace minimumBiasAnalysis;
 
-void plotTriggerEfficiency(TTree*,bool,std::string const&);
+void plotTriggerEfficiency(TTree*,std::string const&);
 
 void plotDataVsMC(std::string const& fileNameData,
                   std::string const& fileNameMC,
@@ -50,28 +50,30 @@ void plotDataVsMC(std::string const& fileNameData,
   plotter.plot(variables,dirs);
 }
 
-void plotTriggerEfficiency(std::string const& fileName, std::string const& treeName, bool saveHistos = false, std::string const& outFileName = ""){
+void plotTriggerEfficiency(std::string const& fileName, std::string const& treeName, std::string const& outFileName = ""){
 
   TFile* file = TFile::Open(fileName.c_str());
   TTree* data = static_cast<TTree*>(file->Get(treeName.c_str()));
 
-  plotTriggerEfficiency(data,saveHistos,outFileName);
+  plotTriggerEfficiency(data,outFileName);
 }
 
-void plotTriggerEfficiency(std::vector<std::string> const& fileNames, std::string const& treeName, bool saveHistos = false, std::string const& outFileName = ""){
+void plotTriggerEfficiency(std::vector<std::string> const& fileNames, std::string const& treeName, std::string const& outFileName = ""){
 
   TChain* chain = new TChain(treeName.c_str());
   for(size_t ifile = 0; ifile < fileNames.size(); ++ifile) {std::cout << "Adding " << fileNames[ifile] << std::endl; chain->Add(fileNames[ifile].c_str());}
 
-  plotTriggerEfficiency(chain,saveHistos,outFileName);
+  plotTriggerEfficiency(chain,outFileName);
 }
 
-void plotTriggerEfficiency(TTree* data, bool saveHistos, std::string const& outFileName){
+void plotTriggerEfficiency(TTree* data, std::string const& outFileName){
   
   EventData eventData;
   setTTreeBranches(*data,eventData);
   int nEntries = data->GetEntries();
  
+  TFile outFile(outFileName.c_str(),"recreate");
+
   std::vector<TH1F*> histosAll;
   TH1F* hTrackMult = new TH1F("HLTBSCORVsTrackMult","HLTBSCORVsTrackMult",5,0,30);
   TH1F* hHFPlusMult = new TH1F("HLTBSCORVsHFPlusMult","HLTBSCORVsHFPlusMult",5,0,20);
@@ -142,16 +144,11 @@ void plotTriggerEfficiency(TTree* data, bool saveHistos, std::string const& outF
         std::cout << " Bin " << binNumber << ": " << effBin << " +/- " << errBin << std::endl;
      }
 
-     TCanvas* canvas = new TCanvas(("canvas_" + std::string(hAll->GetName())).c_str(),hAll->GetName());
+     /*TCanvas* canvas = new TCanvas(("canvas_" + std::string(hAll->GetName())).c_str(),hAll->GetName());
      canvas->cd();
-     hEff->Draw();
+     hEff->Draw();*/
   }
 
-  if(saveHistos){
-     TFile outFile(outFileName.c_str(),"recreate");
-     outFile.cd();
-     for(size_t k = 0; k < histosEff.size(); ++k) histosEff[k]->Write();
-     outFile.Close();
-  }
-
+  outFile.Write(); 
+  outFile.Close();
 }
