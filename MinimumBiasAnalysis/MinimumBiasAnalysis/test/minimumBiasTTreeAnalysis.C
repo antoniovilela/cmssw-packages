@@ -128,6 +128,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    histosTH1F["sumEnergyHFMinusVarBin"] = new TH1F("sumEnergyHFMinusVarBin","sumEnergyHFMinusVarBin",18,binningESumHF);
    histosTH1F["multiplicityHFPlusVarBin"] = new TH1F("multiplicityHFPlusVarBin","multiplicityHFPlusVarBin",20,-0.5,19.5);
    histosTH1F["multiplicityHFMinusVarBin"] = new TH1F("multiplicityHFMinusVarBin","multiplicityHFMinusVarBin",20,-0.5,19.5);
+   histosTH1F["EventsPerBunchCrossing"] = new TH1F("EventsPerBunchCrossing","EventsPerBunchCrossing",3565,0,3565); 
 
    HistoMapTH2F histosTH2F;
    bookHistos(histosTH2F,StdAllocatorAdaptor());
@@ -179,262 +180,264 @@ void minimumBiasTTreeAnalysis(TTree* data,
       int eventNumber = eventData.eventNumber_;
       int runNumber = eventData.runNumber_;
       int lumiSection = eventData.lumiSection_;
-     if(verbose){
-        std::cout << "  Event number: " << eventNumber << std::endl
-                  << "  Run number: " << runNumber << std::endl
-                  << "  Lumi section: " << lumiSection << std::endl;
-     }
-     if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with event...skipping" << std::endl;continue;}
+      int bunchCrossing = eventData.bunchCrossing_;
+      if(verbose){
+         std::cout << "  Event number: " << eventNumber << std::endl
+                   << "  Run number: " << runNumber << std::endl
+                   << "  Lumi section: " << lumiSection << std::endl;
+      }
+      if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with event...skipping" << std::endl;continue;}
 
-     histosTH1F["EventSelection"]->Fill("All",eventWeight);
+      histosTH1F["EventsPerBunchCrossing"]->Fill(bunchCrossing,eventWeight);
+      histosTH1F["EventSelection"]->Fill("All",eventWeight);
 
-     if(accessMCInfo){
-        int processId = eventData.processId_;
-        if(selectProcessIds && std::find(selectedProcIds.begin(),selectedProcIds.end(),processId) == selectedProcIds.end()) continue;
+      if(accessMCInfo){
+         int processId = eventData.processId_;
+         if(selectProcessIds && std::find(selectedProcIds.begin(),selectedProcIds.end(),processId) == selectedProcIds.end()) continue;
 
-        std::vector<int>::const_iterator it_processId = std::find(processIDs.begin(),processIDs.end(),processId);
-        if(it_processId != processIDs.end()){
+         std::vector<int>::const_iterator it_processId = std::find(processIDs.begin(),processIDs.end(),processId);
+         if(it_processId != processIDs.end()){
            int idx_processId = it_processId - processIDs.begin();
            histosTH1F["ProcessId"]->Fill(idx_processId);
-        }  
-     }
+         }  
+      }
 
-     if(!accessMCInfo && selectEventsInRuns && std::find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
+      if(!accessMCInfo && selectEventsInRuns && std::find(selectedRuns.begin(),selectedRuns.end(),runNumber) == selectedRuns.end()) continue;
 
-     histosTH1F["EventSelection"]->Fill("ProcessIdOrRunSelection",eventWeight);
+      histosTH1F["EventSelection"]->Fill("ProcessIdOrRunSelection",eventWeight);
 
-     if(doTriggerSelection){
-        bool accept = true;
-        /*
-        */
-        if(!accept) continue;
-     }
+      if(doTriggerSelection){
+         bool accept = true;
+         /*
+         */
+         if(!accept) continue;
+      }
 
-     histosTH1F["EventSelection"]->Fill("TriggerSelection",eventWeight);
+      histosTH1F["EventSelection"]->Fill("TriggerSelection",eventWeight);
 
-     // Hcal noise
-     bool passNoiseLoose = (eventData.LooseNoiseFilter_ == 1) ? true : false;
-     bool passNoiseTight = (eventData.TightNoiseFilter_ == 1) ? true : false;
+      // Hcal noise
+      bool passNoiseLoose = (eventData.LooseNoiseFilter_ == 1) ? true : false;
+      bool passNoiseTight = (eventData.TightNoiseFilter_ == 1) ? true : false;
 
-     if(passNoiseLoose) histosTH1F["HcalNoiseId"]->Fill(0);
-     if(passNoiseTight) histosTH1F["HcalNoiseId"]->Fill(1); 
+      if(passNoiseLoose) histosTH1F["HcalNoiseId"]->Fill(0);
+      if(passNoiseTight) histosTH1F["HcalNoiseId"]->Fill(1); 
 
-     if(verbose){
-        std::cout << " =============== Hcal Noise =============== " << std::endl
-                  << "   Loose noise filter accept: " << passNoiseLoose << std::endl
-                  << "   Tight noise filter accept: " << passNoiseTight << std::endl;
-     }
+      if(verbose){
+         std::cout << " =============== Hcal Noise =============== " << std::endl
+                   << "   Loose noise filter accept: " << passNoiseLoose << std::endl
+                   << "   Tight noise filter accept: " << passNoiseTight << std::endl;
+      }
 
-     if(doHcalNoiseSelection && !passNoiseTight) continue;
+      if(doHcalNoiseSelection && !passNoiseTight) continue;
 
-     histosTH1F["EventSelection"]->Fill("HcalNoise",eventWeight);
+      histosTH1F["EventSelection"]->Fill("HcalNoise",eventWeight);
 
-     // Beam Halo summary
-     bool beamHaloLooseId = (eventData.BeamHaloLooseId_ == 1) ? true : false;
-     bool beamHaloTightId = (eventData.BeamHaloTightId_ == 1) ? true : false;
+      // Beam Halo summary
+      bool beamHaloLooseId = (eventData.BeamHaloLooseId_ == 1) ? true : false;
+      bool beamHaloTightId = (eventData.BeamHaloTightId_ == 1) ? true : false;
      
-     if(beamHaloLooseId) histosTH1F["BeamHaloId"]->Fill(0);
-     if(beamHaloTightId) histosTH1F["BeamHaloId"]->Fill(1);
+      if(beamHaloLooseId) histosTH1F["BeamHaloId"]->Fill(0);
+      if(beamHaloTightId) histosTH1F["BeamHaloId"]->Fill(1);
 
-     if(verbose){
-        std::cout << " =============== Beam Halo Id =============== " << std::endl
-                  << "   Loose Halo id: " << beamHaloLooseId << std::endl
-                  << "   Tight Halo id: " << beamHaloTightId << std::endl;
-     }
+      if(verbose){
+         std::cout << " =============== Beam Halo Id =============== " << std::endl
+                   << "   Loose Halo id: " << beamHaloLooseId << std::endl
+                   << "   Tight Halo id: " << beamHaloTightId << std::endl;
+      }
 
-     histosTH1F["EventSelection"]->Fill("BeamHaloId",eventWeight);
+      histosTH1F["EventSelection"]->Fill("BeamHaloId",eventWeight);
  
-     // Pre-selection
-     histosTH1F["EventSelection"]->Fill("GoodVertexFilter",eventWeight);
-     histosTH1F["EventSelection"]->Fill("HighQualityTracks",eventWeight);
+      // Pre-selection
+      histosTH1F["EventSelection"]->Fill("GoodVertexFilter",eventWeight);
+      histosTH1F["EventSelection"]->Fill("HighQualityTracks",eventWeight);
  
-     // Vertex Info
-     int nGoodVertices = eventData.nVertex_;
-     histosTH1F["nVertex"]->Fill(nGoodVertices);
-     if(doVertexSelection && (nGoodVertices < 1)) continue;
+      // Vertex Info
+      int nGoodVertices = eventData.nVertex_;
+      histosTH1F["nVertex"]->Fill(nGoodVertices);
+      if(doVertexSelection && (nGoodVertices < 1)) continue;
 
-     double posXPrimVtx = eventData.posXPrimVtx_;
-     double posYPrimVtx = eventData.posYPrimVtx_;
-     double posZPrimVtx = eventData.posZPrimVtx_;
-     histosTH1F["posXPrimVtx"]->Fill(posXPrimVtx);
-     histosTH1F["posYPrimVtx"]->Fill(posYPrimVtx);
-     histosTH1F["posZPrimVtx"]->Fill(posZPrimVtx);
-     //histosTH1F["posRPrimVtx"]->Fill();
-     //histosTH1F["numberDOF"]->Fill();
+      double posXPrimVtx = eventData.posXPrimVtx_;
+      double posYPrimVtx = eventData.posYPrimVtx_;
+      double posZPrimVtx = eventData.posZPrimVtx_;
+      histosTH1F["posXPrimVtx"]->Fill(posXPrimVtx);
+      histosTH1F["posYPrimVtx"]->Fill(posYPrimVtx);
+      histosTH1F["posZPrimVtx"]->Fill(posZPrimVtx);
+      //histosTH1F["posRPrimVtx"]->Fill();
+      //histosTH1F["numberDOF"]->Fill();
 
-     if(doVertexSelection && (fabs(posZPrimVtx) > primVtxZMax)) continue;
-     histosTH1F["EventSelection"]->Fill("VertexSelection",eventWeight);
+      if(doVertexSelection && (fabs(posZPrimVtx) > primVtxZMax)) continue;
+      histosTH1F["EventSelection"]->Fill("VertexSelection",eventWeight);
 
-     // HF Selection
-     if(doHFSelection && ( eventData.sumEnergyHFPlus_ > sumEnergyHFPlusMax || eventData.sumEnergyHFMinus_ > sumEnergyHFMinusMax)) continue;
-     histosTH1F["EventSelection"]->Fill("HCALSelection",eventWeight);
+      // HF Selection
+      if(doHFSelection && ( eventData.sumEnergyHFPlus_ > sumEnergyHFPlusMax || eventData.sumEnergyHFMinus_ > sumEnergyHFMinusMax)) continue;
+      histosTH1F["EventSelection"]->Fill("HCALSelection",eventWeight);
 
-     // MET - SumET
-     if(doSumETSelection && (eventData.sumET_ < sumETMin)) continue;
-     histosTH1F["EventSelection"]->Fill("SumETSelection",eventWeight);
+      // MET - SumET
+      if(doSumETSelection && (eventData.sumET_ < sumETMin)) continue;
+      histosTH1F["EventSelection"]->Fill("SumETSelection",eventWeight);
 
-     // Mx
-     if(doMxSelection && ((eventData.MxFromPFCands_ < MxMin)||eventData.MxFromPFCands_ > MxMax)) continue;
-     histosTH1F["EventSelection"]->Fill("MxSelection",eventWeight);
+      // Mx
+      if(doMxSelection && ((eventData.MxFromPFCands_ < MxMin)||eventData.MxFromPFCands_ > MxMax)) continue;
+      histosTH1F["EventSelection"]->Fill("MxSelection",eventWeight);
 
-     // Fill Histos
-     // SumET
-     double sumET = eventData.sumET_;
-     histosTH1F["sumET"]->Fill(sumET);
+      // Fill Histos
+      // SumET
+      double sumET = eventData.sumET_;
+      histosTH1F["sumET"]->Fill(sumET);
 
-     // Mx
-     double MxFromTowers = eventData.MxFromTowers_;
-     double MxFromPFCands = eventData.MxFromPFCands_;
+      // Mx
+      double MxFromTowers = eventData.MxFromTowers_;
+      double MxFromPFCands = eventData.MxFromPFCands_;
 
-     //histosTH1F["MxFromJets"]->Fill(MxFromJets);
-     histosTH1F["MxFromTowers"]->Fill(MxFromTowers);
-     histosTH1F["MxFromPFCands"]->Fill(MxFromPFCands);
-     if(accessMCInfo){
-        double MxGen = eventData.MxGen_;
-        histosTH1F["MxGen"]->Fill(MxGen);
-        histosTH1F["ResMxFromTowers"]->Fill(MxFromTowers - MxGen);
-        histosTH1F["ResMxFromPFCands"]->Fill(MxFromPFCands - MxGen);
-     }
+      //histosTH1F["MxFromJets"]->Fill(MxFromJets);
+      histosTH1F["MxFromTowers"]->Fill(MxFromTowers);
+      histosTH1F["MxFromPFCands"]->Fill(MxFromPFCands);
+      if(accessMCInfo){
+         double MxGen = eventData.MxGen_;
+         histosTH1F["MxGen"]->Fill(MxGen);
+         histosTH1F["ResMxFromTowers"]->Fill(MxFromTowers - MxGen);
+         histosTH1F["ResMxFromPFCands"]->Fill(MxFromPFCands - MxGen);
+      }
 
-     // Jets
-     double leadingJetPt = eventData.leadingJetPt_;
-     double leadingJetEta = eventData.leadingJetEta_;
-     double leadingJetPhi = eventData.leadingJetPhi_;
-     if(leadingJetPt > 0.){
-        histosTH1F["leadingJetPt"]->Fill(leadingJetPt);
-        histosTH1F["leadingJetEta"]->Fill(leadingJetEta);
-        histosTH1F["leadingJetPhi"]->Fill(leadingJetPhi);
-     }
+      // Jets
+      double leadingJetPt = eventData.leadingJetPt_;
+      double leadingJetEta = eventData.leadingJetEta_;
+      double leadingJetPhi = eventData.leadingJetPhi_;
+      if(leadingJetPt > 0.){
+         histosTH1F["leadingJetPt"]->Fill(leadingJetPt);
+         histosTH1F["leadingJetEta"]->Fill(leadingJetEta);
+         histosTH1F["leadingJetPhi"]->Fill(leadingJetPhi);
+      }
 
-     // Xi
-     /*double xiPlusFromJets =
-     double xiMinusFromJets 
-     histosTH1F["xiPlusFromJets"]->Fill();
-     histosTH1F["xiMinusFromJets"]->Fill();*/
+      // Xi
+      /*double xiPlusFromJets =
+      double xiMinusFromJets 
+      histosTH1F["xiPlusFromJets"]->Fill();
+      histosTH1F["xiMinusFromJets"]->Fill();*/
 
-     double xiPlusFromTowers = eventData.xiPlusFromTowers_;
-     double xiMinusFromTowers = eventData.xiMinusFromTowers_;
-     histosTH1F["xiPlusFromTowers"]->Fill(xiPlusFromTowers);
-     histosTH1F["xiMinusFromTowers"]->Fill(xiMinusFromTowers);
+      double xiPlusFromTowers = eventData.xiPlusFromTowers_;
+      double xiMinusFromTowers = eventData.xiMinusFromTowers_;
+      histosTH1F["xiPlusFromTowers"]->Fill(xiPlusFromTowers);
+      histosTH1F["xiMinusFromTowers"]->Fill(xiMinusFromTowers);
 
-     double xiPlusFromPFCands = eventData.xiPlusFromPFCands_;
-     double xiMinusFromPFCands = eventData.xiMinusFromPFCands_;
-     histosTH1F["xiPlusFromPFCands"]->Fill(xiPlusFromPFCands);
-     histosTH1F["xiMinusFromPFCands"]->Fill(xiMinusFromPFCands);
+      double xiPlusFromPFCands = eventData.xiPlusFromPFCands_;
+      double xiMinusFromPFCands = eventData.xiMinusFromPFCands_;
+      histosTH1F["xiPlusFromPFCands"]->Fill(xiPlusFromPFCands);
+      histosTH1F["xiMinusFromPFCands"]->Fill(xiMinusFromPFCands);
 
-     double EPlusPzFromTowers = eventData.EPlusPzFromTowers_;
-     double EMinusPzFromTowers = eventData.EMinusPzFromTowers_;
-     histosTH1F["EPlusPzFromTowers"]->Fill(EPlusPzFromTowers);
-     histosTH1F["EMinusPzFromTowers"]->Fill(EMinusPzFromTowers);
-     /*histosTH1F["EPlusPzFromTowersVarBin"]->Fill((EPlusPzFromTowers < minEVarBin) ? minEVarBin : EPlusPzFromTowers);
-     histosTH1F["EMinusPzFromTowersVarBin"]->Fill((EMinusPzFromTowers < minEVarBin) ? minEVarBin : EMinusPzFromTowers);*/
-     histosTH1F["EPlusPzFromTowersVarBin"]->Fill(EPlusPzFromTowers);
-     histosTH1F["EMinusPzFromTowersVarBin"]->Fill(EMinusPzFromTowers);
+      double EPlusPzFromTowers = eventData.EPlusPzFromTowers_;
+      double EMinusPzFromTowers = eventData.EMinusPzFromTowers_;
+      histosTH1F["EPlusPzFromTowers"]->Fill(EPlusPzFromTowers);
+      histosTH1F["EMinusPzFromTowers"]->Fill(EMinusPzFromTowers);
+      /*histosTH1F["EPlusPzFromTowersVarBin"]->Fill((EPlusPzFromTowers < minEVarBin) ? minEVarBin : EPlusPzFromTowers);
+      histosTH1F["EMinusPzFromTowersVarBin"]->Fill((EMinusPzFromTowers < minEVarBin) ? minEVarBin : EMinusPzFromTowers);*/
+      histosTH1F["EPlusPzFromTowersVarBin"]->Fill(EPlusPzFromTowers);
+      histosTH1F["EMinusPzFromTowersVarBin"]->Fill(EMinusPzFromTowers);
  
-     double EPlusPzFromPFCands = eventData.EPlusPzFromPFCands_;
-     double EMinusPzFromPFCands = eventData.EMinusPzFromPFCands_;
-     histosTH1F["EPlusPzFromPFCands"]->Fill(EPlusPzFromPFCands);
-     histosTH1F["EMinusPzFromPFCands"]->Fill(EMinusPzFromPFCands);
+      double EPlusPzFromPFCands = eventData.EPlusPzFromPFCands_;
+      double EMinusPzFromPFCands = eventData.EMinusPzFromPFCands_;
+      histosTH1F["EPlusPzFromPFCands"]->Fill(EPlusPzFromPFCands);
+      histosTH1F["EMinusPzFromPFCands"]->Fill(EMinusPzFromPFCands);
 
-     if(accessMCInfo){
-        // xi <= 0.1
-        double xigen_plus = eventData.xiGenPlus_;
-        double xigen_minus = eventData.xiGenMinus_;
-        if(xigen_plus > 0. && xigen_plus <= 0.1){
-           histosTH1F["xiGenPlus"]->Fill(xigen_plus); 
-           histosTH1F["ResXiPlusFromTowers"]->Fill(xiPlusFromTowers - xigen_plus);
-           histosTH1F["ResXiPlusFromPFCands"]->Fill(xiPlusFromPFCands - xigen_plus);
-           histosTH2F["xiFromTowersVsxiGenPlus"]->Fill(xigen_plus,xiPlusFromTowers);
-           histosTH2F["xiFromPFCandsVsxiGenPlus"]->Fill(xigen_plus,xiPlusFromPFCands);
-        }
-        if(xigen_minus > 0. && xigen_minus <= 0.1){
-           histosTH1F["xiGenMinus"]->Fill(xigen_minus);
-           histosTH1F["ResXiMinusFromTowers"]->Fill(xiMinusFromTowers - xigen_minus);
-           histosTH1F["ResXiMinusFromPFCands"]->Fill(xiMinusFromPFCands - xigen_minus);
-           histosTH2F["xiFromTowersVsxiGenMinus"]->Fill(xigen_minus,xiMinusFromTowers);
-           histosTH2F["xiFromPFCandsVsxiGenMinus"]->Fill(xigen_minus,xiMinusFromPFCands);
-        }
-     }
+      if(accessMCInfo){
+         // xi <= 0.1
+         double xigen_plus = eventData.xiGenPlus_;
+         double xigen_minus = eventData.xiGenMinus_;
+         if(xigen_plus > 0. && xigen_plus <= 0.1){
+            histosTH1F["xiGenPlus"]->Fill(xigen_plus); 
+            histosTH1F["ResXiPlusFromTowers"]->Fill(xiPlusFromTowers - xigen_plus);
+            histosTH1F["ResXiPlusFromPFCands"]->Fill(xiPlusFromPFCands - xigen_plus);
+            histosTH2F["xiFromTowersVsxiGenPlus"]->Fill(xigen_plus,xiPlusFromTowers);
+            histosTH2F["xiFromPFCandsVsxiGenPlus"]->Fill(xigen_plus,xiPlusFromPFCands);
+         }
+         if(xigen_minus > 0. && xigen_minus <= 0.1){
+            histosTH1F["xiGenMinus"]->Fill(xigen_minus);
+            histosTH1F["ResXiMinusFromTowers"]->Fill(xiMinusFromTowers - xigen_minus);
+            histosTH1F["ResXiMinusFromPFCands"]->Fill(xiMinusFromPFCands - xigen_minus);
+            histosTH2F["xiFromTowersVsxiGenMinus"]->Fill(xigen_minus,xiMinusFromTowers);
+            histosTH2F["xiFromPFCandsVsxiGenMinus"]->Fill(xigen_minus,xiMinusFromPFCands);
+         }
+      }
 
-     // Access multiplicities
-     /*unsigned int nTracks = eventData.trackMultiplicity_;
-     unsigned int nTracksAssociatedToPV = eventData.trackMultiplicityAssociatedToPV_;*/
-     int multiplicityTracks = eventData.multiplicityTracks_;
-     double sumPtTracks = eventData.sumPtTracks_;
+      // Access multiplicities
+      /*unsigned int nTracks = eventData.trackMultiplicity_;
+      unsigned int nTracksAssociatedToPV = eventData.trackMultiplicityAssociatedToPV_;*/
+      int multiplicityTracks = eventData.multiplicityTracks_;
+      double sumPtTracks = eventData.sumPtTracks_;
 
-     unsigned int nHE_plus = eventData.multiplicityHEPlus_;
-     unsigned int nHE_minus = eventData.multiplicityHEMinus_;
-     unsigned int nHF_plus = eventData.multiplicityHFPlus_;
-     unsigned int nHF_minus = eventData.multiplicityHFMinus_;
+      unsigned int nHE_plus = eventData.multiplicityHEPlus_;
+      unsigned int nHE_minus = eventData.multiplicityHEMinus_;
+      unsigned int nHF_plus = eventData.multiplicityHFPlus_;
+      unsigned int nHF_minus = eventData.multiplicityHFMinus_;
  
-     //histosTH1F["trackMultiplicity"]->Fill(nTracks);
-     //histosTH1F["trackMultiplicityAssociatedToPV"]->Fill(nTracksAssociatedToPV);
-     histosTH1F["multiplicityTracks"]->Fill(multiplicityTracks); 
-     histosTH1F["sumPtTracks"]->Fill(sumPtTracks);
+      //histosTH1F["trackMultiplicity"]->Fill(nTracks);
+      //histosTH1F["trackMultiplicityAssociatedToPV"]->Fill(nTracksAssociatedToPV);
+      histosTH1F["multiplicityTracks"]->Fill(multiplicityTracks); 
+      histosTH1F["sumPtTracks"]->Fill(sumPtTracks);
 
-     histosTH1F["multiplicityHEPlus"]->Fill(nHE_plus);
-     histosTH1F["multiplicityHEMinus"]->Fill(nHE_minus);
-     histosTH1F["multiplicityHFPlus"]->Fill(nHF_plus);
-     histosTH1F["multiplicityHFMinus"]->Fill(nHF_minus);     
-     histosTH1F["multiplicityHFPlusVarBin"]->Fill(nHF_plus);
-     histosTH1F["multiplicityHFMinusVarBin"]->Fill(nHF_minus);
+      histosTH1F["multiplicityHEPlus"]->Fill(nHE_plus);
+      histosTH1F["multiplicityHEMinus"]->Fill(nHE_minus);
+      histosTH1F["multiplicityHFPlus"]->Fill(nHF_plus);
+      histosTH1F["multiplicityHFMinus"]->Fill(nHF_minus);     
+      histosTH1F["multiplicityHFPlusVarBin"]->Fill(nHF_plus);
+      histosTH1F["multiplicityHFMinusVarBin"]->Fill(nHF_minus);
 
-     histosTH2F["multiplicityHFvsHEPlus"]->Fill(nHF_plus,nHE_plus);
-     histosTH2F["multiplicityHFvsHEMinus"]->Fill(nHF_minus,nHE_minus);
+      histosTH2F["multiplicityHFvsHEPlus"]->Fill(nHF_plus,nHE_plus);
+      histosTH2F["multiplicityHFvsHEMinus"]->Fill(nHF_minus,nHE_minus);
  
-     for(unsigned int ieta = 29, index = 0; ieta <= 41; ++ieta,++index){
-        int nHFPlus_ieta = eventData.multiplicityHFPlusVsiEta_[index];
-        histosTH2F["iEtaVsHFCountPlus"]->Fill(ieta,nHFPlus_ieta);
+      for(unsigned int ieta = 29, index = 0; ieta <= 41; ++ieta,++index){
+         int nHFPlus_ieta = eventData.multiplicityHFPlusVsiEta_[index];
+         histosTH2F["iEtaVsHFCountPlus"]->Fill(ieta,nHFPlus_ieta);
 
-        int nHFMinus_ieta = eventData.multiplicityHFMinusVsiEta_[index]; 
-        histosTH2F["iEtaVsHFCountMinus"]->Fill(ieta,nHFMinus_ieta); 
-     }
+         int nHFMinus_ieta = eventData.multiplicityHFMinusVsiEta_[index]; 
+         histosTH2F["iEtaVsHFCountMinus"]->Fill(ieta,nHFMinus_ieta); 
+      }
 
-     double missingMassFromXiFromTowers = eventData.missingMassFromXiFromTowers_;
-     histosTH1F["missingMassFromXiFromTowers"]->Fill(missingMassFromXiFromTowers);
-     //double missingMassFromXiFromJets =
-     //histosTH1F["missingMassFromXiFromJets"]->Fill(missingMassFromXiFromJets);
-     double missingMassFromXiFromPFCands = eventData.missingMassFromXiFromPFCands_;
-     histosTH1F["missingMassFromXiFromPFCands"]->Fill(missingMassFromXiFromPFCands);
+      double missingMassFromXiFromTowers = eventData.missingMassFromXiFromTowers_;
+      histosTH1F["missingMassFromXiFromTowers"]->Fill(missingMassFromXiFromTowers);
+      //double missingMassFromXiFromJets =
+      //histosTH1F["missingMassFromXiFromJets"]->Fill(missingMassFromXiFromJets);
+      double missingMassFromXiFromPFCands = eventData.missingMassFromXiFromPFCands_;
+      histosTH1F["missingMassFromXiFromPFCands"]->Fill(missingMassFromXiFromPFCands);
 
-     double sumEHE_plus = eventData.sumEnergyHEPlus_;
-     double sumEHE_minus = eventData.sumEnergyHEMinus_;
-     double sumEHF_plus = eventData.sumEnergyHFPlus_;
-     double sumEHF_minus = eventData.sumEnergyHFMinus_;
-     histosTH1F["sumEnergyHEPlus"]->Fill(sumEHE_plus);
-     histosTH1F["sumEnergyHEMinus"]->Fill(sumEHE_minus);
-     histosTH1F["sumEnergyHFPlus"]->Fill(sumEHF_plus);
-     histosTH1F["sumEnergyHFMinus"]->Fill(sumEHF_minus);
-     /*histosTH1F["sumEnergyHFPlusVarBin"]->Fill((sumE_plus < minEVarBin) ? minEVarBin : sumE_plus);
-     histosTH1F["sumEnergyHFMinusVarBin"]->Fill((sumE_minus < minEVarBin) ? minEVarBin: sumE_minus);*/
-     histosTH1F["sumEnergyHFPlusVarBin"]->Fill(sumEHF_plus);
-     histosTH1F["sumEnergyHFMinusVarBin"]->Fill(sumEHF_minus);
+      double sumEHE_plus = eventData.sumEnergyHEPlus_;
+      double sumEHE_minus = eventData.sumEnergyHEMinus_;
+      double sumEHF_plus = eventData.sumEnergyHFPlus_;
+      double sumEHF_minus = eventData.sumEnergyHFMinus_;
+      histosTH1F["sumEnergyHEPlus"]->Fill(sumEHE_plus);
+      histosTH1F["sumEnergyHEMinus"]->Fill(sumEHE_minus);
+      histosTH1F["sumEnergyHFPlus"]->Fill(sumEHF_plus);
+      histosTH1F["sumEnergyHFMinus"]->Fill(sumEHF_minus);
+      /*histosTH1F["sumEnergyHFPlusVarBin"]->Fill((sumE_plus < minEVarBin) ? minEVarBin : sumE_plus);
+      histosTH1F["sumEnergyHFMinusVarBin"]->Fill((sumE_minus < minEVarBin) ? minEVarBin: sumE_minus);*/
+      histosTH1F["sumEnergyHFPlusVarBin"]->Fill(sumEHF_plus);
+      histosTH1F["sumEnergyHFMinusVarBin"]->Fill(sumEHF_minus);
 
-     if(accessMCInfo){
-        double sumEHEGen_plus = eventData.sumEnergyHEPlusGen_;
-        double sumEHEGen_minus = eventData.sumEnergyHEMinusGen_;
-        double sumEHFGen_plus = eventData.sumEnergyHFPlusGen_;
-        double sumEHFGen_minus = eventData.sumEnergyHFMinusGen_;
-        histosTH1F["sumEnergyHEPlusGen"]->Fill(sumEHEGen_plus);
-        histosTH1F["sumEnergyHEMinusGen"]->Fill(sumEHEGen_minus);
-        histosTH1F["sumEnergyHFPlusGen"]->Fill(sumEHFGen_plus);
-        histosTH1F["sumEnergyHFMinusGen"]->Fill(sumEHFGen_minus);
-        // Histos as a function of Ntrk
-        if(multiplicityTracks >= 0 && multiplicityTracks <= 5) histosTH1F["sumEnergyHFPlusGen_Ntrk0_5"]->Fill(sumEHFGen_plus);
-        else if(multiplicityTracks > 5 && multiplicityTracks <= 10) histosTH1F["sumEnergyHFPlusGen_Ntrk6_10"]->Fill(sumEHFGen_plus);
-        else if(multiplicityTracks > 10 && multiplicityTracks <= 15) histosTH1F["sumEnergyHFPlusGen_Ntrk11_15"]->Fill(sumEHFGen_plus);
-        else if(multiplicityTracks > 15 && multiplicityTracks <= 25) histosTH1F["sumEnergyHFPlusGen_Ntrk16_25"]->Fill(sumEHFGen_plus);
-        else if(multiplicityTracks > 25 && multiplicityTracks <= 100) histosTH1F["sumEnergyHFPlusGen_Ntrk26_100"]->Fill(sumEHFGen_plus);
-     }
+      if(accessMCInfo){
+         double sumEHEGen_plus = eventData.sumEnergyHEPlusGen_;
+         double sumEHEGen_minus = eventData.sumEnergyHEMinusGen_;
+         double sumEHFGen_plus = eventData.sumEnergyHFPlusGen_;
+         double sumEHFGen_minus = eventData.sumEnergyHFMinusGen_;
+         histosTH1F["sumEnergyHEPlusGen"]->Fill(sumEHEGen_plus);
+         histosTH1F["sumEnergyHEMinusGen"]->Fill(sumEHEGen_minus);
+         histosTH1F["sumEnergyHFPlusGen"]->Fill(sumEHFGen_plus);
+         histosTH1F["sumEnergyHFMinusGen"]->Fill(sumEHFGen_minus);
+         // Histos as a function of Ntrk
+         if(multiplicityTracks >= 0 && multiplicityTracks <= 5) histosTH1F["sumEnergyHFPlusGen_Ntrk0_5"]->Fill(sumEHFGen_plus);
+         else if(multiplicityTracks > 5 && multiplicityTracks <= 10) histosTH1F["sumEnergyHFPlusGen_Ntrk6_10"]->Fill(sumEHFGen_plus);
+         else if(multiplicityTracks > 10 && multiplicityTracks <= 15) histosTH1F["sumEnergyHFPlusGen_Ntrk11_15"]->Fill(sumEHFGen_plus);
+         else if(multiplicityTracks > 15 && multiplicityTracks <= 25) histosTH1F["sumEnergyHFPlusGen_Ntrk16_25"]->Fill(sumEHFGen_plus);
+         else if(multiplicityTracks > 25 && multiplicityTracks <= 100) histosTH1F["sumEnergyHFPlusGen_Ntrk26_100"]->Fill(sumEHFGen_plus);
+      }
      
-     /*selectedEvents.push_back(std::make_pair(runNumber,eventNumber));
-     if(verbose){
-        std::cout << "======== Selected event ========" << std::endl
-                  << "  Event number: " << eventNumber << std::endl
-                  << "  Run number: " << runNumber << std::endl
-                  << "  Lumi section: " << lumiSection << std::endl
-                  << "================================" << std::endl;
-     }*/
+      /*selectedEvents.push_back(std::make_pair(runNumber,eventNumber));
+      if(verbose){
+         std::cout << "======== Selected event ========" << std::endl
+                   << "  Event number: " << eventNumber << std::endl
+                   << "  Run number: " << runNumber << std::endl
+                   << "  Lumi section: " << lumiSection << std::endl
+                   << "================================" << std::endl;
+      }*/
    }  // End loop over events
 
    /*std::cout << "======== List of selected events ========" << std::endl 

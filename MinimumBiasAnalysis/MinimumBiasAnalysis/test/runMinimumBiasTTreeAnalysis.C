@@ -62,7 +62,7 @@ void runMinimumBiasTTreeAnalysis(){
    fileName += getTTreeFileName(runRange);*/
 
    std::vector<std::string> selections;
-   selections.push_back("eventSelectionBscMinBiasOR");
+   /*selections.push_back("eventSelectionBscMinBiasOR");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale090_EnergyScaleFactorHCAL_0_9");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale092_EnergyScaleFactorHCAL_0_92");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale095_EnergyScaleFactorHCAL_0_95");
@@ -70,15 +70,15 @@ void runMinimumBiasTTreeAnalysis(){
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale102_EnergyScaleFactorHCAL_1_02");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale105_EnergyScaleFactorHCAL_1_05");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale108_EnergyScaleFactorHCAL_1_08");
-   selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale110_EnergyScaleFactorHCAL_1_1");
+   selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale110_EnergyScaleFactorHCAL_1_1");*/
    /*selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_3_6");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_6_0");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_8_0");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_1_6_EnergyThresholdHB_1_2");
-   selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_2_4_EnergyThresholdHB_1_8");
+   selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_2_4_EnergyThresholdHB_1_8");*/
    selections.push_back("eventSelection");
    selections.push_back("eventSelectionBscMinBiasORNoColl");
-   selections.push_back("eventSelectionBscMinBiasORBPTXOR");*/
+   selections.push_back("eventSelectionBscMinBiasORBPTXOR");
    /*selections.push_back("eventSelectionBscMinBiasORHFVetoPlus");
    selections.push_back("eventSelectionBscMinBiasORHFVetoMinus");
    selections.push_back("eventSelectionBscMinBiasORHEHFVetoPlus");
