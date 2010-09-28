@@ -10,7 +10,7 @@
 #include <string>
 #include <map>
 
-void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., int maxEvents = -1){
+void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., int maxEvents = -1, std::string const& outputFileName = "analysisOpenHLT_histos_HLT.root"){
    TChain chain("HltTree");
    std::cout << ">>> Reading files: " << std::endl;
    for(std::vector<std::string>::const_iterator file = fileNames.begin(); file != fileNames.end(); ++file){
@@ -19,14 +19,17 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    }
 
    // Create output file
-   TFile* hfile = new TFile("analysisOpenHLT_histos_HLT.root","recreate","data histograms");
+   TFile* hfile = new TFile(outputFileName.c_str(),"recreate","data histograms");
+
+   TH1::SetDefaultSumw2(true);
 
    TH1F* h_L1HfRing1EtSumNegativeEta = new TH1F("L1HfRing1EtSumNegativeEta","L1HfRing1EtSumNegativeEta",10,0,10);
    TH1F* h_L1HfRing2EtSumNegativeEta = new TH1F("L1HfRing2EtSumNegativeEta","L1HfRing2EtSumNegativeEta",10,0,10);
    TH1F* h_L1HfRing1EtSumPositiveEta = new TH1F("L1HfRing1EtSumPositiveEta","L1HfRing1EtSumPositiveEta",10,0,10);
    TH1F* h_L1HfRing2EtSumPositiveEta = new TH1F("L1HfRing2EtSumPositiveEta","L1HfRing2EtSumPositiveEta",10,0,10);
 
-   TH1F* h_trigBit = new TH1F("trigBit","trigBit",2,0,2);
+   TH1F* h_trigBitL1 = new TH1F("trigBitL1","trigBitL1",2,0,2);
+   TH1F* h_trigBitHLT = new TH1F("trigBitHLT","trigBitHLT",2,0,2);
    TH1F* h_L1CenJetEt = new TH1F("L1CenJetEt","L1CenJetEt",100,0.,100.);
    TH1F* h_L1ForJetEt = new TH1F("L1ForJetEt","L1ForJetEt",100,0.,100.);
    TH1F* h_L1TauEt = new TH1F("L1TauEt","L1TauEt",100,0.,100.);
@@ -54,18 +57,27 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    TH1F* h_fracEt = new TH1F("fracEt","fracEt",500,0.,2.);
 
    int nThresholds = 100;
-   float sumEtMin = 0.;
-   float sumEtMax = 500.;
+   float sumEMin = 0.;
+   float sumEMax = 500.;
+   int lumiBinMax = 5000;
 
-   TH1F* h_NevtsVsThreshold = new TH1F("NevtsVsThreshold","NevtsVsThreshold",nThresholds,sumEtMin,sumEtMax);
-   TF1* func_effTrig = new TF1("effTrig","[0]",sumEtMin,sumEtMax);
-   TF1* func_effTrigL1 = new TF1("effTrigL1","[0]",sumEtMin,sumEtMax);
-   
-   std::string trigName = "HLT_Jet30U";
-   //std::string trigName = "L1_SingleJet20";
+   TH1F* h_NevtsVsThreshold = new TH1F("NevtsVsThreshold","NevtsVsThreshold",nThresholds,sumEMin,sumEMax);
+   TH1F* h_NevtsL1BitVsLumi = new TH1F("NevtsL1BitVsLumi","NevtsL1BitVsLumi",lumiBinMax,0,lumiBinMax);
+   TH1F* h_NevtsL1VsLumi = new TH1F("NevtsL1VsLumi","NevtsL1VsLumi",lumiBinMax,0,lumiBinMax);
+   TH1F* h_NevtsHLTBitVsLumi = new TH1F("NevtsHLTBitVsLumi","NevtsHLTBitVsLumi",lumiBinMax,0,lumiBinMax);
+   TH1F* h_NevtsHLTVsLumi = new TH1F("NevtsHLTVsLumi","NevtsHLTVsLumi",lumiBinMax,0,lumiBinMax);
+   TF1* func_effTrigBitL1 = new TF1("effTrigBitL1","[0]",sumEMin,sumEMax);
+   TF1* func_effTrigL1 = new TF1("effTrigL1","[0]",sumEMin,sumEMax);
+   TF1* func_effTrigBitHLT = new TF1("effTrigBitHLT","[0]",sumEMin,sumEMax);
+   TF1* func_effTrigHLT = new TF1("effTrigHLT","[0]",sumEMin,sumEMax);   
+
+   //std::string trigName = "HLT_Jet30U";
+   std::string trigNameL1 = "L1_SingleJet20";
+   std::string trigNameHLT = "HLT_Jet30U"; 
 
    int runNumber,lumiBlock,bunchCrossing;
-   int trigBit;
+   int trigBitL1;
+   int trigBitHLT;
    int nL1CenJet;
    float l1CenJetEt[4];
    int nL1ForJet;
@@ -93,7 +105,8 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    float jetCalPt[100];
    float jetCalEta[100];
 
-   chain.SetBranchAddress(trigName.c_str(),&trigBit);
+   chain.SetBranchAddress(trigNameL1.c_str(),&trigBitL1);
+   chain.SetBranchAddress(trigNameHLT.c_str(),&trigBitHLT);
    chain.SetBranchAddress("Run",&runNumber);
    chain.SetBranchAddress("LumiBlock",&lumiBlock);
    chain.SetBranchAddress("Bx",&bunchCrossing);
@@ -125,9 +138,12 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    double etaMin = 3.0;
    double towerThreshold = 4.0; //energy
    int L1EtSumThreshold = 1;
+   double sumEHFThreshold = 200.; 
  
-   int nPassedTrigBit = 0;
-   int nPassedTrigBitAndL1EtSum = 0;
+   int nPassedTrigBitL1 = 0;
+   int nPassedTrigBitL1AndL1EtSum = 0;
+   int nPassedTrigBitHLT = 0;
+   int nPassedTrigBitHLTAndSumEHF = 0;
    int countEvts = 0;
    int lumiMin = -1;
    int lumiMax = -1;
@@ -144,11 +160,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       if(lumiMax < 0) lumiMax = lumiBlock;
       if(lumiMax >= 0 && lumiBlock > lumiMax) lumiMax = lumiBlock;
 
-      h_trigBit->Fill(trigBit);
-
-      if(trigBit == 0) continue;
-
-      ++nPassedTrigBit;
+      h_trigBitL1->Fill(trigBitL1);
+      if(trigBitL1 == 0) continue;
+      ++nPassedTrigBitL1;
+      h_NevtsL1BitVsLumi->Fill(lumiBlock);
 
       h_L1CenJetEt->Fill(l1CenJetEt[0]);
       h_L1ForJetEt->Fill(l1ForJetEt[0]);
@@ -185,7 +200,13 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
          (L1HfRing1EtSumPositiveEta > L1EtSumThreshold)||
          (L1HfRing2EtSumPositiveEta > L1EtSumThreshold)) continue;
 
-      ++nPassedTrigBitAndL1EtSum;
+      ++nPassedTrigBitL1AndL1EtSum;
+      h_NevtsL1VsLumi->Fill(lumiBlock);
+
+      h_trigBitHLT->Fill(trigBitHLT);
+      if(trigBitHLT == 0) continue;
+      ++nPassedTrigBitHLT;
+      h_NevtsHLTBitVsLumi->Fill(lumiBlock);
 
       h_nHFtowers->Fill(nHFtowers);
       double sumEHF_plus = 0.;
@@ -223,33 +244,60 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
          float bin_center = h_NevtsVsThreshold->GetXaxis()->GetBinCenter(i_bin + 1);
          // Apply veto
          if((sumEHF_plus < threshold)&&(sumEHF_minus < threshold)) h_NevtsVsThreshold->Fill(bin_center);
-      } 
+      }
+
+      if((sumEHF_plus < sumEHFThreshold)&&(sumEHF_minus < sumEHFThreshold)){
+         ++nPassedTrigBitHLTAndSumEHF;
+         h_NevtsHLTVsLumi->Fill(lumiBlock); 
+      }
    }
    std::cout << "Analyzed " << countEvts << " events" << std::endl
              << "Min and max lumi section: (" << lumiMin << "," << lumiMax << ")" << std::endl
-             << "  Nr. events passing trigger " << trigName << ": " << nPassedTrigBit << std::endl
-             << "  Nr. events passing L1 HF Et-sum selection: " << nPassedTrigBitAndL1EtSum << std::endl;
+             << "  Nr. events passing L1 bit " << trigNameL1 << ": " << nPassedTrigBitL1 << std::endl
+             << "  Nr. events passing L1 HF Et-sum selection: " << nPassedTrigBitL1AndL1EtSum << std::endl
+             << "  Nr. events passing HLT bit " << trigNameHLT << ": " << nPassedTrigBitHLT << std::endl
+             << "  Nr. events passing HLT HF selection: " << nPassedTrigBitHLTAndSumEHF << std::endl;
             
-   float effTrigBit = (float)nPassedTrigBit/countEvts;
-   func_effTrig->SetParameter(0,effTrigBit);
+   float effTrigBitL1 = (float)nPassedTrigBitL1/countEvts;
+   func_effTrigBitL1->SetParameter(0,effTrigBitL1);
    
-   float effTrigBitL1 = (float)nPassedTrigBitAndL1EtSum/countEvts;
-   func_effTrigL1->SetParameter(0,effTrigBitL1); 
+   float effTrigL1 = (float)nPassedTrigBitL1AndL1EtSum/countEvts;
+   func_effTrigL1->SetParameter(0,effTrigL1);
+
+   float effTrigBitHLT = (float)nPassedTrigBitHLT/countEvts;
+   func_effTrigBitHLT->SetParameter(0,effTrigBitHLT); 
+
+   float effTrigHLT = (float)nPassedTrigBitHLTAndSumEHF/countEvts;
+   func_effTrigHLT->SetParameter(0,effTrigHLT);
 
    TH1F* h_EffVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("EffVsThreshold"));
    h_EffVsThreshold->Scale(1./countEvts);
 
-   TH1F* h_RateVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("RateVsThreshold"));
    double lumiLength = 23.3; //s
    double deltaLumi = lumiMax - lumiMin;
+   TH1F* h_RateVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("RateVsThreshold"));
    h_RateVsThreshold->Scale(1./(deltaLumi*lumiLength));
 
    TH1F* h_RateXSectionVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("RateXSectionVsThreshold"));
    double Lum = 1.;//10^31cms-2s-1
    h_RateXSectionVsThreshold->Scale(Lum*crossSection*10000.);
 
-   func_effTrig->Write();
+   TH1F* h_RateL1BitVsLumi = static_cast<TH1F*>(h_NevtsL1BitVsLumi->Clone("RateL1BitVsLumi"));
+   h_RateL1BitVsLumi->Scale(1./lumiLength);
+
+   TH1F* h_RateL1VsLumi = static_cast<TH1F*>(h_NevtsL1VsLumi->Clone("RateL1VsLumi"));
+   h_RateL1VsLumi->Scale(1./lumiLength);
+
+   TH1F* h_RateHLTBitVsLumi = static_cast<TH1F*>(h_NevtsHLTBitVsLumi->Clone("RateHLTBitVsLumi"));
+   h_RateHLTBitVsLumi->Scale(1./lumiLength);
+
+   TH1F* h_RateHLTVsLumi = static_cast<TH1F*>(h_NevtsHLTVsLumi->Clone("RateHLTVsLumi"));
+   h_RateHLTVsLumi->Scale(1./lumiLength);
+
+   func_effTrigBitL1->Write();
    func_effTrigL1->Write();
+   func_effTrigBitHLT->Write();
+   func_effTrigHLT->Write();
    hfile->Write();
    hfile->Close();
 }
