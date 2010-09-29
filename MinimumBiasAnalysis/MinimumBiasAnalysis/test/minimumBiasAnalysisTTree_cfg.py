@@ -67,21 +67,13 @@ print "These are the severity levels for the various rechit flags:"
 print "(Severity > 10 causes rechit to be ignored by CaloTower maker)"
 for i in process.hcalRecAlgos.SeverityLevels: print i
 
-# Use the reflagged HF RecHits to make the CaloTowers
-process.towerMaker.hfInput = "hfrecoReflagged"
-process.towerMakerWithHO.hfInput = "hfrecoReflagged"
-# Use the reflagged HBHE RecHits to make the CaloTowers
-process.towerMaker.hbheInput = "hbherecoReflagged"
-process.towerMakerWithHO.hbheInput = "hbherecoReflagged"
-
 ###################################################################################
 
-process.lumiWeight = cms.EDProducer("LuminosityWeightProducer",
-    rootFileName = cms.string(config.instLumiROOTFile),
-    prefix = cms.untracked.string("instLumi")
-)
-#countsAnalyzer = cms.EDAnalyzer("NCountsAnalyzer", weightTag = cms.InputTag("lumiWeight"))
-countsAnalyzer = cms.EDAnalyzer("NCountsAnalyzer")
+process.load('Utilities.AnalysisTools.lumiWeight_cfi')
+process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
+
+from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
+#countsAnalyzer.weightTag = cms.InputTag("lumiWeight")
 
 process.xiTower.comEnergy = config.comEnergy
 process.xiFromCaloTowers.comEnergy = config.comEnergy
