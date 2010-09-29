@@ -45,6 +45,10 @@ def addHFReflagging(process,version,isMC):
     if (isMC==False):  # Don't use HFDigiTime on MC !
         process.hcalRecAlgos=RemoveAddSevLevel.AddFlag(process.hcalRecAlgos,"HFDigiTime",11)
 
+    # Use the reflagged HF RecHits to make the CaloTowers
+    process.towerMaker.hfInput = "hfrecoReflagged"
+    process.towerMakerWithHO.hfInput = "hfrecoReflagged"
+
     return process
 
 def addHBHEReflagging(process):
@@ -53,5 +57,9 @@ def addHBHEReflagging(process):
 
     import JetMETAnalysis.HcalReflagging.RemoveAddSevLevel as RemoveAddSevLevel
     process.hcalRecAlgos=RemoveAddSevLevel.AddFlag(process.hcalRecAlgos,"UserDefinedBit0",10)
-  
+ 
+    # Use the reflagged HBHE RecHits to make the CaloTowers
+    process.towerMaker.hbheInput = "hbherecoReflagged"
+    process.towerMakerWithHO.hbheInput = "hbherecoReflagged"
+ 
     return process
