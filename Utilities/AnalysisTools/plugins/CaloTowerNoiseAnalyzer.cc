@@ -20,8 +20,6 @@
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "FWCore/Utilities/interface/RandomNumberGenerator.h"
-#include "CLHEP/Random/RandGaussQ.h"
 
 #include <iostream>
 #include "TFile.h"
@@ -34,7 +32,6 @@ using namespace reco;
 CaloTowerNoiseAnalyzer::CaloTowerNoiseAnalyzer(const edm::ParameterSet& conf):
   calotowersTag_(conf.getParameter<edm::InputTag>("CaloTowersTag")),
   accessRecHits_(conf.getUntrackedParameter<bool>("AccessRecHits",false)),
-  //excludeHotTowers_(conf.getParameter<bool>("ExcludeHotTowers")), 
   nThresholdIter_(conf.getParameter<unsigned int>("NumberOfTresholds")),
   eThresholdHBMin_(conf.getParameter<double>("TowerEnergyTresholdHBMin")),
   eThresholdHBMax_(conf.getParameter<double>("TowerEnergyTresholdHBMax")),
@@ -42,14 +39,21 @@ CaloTowerNoiseAnalyzer::CaloTowerNoiseAnalyzer(const edm::ParameterSet& conf):
   eThresholdHEMax_(conf.getParameter<double>("TowerEnergyTresholdHEMax")),
   eThresholdHFMin_(conf.getParameter<double>("TowerEnergyTresholdHFMin")),
   eThresholdHFMax_(conf.getParameter<double>("TowerEnergyTresholdHFMax")),
+  eThresholdEBMin_(conf.getParameter<double>("TowerEnergyTresholdEBMin")),
+  eThresholdEBMax_(conf.getParameter<double>("TowerEnergyTresholdEBMax")),
+  eThresholdEEMin_(conf.getParameter<double>("TowerEnergyTresholdEEMin")),
+  eThresholdEEMax_(conf.getParameter<double>("TowerEnergyTresholdEEMax")), 
   nBinsHB_(conf.getUntrackedParameter<int>("NBinsHB",20)),
   nBinsHE_(conf.getUntrackedParameter<int>("NBinsHE",20)),
   nBinsHF_(conf.getUntrackedParameter<int>("NBinsHF",20)),	
+  nBinsEB_(conf.getUntrackedParameter<int>("NBinsEB",20)),
+  nBinsEE_(conf.getUntrackedParameter<int>("NBinsEE",20)),
   reweightHFTower_(conf.getParameter<bool>("ReweightHFTower")),
-  applyEnergyOffset_(conf.getParameter<bool>("ApplyEnergyOffset")),
   eThresholdHB_(std::vector<double>()),
   eThresholdHE_(std::vector<double>()),
-  eThresholdHF_(std::vector<double>()) {
+  eThresholdHF_(std::vector<double>()),
+  eThresholdEB_(std::vector<double>()),
+  eThresholdEE_(std::vector<double>())  {
 
   if(accessRecHits_) hfRecHitsTag_ = conf.getUntrackedParameter<edm::InputTag>("HFRecHitsLabel",edm::InputTag("hfreco"));
 
@@ -65,20 +69,6 @@ CaloTowerNoiseAnalyzer::CaloTowerNoiseAnalyzer(const edm::ParameterSet& conf):
      reweightHisto_ = *histo;
   }
  
-  if(applyEnergyOffset_){
-     edm::Service<edm::RandomNumberGenerator> rng;
-     CLHEP::HepRandomEngine& engine = rng->getEngine();
-     gauss_ = std::auto_ptr<CLHEP::RandGaussQ>(new CLHEP::RandGaussQ(engine));
-     edm::ParameterSet energyOffsetPSet = conf.getParameter<edm::ParameterSet>("EnergyOffsetParameters");
-     /*sigmaShort_ = energyOffsetPSet.getParameter<double>("sigmaShort");
-     sigmaLong_ = energyOffsetPSet.getParameter<double>("sigmaLong");
-     nIncrements_ = energyOffsetPSet.getParameter<int>("nIncrements");*/
-     meanHFEnergy_ = energyOffsetPSet.getParameter<double>("meanHFEnergy");
-     sigmaHFEnergy_ = energyOffsetPSet.getParameter<double>("sigmaHFEnergy");
-     edm::LogVerbatim("Analysis") << "Using \n"
-                                  << "  meanHFEnergy=    " << meanHFEnergy_
-                                  << "\n  sigmaHFEnergy=   " << sigmaHFEnergy_;
-  }  
 }  
   
 CaloTowerNoiseAnalyzer::~CaloTowerNoiseAnalyzer()
@@ -99,10 +89,14 @@ void CaloTowerNoiseAnalyzer::beginJob(){
      eThresholdHB_.push_back(eThresholdHBMin_ + i*((eThresholdHBMax_ - eThresholdHBMin_)/((double)nThresholdIter_))); 
      eThresholdHE_.push_back(eThresholdHEMin_ + i*((eThresholdHEMax_ - eThresholdHEMin_)/((double)nThresholdIter_)));
      eThresholdHF_.push_back(eThresholdHFMin_ + i*((eThresholdHFMax_ - eThresholdHFMin_)/((double)nThresholdIter_)));
+     eThresholdEB_.push_back(eThresholdEBMin_ + i*((eThresholdEBMax_ - eThresholdEBMin_)/((double)nThresholdIter_)));
+     eThresholdEE_.push_back(eThresholdEEMin_ + i*((eThresholdEEMax_ - eThresholdEEMin_)/((double)nThresholdIter_)));
 
      edm::LogVerbatim("Analysis") << "Threshold HB" << i << ": " << eThresholdHB_[i] << "\n"
                                   << "Threshold HE" << i << ": " << eThresholdHE_[i] << "\n"
-                                  << "Threshold HF" << i << ": " << eThresholdHF_[i];
+                                  << "Threshold HF" << i << ": " << eThresholdHF_[i] << "\n"
+                                  << "Threshold HB" << i << ": " << eThresholdEB_[i] << "\n"
+                                  << "Threshold HE" << i << ": " << eThresholdEE_[i];
      // HB
      sprintf(hname,"nHBPlus_%d",i);
      histosNHBPlus_.push_back(fs->make<TH1F>(hname,"Towers mult. HB plus",nBinsHB_,0,nBinsHB_));
@@ -130,12 +124,28 @@ void CaloTowerNoiseAnalyzer::beginJob(){
      histosSumEHFPlus_.push_back(fs->make<TH1F>(hname,"Energy sum HF plus",100,0.,200.));   
      sprintf(hname,"sumEHFminus_%d",i);
      histosSumEHFMinus_.push_back(fs->make<TH1F>(hname,"Energy sum HF minus",100,0.,200.));
-     /*sprintf(hname,"nhflow_%d",i);
-     histosnhflow_.push_back(fs->make<TH1F>(hname,"Towers mult. HF low",nBinsHF_,0,nBinsHF_));
-     sprintf(hname,"nhfhigh_%d",i);
-     histosnhfhigh_.push_back(fs->make<TH1F>(hname,"Towers mult. HF high",nBinsHF_,0,nBinsHF_));*/
+     // 
+     // EB
+     sprintf(hname,"nEBPlus_%d",i);
+     histosNEBPlus_.push_back(fs->make<TH1F>(hname,"Towers mult. EB plus",nBinsEB_,0,nBinsEB_));
+     sprintf(hname,"nEBMinus_%d",i);
+     histosNEBMinus_.push_back(fs->make<TH1F>(hname,"Towers mult. EB minus",nBinsEB_,0,nBinsEB_));
+     sprintf(hname,"sumEEBplus_%d",i);
+     histosSumEEBPlus_.push_back(fs->make<TH1F>(hname,"Energy sum EB plus",100,0.,200.));
+     sprintf(hname,"sumEEBminus_%d",i);
+     histosSumEEBMinus_.push_back(fs->make<TH1F>(hname,"Energy sum EB minus",100,0.,200.));
+     // EE
+     sprintf(hname,"nEEplus_%d",i);
+     histosNEEPlus_.push_back(fs->make<TH1F>(hname,"Towers mult. EE plus",nBinsEE_,0,nBinsEE_));
+     sprintf(hname,"nEEminus_%d",i);
+     histosNEEMinus_.push_back(fs->make<TH1F>(hname,"Towers mult. EE minus",nBinsEE_,0,nBinsEE_));
+     sprintf(hname,"sumEEEplus_%d",i);
+     histosSumEEEPlus_.push_back(fs->make<TH1F>(hname,"Energy sum EE plus",100,0.,200.));
+     sprintf(hname,"sumEEEminus_%d",i);
+     histosSumEEEMinus_.push_back(fs->make<TH1F>(hname,"Energy sum EE minus",100,0.,200.));
   }
 
+  // HB
   histosTH1F_["energyHB"] = fs->make<TH1F>("energyHB","Tower Energy HB",200,0.,8.0);
   histosTH1F_["energyHBplus"] = fs->make<TH1F>("energyHBplus","Tower Energy HB-plus",200,0.,8.0);
   histosTH1F_["energyHBminus"] = fs->make<TH1F>("energyHBminus","Tower Energy HB-minus",200,0.,8.0);
@@ -148,6 +158,7 @@ void CaloTowerNoiseAnalyzer::beginJob(){
   histosTH1F_["energyHBNOECAL"] = fs->make<TH1F>("energyHBNOECAL","Tower Energy HB",200,0.,8.0);
   histosTH1F_["energyHBNOECALplus"] = fs->make<TH1F>("energyHBNOECALplus","Tower Energy HB-plus",200,0.,8.0);
   histosTH1F_["energyHBNOECALminus"] = fs->make<TH1F>("energyHBNOECALminus","Tower Energy HB-minus",200,0.,8.0);
+  // HE 
   histosTH1F_["energyHE"] = fs->make<TH1F>("energyHE","Tower Energy HE",200,0.,10.0);
   histosTH1F_["energyHEplus"] = fs->make<TH1F>("energyHEplus","Tower Energy HE-plus",200,0.,10.0);
   histosTH1F_["energyHEminus"] = fs->make<TH1F>("energyHEminus","Tower Energy HE-minus",200,0.,10.0);
@@ -160,25 +171,31 @@ void CaloTowerNoiseAnalyzer::beginJob(){
   histosTH1F_["energyHENOECAL"] = fs->make<TH1F>("energyHENOECAL","Tower Energy HE",200,0.,10.0);
   histosTH1F_["energyHENOECALplus"] = fs->make<TH1F>("energyHENOECALplus","Tower Energy HE-plus",200,0.,10.0);
   histosTH1F_["energyHENOECALminus"] = fs->make<TH1F>("energyHENOECALminus","Tower Energy HE-minus",200,0.,10.0);
+  // HF
   histosTH1F_["energyHF"] = fs->make<TH1F>("energyHF","Tower Energy HF",200,0.,15.0);
   histosTH1F_["energyHFplus"] = fs->make<TH1F>("energyHFplus","Tower Energy HF-plus",200,0.,15.0);
   histosTH1F_["energyHFminus"] = fs->make<TH1F>("energyHFminus","Tower Energy HF-minus",200,0.,15.0);
   histosTH1F_["emEnergyHF"] = fs->make<TH1F>("emEnergyHF","EM Tower Energy HF",200,0.,15.0); 
   histosTH1F_["hadEnergyHF"] = fs->make<TH1F>("hadEnergyHF","HAD Tower Energy HF",200,0.,15.0);
   histosTH1F_["emFractionHF"] = fs->make<TH1F>("emFractionHF","EM energy fraction HF",200,0.,1.1);
-
+  // EB
   histosTH1F_["energyEB"] = fs->make<TH1F>("energyEB","Tower Energy EB",200,0.,8.0);
   histosTH1F_["energyEBplus"] = fs->make<TH1F>("energyEBplus","Tower Energy EB-plus",200,0.,8.0);
   histosTH1F_["energyEBminus"] = fs->make<TH1F>("energyEBminus","Tower Energy EB-minus",200,0.,8.0);
+  histosTH1F_["emEnergyEB"] = fs->make<TH1F>("emEnergyEB","EM Tower Energy EB",200,0.,8.0);
+  histosTH1F_["hadEnergyEB"] = fs->make<TH1F>("hadEnergyEB","HAD Tower Energy EB",200,0.,8.0);
   histosTH1F_["energyEBHCAL"] = fs->make<TH1F>("energyEBHCAL","Tower Energy EB",200,0.,8.0);
   histosTH1F_["energyEBHCALplus"] = fs->make<TH1F>("energyEBHCALplus","Tower Energy EB-plus",200,0.,8.0);
   histosTH1F_["energyEBHCALminus"] = fs->make<TH1F>("energyEBHCALminus","Tower Energy EB-minus",200,0.,8.0);
   histosTH1F_["energyEBNOHCAL"] = fs->make<TH1F>("energyEBNOHCAL","Tower Energy EB",200,0.,8.0);
   histosTH1F_["energyEBNOHCALplus"] = fs->make<TH1F>("energyEBNOHCALplus","Tower Energy EB-plus",200,0.,8.0);
   histosTH1F_["energyEBNOHCALminus"] = fs->make<TH1F>("energyEBNOHCALminus","Tower Energy EB-minus",200,0.,8.0);
+  // EE
   histosTH1F_["energyEE"] = fs->make<TH1F>("energyEE","Tower Energy EE",200,0.,10.0);
   histosTH1F_["energyEEplus"] = fs->make<TH1F>("energyEEplus","Tower Energy EE-plus",200,0.,10.0);
   histosTH1F_["energyEEminus"] = fs->make<TH1F>("energyEEminus","Tower Energy EE-minus",200,0.,10.0);
+  histosTH1F_["emEnergyEE"] = fs->make<TH1F>("emEnergyEE","EM Tower Energy EE",200,0.,10.0);
+  histosTH1F_["hadEnergyEE"] = fs->make<TH1F>("hadEnergyEE","HAD Tower Energy EE",200,0.,10.0);
   histosTH1F_["energyEEHCAL"] = fs->make<TH1F>("energyEEHCAL","Tower Energy EE",200,0.,10.0);
   histosTH1F_["energyEEHCALplus"] = fs->make<TH1F>("energyEEHCALplus","Tower Energy EE-plus",200,0.,10.0);
   histosTH1F_["energyEEHCALminus"] = fs->make<TH1F>("energyEEHCALminus","Tower Energy EE-minus",200,0.,10.0);
@@ -186,16 +203,11 @@ void CaloTowerNoiseAnalyzer::beginJob(){
   histosTH1F_["energyEENOHCALplus"] = fs->make<TH1F>("energyEENOHCALplus","Tower Energy EE-plus",200,0.,10.0);
   histosTH1F_["energyEENOHCALminus"] = fs->make<TH1F>("energyEENOHCALminus","Tower Energy EE-minus",200,0.,10.0);
   
+  // Misc.
   histosTH1F_["energyvseta"] = fs->make<TH1F>("energyvseta","Tower Energy vs eta",100,-5.1,5.1);
   histosTH2F_["etavsphi"] = fs->make<TH2F>("etavsphi","etavsphi",100,-5.,5.,100,-3.1416,3.1416);
   histosTH2F_["ietavsiphi"] = fs->make<TH2F>("ietavsiphi","ietavsiphi",85,-42,43,75,0,75);
-  histosTH2F_["etavsphiweighted"] = fs->make<TH2F>("etavsphiweighted","etavsphiweighted",100,-5.,5.,100,-3.1416,3.1416);
-  histosTH2F_["ietavsiphiweighted"] = fs->make<TH2F>("ietavsiphiweighted","ietavsiphiweighted",85,-42,43,75,0,75);
 	
-  histosTH1F_["energyvsetaHF"] = fs->make<TH1F>("energyvsetaHF","Tower Energy vs eta",100,-5.1,5.1);
-  histosTH2F_["etavsphiHF"] = fs->make<TH2F>("etavsphiHF","Tower Energy vs eta x phi",100,-5.,5.,100,-3.1416,3.1416);
-  histosTH2F_["etavsphiHFweighted"] = fs->make<TH2F>("etavsphiHFweighted","etavsphiHFweighted",100,-5.,5.,100,-3.1416,3.1416);
-  
   histosTH1F_["energyvsetaHFMax"] = fs->make<TH1F>("energyvsetaHFMax","Tower Energy vs eta",100,-5.1,5.1);
   histosTH2F_["etavsphiHFMax"] = fs->make<TH2F>("etavsphiHFMax","Tower Energy vs eta x phi",100,-5.,5.,100,-3.1416,3.1416);
   	
@@ -213,20 +225,6 @@ void CaloTowerNoiseAnalyzer::beginJob(){
 
   histosTH1F_["hflongenergyFromTwr"] = fs->make<TH1F>("hflongenergyFromTwr","HF RecHit Long Fiber energy",100,-2.,20.);
   histosTH1F_["hfshortenergyFromTwr"] = fs->make<TH1F>("hfshortenergyFromTwr","HF RecHit Short Fiber energy",100,-2.,20.);
-  // Exclude list
-  //(40,63): 0.245
-  //>>>>>>> Tower with very high activity
-  //(40,67): 0.218
-  //>>>>>>> Tower with very high activity
-  /*excludeList = std::vector<std::pair<int,int> >();
-  std::pair<int,int> aux_pair(40,63);	
-  excludeList.push_back(aux_pair);
-  aux_pair = std::pair<int,int>(40,67);	
-  excludeList.push_back(aux_pair);
-
-  for(std::vector<std::pair<int,int> >::const_iterator it = excludeList.begin(); it != excludeList.end(); ++it){
-	std::cout << "Excluding (iEta,iPhi) " << "(" << it->first << "," << it->second << ")" << std::endl;	
-  }*/
 }     
 
 void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& iSetup) {
@@ -267,11 +265,22 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
   std::vector<double> sume_hf_minus(nThresholdIter_,0.);
   std::vector<double> sumew_hf_plus(nThresholdIter_,0.);
   std::vector<double> sumew_hf_minus(nThresholdIter_,0.); 
-
-  /*CandidateCollection::const_iterator cand = calotowercands->begin();
-  CaloTowerRef towerRef = cand->get<CaloTowerRef>();
-		
-  const CaloTowerCollection *towerCollection = towerRef.product();*/
+  std::vector<int> neb_plus(nThresholdIter_,0);
+  std::vector<int> neb_minus(nThresholdIter_,0);
+  std::vector<double> sumw_eb_plus(nThresholdIter_,0.);
+  std::vector<double> sumw_eb_minus(nThresholdIter_,0.);
+  std::vector<double> sume_eb_plus(nThresholdIter_,0.);
+  std::vector<double> sume_eb_minus(nThresholdIter_,0.);
+  std::vector<double> sumew_eb_plus(nThresholdIter_,0.);
+  std::vector<double> sumew_eb_minus(nThresholdIter_,0.);
+  std::vector<int> nee_plus(nThresholdIter_,0);
+  std::vector<int> nee_minus(nThresholdIter_,0);
+  std::vector<double> sumw_ee_plus(nThresholdIter_,0.);
+  std::vector<double> sumw_ee_minus(nThresholdIter_,0.);
+  std::vector<double> sume_ee_plus(nThresholdIter_,0.);
+  std::vector<double> sume_ee_minus(nThresholdIter_,0.);
+  std::vector<double> sumew_ee_plus(nThresholdIter_,0.);
+  std::vector<double> sumew_ee_minus(nThresholdIter_,0.);
 
   double calotwrMaxEnergyHF = 0.;
   CaloTowerCollection::const_iterator calotwrMaxHF = towerCollection->end();
@@ -293,11 +302,6 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
 		 << "Constituents: " << std::endl;*/
      int ieta = calotower->id().ieta();
      int iphi = calotower->id().iphi();
-     //bool hotTower = false;
-     /*for(std::vector<std::pair<int,int> >::const_iterator it = excludeList.begin(); it != excludeList.end(); ++it){
-        if((ieta == it->first)&&(iphi == it->second)) hotTower = true;
-     }*/
-     //if(excludeHotTowers_&&hotTower) continue;
 
      bool hasHCAL = false;		
      bool hasHF = false;
@@ -343,6 +347,9 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
      double phi = calotower->phi();
 
      double energy = calotower->energy();
+     double emEnergy = calotower->emEnergy();
+     double hadEnergy = calotower->hadEnergy();     
+
      double weightHB = 1.0;
      double weightHE = 1.0;
      double weightHF = 1.0;
@@ -350,67 +357,37 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
      double weightEE = 1.0;
      // HF
      if(hasHF&&(!hasHE)){
-        //Valid for HF emEnergy = E(L) - E(S); hadEnergy = 2*E(S)
-        double energyShort = calotower->hadEnergy()/2.;
-        double energyLong = calotower->emEnergy() + energyShort;
-        if(applyEnergyOffset_){
-           /*energyShort += gauss_->fire(0.,sigmaShort_);
-           energyLong += gauss_->fire(0.,sigmaLong_);
-           energy = energyShort + energyLong;*/
-           //energy += nIncrements_*sigmaLong_; 
-           /*double deltaEShort = std::max(gauss_->fire(0.,sigmaShort_),0.);
-           double deltaELong = std::max(gauss_->fire(0.,sigmaLong_),0.);
-           energyShort += deltaEShort;
-           energyLong += deltaELong; 
-           energy = energyShort + energyLong;*/
-           double deltaEnergy = std::max(gauss_->fire(meanHFEnergy_,sigmaHFEnergy_),0.);
-           energy += deltaEnergy;
-        }
-
         if(reweightHFTower_){
            int xbin = reweightHisto_.GetXaxis()->FindBin(energy);
            int nBins = reweightHisto_.GetNbinsX(); // 1 <= xbin <= nBins
            //weight = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : reweightHisto_.GetBinContent(nBins);
            weightHF = (xbin <= nBins) ? reweightHisto_.GetBinContent(xbin) : 1.;
         }
- 
-        histosTH1F_["hflongenergyFromTwr"]->Fill(energyLong,weightHF);
-        histosTH1F_["hfshortenergyFromTwr"]->Fill(energyShort,weightHF);
-        double emEnergy = calotower->emEnergy();
-        double hadEnergy = calotower->hadEnergy(); 
-        double eTot = emEnergy + hadEnergy;
-        histosTH1F_["emEnergyHF"]->Fill(emEnergy,weightHF);
-        histosTH1F_["hadEnergyHF"]->Fill(hadEnergy,weightHF);
-        if(eTot > 50.0) histosTH1F_["emFractionHF"]->Fill(fabs(emEnergy/eTot),weightHF);
-     }
-
-     histosTH1F_["energyvseta"]->Fill(eta,energy*weightHF);
-     histosTH2F_["etavsphi"]->Fill(eta,phi,weightHF);
-     histosTH2F_["ietavsiphi"]->Fill(ieta,iphi,weightHF);
-     /*histosTH2F_["etavsphiweighted"]->Fill(eta,phi,energy*weightHF);
-     histosTH2F_["ietavsiphiweighted"]->Fill(ieta,iphi,energy*weightHF);*/
-	
+     }	
+     
      for(unsigned int i = 0; i < nThresholdIter_; ++i){
-        bool ethreshHB = (energy >= eThresholdHB_[i]);
-        bool ethreshHE = (energy >= eThresholdHE_[i]);
         bool ethreshHF = (energy >= eThresholdHF_[i]);
-        if( ethreshHB && ( hasHB && (!hasHE) ) ){
+        bool ethreshHB = (hadEnergy >= eThresholdHB_[i]);
+        bool ethreshHE = (hadEnergy >= eThresholdHE_[i]);
+        bool ethreshEB = (emEnergy >= eThresholdEB_[i]);
+        bool ethreshEE = (emEnergy >= eThresholdEE_[i]);
+        if( ( hasHB && (!hasHE) ) && ethreshHB ){
            if(zside >= 0){
               nhb_plus[i]++; sumw_hb_plus[i] += weightHB;
-              sume_hb_plus[i] += energy; sumew_hb_plus[i] += energy*weightHB;
+              sume_hb_plus[i] += hadEnergy; sumew_hb_plus[i] += hadEnergy*weightHB;
            } else{
               nhb_minus[i]++; sumw_hb_minus[i] += weightHB;
-              sume_hb_minus[i] += energy; sumew_hb_minus[i] += energy*weightHB;
+              sume_hb_minus[i] += hadEnergy; sumew_hb_minus[i] += hadEnergy*weightHB;
            }
-        } else if( ethreshHE && ( hasHE && (!hasHB) && (!hasHF) ) ){
+        } else if( ( hasHE && (!hasHB) && (!hasHF) ) && ethreshHE ){
            if(zside > 0){
               nhe_plus[i]++; sumw_he_plus[i] += weightHE;
-              sume_he_plus[i] += energy; sumew_he_plus[i] += energy*weightHE;
+              sume_he_plus[i] += hadEnergy; sumew_he_plus[i] += hadEnergy*weightHE;
            } else{
               nhe_minus[i]++; sumw_he_minus[i] += weightHE;
-              sume_he_minus[i] += energy; sumew_he_minus[i] += energy*weightHE;
+              sume_he_minus[i] += hadEnergy; sumew_he_minus[i] += hadEnergy*weightHE;
            }
-        } else if( ethreshHF && ( hasHF && (!hasHE) ) ){
+        } else if( ( hasHF && (!hasHE) ) && ethreshHF ){
 	   if(zside > 0){
               nhf_plus[i]++; sumw_hf_plus[i] += weightHF;
               sume_hf_plus[i] += energy; sumew_hf_plus[i] += energy*weightHF;
@@ -419,13 +396,31 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
               sume_hf_minus[i] += energy; sumew_hf_minus[i] += energy*weightHF;  
            }
 	}
+        if( hasEB && ethreshEB ){
+           if(zside >= 0){
+              neb_plus[i]++; sumw_eb_plus[i] += weightEB;
+              sume_eb_plus[i] += emEnergy; sumew_eb_plus[i] += emEnergy*weightEB;
+           } else{
+              neb_minus[i]++; sumw_eb_minus[i] += weightEB;
+              sume_eb_minus[i] += emEnergy; sumew_eb_minus[i] += emEnergy*weightEB;
+           }
+        } else if( hasEE && ethreshEE ){
+           if(zside >= 0){
+              nee_plus[i]++; sumw_ee_plus[i] += weightEE;
+              sume_ee_plus[i] += emEnergy; sumew_ee_plus[i] += emEnergy*weightEE;
+           } else{
+              nee_minus[i]++; sumw_ee_minus[i] += weightEE;
+              sume_ee_minus[i] += emEnergy; sumew_ee_minus[i] += emEnergy*weightEE;
+           }
+        }
      }
  
-     
      if( hasHB && (!hasHE) ){
         histosTH1F_["energyHB"]->Fill(energy,weightHB);
         if(zside >= 0) histosTH1F_["energyHBplus"]->Fill(energy,weightHB);
         else histosTH1F_["energyHBminus"]->Fill(energy,weightHB);
+        histosTH1F_["emEnergyHB"]->Fill(emEnergy,weightHB);
+        histosTH1F_["hadEnergyHB"]->Fill(hadEnergy,weightHB);
         if(hasECAL){
            histosTH1F_["energyHBECAL"]->Fill(energy,weightHB);
            if(zside >= 0) histosTH1F_["energyHBECALplus"]->Fill(energy,weightHB);
@@ -435,23 +430,42 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
            if(zside >= 0) histosTH1F_["energyHBNOECALplus"]->Fill(energy,weightHB);
            else histosTH1F_["energyHBNOECALminus"]->Fill(energy,weightHB);
         }
+        histosTH1F_["energyvseta"]->Fill(eta,hadEnergy*weightHB);
+        histosTH2F_["etavsphi"]->Fill(eta,phi,hadEnergy*weightHB);
+        histosTH2F_["ietavsiphi"]->Fill(ieta,iphi,hadEnergy*weightHB);
      } else if( hasHE && (!hasHB) && (!hasHF) ){
         histosTH1F_["energyHE"]->Fill(energy,weightHE);
         if(zside > 0) histosTH1F_["energyHEplus"]->Fill(energy,weightHE);
         else histosTH1F_["energyHEminus"]->Fill(energy,weightHE);
+        histosTH1F_["emEnergyHE"]->Fill(emEnergy,weightHE);
+        histosTH1F_["hadEnergyHE"]->Fill(hadEnergy,weightHE);
         if(hasECAL){
            histosTH1F_["energyHEECAL"]->Fill(energy,weightHB);
            if(zside >= 0) histosTH1F_["energyHEECALplus"]->Fill(energy,weightHB);
            else histosTH1F_["energyHEECALminus"]->Fill(energy,weightHB);
         }
+        histosTH1F_["energyvseta"]->Fill(eta,hadEnergy*weightHE);
+        histosTH2F_["etavsphi"]->Fill(eta,phi,hadEnergy*weightHE);
+        histosTH2F_["ietavsiphi"]->Fill(ieta,iphi,hadEnergy*weightHE);
      } else if( hasHF && (!hasHE) ){
         histosTH1F_["energyHF"]->Fill(energy,weightHF);
 	if(zside > 0) histosTH1F_["energyHFplus"]->Fill(energy,weightHF);
 	else histosTH1F_["energyHFminus"]->Fill(energy,weightHF);
+        histosTH1F_["emEnergyHF"]->Fill(emEnergy,weightHF);
+        histosTH1F_["hadEnergyHF"]->Fill(hadEnergy,weightHF);
 
-        histosTH1F_["energyvsetaHF"]->Fill(eta,energy*weightHF);
-        histosTH2F_["etavsphiHF"]->Fill(eta,phi,weightHF);
-        //histosTH2F_["etavsphiHFweighted"]->Fill(eta,phi,energy*weightHF);
+        //Valid for HF emEnergy = E(L) - E(S); hadEnergy = 2*E(S)
+        double energyShort = calotower->hadEnergy()/2.;
+        double energyLong = calotower->emEnergy() + energyShort;
+
+        histosTH1F_["hflongenergyFromTwr"]->Fill(energyLong,weightHF);
+        histosTH1F_["hfshortenergyFromTwr"]->Fill(energyShort,weightHF);
+        double eTot = emEnergy + hadEnergy;
+        if(eTot > 50.0) histosTH1F_["emFractionHF"]->Fill(fabs(emEnergy/eTot),weightHF);
+     
+        histosTH1F_["energyvseta"]->Fill(eta,energy*weightHF);
+        histosTH2F_["etavsphi"]->Fill(eta,phi,energy*weightHF);
+        histosTH2F_["ietavsiphi"]->Fill(ieta,iphi,energy*weightHF);
 
 	if(energy > calotwrMaxEnergyHF){
 	   calotwrMaxEnergyHF = energy;
@@ -463,6 +477,8 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
         histosTH1F_["energyEB"]->Fill(energy,weightEB);
         if(zside >= 0) histosTH1F_["energyEBplus"]->Fill(energy,weightEB);
         else histosTH1F_["energyEBminus"]->Fill(energy,weightEB);
+        histosTH1F_["emEnergyEB"]->Fill(emEnergy,weightEB);
+        histosTH1F_["hadEnergyEB"]->Fill(hadEnergy,weightEB);
         if(hasHCAL){
            histosTH1F_["energyEBHCAL"]->Fill(energy,weightEB);
            if(zside >= 0) histosTH1F_["energyEBHCALplus"]->Fill(energy,weightEB);
@@ -472,10 +488,15 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
            if(zside >= 0) histosTH1F_["energyEBNOHCALplus"]->Fill(energy,weightEB);
            else histosTH1F_["energyEBNOHCALminus"]->Fill(energy,weightEB);
         }
+        histosTH1F_["energyvseta"]->Fill(eta,emEnergy*weightEB);
+        histosTH2F_["etavsphi"]->Fill(eta,phi,emEnergy*weightEB);
+        histosTH2F_["ietavsiphi"]->Fill(ieta,iphi,emEnergy*weightEB);
      } else if( hasEE && (!hasEB) ){
         histosTH1F_["energyEE"]->Fill(energy,weightEE);
         if(zside >= 0) histosTH1F_["energyEEplus"]->Fill(energy,weightEE);
         else histosTH1F_["energyEEminus"]->Fill(energy,weightEE);
+        histosTH1F_["emEnergyEE"]->Fill(emEnergy,weightEE);
+        histosTH1F_["hadEnergyEE"]->Fill(hadEnergy,weightEE);
         if(hasHCAL){
            histosTH1F_["energyEEHCAL"]->Fill(energy,weightEE);
            if(zside >= 0) histosTH1F_["energyEEHCALplus"]->Fill(energy,weightEE);
@@ -485,6 +506,9 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
            if(zside >= 0) histosTH1F_["energyEENOHCALplus"]->Fill(energy,weightEE);
            else histosTH1F_["energyEENOHCALminus"]->Fill(energy,weightEE);
         }
+        histosTH1F_["energyvseta"]->Fill(eta,emEnergy*weightEE);
+        histosTH2F_["etavsphi"]->Fill(eta,phi,emEnergy*weightEE);
+        histosTH2F_["ietavsiphi"]->Fill(ieta,iphi,emEnergy*weightEE);
      }
   }
 
@@ -506,12 +530,18 @@ void CaloTowerNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSe
 
      histosNHFPlus_[i]->Fill(sumw_hf_plus[i]);
      histosNHFMinus_[i]->Fill(sumw_hf_minus[i]);
-     /*double sumw_hf_low = (sumw_hf_minus < sumw_hf_plus)?sumw_hf_minus[i]:sumw_hf_plus[i];
-     double sumw_hf_high = sumw_hf_minus[i] + sumw_hf_plus[i] - sumw_hf_low;
-     histosnhflow_[i]->Fill(sumw_hf_low);
-     histosnhfhigh_[i]->Fill(sumw_hf_high);*/
      histosSumEHFPlus_[i]->Fill(sumew_hf_plus[i]);
      histosSumEHFMinus_[i]->Fill(sumew_hf_minus[i]);
+
+     histosNEBPlus_[i]->Fill(sumw_eb_plus[i]);
+     histosNEBMinus_[i]->Fill(sumw_eb_minus[i]);
+     histosSumEEBPlus_[i]->Fill(sumew_eb_plus[i]);
+     histosSumEEBMinus_[i]->Fill(sumew_eb_minus[i]);
+
+     histosNEEPlus_[i]->Fill(sumw_ee_plus[i]);
+     histosNEEMinus_[i]->Fill(sumw_ee_minus[i]);
+     histosSumEEEPlus_[i]->Fill(sumew_ee_plus[i]);
+     histosSumEEEMinus_[i]->Fill(sumew_ee_minus[i]);
   }
 
   if(accessRecHits_){
