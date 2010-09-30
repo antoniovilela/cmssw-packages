@@ -46,10 +46,9 @@ class Sum{
    public:
       typedef T value_type;
 
-      // Expect built-in's, passing everything by value
-      Sum(T init): sum_(init) {}
-      inline void operator()(T const x) {sum_ += x;}
-      inline T value() const {return sum_;}
+      Sum(T const& init): sum_(init) {}
+      void operator()(T const& x) {sum_ += x;}
+      T const value() const {return sum_;}
    private:
       T sum_;
 };
@@ -59,8 +58,8 @@ class Mult{
    public:
       typedef T value_type;
  
-      Mult(T x): val_(x) {}
-      inline T operator()(T const x) {return x*val_;}
+      Mult(T const& x): val_(x) {}
+      T const operator()(T const& x) {return x*val_;}
    private:
       T val_;
 };

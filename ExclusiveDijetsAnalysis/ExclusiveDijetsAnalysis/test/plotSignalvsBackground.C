@@ -72,25 +72,25 @@ void plot(bool Norm = false, string attribute = "", int rebinFactor = 1, bool va
    samples.push_back("DPE di-jets");
 
    std::vector<TFile*> files;
-   /*files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDPlusDijets_Pt30-FastSim_histos.root")); 
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDMinusDijets_Pt30-FastSim_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_QCD100to250-madgraph-FastSim_histos.root"));
-   files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));*/
-   files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));
+   /*files.push_back(TFile::Open("root/analysisDijets_PAT_CEPDijets_M100_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDPlusDijets_Pt30_histos.root")); 
    files.push_back(TFile::Open("root/analysisDijets_PAT_SDMinusDijets_Pt30_histos.root"));
    files.push_back(TFile::Open("root/analysisDijets_PAT_QCD100to250-madgraph_histos.root"));
-   files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));
+   files.push_back(TFile::Open("root/analysisDijets_PAT_DPEDijets_Pt40_histos.root"));*/
 
    std::vector<TDirectory*> directories;
    std::vector<TDirectory*> directoriesHLT;
 
    size_t index = 0;
    std::vector<std::string> samplesFastSim;
-   //samplesFastSim.push_back("SD-plus di-jets");
-   //samplesFastSim.push_back("SD-minus di-jets");
-   //samplesFastSim.push_back("QCD non-diffractive");
+   samplesFastSim.push_back("SD-plus di-jets");
+   samplesFastSim.push_back("SD-minus di-jets");
+   samplesFastSim.push_back("QCD non-diffractive");
    for(std::vector<TFile*>::const_iterator file = files.begin(); file != files.end(); ++file,++index){
       if(find(samplesFastSim.begin(),samplesFastSim.end(),samples[index]) != samplesFastSim.end()){
          directories.push_back((*file)->GetDirectory(("edmDumpAnalysis_singleVtx" + attribute).c_str()));
