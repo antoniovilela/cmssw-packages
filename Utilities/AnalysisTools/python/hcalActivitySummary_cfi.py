@@ -8,10 +8,16 @@ hcalActivitySummary = cms.EDProducer("HCALActivitySummary",
     TowerEnergyThresholdHEMax = cms.double(10.0),
     TowerEnergyThresholdHFMin = cms.double(0.0),
     TowerEnergyThresholdHFMax = cms.double(10.0),
+    TowerEnergyThresholdEBMin = cms.double(0.0),
+    TowerEnergyThresholdEBMax = cms.double(5.0),
+    TowerEnergyThresholdEEMin = cms.double(0.0),
+    TowerEnergyThresholdEEMax = cms.double(10.0),
     NumberOfThresholds = cms.uint32(50),
     DiscardFlaggedTowers = cms.bool(False),
     ApplyEnergyScale = cms.bool(False),
     EnergyScaleFactorHB = cms.double(1.0),
     EnergyScaleFactorHE = cms.double(1.0),
-    EnergyScaleFactorHF = cms.double(1.0)
+    EnergyScaleFactorHF = cms.double(1.0),
+    EnergyScaleFactorEB = cms.double(1.0),
+    EnergyScaleFactorEE = cms.double(1.0)
 )
