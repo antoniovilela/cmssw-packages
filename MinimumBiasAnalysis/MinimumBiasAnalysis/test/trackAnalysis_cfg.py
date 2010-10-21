@@ -7,7 +7,7 @@ config.runOnMC = False
 config.globalTagNameData = 'GR_R_36X_V12A::All'
 config.globalTagNameMC = 'START36_V10::All'
 config.outputTTreeFile = 'analysisTracks_MinimumBias.root'
-config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_StreamExpress_Collisions10_V2_sub_132440.root'
+config.instLumiROOTFile = 'lumibylsXing_132440-137028_June14thReReco_Collisions10_JSON_v2_sub_132440.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 #config.trackTagName = 'selectGoodTracks'
@@ -48,9 +48,16 @@ process.TFileService = cms.Service("TFileService",
 # HF RecHit reflagger -- specify type of HF cleaning to use
 from Utilities.AnalysisTools.addHcalReflagging import addHFReflagging,addHBHEReflagging
 # Adds hfrecoReflagged
-process = addHFReflagging(process,version=10,isMC=config.runOnMC)
+reflagVersion = None
+if config.runOnMC: reflagVersion = 2
+else: reflagVersion = 10
+if config.verbose:
+    print "Adding HF reflagging with version",reflagVersion 
+process = addHFReflagging(process,version=reflagVersion,isMC=config.runOnMC)
 # HBHE RecHit reflagger
 # Adds hbherecoReflagged
+if config.verbose:
+    print "Adding HB/HE reflagging"
 process = addHBHEReflagging(process)
 
 if config.verbose:
@@ -116,8 +123,8 @@ makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR')
 if config.runHCALFilter:
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoPlus')
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoMinus')
-    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoPlus')
-    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoMinus')
+    #makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoPlus')
+    #makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoMinus')
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus4')
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus8')
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus12')

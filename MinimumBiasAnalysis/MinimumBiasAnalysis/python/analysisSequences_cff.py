@@ -130,9 +130,11 @@ eventSelectionBscMinBiasORNoColl = cms.Sequence(hltBscMinBiasORNoColl+offlineSel
 eventSelectionBscMinBiasORBPTXOR = cms.Sequence(hltBscMinBiasORBPTXOR+offlineSelection) 
 
 from Utilities.AnalysisTools.hcalActivityFilter_cfi import hcalActivityFilter
-hcalActivityFilter.EnergyThresholdHB = 1.5
-hcalActivityFilter.EnergyThresholdHE = 2.0
+hcalActivityFilter.EnergyThresholdHB = 1.25
+hcalActivityFilter.EnergyThresholdHE = 1.9
 hcalActivityFilter.EnergyThresholdHF = 4.0
+#hcalActivityFilter.EnergyThresholdEB = 0.6
+#hcalActivityFilter.EnergyThresholdEE = 2.45
 hcalVetoHFPlus = hcalActivityFilter.clone(NTowersMaxHFPlus = 0)
 hcalVetoHFMinus = hcalActivityFilter.clone(NTowersMaxHFMinus = 0)
 hcalVetoHEHFPlus = hcalActivityFilter.clone(NTowersMaxHEPlus = 0, NTowersMaxHFPlus = 0)
