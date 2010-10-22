@@ -79,14 +79,15 @@ trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksT
 
 from Utilities.AnalysisTools.hcalActivitySummary_cfi import *
 hcalActivitySummary.DiscardFlaggedTowers = False
-hcalActivitySummaryScale090 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.90,EnergyScaleFactorHE = 0.90,EnergyScaleFactorHF = 0.90)
-hcalActivitySummaryScale092 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.92,EnergyScaleFactorHE = 0.92,EnergyScaleFactorHF = 0.92)
-hcalActivitySummaryScale095 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.95,EnergyScaleFactorHE = 0.95,EnergyScaleFactorHF = 0.95)
-hcalActivitySummaryScale098 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.98,EnergyScaleFactorHE = 0.98,EnergyScaleFactorHF = 0.98)
-hcalActivitySummaryScale102 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.02,EnergyScaleFactorHE = 1.02,EnergyScaleFactorHF = 1.02)
-hcalActivitySummaryScale105 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.05,EnergyScaleFactorHE = 1.05,EnergyScaleFactorHF = 1.05)
-hcalActivitySummaryScale108 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.08,EnergyScaleFactorHE = 1.08,EnergyScaleFactorHF = 1.08)
-hcalActivitySummaryScale110 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.10,EnergyScaleFactorHE = 1.10,EnergyScaleFactorHF = 1.10)
+hcalActivitySummary.NumberOfThresholds = 200
+hcalActivitySummaryScale090 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.90,EnergyScaleFactorHE = 0.90,EnergyScaleFactorHF = 0.90,EnergyScaleFactorEB = 0.90,EnergyScaleFactorEE = 0.90)
+hcalActivitySummaryScale092 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.92,EnergyScaleFactorHE = 0.92,EnergyScaleFactorHF = 0.92,EnergyScaleFactorEB = 0.92,EnergyScaleFactorEE = 0.92)
+hcalActivitySummaryScale095 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.95,EnergyScaleFactorHE = 0.95,EnergyScaleFactorHF = 0.95,EnergyScaleFactorEB = 0.95,EnergyScaleFactorEE = 0.95)
+hcalActivitySummaryScale098 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 0.98,EnergyScaleFactorHE = 0.98,EnergyScaleFactorHF = 0.98,EnergyScaleFactorEB = 0.98,EnergyScaleFactorEE = 0.98)
+hcalActivitySummaryScale102 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.02,EnergyScaleFactorHE = 1.02,EnergyScaleFactorHF = 1.02,EnergyScaleFactorEB = 1.02,EnergyScaleFactorEE = 1.02)
+hcalActivitySummaryScale105 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.05,EnergyScaleFactorHE = 1.05,EnergyScaleFactorHF = 1.05,EnergyScaleFactorEB = 1.05,EnergyScaleFactorEE = 1.05)
+hcalActivitySummaryScale108 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.08,EnergyScaleFactorHE = 1.08,EnergyScaleFactorHF = 1.08,EnergyScaleFactorEB = 1.08,EnergyScaleFactorEE = 1.08)
+hcalActivitySummaryScale110 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.10,EnergyScaleFactorHE = 1.10,EnergyScaleFactorHF = 1.10,EnergyScaleFactorEB = 1.10,EnergyScaleFactorEE = 1.10)
 
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
 from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import *
@@ -133,14 +134,17 @@ from Utilities.AnalysisTools.hcalActivityFilter_cfi import hcalActivityFilter
 hcalActivityFilter.EnergyThresholdHB = 1.25
 hcalActivityFilter.EnergyThresholdHE = 1.9
 hcalActivityFilter.EnergyThresholdHF = 4.0
-#hcalActivityFilter.EnergyThresholdEB = 0.6
-#hcalActivityFilter.EnergyThresholdEE = 2.45
+hcalActivityFilter.EnergyThresholdEB = 0.6
+hcalActivityFilter.EnergyThresholdEE = 2.45
 hcalVetoHFPlus = hcalActivityFilter.clone(NTowersMaxHFPlus = 0)
 hcalVetoHFMinus = hcalActivityFilter.clone(NTowersMaxHFMinus = 0)
 hcalVetoHEHFPlus = hcalActivityFilter.clone(NTowersMaxHEPlus = 0, NTowersMaxHFPlus = 0)
 hcalVetoHEHFMinus = hcalActivityFilter.clone(NTowersMaxHEMinus = 0, NTowersMaxHFMinus = 0)
+hcalVetoEEHEHFPlus = hcalActivityFilter.clone(NTowersMaxEEPlus = 0, NTowersMaxHEPlus = 0, NTowersMaxHFPlus = 0)
+hcalVetoEEHEHFMinus = hcalActivityFilter.clone(NTowersMaxEEMinus = 0, NTowersMaxHEMinus = 0, NTowersMaxHFMinus = 0)
 hcalVetoHFPlusAndMinus = hcalActivityFilter.clone(NTowersMaxHFPlus = 0, NTowersMaxHFMinus = 0)
 hcalVetoHEHFPlusAndMinus = hcalActivityFilter.clone(NTowersMaxHEPlus = 0, NTowersMaxHFPlus = 0, NTowersMaxHEMinus = 0, NTowersMaxHFMinus = 0)
+hcalVetoEEHEHFPlusAndMinus = hcalActivityFilter.clone(NTowersMaxEEPlus = 0, NTowersMaxHEPlus = 0, NTowersMaxHFPlus = 0, NTowersMaxEEMinus = 0, NTowersMaxHEMinus = 0, NTowersMaxHFMinus = 0)
 hcalVetoSumEMaxHFPlus4 = hcalActivityFilter.clone(SumEMaxHFPlus = 4.0)
 hcalVetoSumEMaxHFPlus8 = hcalActivityFilter.clone(SumEMaxHFPlus = 8.0)
 hcalVetoSumEMaxHFPlus12 = hcalActivityFilter.clone(SumEMaxHFPlus = 12.0)
@@ -149,11 +153,24 @@ hcalVetoSumEMaxHFMinus4 = hcalActivityFilter.clone(SumEMaxHFMinus = 4.0)
 hcalVetoSumEMaxHFMinus8 = hcalActivityFilter.clone(SumEMaxHFMinus = 8.0)
 hcalVetoSumEMaxHFMinus12 = hcalActivityFilter.clone(SumEMaxHFMinus = 12.0)
 hcalVetoSumEMaxHFMinus16 = hcalActivityFilter.clone(SumEMaxHFMinus = 16.0)
+hcalVetoSumETMaxHFPlus05 = hcalActivityFilter.clone(SumETMaxHFPlus = 0.5)
+hcalVetoSumETMaxHFPlus10 = hcalActivityFilter.clone(SumETMaxHFPlus = 1.0)
+hcalVetoSumETMaxHFPlus15 = hcalActivityFilter.clone(SumETMaxHFPlus = 1.5)
+hcalVetoSumETMaxHFPlus20 = hcalActivityFilter.clone(SumETMaxHFPlus = 2.0)
+hcalVetoSumETMaxHFMinus05 = hcalActivityFilter.clone(SumETMaxHFMinus = 0.5)
+hcalVetoSumETMaxHFMinus10 = hcalActivityFilter.clone(SumETMaxHFMinus = 1.0)
+hcalVetoSumETMaxHFMinus15 = hcalActivityFilter.clone(SumETMaxHFMinus = 1.5)
+hcalVetoSumETMaxHFMinus20 = hcalActivityFilter.clone(SumETMaxHFMinus = 2.0)
 
 eventSelectionBscMinBiasORHFVetoPlus = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoHFPlus)
 eventSelectionBscMinBiasORHFVetoMinus = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoHFMinus)
 eventSelectionBscMinBiasORHEHFVetoPlus = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoHEHFPlus)
 eventSelectionBscMinBiasORHEHFVetoMinus = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoHEHFMinus)
+eventSelectionBscMinBiasOREEHEHFVetoPlus = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoEEHEHFPlus)
+eventSelectionBscMinBiasOREEHEHFVetoMinus = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoEEHEHFMinus)
+eventSelectionBscMinBiasORHFPlusAndMinus = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoHFPlusAndMinus)
+eventSelectionBscMinBiasORHEHFPlusAndMinus = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoHEHFPlusAndMinus)
+eventSelectionBscMinBiasOREEHEHFPlusAndMinus = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoEEHEHFPlusAndMinus)
 eventSelectionBscMinBiasORSumEMaxHFPlus4 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumEMaxHFPlus4)
 eventSelectionBscMinBiasORSumEMaxHFPlus8 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumEMaxHFPlus8)
 eventSelectionBscMinBiasORSumEMaxHFPlus12 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumEMaxHFPlus12)
@@ -162,6 +179,14 @@ eventSelectionBscMinBiasORSumEMaxHFMinus4 = cms.Sequence(eventSelectionBscMinBia
 eventSelectionBscMinBiasORSumEMaxHFMinus8 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumEMaxHFMinus8)
 eventSelectionBscMinBiasORSumEMaxHFMinus12 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumEMaxHFMinus12)
 eventSelectionBscMinBiasORSumEMaxHFMinus16 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumEMaxHFMinus16)
+eventSelectionBscMinBiasORSumETMaxHFPlus05 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumETMaxHFPlus05)
+eventSelectionBscMinBiasORSumETMaxHFPlus10 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumETMaxHFPlus10)
+eventSelectionBscMinBiasORSumETMaxHFPlus15 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumETMaxHFPlus15)
+eventSelectionBscMinBiasORSumETMaxHFPlus20 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumETMaxHFPlus20)
+eventSelectionBscMinBiasORSumETMaxHFMinus05 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumETMaxHFMinus05)
+eventSelectionBscMinBiasORSumETMaxHFMinus10 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumETMaxHFMinus10)
+eventSelectionBscMinBiasORSumETMaxHFMinus15 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumETMaxHFMinus15)
+eventSelectionBscMinBiasORSumETMaxHFMinus20 = cms.Sequence(eventSelectionBscMinBiasOR+hcalVetoSumETMaxHFMinus20)
 
 #jets = cms.Sequence(leadingJets)
 #tracks = cms.Sequence(selectGoodTracks*
