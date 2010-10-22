@@ -1,12 +1,22 @@
 import FWCore.ParameterSet.Config as cms
 
+from Utilities.PyConfigTools.parseInput import parseInput
+inputFields = ('runOnMC','generator')
+inputOptions = parseInput(inputFields) 
+
 # Settings
 class config: pass
+#config.fileNames = ['file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root']
+config.fileNames = ['file:/data1/antoniov/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
 config.verbose = True
-config.runOnMC = False
+if not hasattr(inputOptions,'runOnMC'): config.runOnMC = False
+else: config.runOnMC = inputOptions.runOnMC
+if not hasattr(inputOptions,'generator'): config.generator = 'Pythia6'
+else: config.generator = inputOptions.generator
 config.globalTagNameData = 'GR_R_36X_V12A::All'
 config.globalTagNameMC = 'START36_V10::All'
-config.outputTTreeFile = 'analysisTracks_MinimumBias.root'
+if config.runOnMC: config.outputTTreeFile = 'analysisTracks_MinBias.root'
+else: config.outputTTreeFile = 'analysisTracks_MinimumBias.root'
 config.instLumiROOTFile = 'lumibylsXing_132440-137028_June14thReReco_Collisions10_JSON_v2_sub_132440.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
@@ -24,9 +34,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-        'file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root'
-    )
+    fileNames = cms.untracked.vstring(config.fileNames)
 )
 # Import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -67,17 +75,18 @@ if config.verbose:
 
 ###################################################################################
 
-process.load('Utilities.AnalysisTools.lumiWeight_cfi')
-process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
+if not config.runOnMC:
+    process.load('Utilities.AnalysisTools.lumiWeight_cfi')
+    process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
 
 from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
-#countsAnalyzer.weightTag = cms.InputTag("lumiWeight")
+if not config.runOnMC: countsAnalyzer.weightTag = cms.InputTag("lumiWeight")
 
 process.xiTower.comEnergy = config.comEnergy
 process.xiFromCaloTowers.comEnergy = config.comEnergy
 process.xiFromJets.comEnergy = config.comEnergy
 process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
-process.eventWeightSequence = cms.Sequence(process.lumiWeight)
+if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
 process.reflagging_step = cms.Path(process.hfrecoReflagged+process.hbherecoReflagged)
 process.rereco_step = cms.Path(process.caloTowersRec
@@ -87,7 +96,7 @@ process.rereco_step = cms.Path(process.caloTowersRec
                                ) # re-reco jets and met
 
 process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
-process.eventWeight_step = cms.Path(process.eventWeightSequence)
+if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.eventSelection+process.recoSequence)
 # Path for event counting  
 process.countsAll = countsAnalyzer.clone()
@@ -118,8 +127,18 @@ process.trackHistoAnalyzer.TrackTag = config.trackTagName
 
 from Utilities.PyConfigTools.analysisTools import *
 
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR')
+processIdFilters = None
+if config.runOnMC:
+    from MinimumBiasAnalysis.MinimumBiasAnalysis.addProcessIdFilters import addProcessIdFilters
+    if config.verbose:
+        print 'Using generator type',config.generator
+    processIdFilters = addProcessIdFilters(process,config.generator)
 
+# Analysis modules
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR')
+if config.runOnMC:
+    makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR',filters=processIdFilters)
+  
 if config.runHCALFilter:
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoPlus')
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoMinus')
@@ -146,3 +165,37 @@ if config.runHCALFilter:
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFMinus10')
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFMinus15')
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFMinus20')
+
+    if config.runOnMC:
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoPlus',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoMinus',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoPlus',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoMinus',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREEHEHFVetoPlus',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREEHEHFVetoMinus',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFPlusAndMinus',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFPlusAndMinus',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREEHEHFPlusAndMinus',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus4',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus8',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus12',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus16',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus4',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus8',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus12',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus16',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFPlus05',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFPlus10',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFPlus15',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFPlus20',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFMinus05',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFMinus10',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFMinus15',filters=processIdFilters)
+        makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumETMaxHFMinus20',filters=processIdFilters)
+    
+if config.runOnMC:
+    from Utilities.PyConfigTools.removeFromPaths import removeFromPaths
+    removeFromPaths(process,'bptx')
+    removeFromPaths(process,'hltBscMinBiasORBptxPlusORMinusFilter')
+
+    
