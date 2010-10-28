@@ -37,11 +37,15 @@ class Plotter{
     
       void SetVerbose(bool verbose) {verbose_ = verbose;}
       void SetRebin(int rebin) {rebin_ = rebin;}
+      void SetStats(bool stats) {histStats_ = stats;}
       void SetColors(std::vector<int> const& colors) {histLineColors_ = colors; histFillColors_ = colors;}
       void SetLineColors(std::vector<int> const& colors) {histLineColors_ = colors;}
       void SetFillColors(std::vector<int> const& colors) {histFillColors_ = colors;}
       void SetLineStyles(std::vector<int> const& linestyles) {histLineStyles_ = linestyles;}
       void SetFillStyles(std::vector<int> const& fillstyles) {histFillStyles_ = fillstyles;}
+      void SetMarkerColors(std::vector<int> const& colors) {histMarkerColors_ = colors;}
+      void SetMarkerStyles(std::vector<int> const& styles) {histMarkerStyles_ = styles;}
+      void SetMarkerSizes(std::vector<float> const& sizes) {histMarkerSizes_ = sizes;}
 
       void plot(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const char* drawOption = "");
       void plot(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const std::vector<double>&, const char* drawOption = "");
@@ -64,10 +68,14 @@ class Plotter{
 
       bool verbose_;
       int rebin_;
+      bool histStats_;
       std::vector<int> histLineColors_;
       std::vector<int> histLineStyles_;
       std::vector<int> histFillColors_;
       std::vector<int> histFillStyles_;
+      std::vector<int> histMarkerColors_;
+      std::vector<int> histMarkerStyles_;
+      std::vector<float> histMarkerSizes_;
       //NormPolicy norm_;
 };
 

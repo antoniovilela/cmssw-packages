@@ -12,7 +12,7 @@
 #include <sstream>
 
 template <class NormPolicy>
-Plotter<NormPolicy>::Plotter(): verbose_(false),rebin_(1){
+Plotter<NormPolicy>::Plotter(): verbose_(false),rebin_(1),histStats_(true){
    // Default colors/styles
    int colors[] = {kRed,kBlue,kMagenta};
    std::vector<int> vec_colors(colors,colors + sizeof(colors)/sizeof(int));
@@ -20,11 +20,18 @@ Plotter<NormPolicy>::Plotter(): verbose_(false),rebin_(1){
    std::vector<int> vec_linestyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
    int fillstyles[] = {3004,3006,3005,3007,3013};
    std::vector<int> vec_fillstyles(fillstyles,fillstyles + sizeof(fillstyles)/sizeof(int)); 
+   int markerstyles[] = {1};
+   std::vector<int> vec_markerstyles(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
+   int markersizes[] = {1.};
+   std::vector<float> vec_markersizes(markersizes,markersizes + sizeof(markersizes)/sizeof(float)); 
 
    SetLineColors(vec_colors);
    SetLineStyles(vec_linestyles);
    SetFillColors(vec_colors);
    SetFillStyles(vec_fillstyles);
+   SetMarkerColors(vec_colors);
+   SetMarkerStyles(vec_markerstyles); 
+   SetMarkerSizes(vec_markersizes);
 }
 
 //======================================================
@@ -99,7 +106,13 @@ THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<
    std::reverse(fillcolors.begin(),fillcolors.end());
    std::vector<int> fillstyles(histFillStyles_);
    std::reverse(fillstyles.begin(),fillstyles.end());
- 
+   std::vector<int> markercolors(histMarkerColors_);
+   std::reverse(markercolors.begin(),markercolors.end());
+   std::vector<int> markerstyles(histMarkerStyles_);
+   std::reverse(markerstyles.begin(),markerstyles.end());
+   std::vector<float> markersizes(histMarkerSizes_);
+   std::reverse(markersizes.begin(),markersizes.end()); 
+
    THStack* stack = new THStack(("stack_" + name).c_str(),name.c_str());
    if(verbose_) std::cout << " Created THStack " << stack->GetName() << std::endl;
    size_t index = 0;
@@ -108,10 +121,14 @@ THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<
    //std::vector<HistDesc>::const_iterator histos_last = reversedHistos.end() - 1;
    for(; it_histo != histos_end; ++it_histo, ++index){
       TH1F* histo = it_histo->first;
+      histo->SetStats(histStats_);
       histo->SetLineColor(linecolors[index % linecolors.size()]);
       histo->SetLineStyle(linestyles[index % linestyles.size()]);
       histo->SetFillColor(fillcolors[index % fillcolors.size()]);
       histo->SetFillStyle(fillstyles[index % fillstyles.size()]);
+      histo->SetMarkerColor(markercolors[index % markercolors.size()]);
+      histo->SetMarkerStyle(markerstyles[index % markerstyles.size()]);
+      histo->SetMarkerSize(markersizes[index % markersizes.size()]);
       /*if(it_histo == histos_last){
          histo->SetLineStyle(1);
       } else{
@@ -203,10 +220,14 @@ void Plotter<NormPolicy>::plotHistos(std::vector<HistDesc> const& histos, std::s
       TH1F* histo = it_histo->first;
       //std::string const& desc = it_histo->second;
 
+      histo->SetStats(histStats_);
       histo->SetLineColor(histLineColors_[index % histLineColors_.size()]);
       histo->SetLineStyle(histLineStyles_[index % histLineStyles_.size()]);
       histo->SetFillColor(histFillColors_[index % histFillColors_.size()]);
       histo->SetFillStyle(histFillStyles_[index % histFillStyles_.size()]);
+      histo->SetMarkerColor(histMarkerColors_[index % histMarkerColors_.size()]);
+      histo->SetMarkerStyle(histMarkerStyles_[index % histMarkerStyles_.size()]);
+      histo->SetMarkerSize(histMarkerSizes_[index % histMarkerSizes_.size()]);
 
       /*TH1F* histo_new = static_cast<TH1F*>(
                ( var == vars.begin() ) ?
