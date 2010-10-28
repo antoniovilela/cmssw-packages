@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 void setDirsDataMC(std::string const&, std::vector<std::pair<std::string,TDirectory*> >&, std::vector<double>&);
 void setDirsDataMCDiff(std::string const&, std::vector<std::pair<std::string,TDirectory*> >&, std::vector<double>&);
@@ -18,7 +19,7 @@ void setDirsDataMCTunes(std::string const&, std::vector<std::pair<std::string,TD
 void setDirsDataMCMatBudget(std::string const&, std::vector<std::pair<std::string,TDirectory*> >&, std::vector<double>&);
 void setDirsDataVsSumEHF(std::vector<std::pair<std::string,TDirectory*> >&, std::vector<double>&);
 
-void plot(const char* eventSelection = "", const char* drawOption = "", int rebin = 1){
+void plot(std::string const& eventSelection = "", std::string const& mode = "setDirsDataMC", const char* drawOption = "", int rebin = 1){
 
    std::vector<std::string> variables;
    variables.push_back("TrackEta");
@@ -40,11 +41,11 @@ void plot(const char* eventSelection = "", const char* drawOption = "", int rebi
 
    std::vector<std::pair<std::string,TDirectory*> > dirs;
    std::vector<double> normFactors;
-   //setDirsDataMC(eventSelection,dirs,normFactors);
-   //setDirsDataMCDiff(eventSelection,dirs,normFactors);
-   //setDirsDataMCTunes(eventSelection,dirs,normFactors);
-   setDirsDataMCMatBudget(eventSelection,dirs,normFactors);
-   //setDirsDataVsSumEHF(dirs,normFactors);
+   if(mode == "setDirsDataMC") setDirsDataMC(eventSelection,dirs,normFactors);
+   else if(mode == "setDirsDataMCDiff") setDirsDataMCDiff(eventSelection,dirs,normFactors);
+   else if(mode == "setDirsDataMCTunes") setDirsDataMCTunes(eventSelection,dirs,normFactors);
+   else if(mode == "setDirsDataMCMatBudget") setDirsDataMCMatBudget(eventSelection,dirs,normFactors);
+   else if(mode == "setDirsDataVsSumEHF") setDirsDataVsSumEHF(dirs,normFactors);
 
    //Plotter<NumberEntriesNorm> plotter;
    Plotter<DefaultNorm> plotter;
@@ -52,12 +53,18 @@ void plot(const char* eventSelection = "", const char* drawOption = "", int rebi
    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
    int linestyles[] = {1,1,2,3,4,9,10,2};
    std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+   int markerstyles[] = {20,1,1,1,1,1,1,1};
+   std::vector<int> histMarkerStyles(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
    plotter.SetLineColors(histColors);
    plotter.SetLineStyles(histLineStyles);
    plotter.SetFillColors(std::vector<int>(1,0));
    plotter.SetFillStyles(std::vector<int>(1,0));
+   plotter.SetMarkerColors(histColors);
+   plotter.SetMarkerStyles(histMarkerStyles);
+   plotter.SetMarkerSizes(std::vector<float>(1,1.));
    plotter.SetRebin(rebin);
    plotter.SetVerbose(true);
+   plotter.SetStats(false);
    plotter.plot(variables,dirs,normFactors,drawOption);
    //plotter.plot(variables,dirs,drawOption);
    //plotter.plotComponents(variables,dirs,normFactors,"NOSTACK");
@@ -66,11 +73,8 @@ void plot(const char* eventSelection = "", const char* drawOption = "", int rebi
 
 void setDirsDataMC(std::string const& eventSelection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
 
-   //TFile* file_data = TFile::Open("root/7TeV/analysisMinBias_TTree_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132440_minimumBiasAnalysisTTree-v5.root");
-   TFile* file_data = TFile::Open("root/7TeV/analysisMinBias_TTree_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132605_minimumBiasAnalysisTTree-v2.root");
-   //TFile* file_mc = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1_minimumBiasAnalysisTTree-v2.root");
-   //TFile* file_mc = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1_minimumBiasAnalysisTTree-v1.root");
-   TFile* file_mc = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_minimumBiasAnalysisTTree-v2.root");
+   TFile* file_data = TFile::Open("root/7TeV/Data/Run132605/trackAnalysis/analysisTracks_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132605_trackAnalysis-v3.root");
+   TFile* file_mc = TFile::Open("root/7TeV/Pythia8/trackAnalysis/analysisTracks_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1-trackAnalysis-v1.root");
 
    /*std::string labelAll  = "trackHistoAnalyzer_";                       labelAll  += eventSelection;
    std::string labelSD   = "trackHistoAnalyzer_processIdPythia6_SD_";   labelSD   += eventSelection;
@@ -110,10 +114,10 @@ void setDirsDataMC(std::string const& eventSelection,std::vector<std::pair<std::
 
 void setDirsDataMCDiff(std::string const& eventSelection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
    
-   TFile* file_data = TFile::Open("root/7TeV/analysisMinBias_TTree_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132440_minimumBiasAnalysisTTree-v5.root");
-   TFile* file_mc_0 = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1_minimumBiasAnalysisTTree-v2.root");
-   //TFile* file_mc = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1_minimumBiasAnalysisTTree-v1.root");
-   TFile* file_mc_1 = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_minimumBiasAnalysisTTree-v2.root");
+   TFile* file_data = TFile::Open("root/7TeV/Data/Run132605/trackAnalysis/analysisTracks_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132605_trackAnalysis-v3.root");
+   TFile* file_mc_0 = TFile::Open("root/7TeV/Pythia6D6T/trackAnalysis/analysisTracks_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1-trackAnalysis-v1.root");
+   TFile* file_mc_1 = TFile::Open("root/7TeV/Pythia8/trackAnalysis/analysisTracks_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1-trackAnalysis-v1.root");
+   TFile* file_mc_2 = TFile::Open("root/7TeV/Phojet/trackAnalysis/analysisTracks_MinBias_7TeV-phojet_START36_V10_362-HLT-v1_antoniov-PrivateProd-START36_V10_362_RECO-v1-trackAnalysis-v1.root");
 
    std::string labelAll    = "trackHistoAnalyzer_";                       labelAll    += eventSelection;
 
@@ -123,6 +127,9 @@ void setDirsDataMCDiff(std::string const& eventSelection,std::vector<std::pair<s
    std::string labelDiff_1 = "trackHistoAnalyzer_processIdPythia8_Diff_"; labelDiff_1 += eventSelection;
    std::string labelND_1   = "trackHistoAnalyzer_processIdPythia8_ND_";   labelND_1   += eventSelection;
 
+   std::string labelDiff_2 = "trackHistoAnalyzer_processIdPhojet_Diff_";  labelDiff_2 += eventSelection;
+   std::string labelND_2   = "trackHistoAnalyzer_processIdPhojet_ND_";    labelND_2   += eventSelection;
+
    std::string hNTracksPath = labelAll + "/NTracks";
    TH1F* hNTracks_data = static_cast<TH1F*>(file_data->Get(hNTracksPath.c_str()));
    double nEvents_data = hNTracks_data->GetEntries();
@@ -130,34 +137,39 @@ void setDirsDataMCDiff(std::string const& eventSelection,std::vector<std::pair<s
    double nEvents_mc_0 = hNTracks_mc_0->GetEntries();
    TH1F* hNTracks_mc_1 = static_cast<TH1F*>(file_mc_1->Get(hNTracksPath.c_str()));
    double nEvents_mc_1 = hNTracks_mc_1->GetEntries();
+   TH1F* hNTracks_mc_2 = static_cast<TH1F*>(file_mc_2->Get(hNTracksPath.c_str()));
+   double nEvents_mc_2 = hNTracks_mc_2->GetEntries();
 
    dirs.push_back(std::make_pair("p+p (7 TeV)",file_data->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PYTHIA D6T All",file_mc_0->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PYTHIA D6T Diffractive",file_mc_0->GetDirectory(labelDiff_0.c_str()))); 
    dirs.push_back(std::make_pair("PYTHIA 8 All",file_mc_1->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PYTHIA 8 Diffractive",file_mc_1->GetDirectory(labelDiff_1.c_str())));
+   dirs.push_back(std::make_pair("PHOJET All",file_mc_2->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PHOJET Diffractive",file_mc_2->GetDirectory(labelDiff_2.c_str())));
 
-   normFactors.resize(5);
+   normFactors.resize(7);
    normFactors[0] = 1./nEvents_data;
    normFactors[1] = 1./nEvents_mc_0;
    normFactors[2] = 1./nEvents_mc_0;
    normFactors[3] = 1./nEvents_mc_1;
    normFactors[4] = 1./nEvents_mc_1;
+   normFactors[5] = 1./nEvents_mc_2;
+   normFactors[6] = 1./nEvents_mc_2;
 }
 
 void setDirsDataMCTunes(std::string const& eventSelection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
-   //TFile* file_data = TFile::Open("root/7TeV/analysisMinBias_TTree_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132440_minimumBiasAnalysisTTree-v5.root");
-   TFile* file_data = TFile::Open("root/7TeV/analysisMinBias_TTree_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132605_minimumBiasAnalysisTTree-v2.root");
+   TFile* file_data = TFile::Open("root/7TeV/Data/Run132605/trackAnalysis/analysisTracks_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132605_trackAnalysis-v3.root");
 
    std::vector<TFile*> filesMC;
    filesMC.resize(7);
-   filesMC[0] = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1_minimumBiasAnalysisTTree-v2.root");
-   filesMC[1] = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneDW_7TeV-pythia6_Summer10-START36_V10-v1_minimumBiasAnalysisTTree-v2.root");
-   filesMC[2] = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1_minimumBiasAnalysisTTree-v1.root"); 
-   filesMC[3] = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1_minimumBiasAnalysisTTree-v1.root");
-   filesMC[4] = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1_minimumBiasAnalysisTTree-v1.root");
-   filesMC[5] = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_minimumBiasAnalysisTTree-v2.root");
-   filesMC[6] = TFile::Open("root/7TeV/analysisMinBias_TTree_MinBias_7TeV-phojet_START36_V10_362-HLT-v1_antoniov-PrivateProd-START36_V10_362_RECO-v1_minimumBiasAnalysisTTree-v1.root");
+   filesMC[0] = TFile::Open("root/7TeV/Pythia6D6T/trackAnalysis/analysisTracks_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1-trackAnalysis-v1.root");
+   filesMC[1] = TFile::Open("root/7TeV/Pythia6DW/trackAnalysis/analysisTracks_MinBias_TuneDW_7TeV-pythia6_Summer10-START36_V10-v1-trackAnalysis-v1.root");
+   filesMC[2] = TFile::Open("root/7TeV/Pythia6CW/trackAnalysis/analysisTracks_MinBias_TuneCW_7TeV-pythia6_Summer10-START36_V10-v1-trackAnalysis-v1.root"); 
+   filesMC[3] = TFile::Open("root/7TeV/Pythia6P0/trackAnalysis/analysisTracks_MinBias_TuneP0_7TeV-pythia6_Summer10-START36_V10_SP10-v1-trackAnalysis-v1.root");
+   filesMC[4] = TFile::Open("root/7TeV/Pythia6Z1/trackAnalysis/analysisTracks_MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1-trackAnalysis-v1.root");
+   filesMC[5] = TFile::Open("root/7TeV/Pythia8/trackAnalysis/analysisTracks_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1-trackAnalysis-v1.root");
+   filesMC[6] = TFile::Open("root/7TeV/Phojet/trackAnalysis/analysisTracks_MinBias_7TeV-phojet_START36_V10_362-HLT-v1_antoniov-PrivateProd-START36_V10_362_RECO-v1-trackAnalysis-v1.root");
 
    std::string labelAll    = "trackHistoAnalyzer_";                       labelAll    += eventSelection;
 
@@ -202,9 +214,9 @@ void setDirsDataMCMatBudget(std::string const& eventSelection,std::vector<std::p
 
    std::vector<TFile*> filesMC;
    filesMC.resize(3);
-   filesMC[0] = TFile::Open("root/7TeV/Pythia6D6T/trackAnalysis/analysisTracks_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1.root");
-   filesMC[1] = TFile::Open("root/7TeV/Pythia6D6T_X0MAX/trackAnalysis/analysisTracks_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10-X0MAX-v1.root");
-   filesMC[2] = TFile::Open("root/7TeV/Pythia6D6T_LiMAX/trackAnalysis/analysisTracks_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10-LiMAX-v1.root");
+   filesMC[0] = TFile::Open("root/7TeV/Pythia6D6T/trackAnalysis/analysisTracks_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10_SP10-v1-trackAnalysis-v1.root");
+   filesMC[1] = TFile::Open("root/7TeV/Pythia6D6T_X0MAX/trackAnalysis/analysisTracks_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10-X0MAX-v1-trackAnalysis-v1.root");
+   filesMC[2] = TFile::Open("root/7TeV/Pythia6D6T_LiMAX/trackAnalysis/analysisTracks_MinBias_TuneD6T_7TeV-pythia6_Summer10-START36_V10-LiMAX-v1-trackAnalysis-v1.root");
 
    std::string labelAll    = "trackHistoAnalyzer_";                       labelAll    += eventSelection; 
 
@@ -237,7 +249,7 @@ void setDirsDataMCMatBudget(std::string const& eventSelection,std::vector<std::p
 
 void setDirsDataVsSumEHF(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
 
-   TFile* file_data = TFile::Open("root/7TeV/analysisMinBias_TTree_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132440_minimumBiasAnalysisTTree-v5.root");
+   TFile* file_data = TFile::Open("root/7TeV/Data/Run132605/trackAnalysis/analysisTracks_MinimumBias_Commissioning10-GOODCOLL-Jun14thSkim_Run132605_trackAnalysis-v3.root");
 
    std::string labelAll              = "trackHistoAnalyzer_eventSelectionBscMinBiasOR";
    std::string labelSumEMaxHFPlus4   = "trackHistoAnalyzer_eventSelectionBscMinBiasORSumEMaxHFPlus4";
@@ -251,9 +263,9 @@ void setDirsDataVsSumEHF(std::vector<std::pair<std::string,TDirectory*> >& dirs,
    dirs.push_back(std::make_pair("p+p (7 TeV) E(HF+) < 8 GeV",file_data->GetDirectory(labelSumEMaxHFPlus8.c_str())));
    dirs.push_back(std::make_pair("p+p (7 TeV) E(HF+) < 4 GeV",file_data->GetDirectory(labelSumEMaxHFPlus4.c_str())));
 
-   std::string hNTracksPath = labelAll + "/NTracks";
+   /*std::string hNTracksPath = labelAll + "/NTracks";
    TH1F* hNTracks_data = static_cast<TH1F*>(file_data->Get(hNTracksPath.c_str()));
-   double nEvents_data = hNTracks_data->GetEntries();
+   double nEvents_data = hNTracks_data->GetEntries();*/
 
    normFactors = std::vector<double>(5,1.);       
 }
