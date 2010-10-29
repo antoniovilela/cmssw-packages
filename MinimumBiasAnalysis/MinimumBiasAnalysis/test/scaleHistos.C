@@ -11,7 +11,18 @@
 void scaleByWidthHistos(std::string const& fileName, std::string const& dirName, std::vector<std::string> variables, bool saveHistos);
 void scaleByWidth(TH1F*);
 
-void scaleByWidthHistos(std::string const& fileName, std::string const& dirName, bool saveHistos = false){
+void scaleByWidthTrackHistos(std::string const& fileName, std::string const& dirName, bool saveHistos = false){
+
+  std::vector<std::string> variables;
+  variables.push_back("TrackEta");
+  variables.push_back("TrackPt");
+  variables.push_back("NTracks");
+  variables.push_back("TrackPtSum");
+
+  scaleByWidthHistos(fileName,dirName,variables,saveHistos);
+}
+
+void scaleByWidthCaloTowerHistos(std::string const& fileName, std::string const& dirName, bool saveHistos = false){
 
   std::vector<std::string> variables;
   variables.push_back("EPlusPzFromTowersVarBin");

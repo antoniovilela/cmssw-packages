@@ -22,10 +22,10 @@ void setDirsDataVsSumEHF(std::vector<std::pair<std::string,TDirectory*> >&, std:
 void plot(std::string const& eventSelection = "", std::string const& mode = "setDirsDataMC", const char* drawOption = "", int rebin = 1){
 
    std::vector<std::string> variables;
-   variables.push_back("TrackEta");
-   variables.push_back("TrackPt");
-   variables.push_back("NTracks");
-   variables.push_back("TrackPtSum");
+   variables.push_back("TrackEta_dist");
+   variables.push_back("TrackPt_dist");
+   variables.push_back("NTracks_dist");
+   variables.push_back("TrackPtSum_dist");
  
    /*std::string fileNameEvtSel_data = "root/7TeV/Data/Run132440/analysisMinBiasTTree_MinimumBias_7TeV_";
    fileNameEvtSel_data += eventSelection; fileNameEvtSel_data += "_histos.root";
@@ -53,7 +53,7 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
    int linestyles[] = {1,1,2,3,4,9,10,2};
    std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
-   int markerstyles[] = {20,1,1,1,1,1,1,1};
+   int markerstyles[] = {20,21,25,22,26,20,24,27};
    std::vector<int> histMarkerStyles(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
    plotter.SetLineColors(histColors);
    plotter.SetLineStyles(histLineStyles);
@@ -61,7 +61,7 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
    plotter.SetFillStyles(std::vector<int>(1,0));
    plotter.SetMarkerColors(histColors);
    plotter.SetMarkerStyles(histMarkerStyles);
-   plotter.SetMarkerSizes(std::vector<float>(1,1.));
+   plotter.SetMarkerSizes(std::vector<float>(1,1.5));
    plotter.SetRebin(rebin);
    plotter.SetVerbose(true);
    plotter.SetStats(false);
