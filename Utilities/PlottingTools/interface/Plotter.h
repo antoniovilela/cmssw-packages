@@ -8,6 +8,7 @@
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 
 #include <vector>
+#include <string> 
 #include <map>
 
 class VarDesc{
@@ -46,6 +47,8 @@ class Plotter{
       void SetMarkerColors(std::vector<int> const& colors) {histMarkerColors_ = colors;}
       void SetMarkerStyles(std::vector<int> const& styles) {histMarkerStyles_ = styles;}
       void SetMarkerSizes(std::vector<float> const& sizes) {histMarkerSizes_ = sizes;}
+      /*void SetTitlesX(std::vector<std::string> const& titles) {histTitlesX_ = titles;}
+      void SetTitlesY(std::vector<std::string> const& titles) {histTitlesY_ = titles;}*/ 
 
       void plot(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const char* drawOption = "");
       void plot(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const std::vector<double>&, const char* drawOption = "");
@@ -76,6 +79,8 @@ class Plotter{
       std::vector<int> histMarkerColors_;
       std::vector<int> histMarkerStyles_;
       std::vector<float> histMarkerSizes_;
+      /*std::vector<std::string> histTitlesX_;
+      std::vector<std::string> histTitlesY_;*/
       //NormPolicy norm_;
 };
 
