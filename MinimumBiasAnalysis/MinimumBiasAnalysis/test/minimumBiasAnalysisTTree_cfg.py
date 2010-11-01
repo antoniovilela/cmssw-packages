@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
+config.verbose = True
 config.writeEdmOutput = False
 config.runOnMC = False
 config.globalTagNameData = 'GR_R_36X_V12A::All'
@@ -13,10 +14,11 @@ config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 #config.trackTagName = 'selectGoodTracks'
 config.trackTagName = 'analysisTracks'
+config.generator = 'Pythia6'
 config.varyAttributes = True
 config.runOfflineOnly = True
 config.runNoColl = True
-config.runBPTX = False
+config.runBPTX = True
 config.runHCALFilter = True
 
 process = cms.Process("Analysis")
@@ -59,27 +61,37 @@ process.TFileService = cms.Service("TFileService",
 # HCAL reflagging
 # HF RecHit reflagger -- specify type of HF cleaning to use
 from Utilities.AnalysisTools.addHcalReflagging import addHFReflagging,addHBHEReflagging
-process = addHFReflagging(process,version=10,isMC=config.runOnMC)
+# Adds hfrecoReflagged
+reflagVersion = None
+if config.runOnMC: reflagVersion = 2
+else: reflagVersion = 10
+if config.verbose:
+    print "Adding HF reflagging with version",reflagVersion
+process = addHFReflagging(process,version=reflagVersion,isMC=config.runOnMC)
 # HBHE RecHit reflagger
+# Adds hbherecoReflagged
+if config.verbose:
+    print "Adding HB/HE reflagging"
 process = addHBHEReflagging(process)
 
-print "These are the severity levels for the various rechit flags:"
-print "(Severity > 10 causes rechit to be ignored by CaloTower maker)"
-for i in process.hcalRecAlgos.SeverityLevels: print i
+if config.verbose:
+    print "These are the severity levels for the various rechit flags:"
+    print "(Severity > 10 causes rechit to be ignored by CaloTower maker)"
+    for i in process.hcalRecAlgos.SeverityLevels: print i
 
 ###################################################################################
 
-process.load('Utilities.AnalysisTools.lumiWeight_cfi')
-process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
+if not config.runOnMC:
+    process.load('Utilities.AnalysisTools.lumiWeight_cfi')
+    process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
 
 from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
-#countsAnalyzer.weightTag = cms.InputTag("lumiWeight")
 
 process.xiTower.comEnergy = config.comEnergy
 process.xiFromCaloTowers.comEnergy = config.comEnergy
 process.xiFromJets.comEnergy = config.comEnergy
 process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
-process.eventWeightSequence = cms.Sequence(process.lumiWeight)
+if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
 process.reflagging_step = cms.Path(process.hfrecoReflagged+process.hbherecoReflagged)
 process.rereco_step = cms.Path(process.caloTowersRec
@@ -89,7 +101,7 @@ process.rereco_step = cms.Path(process.caloTowersRec
                                ) # re-reco jets and met
 
 process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
-process.eventWeight_step = cms.Path(process.eventWeightSequence)
+if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.eventSelection+process.recoSequence)
 # Path for event counting  
 process.countsAll = countsAnalyzer.clone()
@@ -145,6 +157,13 @@ attributesThresholds = [{'EnergyThresholdHF':3.6},
 attributes = attributesEnergyScale
 attributes.extend(attributesThresholds)
 
+processIdFilters = None
+if config.runOnMC:
+    from MinimumBiasAnalysis.MinimumBiasAnalysis.addProcessIdFilters import addProcessIdFilters
+    if config.verbose:
+        print 'Using generator type',config.generator
+    processIdFilters = addProcessIdFilters(process,config.generator)
+
 from Utilities.PyConfigTools.analysisTools import *
 
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR')
@@ -191,3 +210,11 @@ if config.runHCALFilter:
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus8')
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus12')
     makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus16')
+
+# Add MC-specific paths
+# ...
+
+if config.runOnMC:
+    from Utilities.PyConfigTools.removeFromPaths import removeFromPaths
+    removeFromPaths(process,'bptx')
+    removeFromPaths(process,'hltBscMinBiasORBptxPlusORMinusFilter')
