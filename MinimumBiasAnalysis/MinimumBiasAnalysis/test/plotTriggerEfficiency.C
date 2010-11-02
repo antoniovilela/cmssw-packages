@@ -55,6 +55,12 @@ void plotTriggerEfficiency(std::string const& fileName, std::string const& treeN
   TFile* file = TFile::Open(fileName.c_str());
   TTree* data = static_cast<TTree*>(file->Get(treeName.c_str()));
 
+  if(!data){                 
+      std::cout << "ERROR: Could not find " << treeName << " in " << fileName << std::endl;
+      file->Close();          
+      return;                 
+  }
+
   plotTriggerEfficiency(data,outFileName);
 }
 

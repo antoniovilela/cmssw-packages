@@ -32,7 +32,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root'
+        #'file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root'
+        'file:/data1/antoniov/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO_6AF419E4-E17B-DF11-AEB6-0026189437FC.root'
     )
 )
 # Import of standard configurations

@@ -40,10 +40,10 @@ namespace minimumBiasAnalysis {
      // 1-13 HF rings, 2.866 < |eta| < 5.205
      data.Branch("multiplicityHFPlusVsiEta",eventData.multiplicityHFPlusVsiEta_,"multiplicityHFPlusVsiEta[13]/I");
      data.Branch("multiplicityHFMinusVsiEta",eventData.multiplicityHFMinusVsiEta_,"multiplicityHFMinusVsiEta[13]/I");
-     data.Branch("sumEHFPlusVsiEta",eventData.sumEHFPlusVsiEta_,"sumEHFPlusVsiEta[13]/I");
-     data.Branch("sumEHFMinusVsiEta",eventData.sumEHFMinusVsiEta_,"sumEHFMinusVsiEta[13]/I");
-     data.Branch("sumETHFPlusVsiEta",eventData.sumETHFPlusVsiEta_,"sumETHFPlusVsiEta[13]/I");
-     data.Branch("sumETHFMinusVsiEta",eventData.sumETHFMinusVsiEta_,"sumETHFMinusVsiEta[13]/I");
+     data.Branch("sumEHFPlusVsiEta",eventData.sumEHFPlusVsiEta_,"sumEHFPlusVsiEta[13]/D");
+     data.Branch("sumEHFMinusVsiEta",eventData.sumEHFMinusVsiEta_,"sumEHFMinusVsiEta[13]/D");
+     data.Branch("sumETHFPlusVsiEta",eventData.sumETHFPlusVsiEta_,"sumETHFPlusVsiEta[13]/D");
+     data.Branch("sumETHFMinusVsiEta",eventData.sumETHFMinusVsiEta_,"sumETHFMinusVsiEta[13]/D");
      data.Branch("sumEnergyHEPlusGen",&eventData.sumEnergyHEPlusGen_,"sumEnergyHEPlusGen/D");
      data.Branch("sumEnergyHEMinusGen",&eventData.sumEnergyHEMinusGen_,"sumEnergyHEMinusGen/D"); 
      data.Branch("sumEnergyHFPlusGen",&eventData.sumEnergyHFPlusGen_,"sumEnergyHFPlusGen/D");
