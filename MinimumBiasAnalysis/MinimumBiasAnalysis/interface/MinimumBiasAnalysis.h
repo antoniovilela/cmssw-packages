@@ -38,6 +38,7 @@ class MinimumBiasAnalysis {
      edm::InputTag jetTag_;
      edm::InputTag caloTowerTag_;
      edm::InputTag particleFlowTag_;
+     edm::InputTag genChargedTag_;
      edm::InputTag triggerResultsTag_;
      edm::InputTag hcalTowerSummaryTag_;
 

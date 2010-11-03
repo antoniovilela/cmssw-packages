@@ -20,6 +20,8 @@ namespace minimumBiasAnalysis {
      data.Branch("posZPrimVtx",&eventData.posZPrimVtx_,"posZPrimVtx/D");
      data.Branch("multiplicityTracks",&eventData.multiplicityTracks_,"multiplicityTracks/I");
      data.Branch("sumPtTracks",&eventData.sumPtTracks_,"sumPtTracks/D");
+     data.Branch("multiplicityTracksGen",&eventData.multiplicityTracksGen_,"multiplicityTracksGen/I");
+     data.Branch("sumPtTracksGen",&eventData.sumPtTracksGen_,"sumPtTracksGen/D");
      data.Branch("leadingJetPt",&eventData.leadingJetPt_,"leadingJetPt/D");
      data.Branch("leadingJetEta",&eventData.leadingJetEta_,"leadingJetEta/D");
      data.Branch("leadingJetPhi",&eventData.leadingJetPhi_,"leadingJetPhi/D");
@@ -96,6 +98,8 @@ namespace minimumBiasAnalysis {
      data.SetBranchAddress("posZPrimVtx",&eventData.posZPrimVtx_);
      data.SetBranchAddress("multiplicityTracks",&eventData.multiplicityTracks_);
      data.SetBranchAddress("sumPtTracks",&eventData.sumPtTracks_); 
+     data.SetBranchAddress("multiplicityTracksGen",&eventData.multiplicityTracksGen_);
+     data.SetBranchAddress("sumPtTracksGen",&eventData.sumPtTracksGen_);
      data.SetBranchAddress("leadingJetPt",&eventData.leadingJetPt_);
      data.SetBranchAddress("leadingJetEta",&eventData.leadingJetEta_);
      data.SetBranchAddress("leadingJetPhi",&eventData.leadingJetPhi_);

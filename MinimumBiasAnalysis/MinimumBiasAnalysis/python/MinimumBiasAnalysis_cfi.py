@@ -8,6 +8,7 @@ MinimumBiasAnalysis = cms.PSet(
     METTag = cms.InputTag("met"),
     CaloTowerTag = cms.InputTag("towerMaker"), 
     ParticleFlowTag = cms.InputTag("particleFlow"),
+    GenChargedParticlesTag = cms.InputTag("genChargedParticles"),
     TriggerResultsTag = cms.InputTag("TriggerResults::HLT"),
     HCALTowerSummaryTag = cms.InputTag("hcalActivitySummary"),
     # Misc

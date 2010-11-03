@@ -31,11 +31,12 @@ namespace minimumBiasAnalysis {
 
 MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   vertexTag_(pset.getParameter<edm::InputTag>("VertexTag")),
-  trackTag_(pset.getParameter<edm::InputTag>("TrackTag")), 
+  trackTag_(pset.getParameter<edm::InputTag>("TrackTag")),
   metTag_(pset.getParameter<edm::InputTag>("METTag")),
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
   caloTowerTag_(pset.getParameter<edm::InputTag>("CaloTowerTag")),
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
+  genChargedTag_(pset.getParameter<edm::InputTag>("GenChargedParticlesTag")),
   triggerResultsTag_(pset.getParameter<edm::InputTag>("TriggerResultsTag")),
   hcalTowerSummaryTag_(pset.getParameter<edm::InputTag>("HCALTowerSummaryTag")),
   energyThresholdHB_(pset.getParameter<double>("EnergyThresholdHB")),
@@ -223,15 +224,38 @@ void MinimumBiasAnalysis::fillTrackInfo(EventData& eventData, const edm::Event& 
   const edm::View<reco::Track>& trackColl = *(trackCollectionH.product());
 
   double ptSum = 0.;
+  int nTracks = 0; 
   edm::View<reco::Track>::const_iterator track = trackColl.begin();
   edm::View<reco::Track>::const_iterator tracks_end = trackColl.end();
   for(; track != tracks_end; ++track){
      ptSum += track->pt();
+     ++nTracks;
      // Other variables..
   }
 
-  eventData.multiplicityTracks_ = trackColl.size();
+  eventData.multiplicityTracks_ = nTracks;
   eventData.sumPtTracks_ = ptSum;
+
+  if(accessMCInfo_){
+     edm::Handle<reco::GenParticleCollection> genChargedParticlesH;
+     event.getByLabel(genChargedTag_,genChargedParticlesH);
+     const reco::GenParticleCollection& genChargedParticles = *genChargedParticlesH;
+     reco::GenParticleCollection::const_iterator genpart = genChargedParticles.begin();
+     reco::GenParticleCollection::const_iterator genparts_end = genChargedParticles.end();
+
+     double ptSumGen = 0.;
+     int nTracksGen = 0;
+     for(; genpart != genparts_end; ++genpart){
+        ptSumGen += genpart->pt();
+        ++nTracksGen; 
+        //...
+     }
+     eventData.multiplicityTracksGen_ = nTracksGen;
+     eventData.sumPtTracksGen_ = ptSumGen;
+  } else{
+     eventData.multiplicityTracksGen_ = -1;
+     eventData.sumPtTracksGen_ = -1.;
+  }
 }
 
 void MinimumBiasAnalysis::fillMETInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){

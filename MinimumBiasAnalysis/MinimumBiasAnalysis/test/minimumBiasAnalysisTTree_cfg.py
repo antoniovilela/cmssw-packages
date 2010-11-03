@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 class config: pass
 config.verbose = True
 config.writeEdmOutput = False
-config.runOnMC = False
+config.runOnMC = True
 config.globalTagNameData = 'GR_R_36X_V12A::All'
 config.globalTagNameMC = 'START36_V10::All'
 config.outputEdmFile = '/tmp/antoniov/minimumBias.root'
@@ -17,8 +17,8 @@ config.trackTagName = 'analysisTracks'
 config.generator = 'Pythia6'
 config.varyAttributes = True
 config.runOfflineOnly = True
-config.runNoColl = True
-config.runBPTX = True
+config.runNoColl = False
+config.runBPTX = False
 config.runHCALFilter = True
 
 process = cms.Process("Analysis")
@@ -33,7 +33,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         #'file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root'
-        'file:/data1/antoniov/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO_6AF419E4-E17B-DF11-AEB6-0026189437FC.root'
+        #'file:/data1/antoniov/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO_6AF419E4-E17B-DF11-AEB6-0026189437FC.root'
+        'file:/data1/antoniov/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F63DF090-6879-DF11-9E7D-0030487CDA68.root'
     )
 )
 # Import of standard configurations
@@ -104,6 +105,10 @@ process.rereco_step = cms.Path(process.caloTowersRec
 process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
 if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.eventSelection+process.recoSequence)
+if config.runOnMC:
+    process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.genChargedParticles_cfi')
+    process.gen_step = cms.Path(process.genChargedParticles)
+
 # Path for event counting  
 process.countsAll = countsAnalyzer.clone()
 process.countsL1CollBscOr = countsAnalyzer.clone()
@@ -219,3 +224,8 @@ if config.runOnMC:
     from Utilities.PyConfigTools.removeFromPaths import removeFromPaths
     removeFromPaths(process,'bptx')
     removeFromPaths(process,'hltBscMinBiasORBptxPlusORMinusFilter')
+
+    from Utilities.PyConfigTools.setAnalyzerAttributes import setAnalyzerAttributes
+    setAnalyzerAttributes(process,'minimumBiasTTreeAnalysis',
+                                  AccessMCInfo = True, 
+                                  TriggerResultsTag = cms.InputTag("TriggerResults::REDIGI36")) 
