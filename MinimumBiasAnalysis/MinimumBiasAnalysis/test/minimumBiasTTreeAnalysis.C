@@ -173,7 +173,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
    // Loop over the events
    for(int ientry = 0; ientry < nEntries; ++ientry){
       if((maxEvents > 0)&&(ientry == maxEvents)) break;
-      if(verbose && ientry%2000 == 0) std::cout << ">>> Analysing " << ientry << "th entry" << std::endl;
+      //if(verbose && ientry%2000 == 0) std::cout << ">>> Analysing " << ientry << "th entry" << std::endl;
+      if(ientry%2000 == 0) std::cout << ">>> Analysing " << ientry << "th entry" << std::endl;
 
       data->GetEntry(ientry);
 

@@ -16,8 +16,8 @@
 //Headers for the data items
 #include "DataFormats/FWLite/interface/Handle.h"
 #include "DataFormats/FWLite/interface/Event.h"
-#include "DataFormats/FWLite/interface/TriggerNames.h"
-//#include "FWCore/Common/interface/TriggerNames.h"
+//#include "DataFormats/FWLite/interface/TriggerNames.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #endif
 
@@ -29,10 +29,10 @@ void hltFWLiteAnalysis(std::vector<std::string>& fileNames,
                                    std::string const& outFileName = "analysisHLTFWLite_histos.root",
                                    int maxEvents = -1, bool verbose = false) {
  
-   bool selectEventsInRuns = true;
+   std::string hltProcessName = "REDIGI36";
+
+   bool selectEventsInRuns = false;
    std::vector<int> selectedRuns;
-   selectedRuns.push_back(124027);
-   //selectedRuns.push_back(124030);
 
    if(verbose){
      std::cout << ">>> Reading files: " << std::endl;
@@ -90,7 +90,7 @@ void hltFWLiteAnalysis(std::vector<std::string>& fileNames,
 
      fwlite::Handle<edm::TriggerResults> triggerResults;
      try{
-        triggerResults.getByLabel(ev,"TriggerResults","","HLT");
+        triggerResults.getByLabel(ev,"TriggerResults","",hltProcessName.c_str());
      } catch(std::exception& e){
         e.what();
         continue;
@@ -99,7 +99,8 @@ void hltFWLiteAnalysis(std::vector<std::string>& fileNames,
      if(!triggerResults.isValid()) continue;
 
      //triggerNames.init(*triggerResults);
-     fwlite::TriggerNames const & triggerNames = ev.triggerNames(*triggerResults);
+     //fwlite::TriggerNames const & triggerNames = ev.triggerNames(*triggerResults);
+     edm::TriggerNames const & triggerNames = ev.triggerNames(*triggerResults);
      if(histos.find("countAll") == histos.end()) bookHistos(histos,triggerNames.triggerNames());
  
      // Loop over triggers

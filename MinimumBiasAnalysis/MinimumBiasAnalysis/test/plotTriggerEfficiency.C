@@ -5,6 +5,7 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TCanvas.h"
+#include "TGraphAsymmErrors.h"
 
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 #include "Utilities/PlottingTools/interface/Plotter.h"
@@ -132,12 +133,17 @@ void plotTriggerEfficiency(TTree* data, std::string const& outFileName){
   double effAve = nAcc/nAll;
   double effError = sqrt(nAll*effAve*(1. - effAve))/nAll;
   std::cout << "Efficiency = " << effAve << " +/- " << effError << std::endl;
-   
+ 
+  std::vector<TGraphAsymmErrors*> graphsEff(histosEff.size());  
   for(size_t k = 0; k < histosAll.size(); ++k){
      TH1F* hAll = histosAll[k];
      TH1F* hEff = histosEff[k];
      std::cout << "================================" << std::endl;
      std::cout << " Histogram " << hAll->GetName() << std::endl;
+     graphsEff[k] = new TGraphAsymmErrors(hEff,hAll);
+     graphsEff[k]->SetName( (std::string(hEff->GetName()) + "_graph" ).c_str() );
+     std::cout << "  Created eff. graph " << graphsEff[k]->GetName() << std::endl;
+
      for(int ibin = 0; ibin < hAll->GetNbinsX(); ++ibin){
         int binNumber = ibin + 1;
         double nAllBin = hAll->GetBinContent(binNumber);
@@ -154,7 +160,9 @@ void plotTriggerEfficiency(TTree* data, std::string const& outFileName){
      canvas->cd();
      hEff->Draw();*/
   }
-
+  
+  outFile.cd();
+  for(size_t k = 0; k < graphsEff.size(); ++k) graphsEff[k]->Write();
   outFile.Write(); 
   outFile.Close();
 }

@@ -8,6 +8,10 @@
 
 #include "fileNames_data.C"
 
+void setFileNamesZeroBiasRun132605(std::vector<std::string>& fileNames){
+   fileNames.push_back("/data1/antoniov/AnalysisResults/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO/analysisMinBias_ZeroBias_Commissioning10-Jun14thReReco_v1_Run132605_minimumBiasAnalysisTTree-v5.root");
+}
+
 void runMinimumBiasTTreeAnalysis(){
    gROOT->ProcessLine(".L minimumBiasTTreeAnalysis.C+");
 
@@ -20,7 +24,8 @@ void runMinimumBiasTTreeAnalysis(){
    std::vector<std::string> fileNames(0);
    //setFileNamesRun132440(fileNames);
    //setFileNamesRun132605(fileNames);
-   setFileNamesRun132605V2(fileNames);
+   //setFileNamesRun132605V2(fileNames);
+   setFileNamesZeroBiasRun132605(fileNames);
  
    //std::string outDir = "root/900GeV/NoSel";
    //std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0";
@@ -30,30 +35,33 @@ void runMinimumBiasTTreeAnalysis(){
    //std::string outDir = "root/2360GeV/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/2360GeV/SumEnergyMaxHFMinus_8_0";
    //std::string outDir = "root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0";
-   std::string outDir = "root/7TeV/Data/Run132605";
+   //std::string outDir = "root/7TeV/Data/Run132605";
+   std::string outDir = "root/7TeV/ZeroBias/Run132605";
    bool verbose = false;
 
    /*std::string fileName = rootDir + "/";
    fileName += getTTreeFileName(runRange);*/
 
    std::vector<std::string> selections;
-   selections.push_back("eventSelectionBscMinBiasOR");
-   selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale090_EnergyScaleFactorHCAL_0_9");
+   //selections.push_back("eventSelectionBscMinBiasOR");
+   /*selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale090_EnergyScaleFactorHCAL_0_9");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale092_EnergyScaleFactorHCAL_0_92");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale095_EnergyScaleFactorHCAL_0_95");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale098_EnergyScaleFactorHCAL_0_98");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale102_EnergyScaleFactorHCAL_1_02");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale105_EnergyScaleFactorHCAL_1_05");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale108_EnergyScaleFactorHCAL_1_08");
-   selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale110_EnergyScaleFactorHCAL_1_1");
+   selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale110_EnergyScaleFactorHCAL_1_1");*/
    /*selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_3_6");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_6_0");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_8_0");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_1_6_EnergyThresholdHB_1_2");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_2_4_EnergyThresholdHB_1_8");*/
-   selections.push_back("eventSelection");
-   selections.push_back("eventSelectionBscMinBiasORNoColl");
-   selections.push_back("eventSelectionBscMinBiasORBPTXOR");
+   //selections.push_back("eventSelection");
+   //selections.push_back("eventSelectionL1Tech4");
+   selections.push_back("eventSelectionBPTX");
+   /*selections.push_back("eventSelectionBscMinBiasORNoColl");
+   selections.push_back("eventSelectionBscMinBiasORBPTXOR");*/
    /*selections.push_back("eventSelectionBscMinBiasORHFVetoPlus");
    selections.push_back("eventSelectionBscMinBiasORHFVetoMinus");
    selections.push_back("eventSelectionBscMinBiasORHEHFVetoPlus");
