@@ -10,7 +10,8 @@ def customiseEventContent(process):
             )
         )
 
-        process.output.outputCommands.extend(AddToEventContent.outputCommands)
+        for moduleName in process.outputModules:
+            process.outputModules[moduleName].outputCommands.extend(AddToEventContent.outputCommands)
 
         return(process)
 
@@ -22,7 +23,11 @@ def customise(process):
             initialSeed = cms.untracked.uint32(123456789),
             engineName = cms.untracked.string('HepJamesRandom')
         )
-        process.LHCTransport.HepMCProductLabel = "source"
+        if process.g4SimHits.Generator.HepMCProductLabel == "LHCTransport":
+            process.LHCTransport.HepMCProductLabel = "source"
+        else:
+            process.g4SimHits.Generator.HepMCProductLabel = "source"
+
         process.mix.mixObjects.mixHepMC.input = cms.VInputTag(cms.InputTag("source"))
 
         process = customiseEventContent(process)
