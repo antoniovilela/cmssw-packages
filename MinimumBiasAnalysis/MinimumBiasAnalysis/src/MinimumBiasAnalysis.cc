@@ -499,6 +499,10 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
   double missingMassFromXiFromPFCands = 2*Ebeam_*sqrt(xiFromPFCands_plus*xiFromPFCands_minus);
   eventData.missingMassFromXiFromPFCands_ = missingMassFromXiFromPFCands;
 
+  std::pair<double,double> etaMaxFromPFCands = etaMax(*particleFlowCollectionH,thresholdsPFlow_);
+  eventData.etaMaxFromPFCands_ = etaMaxFromPFCands.first;
+  eventData.etaMinFromPFCands_ = etaMaxFromPFCands.second;
+
   fillMultiplicities(eventData,event,setup);
 }
 } // namespace

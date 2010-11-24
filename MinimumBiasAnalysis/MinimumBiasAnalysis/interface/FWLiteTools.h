@@ -6,6 +6,9 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
+
+#include <vector>
+#include <algorithm>
 #endif
 
 namespace minimumBiasAnalysis {
@@ -132,6 +135,20 @@ std::pair<double,double> EPlusPz(reco::PFCandidateCollection const& pflowCollect
    }
 
    return std::make_pair(e_plus_pz,e_minus_pz);
+}
+
+std::pair<double,double> etaMax(reco::PFCandidateCollection const& pflowCollection, std::map<int,std::pair<double,double> > const& thresholds){
+   std::vector<double> etaCands;
+   reco::PFCandidateCollection::const_iterator part = pflowCollection.begin();
+   reco::PFCandidateCollection::const_iterator pfCands_end = pflowCollection.end();
+   for(; part != pfCands_end; ++part){                           
+      if(!pflowThreshold(*part,thresholds)) continue;            
+      etaCands.push_back( part->eta() );
+   }                                                             
+   double eta_max = *( std::max_element(etaCands.begin(), etaCands.end()) );
+   double eta_min = *( std::min_element(etaCands.begin(), etaCands.end()) );
+
+   return std::make_pair(eta_max,eta_min);
 }
 
 } // namespace

@@ -53,6 +53,9 @@ namespace minimumBiasAnalysis {
      histos["MxFromJets"] = adaptor.template make<TH1F>("MxFromJets","MxFromJets",200,-10.,400.);
      histos["MxFromTowers"] = adaptor.template make<TH1F>("MxFromTowers","MxFromTowers",200,-10.,400.);
      histos["MxFromPFCands"] = adaptor.template make<TH1F>("MxFromPFCands","MxFromPFCands",200,-10.,400.);
+     histos["etaMaxFromPFCands"] = adaptor.template make<TH1F>("etaMaxFromPFCands","etaMaxFromPFCands",200,-7.,7.);
+     histos["etaMinFromPFCands"] = adaptor.template make<TH1F>("etaMinFromPFCands","etaMinFromPFCands",200,-7.,7.);
+
      histos["towerEcalTime"] = adaptor.template make<TH1F>("towerEcalTime","towerEcalTime",200,-100.,100.);
      histos["towerHcalTime"] = adaptor.template make<TH1F>("towerHcalTime","towerHcalTime",200,-100.,100.);
      histos["energySumVsEcalTime"] = adaptor.template make<TH1F>("energySumVsEcalTime","energySumVsEcalTime",200,-100.,100.);

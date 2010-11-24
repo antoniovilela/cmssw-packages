@@ -146,7 +146,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    }
 
    bool doTriggerSelection = false;
-   bool doHcalNoiseSelection = true;
+   bool doHcalNoiseSelection = false;
    /*// Pre-selection
    bool doGoodVertexSelection = false;
    bool doHighQualityTracksSelection = true;*/

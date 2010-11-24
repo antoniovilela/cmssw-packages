@@ -82,16 +82,19 @@ void plotTriggerEfficiency(TTree* data, std::string const& outFileName){
   TFile outFile(outFileName.c_str(),"recreate");
 
   std::vector<TH1F*> histosAll;
+  std::vector<TH2F*> histos2DAll;
   TH1F* hTrackMult = new TH1F("HLTBSCORVsTrackMult","HLTBSCORVsTrackMult",5,0,30);
   TH1F* hHFPlusMult = new TH1F("HLTBSCORVsHFPlusMult","HLTBSCORVsHFPlusMult",5,0,20);
   TH1F* hHFMinusMult = new TH1F("HLTBSCORVsHFMinusMult","HLTBSCORVsHFMinusMult",5,0,20);
   TH1F* hSumEHFPlus = new TH1F("HLTBSCORVsSumEHFPlus","HLTBSCORVsSumEHFPlus",5,0.,100.);
   TH1F* hSumEHFMinus = new TH1F("HLTBSCORVsSumEHFMinus","HLTBSCORVsSumEHFMinus",5,0.,100.);
+  TH2F* hSumEHFPlusVsSumEHFMinus = new TH2F("HLTBSCORVsSumEHFPlusVsSumEHFMinus","HLTBSCORVsSumEHFPlusVsSumEHFMinus",10,0.,100.,10,0.,100.);
   histosAll.push_back(hTrackMult);
   histosAll.push_back(hHFPlusMult);
   histosAll.push_back(hHFMinusMult);
   histosAll.push_back(hSumEHFPlus);
   histosAll.push_back(hSumEHFMinus); 
+  histos2DAll.push_back(hSumEHFPlusVsSumEHFMinus);
 
   std::vector<TH1F*> histosEff;
   std::vector<TH1F*>::const_iterator it_histoAll = histosAll.begin();
@@ -100,6 +103,14 @@ void plotTriggerEfficiency(TTree* data, std::string const& outFileName){
      std::string hname = (*it_histoAll)->GetName();
      hname += "_eff";
      histosEff.push_back(static_cast<TH1F*>((*it_histoAll)->Clone(hname.c_str())));
+  }
+  std::vector<TH2F*> histos2DEff;
+  std::vector<TH2F*>::const_iterator it_histo2DAll = histos2DAll.begin();
+  std::vector<TH2F*>::const_iterator it_histos2DAll_end = histos2DAll.end();
+  for(; it_histo2DAll != it_histos2DAll_end; ++it_histo2DAll){
+     std::string hname = (*it_histo2DAll)->GetName();
+     hname += "_eff";
+     histos2DEff.push_back(static_cast<TH2F*>((*it_histo2DAll)->Clone(hname.c_str())));
   }
 
   double nAcc = 0.;
@@ -121,13 +132,15 @@ void plotTriggerEfficiency(TTree* data, std::string const& outFileName){
      histosAll[2]->Fill(multiplicityHFMinus);
      histosAll[3]->Fill(sumEnergyHFPlus);
      histosAll[4]->Fill(sumEnergyHFMinus);
+     histos2DAll[0]->Fill(sumEnergyHFPlus,sumEnergyHFMinus);
      if(trigBSCOR == 1){
         ++nAcc;
         histosEff[0]->Fill(trackMultiplicity);
         histosEff[1]->Fill(multiplicityHFPlus);
         histosEff[2]->Fill(multiplicityHFMinus);
         histosEff[3]->Fill(sumEnergyHFPlus);
-        histosEff[4]->Fill(sumEnergyHFMinus); 
+        histosEff[4]->Fill(sumEnergyHFMinus);
+        histos2DEff[0]->Fill(sumEnergyHFPlus,sumEnergyHFMinus); 
      }
   }
   double effAve = nAcc/nAll;

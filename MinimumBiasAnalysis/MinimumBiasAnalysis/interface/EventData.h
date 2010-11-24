@@ -73,6 +73,8 @@ namespace minimumBiasAnalysis {
      double MxFromTowers_;
      //double MxFromJets_;
      double MxFromPFCands_;
+     double etaMaxFromPFCands_;
+     double etaMinFromPFCands_;
      double sumET_;
      double MEx_;
      double MEy_;
