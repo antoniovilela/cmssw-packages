@@ -1,3 +1,4 @@
+#include "TStyle.h"
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TPaveLabel.h"
@@ -69,17 +70,14 @@ void Plotter<NormPolicy>::plotStack(VarMap const& variablesMap, const char* draw
          std::copy(histos.begin(), histos.end(), stackedHistos.begin());
       }
       THStack* stack = buildTHStack(setName,stackedHistos);
-      //stack->Draw(option.c_str());
 
       if(firstAsRefHist){
          HistDesc const& histoFirst = histos[0];
          histoFirst.first->SetMarkerStyle(20);
          histoFirst.first->SetMarkerSize(1.2);
-         histoFirst.first->SetStats(0);
+         //histoFirst.first->SetStats(0);
          stack->Draw(option.c_str());
          histoFirst.first->Draw("SAME][");
-         //histoFirst.first->Draw(); 
-         //stack->Draw( ( option + "SAME" ).c_str() );
       } else {
          stack->Draw(option.c_str());
       }  
@@ -88,8 +86,9 @@ void Plotter<NormPolicy>::plotStack(VarMap const& variablesMap, const char* draw
       std::vector<HistDesc>::const_iterator histos_end = histos.end();
       for(; histo != histos_end; ++histo) legendMap[setName]->AddEntry(histo->first,histo->second.c_str(),"LPF");
 
-      legendMap[setName]->SetFillColor(0);
+      legendMap[setName]->SetFillColor( canvasMap[setName]->GetFillColor() );
       legendMap[setName]->SetHeader(legendHeader_.c_str());
+      legendMap[setName]->UseCurrentStyle();
       legendMap[setName]->Draw("SAME");
    }
 
@@ -126,7 +125,7 @@ THStack* Plotter<NormPolicy>::buildTHStack(std::string const& name, std::vector<
    //std::vector<HistDesc>::const_iterator histos_last = reversedHistos.end() - 1;
    for(; it_histo != histos_end; ++it_histo, ++index){
       TH1F* histo = it_histo->first;
-      histo->SetStats(histStats_);
+      //histo->SetStats(histStats_);
       histo->SetLineColor(linecolors[index % linecolors.size()]);
       histo->SetLineStyle(linestyles[index % linestyles.size()]);
       histo->SetFillColor(fillcolors[index % fillcolors.size()]);
@@ -183,10 +182,12 @@ TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var, unsigned int index){
    std::stringstream label;
    label << name << "_scaled_" << index; 
    TH1F* histo_new = static_cast<TH1F*>(histo->Clone(label.str().c_str()));
+   histo_new->UseCurrentStyle();
 
    double scaleFactor = (histo_new->GetSumOfWeights() > 0.) ? NormPolicy::GetNorm(histo_new)*normFactor/histo_new->GetSumOfWeights() : 1.;
    scaleHisto(histo_new,scaleFactor,1,1,rebin_);
 
+   // Style and customizations
    if(histTitlesX.find(name) != histTitlesX.end()) histo_new->GetXaxis()->SetTitle( histTitlesX[name].c_str() );
 
    char const* titleY = "";
@@ -201,9 +202,10 @@ TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var, unsigned int index){
    histo_new->GetXaxis()->SetLabelSize(axisLabelSize_);
    histo_new->GetYaxis()->SetLabelSize(axisLabelSize_);
 
+   histo_new->SetStats(histStats_);
+
    return histo_new;
 }
-
 
 template <class NormPolicy>
 typename Plotter<NormPolicy>::VarMap Plotter<NormPolicy>::makeVarMap(std::vector<std::string>& variables, std::vector<std::pair<std::string,TDirectory*> >& directories, const std::vector<double>& normFactors){
@@ -237,7 +239,7 @@ void Plotter<NormPolicy>::plotHistos(std::vector<HistDesc> const& histos, std::s
       TH1F* histo = it_histo->first;
       //std::string const& desc = it_histo->second;
 
-      histo->SetStats(histStats_);
+      //histo->SetStats(histStats_);
       histo->SetLineColor(histLineColors_[index % histLineColors_.size()]);
       histo->SetLineStyle(histLineStyles_[index % histLineStyles_.size()]);
       histo->SetFillColor(histFillColors_[index % histFillColors_.size()]);
@@ -288,7 +290,7 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
       const std::string& setName = set->first;
       canvasMap[setName] = new TCanvas(setName.c_str(),setName.c_str());
       canvasMap[setName]->cd();
-
+      
       legendMap[setName] = new TLegend(0.50,0.65,0.75,0.90);
     
       std::vector<HistDesc> const& histos = set->second;
@@ -298,21 +300,24 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
       std::vector<HistDesc>::const_iterator histos_end = histos.end();
       for(; histo != histos_end; ++histo) legendMap[setName]->AddEntry(histo->first,histo->second.c_str(),"LPF");
 
-      legendMap[setName]->SetFillColor(0);
-      legendMap[setName]->SetHeader(legendHeader_.c_str()); 
+      legendMap[setName]->SetFillColor( canvasMap[setName]->GetFillColor() );
+      legendMap[setName]->SetHeader(legendHeader_.c_str());
+      legendMap[setName]->UseCurrentStyle();
       legendMap[setName]->Draw("SAME");
    
       std::vector<std::string>::const_iterator label = paveLabels_.begin();
       std::vector<std::string>::const_iterator labels_end = paveLabels_.end();
       for(; label != labels_end; ++label){
          TPaveLabel* paveLabel = new TPaveLabel(0.45,0.80,0.80,0.90,label->c_str(),"NDC");
-         paveLabel->SetFillColor(0);
+         paveLabel->SetFillColor( canvasMap[setName]->GetFillColor() );
+         paveLabel->UseCurrentStyle(); 
          paveLabel->Draw("SAME");
       }
 
       std::vector<TObject*>::const_iterator obj = drawObjects_.begin();
       std::vector<TObject*>::const_iterator objs_end = drawObjects_.end();
       for(; obj != objs_end; ++obj) (*obj)->Draw("SAME");
+
    }
 
    TH1::AddDirectory(addStatus);

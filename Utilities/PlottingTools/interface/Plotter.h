@@ -36,13 +36,13 @@ class Plotter{
 
       Plotter();
     
-      void SetVerbose(bool set) { verbose_ = set; }
+      void SetVerbose(bool set = true) { verbose_ = set; }
       void SetRebin(int rebin) { rebin_ = rebin; }
       void SetStats(bool stats) { histStats_ = stats; }
       void SetTitleSize(float size) { titleSize_ = size; }
       void SetAxisLabelSize(float size) { axisLabelSize_ = size; }
       void SetHeader(std::string const& header) { legendHeader_ = header; }
-      void SetRefHisto(bool set) { firstAsRefHist_ = set; }
+      void SetRefHisto(bool set = true) { firstAsRefHist_ = set; }
 
       void AddLabel(std::string const& label) { paveLabels_.push_back(label); }
       void AddObject(TObject* object) { drawObjects_.push_back(object); }

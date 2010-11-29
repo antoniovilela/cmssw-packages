@@ -82,7 +82,7 @@ void scaleHisto(TH1F* histo, double scale, int line, int color, int rebin){
    if(scale != 1.) {std::cout << "DEBUG: Calling scaleHisto..scaling histo by " << scale << std::endl; histo->Scale(scale);}
 
    if(rebin != 1) {std::cout << "DEBUG: Calling scaleHisto..re-bining histo by " << rebin << std::endl; histo->Rebin(rebin);}
-   histo->SetLineWidth(3);
+   //histo->SetLineWidth(3);
    histo->SetLineStyle(line);
    histo->SetLineColor(color);
 
