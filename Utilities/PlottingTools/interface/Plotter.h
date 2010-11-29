@@ -40,9 +40,12 @@ class Plotter{
       void SetRebin(int rebin) { rebin_ = rebin; }
       void SetStats(bool stats) { histStats_ = stats; }
       void SetTitleSize(float size) { titleSize_ = size; }
+      void SetAxisLabelSize(float size) { axisLabelSize_ = size; }
       void SetHeader(std::string const& header) { legendHeader_ = header; }
       void SetRefHisto(bool set) { firstAsRefHist_ = set; }
+
       void AddLabel(std::string const& label) { paveLabels_.push_back(label); }
+      void AddObject(TObject* object) { drawObjects_.push_back(object); }
 
       void SetColors(std::vector<int> const& colors) {histLineColors_ = colors; histFillColors_ = colors;}
       void SetLineColors(std::vector<int> const& colors) {histLineColors_ = colors;}
@@ -79,7 +82,7 @@ class Plotter{
 
       bool verbose_, firstAsRefHist_, histStats_;
       int rebin_;
-      float titleSize_; 
+      float titleSize_, axisLabelSize_; 
       std::string legendHeader_;
 
       std::vector<int> histLineColors_;
@@ -94,6 +97,7 @@ class Plotter{
       std::map<std::string, std::string> histTitlesX;
       std::map<std::string, std::string> histTitlesY;
       std::vector<std::string> paveLabels_;
+      std::vector<TObject*> drawObjects_;
       //NormPolicy norm_;
 };
 

@@ -15,7 +15,7 @@
 template <class NormPolicy>
 Plotter<NormPolicy>::Plotter(): verbose_(false), firstAsRefHist_(false), histStats_(true),
                                 rebin_(1),
-                                titleSize_(0.05), 
+                                titleSize_(0.05), axisLabelSize_(0.05),
                                 legendHeader_("") {
    // Default colors/styles
    int colors[] = {kRed,kBlue,kMagenta};
@@ -198,6 +198,9 @@ TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var, unsigned int index){
    histo_new->GetXaxis()->SetTitleSize(titleSize_);
    histo_new->GetYaxis()->SetTitleSize(titleSize_);
 
+   histo_new->GetXaxis()->SetLabelSize(axisLabelSize_);
+   histo_new->GetYaxis()->SetLabelSize(axisLabelSize_);
+
    return histo_new;
 }
 
@@ -286,7 +289,7 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
       canvasMap[setName] = new TCanvas(setName.c_str(),setName.c_str());
       canvasMap[setName]->cd();
 
-      legendMap[setName] = new TLegend(0.4,0.7,0.95,0.8);
+      legendMap[setName] = new TLegend(0.50,0.65,0.75,0.90);
     
       std::vector<HistDesc> const& histos = set->second;
       plotHistos(histos,option);
@@ -306,6 +309,10 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
          paveLabel->SetFillColor(0);
          paveLabel->Draw("SAME");
       }
+
+      std::vector<TObject*>::const_iterator obj = drawObjects_.begin();
+      std::vector<TObject*>::const_iterator objs_end = drawObjects_.end();
+      for(; obj != objs_end; ++obj) (*obj)->Draw("SAME");
    }
 
    TH1::AddDirectory(addStatus);
