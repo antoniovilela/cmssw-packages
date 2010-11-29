@@ -36,9 +36,14 @@ class Plotter{
 
       Plotter();
     
-      void SetVerbose(bool verbose) {verbose_ = verbose;}
-      void SetRebin(int rebin) {rebin_ = rebin;}
-      void SetStats(bool stats) {histStats_ = stats;}
+      void SetVerbose(bool set) { verbose_ = set; }
+      void SetRebin(int rebin) { rebin_ = rebin; }
+      void SetStats(bool stats) { histStats_ = stats; }
+      void SetTitleSize(float size) { titleSize_ = size; }
+      void SetHeader(std::string const& header) { legendHeader_ = header; }
+      void SetRefHisto(bool set) { firstAsRefHist_ = set; }
+      void AddLabel(std::string const& label) { paveLabels_.push_back(label); }
+
       void SetColors(std::vector<int> const& colors) {histLineColors_ = colors; histFillColors_ = colors;}
       void SetLineColors(std::vector<int> const& colors) {histLineColors_ = colors;}
       void SetFillColors(std::vector<int> const& colors) {histFillColors_ = colors;}
@@ -47,8 +52,11 @@ class Plotter{
       void SetMarkerColors(std::vector<int> const& colors) {histMarkerColors_ = colors;}
       void SetMarkerStyles(std::vector<int> const& styles) {histMarkerStyles_ = styles;}
       void SetMarkerSizes(std::vector<float> const& sizes) {histMarkerSizes_ = sizes;}
+
       /*void SetTitlesX(std::vector<std::string> const& titles) {histTitlesX_ = titles;}
-      void SetTitlesY(std::vector<std::string> const& titles) {histTitlesY_ = titles;}*/ 
+      void SetTitlesY(std::vector<std::string> const& titles) {histTitlesY_ = titles;}*/
+      void SetTitleX(std::string const& var, std::string const& title) { histTitlesX[var] = title; }
+      void SetTitleY(std::string const& var, std::string const& title) { histTitlesY[var] = title; } 
 
       void plot(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const char* drawOption = "");
       void plot(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const std::vector<double>&, const char* drawOption = "");
@@ -69,9 +77,11 @@ class Plotter{
       VarMap makeVarMap(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const std::vector<double>&);
       void plotHistos(std::vector<HistDesc> const&, std::string const&);
 
-      bool verbose_;
+      bool verbose_, firstAsRefHist_, histStats_;
       int rebin_;
-      bool histStats_;
+      float titleSize_; 
+      std::string legendHeader_;
+
       std::vector<int> histLineColors_;
       std::vector<int> histLineStyles_;
       std::vector<int> histFillColors_;
@@ -81,6 +91,9 @@ class Plotter{
       std::vector<float> histMarkerSizes_;
       /*std::vector<std::string> histTitlesX_;
       std::vector<std::string> histTitlesY_;*/
+      std::map<std::string, std::string> histTitlesX;
+      std::map<std::string, std::string> histTitlesY;
+      std::vector<std::string> paveLabels_;
       //NormPolicy norm_;
 };
 

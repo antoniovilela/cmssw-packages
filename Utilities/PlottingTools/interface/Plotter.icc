@@ -1,5 +1,6 @@
 #include "TCanvas.h"
 #include "TLegend.h"
+#include "TPaveLabel.h"
 #include "TH1F.h"
 #include "TH2F.h"
 
@@ -12,7 +13,10 @@
 #include <sstream>
 
 template <class NormPolicy>
-Plotter<NormPolicy>::Plotter(): verbose_(false),rebin_(1),histStats_(true){
+Plotter<NormPolicy>::Plotter(): verbose_(false), firstAsRefHist_(false), histStats_(true),
+                                rebin_(1),
+                                titleSize_(0.05), 
+                                legendHeader_("") {
    // Default colors/styles
    int colors[] = {kRed,kBlue,kMagenta};
    std::vector<int> vec_colors(colors,colors + sizeof(colors)/sizeof(int));
@@ -85,6 +89,7 @@ void Plotter<NormPolicy>::plotStack(VarMap const& variablesMap, const char* draw
       for(; histo != histos_end; ++histo) legendMap[setName]->AddEntry(histo->first,histo->second.c_str(),"LPF");
 
       legendMap[setName]->SetFillColor(0);
+      legendMap[setName]->SetHeader(legendHeader_.c_str());
       legendMap[setName]->Draw("SAME");
    }
 
@@ -181,9 +186,17 @@ TH1F* Plotter<NormPolicy>::loadHisto(VarDesc const& var, unsigned int index){
 
    double scaleFactor = (histo_new->GetSumOfWeights() > 0.) ? NormPolicy::GetNorm(histo_new)*normFactor/histo_new->GetSumOfWeights() : 1.;
    scaleHisto(histo_new,scaleFactor,1,1,rebin_);
+
+   if(histTitlesX.find(name) != histTitlesX.end()) histo_new->GetXaxis()->SetTitle( histTitlesX[name].c_str() );
+
+   char const* titleY = "";
+   if(histTitlesY.find(name) != histTitlesY.end()) titleY = histTitlesY[name].c_str();
    double binWidth = histo_new->GetBinWidth(1);
-   char axisYTitle[50]; sprintf(axisYTitle,"/ (%f)",binWidth);
+   char axisYTitle[50]; sprintf(axisYTitle,"%s / (%.2f)", titleY, binWidth);
    histo_new->GetYaxis()->SetTitle(axisYTitle);
+
+   histo_new->GetXaxis()->SetTitleSize(titleSize_);
+   histo_new->GetYaxis()->SetTitleSize(titleSize_);
 
    return histo_new;
 }
@@ -216,6 +229,7 @@ void Plotter<NormPolicy>::plotHistos(std::vector<HistDesc> const& histos, std::s
    size_t index = 0;
    std::vector<HistDesc>::const_iterator it_histo = histos.begin();
    std::vector<HistDesc>::const_iterator histos_end = histos.end();
+   std::vector<HistDesc>::const_iterator it_first = (firstAsRefHist_) ? (it_histo + 1) : it_histo; 
    for(; it_histo != histos_end; ++it_histo, ++index){
       TH1F* histo = it_histo->first;
       //std::string const& desc = it_histo->second;
@@ -234,9 +248,10 @@ void Plotter<NormPolicy>::plotHistos(std::vector<HistDesc> const& histos, std::s
                histo->DrawNormalized(option.c_str(),NormPolicy::GetNorm(histo)*normFactor) :
                histo->DrawNormalized((option + "SAME").c_str(),NormPolicy::GetNorm(histo)*normFactor) );*/
 
-      if(it_histo == histos.begin()) histo->Draw(option.c_str());
+      if(it_histo == it_first) histo->Draw(option.c_str());
       else histo->Draw((option + "SAME").c_str());
    }
+   if(firstAsRefHist_) histos.begin()->first->Draw((option + "SAME").c_str());
 }
 
 template <class NormPolicy>
@@ -281,7 +296,16 @@ void Plotter<NormPolicy>::plot(VarMap& variablesMap,const char* drawOption){
       for(; histo != histos_end; ++histo) legendMap[setName]->AddEntry(histo->first,histo->second.c_str(),"LPF");
 
       legendMap[setName]->SetFillColor(0);
+      legendMap[setName]->SetHeader(legendHeader_.c_str()); 
       legendMap[setName]->Draw("SAME");
+   
+      std::vector<std::string>::const_iterator label = paveLabels_.begin();
+      std::vector<std::string>::const_iterator labels_end = paveLabels_.end();
+      for(; label != labels_end; ++label){
+         TPaveLabel* paveLabel = new TPaveLabel(0.45,0.80,0.80,0.90,label->c_str(),"NDC");
+         paveLabel->SetFillColor(0);
+         paveLabel->Draw("SAME");
+      }
    }
 
    TH1::AddDirectory(addStatus);
