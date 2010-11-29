@@ -5,16 +5,16 @@
         gStyle->SetOptStat(1111111);
         gStyle->SetHistLineWidth(2);
         //gStyle->SetHistFillStyle(1);
-        gStyle->SetMarkerStyle(23);
-        gStyle->SetMarkerSize(0.3);
+        gStyle->SetMarkerStyle(20);
+        gStyle->SetMarkerSize(1.0);
         gStyle->SetErrorX(0.5);
+        gROOT->ForceStyle();
 
         gSystem->Load("libFWCoreFWLite");
         AutoLibraryLoader::enable();
         gSystem->Load("libDataFormatsFWLite.so");
         gSystem->Load("libDataFormatsPatCandidates.so");
         gSystem->Load("libDataFormatsMETReco.so");
-        //gSystem->Load("libExclusiveDijetsAnalysisExclusiveDijetsAnalysis");
         gSystem->Load("libMinimumBiasAnalysisMinimumBiasAnalysis");
         gSystem->Load("libUtilitiesPlottingTools");
 }

@@ -1,7 +1,8 @@
-#include <TFile.h>
-#include <TCanvas.h>
-#include <TLegend.h>
-#include "TStyle.h"
+#include "TROOT.h"
+#include "TFile.h"
+#include "TCanvas.h"
+#include "TLegend.h"
+#include "TLatex.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TTree.h"
@@ -19,7 +20,7 @@ void setDirsDataMCTunes(std::string const&, std::vector<std::pair<std::string,TD
 void setDirsDataMCMatBudget(std::string const&, std::vector<std::pair<std::string,TDirectory*> >&, std::vector<double>&);
 void setDirsDataVsSumEHF(std::vector<std::pair<std::string,TDirectory*> >&, std::vector<double>&);
 
-void plot(std::string const& eventSelection = "", std::string const& mode = "setDirsDataMC", const char* drawOption = "", int rebin = 1){
+void plot(std::string const& eventSelection = "", std::string const& mode = "setDirsDataMC", const char* drawOption = ""){
 
    std::vector<std::string> variables;
    variables.push_back("TrackEta_dist");
@@ -27,44 +28,81 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
    variables.push_back("NTracks_dist");
    variables.push_back("TrackPtSum_dist");
  
-   /*std::string fileNameEvtSel_data = "root/7TeV/Data/Run132440/analysisMinBiasTTree_MinimumBias_7TeV_";
-   fileNameEvtSel_data += eventSelection; fileNameEvtSel_data += "_histos.root";
-   TFile* fileEvtSel_data = TFile::Open(fileNameEvtSel_data.c_str());
-   TH1F* h_EventSelection_data = static_cast<TH1F*>(fileEvtSel_data->Get("EventSelection"));
-   double nEvents_data = h_EventSelection_data->GetBinContent(h_EventSelection_data->GetNbinsX());
-
-   std::string fileNameEvtSel_mc = "root/7TeV/Pythia6/analysisMinBiasTTree_PYTHIA_MinBias_7TeV_";
-   fileNameEvtSel_mc += eventSelection; fileNameEvtSel_mc += "_histos_All.root";
-   TFile* fileEvtSel_mc = TFile::Open(fileNameEvtSel_mc.c_str());
-   TH1F* h_EventSelection_mc = static_cast<TH1F*>(fileEvtSel_mc->Get("EventSelection"));
-   double nEvents_mc = h_EventSelection_mc->GetBinContent(h_EventSelection_mc->GetNbinsX());*/
+   int colors[] = {1,2,6,12,4,43,38,57};
+   int linestyles[] = {1,1,2,3,4,9,10,2};
+   int markerstyles[] = {20,21,25,22,26,20,24,27};
+   std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
+   std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+   std::vector<int> histMarkerStyles(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
 
    std::vector<std::pair<std::string,TDirectory*> > dirs;
    std::vector<double> normFactors;
-   if(mode == "setDirsDataMC") setDirsDataMC(eventSelection,dirs,normFactors);
-   else if(mode == "setDirsDataMCDiff") setDirsDataMCDiff(eventSelection,dirs,normFactors);
-   else if(mode == "setDirsDataMCTunes") setDirsDataMCTunes(eventSelection,dirs,normFactors);
+   if(mode == "setDirsDataMC"){
+      setDirsDataMC(eventSelection,dirs,normFactors);
+      int colors[] = {1,2,4,6,12};
+      int linestyles[] = {1,1,2,3,4};
+      int markerstyles[] = {20,1,1,1,1};
+      histColors = std::vector<int>(colors,colors + sizeof(colors)/sizeof(int));
+      histLineStyles = std::vector<int>(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+      histMarkerStyles = std::vector<int>(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
+   } else if(mode == "setDirsDataMCDiff"){
+      setDirsDataMCDiff(eventSelection,dirs,normFactors);
+      int colors[] = {1,2,2,4,4,12,12};
+      int linestyles[] = {1,1,1,2,2,3,3};
+      int markerstyles[] = {20,1,1,1,1,1,1};
+      histColors = std::vector<int>(colors,colors + sizeof(colors)/sizeof(int));
+      histLineStyles = std::vector<int>(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+      histMarkerStyles = std::vector<int>(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
+   } else if(mode == "setDirsDataMCTunes") setDirsDataMCTunes(eventSelection,dirs,normFactors);
    else if(mode == "setDirsDataMCMatBudget") setDirsDataMCMatBudget(eventSelection,dirs,normFactors);
    else if(mode == "setDirsDataVsSumEHF") setDirsDataVsSumEHF(dirs,normFactors);
 
    //Plotter<NumberEntriesNorm> plotter;
    Plotter<DefaultNorm> plotter;
-   int colors[] = {1,2,6,12,4,43,38,57};
-   std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
-   int linestyles[] = {1,1,2,3,4,9,10,2};
-   std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
-   int markerstyles[] = {20,21,25,22,26,20,24,27};
-   std::vector<int> histMarkerStyles(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
+   plotter.SetVerbose(true);
+   plotter.SetRefHisto(true);
+   plotter.SetStats(false);
+   //plotter.SetRebin(rebin);
+
+   /*plotter.AddLabel("CMS Preliminary 2010");
+   plotter.AddLabel("#int#font[12]{L}dt = 20 #mub^{-1}");
+   plotter.AddLabel("SD + DD + CD");*/
+   
+   float lumi = 20.; // mub^{-1}
+   TLatex* latexEnergy = new TLatex;
+   latexEnergy->SetNDC();
+   latexEnergy->SetTextSize(0.04);
+   latexEnergy->SetTextAlign(31); // align right
+   latexEnergy->SetText(0.98,0.96,"#sqrt{s} = 7 TeV");
+   TLatex* latexLumi = static_cast<TLatex*>(latexEnergy->Clone());
+   latexLumi->SetText(0.95,0.85,Form("#int#font[12]{L}dt = %.0f #mub^{-1}",lumi));
+   TLatex* latexCMSPrel = static_cast<TLatex*>(latexEnergy->Clone()); 
+   latexCMSPrel->SetTextAlign(11); // align left
+   latexCMSPrel->SetText(0.15,0.96,"CMS Preliminary 2010");
+   plotter.AddObject(latexEnergy);
+   plotter.AddObject(latexLumi);
+   plotter.AddObject(latexCMSPrel);
+   plotter.AddLabel("SD + DD + CD");
+
+   //plotter.SetHeader("#sqrt{s} = 7 TeV (p_{T} > 0.5 GeV, |#eta| < 2.4)");
+   plotter.SetHeader("p_{T} > 0.5 GeV, |#eta| < 2.4");
+   plotter.SetTitleX("TrackEta_dist","#eta^{trk}");
+   plotter.SetTitleX("TrackPt_dist","p^{trk}_{T} (GeV)");
+   plotter.SetTitleX("NTracks_dist","N_{trk}");
+   plotter.SetTitleX("TrackPtSum_dist","#sump^{trk}_{T} (GeV)");
+   plotter.SetTitleY("TrackEta_dist","#font[42]{(1/N_{ev})dN_{trk}/d#eta}");
+   plotter.SetTitleY("TrackPt_dist","(1/N_{ev})dN_{trk}/dp_{T} (GeV^{-1})");
+   plotter.SetTitleY("NTracks_dist","(1/N_{ev})dN_{ev}/dN_{trk}");
+   plotter.SetTitleY("TrackPtSum_dist","(1/N_{ev})dN_{ev}/d(#sump^{trk}_{T}) (GeV^{-1})"); 
+
    plotter.SetLineColors(histColors);
    plotter.SetLineStyles(histLineStyles);
    plotter.SetFillColors(std::vector<int>(1,0));
    plotter.SetFillStyles(std::vector<int>(1,0));
    plotter.SetMarkerColors(histColors);
    plotter.SetMarkerStyles(histMarkerStyles);
-   plotter.SetMarkerSizes(std::vector<float>(1,1.5));
-   plotter.SetRebin(rebin);
-   plotter.SetVerbose(true);
-   plotter.SetStats(false);
+   plotter.SetMarkerSizes(std::vector<float>(1,1.4));
+
    plotter.plot(variables,dirs,normFactors,drawOption);
    //plotter.plot(variables,dirs,drawOption);
    //plotter.plotComponents(variables,dirs,normFactors,"NOSTACK");
@@ -96,8 +134,8 @@ void setDirsDataMC(std::string const& eventSelection,std::vector<std::pair<std::
    std::cout << "Number of events in Data: " << nEvents_data << std::endl;
    std::cout << "Number of events in MC: " << nEvents_mc << std::endl;
 
-   dirs.push_back(std::make_pair("p+p (7 TeV)",file_data->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("MC All",file_mc->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("p+p (BSC OR and Vertex)",file_data->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA 8",file_mc->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("SD",file_mc->GetDirectory(labelSD.c_str())));
    dirs.push_back(std::make_pair("DD",file_mc->GetDirectory(labelDD.c_str())));
    //dirs.push_back(std::make_pair("Diff",file_mc->GetDirectory(labelDiff.c_str()))); 
@@ -140,12 +178,12 @@ void setDirsDataMCDiff(std::string const& eventSelection,std::vector<std::pair<s
    TH1F* hNTracks_mc_2 = static_cast<TH1F*>(file_mc_2->Get(hNTracksPath.c_str()));
    double nEvents_mc_2 = hNTracks_mc_2->GetEntries();
 
-   dirs.push_back(std::make_pair("p+p (7 TeV)",file_data->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA D6T All",file_mc_0->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("p+p (BSC OR and Vertex)",file_data->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA D6T",file_mc_0->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PYTHIA D6T Diffractive",file_mc_0->GetDirectory(labelDiff_0.c_str()))); 
-   dirs.push_back(std::make_pair("PYTHIA 8 All",file_mc_1->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA 8",file_mc_1->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PYTHIA 8 Diffractive",file_mc_1->GetDirectory(labelDiff_1.c_str())));
-   dirs.push_back(std::make_pair("PHOJET All",file_mc_2->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PHOJET",file_mc_2->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PHOJET Diffractive",file_mc_2->GetDirectory(labelDiff_2.c_str())));
 
    normFactors.resize(7);

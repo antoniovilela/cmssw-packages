@@ -169,7 +169,7 @@ void plotErrorBandsAll(){
   std::string labelData = "p+p (BSC OR and Vertex)";
   std::string labelCMSPrel = "CMS Preliminary 2010";
   //std::string labelLum = "Run 132440 (L = 3.5#mub^{-1})";
-  std::string labelLum = "#sqrt{s} = 7 TeV  L = 20#mub^{-1} (Run 132605)";  
+  std::string labelLum = "#sqrt{s} = 7 TeV  L = 20#mub^{-1}";  
 
   std::string labelErrorBands = "Energy scale #pm10%";
   std::vector<std::string> labelsMC(filesMC.size());
