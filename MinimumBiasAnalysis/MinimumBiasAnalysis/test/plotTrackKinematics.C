@@ -53,8 +53,15 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
       histColors = std::vector<int>(colors,colors + sizeof(colors)/sizeof(int));
       histLineStyles = std::vector<int>(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
       histMarkerStyles = std::vector<int>(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
-   } else if(mode == "setDirsDataMCTunes") setDirsDataMCTunes(eventSelection,dirs,normFactors);
-   else if(mode == "setDirsDataMCMatBudget") setDirsDataMCMatBudget(eventSelection,dirs,normFactors);
+   } else if(mode == "setDirsDataMCTunes"){
+      setDirsDataMCTunes(eventSelection,dirs,normFactors);
+      int colors[] = {1,2,6,12,4,43,38,57};
+      int linestyles[] = {1,1,2,3,4,9,10,2};
+      int markerstyles[] = {20,1,1,1,1,1,1,1};
+      histColors = std::vector<int>(colors,colors + sizeof(colors)/sizeof(int));
+      histLineStyles = std::vector<int>(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+      histMarkerStyles = std::vector<int>(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
+   } else if(mode == "setDirsDataMCMatBudget") setDirsDataMCMatBudget(eventSelection,dirs,normFactors);
    else if(mode == "setDirsDataVsSumEHF") setDirsDataVsSumEHF(dirs,normFactors);
 
    //Plotter<NumberEntriesNorm> plotter;
@@ -82,7 +89,7 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
    plotter.AddObject(latexEnergy);
    plotter.AddObject(latexLumi);
    plotter.AddObject(latexCMSPrel);
-   plotter.AddLabel("SD + DD + CD");
+   //plotter.AddLabel("SD + DD + CD");
 
    //plotter.SetHeader("#sqrt{s} = 7 TeV (p_{T} > 0.5 GeV, |#eta| < 2.4)");
    plotter.SetHeader("p_{T} > 0.5 GeV, |#eta| < 2.4");
@@ -220,7 +227,7 @@ void setDirsDataMCTunes(std::string const& eventSelection,std::vector<std::pair<
    std::string labelDiffPhojet = "trackHistoAnalyzer_processIdPhojet_Diff_"; labelDiffPhojet += eventSelection;
    std::string labelNDPhojet   = "trackHistoAnalyzer_processIdPhojet_ND_";   labelNDPhojet   += eventSelection;
 
-   dirs.push_back(std::make_pair("p+p (7 TeV)",file_data->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("p+p (BSC OR and Vertex)",file_data->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PYTHIA D6T",filesMC[0]->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PYTHIA DW",filesMC[1]->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PYTHIA CW",filesMC[2]->GetDirectory(labelAll.c_str())));

@@ -61,6 +61,47 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    if(proton2 != genParticles.end()) genProtonMinus = proton2->p4();
 }
 
+int pflowId(std::string const& name){
+   // FIXME: The labels definition could go somewhere else
+   std::vector<std::string> labels_X, labels_h, labels_e, labels_mu, labels_gamma, labels_h0, labels_h_HF, labels_egamma_HF;
+   labels_X.push_back("X");
+   labels_X.push_back("undefined");
+   labels_h.push_back("h");
+   labels_h.push_back("chargedHadron");
+   labels_h.push_back("hadronCharged");
+   labels_e.push_back("e");
+   labels_e.push_back("electron");
+   labels_mu.push_back("mu");
+   labels_mu.push_back("muon");
+   labels_gamma.push_back("gamma");
+   labels_gamma.push_back("photon");
+   labels_h0.push_back("h0");
+   labels_h0.push_back("neutralHadron");
+   labels_h0.push_back("hadronNeutral");
+   labels_h_HF.push_back("h_HF");
+   labels_h_HF.push_back("hadronHF");
+   labels_egamma_HF.push_back("egamma_HF");
+   labels_egamma_HF.push_back("emHF");
+   // Find corresponding particle type   
+   if( std::find(labels_X.begin(), labels_X.end(), name) != labels_X.end() )
+      return reco::PFCandidate::X;
+   else if( std::find(labels_h.begin(), labels_h.end(), name) != labels_h.end() )
+      return reco::PFCandidate::h;
+   else if( std::find(labels_e.begin(), labels_e.end(), name) != labels_e.end() )
+      return reco::PFCandidate::e;
+   else if( std::find(labels_mu.begin(), labels_mu.end(), name) != labels_mu.end() )
+      return reco::PFCandidate::mu;
+   else if( std::find(labels_gamma.begin(), labels_gamma.end(), name) != labels_gamma.end() ) 
+      return reco::PFCandidate::gamma;
+   else if( std::find(labels_h0.begin(), labels_h0.end(), name) != labels_h0.end() ) 
+      return reco::PFCandidate::h0;
+   else if( std::find(labels_h_HF.begin(), labels_h_HF.end(), name) != labels_h_HF.end() ) 
+      return reco::PFCandidate::h_HF;
+   else if( std::find(labels_egamma_HF.begin(), labels_egamma_HF.end(), name) != labels_egamma_HF.end() ) 
+      return reco::PFCandidate::egamma_HF;
+   else return -1;
+}
+
 bool pflowThreshold(reco::PFCandidate const& part, std::map<int,std::pair<double,double> > const& thresholds){
 
    bool accept = true;
@@ -145,8 +186,8 @@ std::pair<double,double> etaMax(reco::PFCandidateCollection const& pflowCollecti
       if(!pflowThreshold(*part,thresholds)) continue;            
       etaCands.push_back( part->eta() );
    }                                                             
-   double eta_max = *( std::max_element(etaCands.begin(), etaCands.end()) );
-   double eta_min = *( std::min_element(etaCands.begin(), etaCands.end()) );
+   double eta_max = etaCands.size() ? *( std::max_element(etaCands.begin(), etaCands.end()) ) : -999.;
+   double eta_min = etaCands.size() ? *( std::min_element(etaCands.begin(), etaCands.end()) ) : -999.;
 
    return std::make_pair(eta_max,eta_min);
 }

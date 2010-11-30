@@ -1,31 +1,47 @@
 import FWCore.ParameterSet.Config as cms
 
+from Utilities.PyConfigTools.parseInput import parseInput
+inputFields = ('runOnMC','generator')
+requiredFields = ('runOnMC',)
+inputOptions = parseInput(inputFields,requiredFields)
+if not hasattr(inputOptions,'generator'): inputOptions.generator = 'Pythia6'
+
 # Settings
 class config: pass
+config.runOnMC = inputOptions.runOnMC
+config.generator = inputOptions.generator
+
 config.verbose = True
-config.runOnMC = True
 config.globalTagNameData = 'GR_R_36X_V12A::All'
 config.globalTagNameMC = 'START36_V10::All'
 config.outputTTreeFile = 'eventSelectionAnalysis_TTree_MinimumBias.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
-config.generator = 'Pythia6'
+config.triggerResultsProcessNameMC = 'REDIGI36'
+config.instLumiROOTFile = 'lumibylsXing_132440-137028_June14thReReco_Collisions10_JSON_v2_sub_132440.root'
+
+if config.runOnMC: config.fileNames = ['file:/data1/antoniov/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F63DF090-6879-DF11-9E7D-0030487CDA68.root']
+else: config.fileNames = ['file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root']
 
 process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.cerr.threshold = 'DEBUG'
+process.MessageLogger.debugModules = cms.untracked.vstring('minimumBiasTTreeAnalysisVertexFilter')
+process.MessageLogger.categories.append('Analysis')
+process.MessageLogger.cerr.DEBUG = cms.untracked.PSet(limit = cms.untracked.int32(0))
+process.MessageLogger.cerr.Analysis = cms.untracked.PSet(limit = cms.untracked.int32(-1)) 
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-        'file:/data1/antoniov/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F63DF090-6879-DF11-9E7D-0030487CDA68.root'
-    )
+    fileNames = cms.untracked.vstring()
 )
+process.source.fileNames = config.fileNames
+
 # Import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
@@ -65,12 +81,15 @@ if config.verbose:
 
 ###################################################################################
 
-from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
+if not config.runOnMC:
+    process.load('Utilities.AnalysisTools.lumiWeight_cfi')
+    process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
 
 process.xiTower.comEnergy = config.comEnergy
 process.xiFromCaloTowers.comEnergy = config.comEnergy
 process.xiFromJets.comEnergy = config.comEnergy
 process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
+if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
 process.reflagging_step = cms.Path(process.hfrecoReflagged+process.hbherecoReflagged)
 process.rereco_step = cms.Path(process.caloTowersRec
@@ -78,7 +97,7 @@ process.rereco_step = cms.Path(process.caloTowersRec
                                *process.recoJetAssociations
                                *process.metreco
                                ) # re-reco jets and met
-
+if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.recoSequence)
 if config.runOnMC:
     process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.genChargedParticles_cfi')
@@ -89,9 +108,11 @@ from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi import
 minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2.
 minimumBiasTTreeAnalysis.TrackTag = config.trackTagName
 process.minimumBiasTTreeAnalysisAll = minimumBiasTTreeAnalysis.clone()
-process.minimumBiasTTreeAnalysisL1CollBscOr = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus = minimumBiasTTreeAnalysis.clone()
+process.minimumBiasTTreeAnalysisBPTX = minimumBiasTTreeAnalysis.clone()
+process.minimumBiasTTreeAnalysisBscOr = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisVertexFilter = minimumBiasTTreeAnalysis.clone()
+process.minimumBiasTTreeAnalysisBeamHaloVeto = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisFilterScraping = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisHBHENoiseFilter = minimumBiasTTreeAnalysis.clone()
 
@@ -109,29 +130,39 @@ if config.runOnMC:
 
 #process.analysisPreSelection = cms.Sequence(process.processIdPythia6_SD)
 
-# Paths for event counting  
+# Paths for event counting
+from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer  
 process.countsAll = countsAnalyzer.clone()
-process.countsL1CollBscOr = countsAnalyzer.clone()
 process.countshltBscMinBiasORBptxPlusORMinus = countsAnalyzer.clone()
+process.countsBPTX = countsAnalyzer.clone()
+process.countsBscOr = countsAnalyzer.clone()
 process.countsVertexFilter = countsAnalyzer.clone()
+process.countsBeamHaloVeto = countsAnalyzer.clone()
 process.countsFilterScraping = countsAnalyzer.clone()
 process.countsHBHENoiseFilter = countsAnalyzer.clone()
-process.countEvents_step = cms.Path(process.countsAll +
+
+process.countEvents_step = cms.Path(    process.countsAll +
                                         process.minimumBiasTTreeAnalysisAll +
-                                    process.l1CollBscOr +
-                                    process.countsL1CollBscOr +
-                                        process.minimumBiasTTreeAnalysisL1CollBscOr + 
-                                    process.hltBscMinBiasORBptxPlusORMinusFilter + 
-                                    process.countshltBscMinBiasORBptxPlusORMinus + 
+                                    process.hltBscMinBiasORBptxPlusORMinusFilter +
+                                        process.countshltBscMinBiasORBptxPlusORMinus +
                                         process.minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus +
+                                    process.bptx +
+                                        process.countsBPTX +
+                                        process.minimumBiasTTreeAnalysisBPTX + 
+                                    process.bscOr + 
+                                        process.countsBscOr +
+                                        process.minimumBiasTTreeAnalysisBscOr +
                                     process.primaryVertexFilter +
-                                    process.countsVertexFilter + 
+                                        process.countsVertexFilter + 
                                         process.minimumBiasTTreeAnalysisVertexFilter +
+                                    process.beamHaloVeto + 
+                                        process.countsBeamHaloVeto +
+                                        process.minimumBiasTTreeAnalysisBeamHaloVeto +
                                     process.filterScraping +
-                                    process.countsFilterScraping + 
+                                        process.countsFilterScraping + 
                                         process.minimumBiasTTreeAnalysisFilterScraping +
                                     process.HBHENoiseFilter +
-                                    process.countsHBHENoiseFilter +
+                                        process.countsHBHENoiseFilter +
                                         process.minimumBiasTTreeAnalysisHBHENoiseFilter)  
 
 ###################################################################################
@@ -147,4 +178,4 @@ if config.runOnMC:
     from Utilities.PyConfigTools.setAnalyzerAttributes import setAnalyzerAttributes
     setAnalyzerAttributes(process,'minimumBiasTTreeAnalysis',
                                   AccessMCInfo = True, 
-                                  TriggerResultsTag = cms.InputTag("TriggerResults::REDIGI36")) 
+                                  TriggerResultsTag = cms.InputTag("TriggerResults::%s" % config.triggerResultsProcessNameMC)) 

@@ -27,6 +27,8 @@
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/FWLiteTools.h"
 
+#include <sstream>
+
 namespace minimumBiasAnalysis {
 
 MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
@@ -71,6 +73,33 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,-1.);
   thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,-1.);
   thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,-1.);
+  if(pset.exists("PFlowThresholds")){ 
+     edm::ParameterSet const& thresholdsPFPset = pset.getParameter<edm::ParameterSet>("PFlowThresholds");
+     std::vector<std::string> pfThresholdNames = thresholdsPFPset.getParameterNames();
+     std::vector<std::string>::const_iterator param = pfThresholdNames.begin();
+     std::vector<std::string>::const_iterator params_end = pfThresholdNames.end();  
+     for(; param != params_end; ++param){
+        //reco::PFCandidate::ParticleType particleType = pflowId(*param);
+        int particleType = pflowId(*param);
+        if(particleType == -1)
+           throw cms::Exception("Configuration") << "Parameter " << *param 
+                                                 << " does not correspond to any particle type (PF)";
+
+        edm::ParameterSet const& typePSet = thresholdsPFPset.getParameter<edm::ParameterSet>(*param);
+        double ptThreshold = typePSet.getParameter<double>("ptMin");
+        double energyThreshold = typePSet.getParameter<double>("energyMin");
+        thresholdsPFlow_[particleType].first = ptThreshold;
+        thresholdsPFlow_[particleType].second = energyThreshold; 
+     }
+  }
+  std::map<int,std::pair<double,double> >::const_iterator pfThreshold = thresholdsPFlow_.begin();
+  std::map<int,std::pair<double,double> >::const_iterator pfThresholds_end = thresholdsPFlow_.end(); 
+  std::ostringstream oss;
+  oss << "Using the following PF thresholds:\n";
+  for(; pfThreshold != pfThresholds_end; ++pfThreshold) oss << "  " << pfThreshold->first << ": "
+                                                            << "(" << pfThreshold->second.first
+                                                            << "," << pfThreshold->second.second << ")\n";   
+  LogDebug("Analysis") << oss.str();
 
   if(applyEnergyScaleHCAL_) energyScaleHCAL_ = pset.getParameter<double>("EnergyScaleFactorHCAL");
 }

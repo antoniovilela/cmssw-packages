@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_cfi import pfThresholds
+
 MinimumBiasAnalysis = cms.PSet(
     # Input tags
     VertexTag = cms.InputTag("offlinePrimaryVertices"),
@@ -15,6 +17,8 @@ MinimumBiasAnalysis = cms.PSet(
     EnergyThresholdHB = cms.double(1.5),
     EnergyThresholdHE = cms.double(2.0),
     EnergyThresholdHF = cms.double(4.0),
+    # PF thresholds
+    PFlowThresholds = pfThresholds,
     # Options
     EBeam = cms.double(3500.),
     ApplyEnergyScaleHCAL = cms.bool(False),
