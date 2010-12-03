@@ -146,7 +146,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    }
 
    bool doTriggerSelection = false;
-   bool doHcalNoiseSelection = false;
+   bool doHcalNoiseSelection = true;
    /*// Pre-selection
    bool doGoodVertexSelection = false;
    bool doHighQualityTracksSelection = true;*/
@@ -263,7 +263,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
       histosTH1F["posXPrimVtx"]->Fill(posXPrimVtx);
       histosTH1F["posYPrimVtx"]->Fill(posYPrimVtx);
       histosTH1F["posZPrimVtx"]->Fill(posZPrimVtx);
-      //histosTH1F["posRPrimVtx"]->Fill();
+      histosTH1F["posRPrimVtx"]->Fill(sqrt(posXPrimVtx*posXPrimVtx + posYPrimVtx*posYPrimVtx));
       //histosTH1F["numberDOF"]->Fill();
 
       if(doVertexSelection && (fabs(posZPrimVtx) > primVtxZMax)) continue;

@@ -1,6 +1,36 @@
 import ROOT
 
+def plotTTreeHistos():
+
+    return -1
+
 def plotEventSelection():
+
+    variables = [
+        'posRPrimVtx',
+        'sumEnergyHFPlus',
+        'sumEnergyHFMinus'
+    ]
+
+    selectionRef = 'BscOr'
+    selectionEff = 'VertexFilter'
+    dir = 'root/7TeV/Data/Run132605/eventSelection/test_031210'
+    fileNameRef = dir + "/" + "analysisMinBiasTTree_MinimumBias_7TeV_minimumBiasTTreeAnalysisAll_histos.root"
+    fileNameEff = dir + "/" + "analysisMinBiasTTree_MinimumBias_7TeV_minimumBiasTTreeAnalysisBscOr_histos.root"
+
+    files = {}
+    indexRef = (selectionRef,"")
+    files[indexRef] = ROOT.TFile(fileNameRef)
+    indexEff = (selectionEff,"")
+    files[indexEff] = ROOT.TFile(fileNameEff)
+
+    return plotEfficiencies(variables=variables,
+                            files=files,
+                            types=("",),
+                            selectionRef=selectionRef,
+                            selectionEff=selectionEff)
+
+def plotEventSelectionMC():
     variables = [
         'multiplicityTracks',
         'sumEnergyHFPlus',
@@ -31,11 +61,20 @@ def plotEventSelection():
     
     # Loop over steps
     #for step in range(1,len(steps)):
-    
-    ROOT.TH1.AddDirectory(False)
-
+   
     selectionRef = 'minimumBiasTTreeAnalysisAll'
     selectionEff = 'minimumBiasTTreeAnalysisL1CollBscOr'
+   
+    return plotEfficiencies(variables=variables,
+                            files=files,
+                            types=processIds,
+                            selectionRef=selectionRef,
+                            selectionEff=selectionEff)
+
+def plotEfficiencies(variables, files, types, selectionRef, selectionEff):
+
+    ROOT.TH1.AddDirectory(False)
+
     colors = (1,2,6,12,4,43,38,57)
     markers = (20,21,25,22,26,20,24,27)
     canvases = []
@@ -44,7 +83,7 @@ def plotEventSelection():
         canvases.append(ROOT.TCanvas("c_" + variable))
         graphsEff[variable] = []
         idx_type = 0
-        for type in processIds:
+        for type in types:
             indexRef = (selectionRef,type)
             h_Ref = files[indexRef].Get(variable)
             indexEff = (selectionEff,type)
