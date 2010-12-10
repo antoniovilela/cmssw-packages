@@ -9,7 +9,9 @@ def plotEventSelection():
     variables = [
         'posRPrimVtx',
         'sumEnergyHFPlus',
-        'sumEnergyHFMinus'
+        'sumEnergyHFMinus',
+        'etaMaxFromPFCands',
+        'etaMinFromPFCands'
     ]
 
     selectionRef = 'BscOr'
@@ -30,25 +32,28 @@ def plotEventSelection():
                             selectionRef=selectionRef,
                             selectionEff=selectionEff)
 
-def plotEventSelectionMC(rebin=1):
+def plotEventSelectionMC(dir,prefix,rebin=1):
 
-    #selectionRef = 'minimumBiasTTreeAnalysisAll'
+    #dir = 'root/7TeV/Pythia8/eventSelection'
+    #prefix = 'analysisMinBiasTTree_PYTHIA8_MinBias_7TeV'
+
+    #selectionRef = 'minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus'
     #selectionEff = 'minimumBiasTTreeAnalysisBscOr'
 
-    #selectionRef = 'minimumBiasTTreeAnalysisBscOr'
-    #selectionEff = 'minimumBiasTTreeAnalysisVertexFilter'
+    selectionRef = 'minimumBiasTTreeAnalysisBscOr'
+    selectionEff = 'minimumBiasTTreeAnalysisVertexFilter'
 
-    selectionRef = 'minimumBiasTTreeAnalysisVertexFilter'
-    selectionEff = 'minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection'
+    #selectionRef = 'minimumBiasTTreeAnalysisVertexFilter'
+    #selectionEff = 'minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection'
 
     variables = [
         'multiplicityTracks',
         'sumEnergyHFPlus',
-        'sumEnergyHFMinus'
+        'sumEnergyHFMinus',
+        'etaMaxFromPFCands',
+        'etaMinFromPFCands'
     ]
 
-    dir = 'root/7TeV/Pythia8/eventSelection'
-    prefix = 'analysisMinBiasTTree_PYTHIA8_MinBias_7TeV'
     """
     steps = [
         'minimumBiasTTreeAnalysisAll',
@@ -118,6 +123,7 @@ def plotEfficiencies(variables, files, types, selectionRef, selectionEff, rebin=
             idx_type += 1
         canvases[-1].cd()
         legends[-1].SetFillColor( canvases[-1].GetFillColor() ) 
+        legends[-1].SetHeader( variable ) 
         legends[-1].Draw("SAME")
 
     return (canvases,legends,graphsEff)
