@@ -1,10 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 
 from Utilities.PyConfigTools.parseInput import parseInput
-inputFields = ('runOnMC','generator')
+inputFields = ('runOnMC','generator','hltProcessNameMC')
 requiredFields = ('runOnMC',)
 inputOptions = parseInput(inputFields,requiredFields)
 if not hasattr(inputOptions,'generator'): inputOptions.generator = 'Pythia6'
+if not hasattr(inputOptions,'hltProcessNameMC'): inputOptions.hltProcessNameMC = 'REDIGI36'
 
 # Settings
 class config: pass
@@ -18,7 +19,7 @@ config.outputTTreeFile = 'eventSelectionAnalysis_TTree_MinimumBias.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
-config.triggerResultsProcessNameMC = 'REDIGI36'
+config.triggerResultsProcessNameMC = inputOptions.hltProcessNameMC
 config.instLumiROOTFile = 'lumibylsXing_132440-137028_June14thReReco_Collisions10_JSON_v2_sub_132440.root'
 
 if config.runOnMC: config.fileNames = ['file:/data1/antoniov/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F63DF090-6879-DF11-9E7D-0030487CDA68.root']
@@ -142,7 +143,7 @@ process.countsFilterScraping = countsAnalyzer.clone()
 process.countsHBHENoiseFilter = countsAnalyzer.clone()
 
 process.countEvents_step = cms.Path(    process.countsAll +
-                                        process.minimumBiasTTreeAnalysisAll +
+                                        #process.minimumBiasTTreeAnalysisAll +
                                     process.hltBscMinBiasORBptxPlusORMinusFilter +
                                         process.countshltBscMinBiasORBptxPlusORMinus +
                                         process.minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus +
