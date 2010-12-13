@@ -4,35 +4,38 @@ def plotTTreeHistos():
 
     return -1
 
-def plotEventSelection():
+def plotEventSelection(dir,selectionRef,selectionEff,
+                       prefix='analysisMinBiasTTree_MinimumBias_7TeV',rebin=1):
+
+    #selectionRef = 'minimumBiasTTreeAnalysisBscOr'
+    #selectionEff = 'minimumBiasTTreeAnalysisVertexFilter'
 
     variables = [
         'posRPrimVtx',
+        'multiplicityTracks',  
         'sumEnergyHFPlus',
         'sumEnergyHFMinus',
         'etaMaxFromPFCands',
         'etaMinFromPFCands'
     ]
 
-    selectionRef = 'BscOr'
-    selectionEff = 'VertexFilter'
-    dir = 'root/7TeV/Data/Run132605/eventSelection/test_031210'
-    fileNameRef = dir + "/" + "analysisMinBiasTTree_MinimumBias_7TeV_minimumBiasTTreeAnalysisAll_histos.root"
-    fileNameEff = dir + "/" + "analysisMinBiasTTree_MinimumBias_7TeV_minimumBiasTTreeAnalysisBscOr_histos.root"
+    steps = [selectionRef,selectionEff]
 
     files = {}
-    indexRef = (selectionRef,"")
-    files[indexRef] = ROOT.TFile(fileNameRef)
-    indexEff = (selectionEff,"")
-    files[indexEff] = ROOT.TFile(fileNameEff)
-
+    for selection in steps:
+        fileName = "%s/%s_%s_histos.root" % (dir, prefix, selection)
+        print "Accessing", fileName
+        index = (selection,"")
+        files[index] = ROOT.TFile(fileName)
+ 
     return plotEfficiencies(variables=variables,
                             files=files,
                             types=("",),
                             selectionRef=selectionRef,
-                            selectionEff=selectionEff)
+                            selectionEff=selectionEff,
+                            rebin=rebin)
 
-def plotEventSelectionMC(dir,prefix,rebin=1):
+def plotEventSelectionMC(dir,selectionRef,selectionEff,prefix,rebin=1):
 
     #dir = 'root/7TeV/Pythia8/eventSelection'
     #prefix = 'analysisMinBiasTTree_PYTHIA8_MinBias_7TeV'
@@ -40,8 +43,8 @@ def plotEventSelectionMC(dir,prefix,rebin=1):
     #selectionRef = 'minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus'
     #selectionEff = 'minimumBiasTTreeAnalysisBscOr'
 
-    selectionRef = 'minimumBiasTTreeAnalysisBscOr'
-    selectionEff = 'minimumBiasTTreeAnalysisVertexFilter'
+    #selectionRef = 'minimumBiasTTreeAnalysisBscOr'
+    #selectionEff = 'minimumBiasTTreeAnalysisVertexFilter'
 
     #selectionRef = 'minimumBiasTTreeAnalysisVertexFilter'
     #selectionEff = 'minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection'
