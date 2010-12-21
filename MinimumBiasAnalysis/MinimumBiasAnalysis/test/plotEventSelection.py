@@ -16,7 +16,9 @@ def plotEventSelection(dir,selectionRef,selectionEff,
         'sumEnergyHFPlus',
         'sumEnergyHFMinus',
         'etaMaxFromPFCands',
-        'etaMinFromPFCands'
+        'etaMinFromPFCands',
+        'xiPlusFromPFCands',
+        'xiMinusFromPFCands'
     ]
 
     steps = [selectionRef,selectionEff]
@@ -54,7 +56,11 @@ def plotEventSelectionMC(dir,selectionRef,selectionEff,prefix,rebin=1):
         'sumEnergyHFPlus',
         'sumEnergyHFMinus',
         'etaMaxFromPFCands',
-        'etaMinFromPFCands'
+        'etaMinFromPFCands',
+        'xiPlusFromPFCands',
+        'xiMinusFromPFCands',
+        'xiGenPlus',
+        'xiGenMinus'
     ]
 
     """

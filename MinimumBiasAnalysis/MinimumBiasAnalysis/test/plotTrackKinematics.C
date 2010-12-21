@@ -76,7 +76,7 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
    plotter.AddLabel("SD + DD + CD");*/
    
    float lumi = 20.; // mub^{-1}
-   TLatex* latexEnergy = new TLatex;
+   /*TLatex* latexEnergy = new TLatex;
    latexEnergy->SetNDC();
    latexEnergy->SetTextSize(0.04);
    latexEnergy->SetTextAlign(31); // align right
@@ -88,8 +88,19 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
    latexCMSPrel->SetText(0.15,0.96,"CMS Preliminary 2010");
    plotter.AddObject(latexEnergy);
    plotter.AddObject(latexLumi);
+   plotter.AddObject(latexCMSPrel);*/
+
+   TLatex* latexLumiEnergy = new TLatex;
+   latexLumiEnergy->SetNDC();
+   latexLumiEnergy->SetTextSize(0.04);
+   latexLumiEnergy->SetTextAlign(31); // align right
+   latexLumiEnergy->SetText(0.98,0.96,Form("#sqrt{s} = 7 TeV   L = %.0f #mub^{-1}",lumi));
+   TLatex* latexCMSPrel = static_cast<TLatex*>(latexLumiEnergy->Clone()); 
+   latexCMSPrel->SetTextAlign(11); // align left
+   latexCMSPrel->SetText(0.15,0.96,"CMS Preliminary 2010");
+   plotter.AddObject(latexLumiEnergy);
    plotter.AddObject(latexCMSPrel);
-   //plotter.AddLabel("SD + DD + CD");
+   plotter.AddLabel("SD");
 
    //plotter.SetHeader("#sqrt{s} = 7 TeV (p_{T} > 0.5 GeV, |#eta| < 2.4)");
    plotter.SetHeader("p_{T} > 0.5 GeV, |#eta| < 2.4");
@@ -166,13 +177,16 @@ void setDirsDataMCDiff(std::string const& eventSelection,std::vector<std::pair<s
 
    std::string labelAll    = "trackHistoAnalyzer_";                       labelAll    += eventSelection;
 
-   std::string labelDiff_0 = "trackHistoAnalyzer_processIdPythia6_Diff_"; labelDiff_0 += eventSelection;
+   //std::string labelDiff_0 = "trackHistoAnalyzer_processIdPythia6_Diff_"; labelDiff_0 += eventSelection;
+   std::string labelDiff_0 = "trackHistoAnalyzer_processIdPythia6_SD_";   labelDiff_0 += eventSelection;
    std::string labelND_0   = "trackHistoAnalyzer_processIdPythia6_ND_";   labelND_0   += eventSelection;
 
-   std::string labelDiff_1 = "trackHistoAnalyzer_processIdPythia8_Diff_"; labelDiff_1 += eventSelection;
+   //std::string labelDiff_1 = "trackHistoAnalyzer_processIdPythia8_Diff_"; labelDiff_1 += eventSelection;
+   std::string labelDiff_1 = "trackHistoAnalyzer_processIdPythia8_SD_";   labelDiff_1 += eventSelection;
    std::string labelND_1   = "trackHistoAnalyzer_processIdPythia8_ND_";   labelND_1   += eventSelection;
 
-   std::string labelDiff_2 = "trackHistoAnalyzer_processIdPhojet_Diff_";  labelDiff_2 += eventSelection;
+   //std::string labelDiff_2 = "trackHistoAnalyzer_processIdPhojet_Diff_";  labelDiff_2 += eventSelection;
+   std::string labelDiff_2 = "trackHistoAnalyzer_processIdPhojet_SD_";    labelDiff_2 += eventSelection;
    std::string labelND_2   = "trackHistoAnalyzer_processIdPhojet_ND_";    labelND_2   += eventSelection;
 
    std::string hNTracksPath = labelAll + "/NTracks";
@@ -186,12 +200,12 @@ void setDirsDataMCDiff(std::string const& eventSelection,std::vector<std::pair<s
    double nEvents_mc_2 = hNTracks_mc_2->GetEntries();
 
    dirs.push_back(std::make_pair("p+p (BSC OR and Vertex)",file_data->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA D6T",file_mc_0->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA D6T Diffractive",file_mc_0->GetDirectory(labelDiff_0.c_str()))); 
-   dirs.push_back(std::make_pair("PYTHIA 8",file_mc_1->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA 8 Diffractive",file_mc_1->GetDirectory(labelDiff_1.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 D6T",file_mc_0->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 D6T SD",file_mc_0->GetDirectory(labelDiff_0.c_str()))); 
+   dirs.push_back(std::make_pair("PYTHIA8",file_mc_1->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA8 SD",file_mc_1->GetDirectory(labelDiff_1.c_str())));
    dirs.push_back(std::make_pair("PHOJET",file_mc_2->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PHOJET Diffractive",file_mc_2->GetDirectory(labelDiff_2.c_str())));
+   dirs.push_back(std::make_pair("PHOJET SD",file_mc_2->GetDirectory(labelDiff_2.c_str())));
 
    normFactors.resize(7);
    normFactors[0] = 1./nEvents_data;
@@ -228,12 +242,12 @@ void setDirsDataMCTunes(std::string const& eventSelection,std::vector<std::pair<
    std::string labelNDPhojet   = "trackHistoAnalyzer_processIdPhojet_ND_";   labelNDPhojet   += eventSelection;
 
    dirs.push_back(std::make_pair("p+p (BSC OR and Vertex)",file_data->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA D6T",filesMC[0]->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA DW",filesMC[1]->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA CW",filesMC[2]->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA P0",filesMC[3]->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA Z1",filesMC[4]->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA 8",filesMC[5]->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 D6T",filesMC[0]->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 DW",filesMC[1]->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 CW",filesMC[2]->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 P0",filesMC[3]->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 Z1",filesMC[4]->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA8",filesMC[5]->GetDirectory(labelAll.c_str())));
    dirs.push_back(std::make_pair("PHOJET",filesMC[6]->GetDirectory(labelAll.c_str())));
 
    std::string hNTracksPath = labelAll + "/NTracks";
@@ -269,9 +283,9 @@ void setDirsDataMCMatBudget(std::string const& eventSelection,std::vector<std::p
    std::string labelNDPythia6   = "trackHistoAnalyzer_processIdPythia6_ND_";   labelNDPythia6   += eventSelection;
 
    dirs.push_back(std::make_pair("p+p (7 TeV)",file_data->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA D6T",filesMC[0]->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA D6T - X0Max",filesMC[1]->GetDirectory(labelAll.c_str())));
-   dirs.push_back(std::make_pair("PYTHIA D6T - LiMax",filesMC[2]->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 D6T",filesMC[0]->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 D6T - X0Max",filesMC[1]->GetDirectory(labelAll.c_str())));
+   dirs.push_back(std::make_pair("PYTHIA6 D6T - LiMax",filesMC[2]->GetDirectory(labelAll.c_str())));
 
    std::string hNTracksPath = labelAll + "/NTracks";
    TH1F* hNTracks_data = static_cast<TH1F*>(file_data->Get(hNTracksPath.c_str()));

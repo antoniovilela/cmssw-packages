@@ -46,9 +46,10 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
       if((proton1 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz > 0.75*Ebeam)) proton1 = genpart;
       else if((proton2 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz < -0.75*Ebeam)) proton2 = genpart;
    }
-   /*// Subtract the two protons' momenta
-   if(proton1 != genParticles.end()) allGenParticles -= proton1->p4();
-   if(proton2 != genParticles.end()) allGenParticles -= proton2->p4();*/
+   math::XYZTLorentzVector genProton_plus(0.,0.,0.,0.);
+   math::XYZTLorentzVector genProton_minus(0.,0.,0.,0.);
+   if(proton1 != genParticles.end()) genProton_plus = proton1->p4();
+   if(proton2 != genParticles.end()) genProton_minus = proton2->p4();
 
    // Commit
    genAllParticles = allGenParticles;
@@ -57,8 +58,8 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    genAllParticlesHFPlus = allGenParticlesHFPlus;
    genAllParticlesHFMinus = allGenParticlesHFMinus;
  
-   if(proton1 != genParticles.end()) genProtonPlus = proton1->p4();
-   if(proton2 != genParticles.end()) genProtonMinus = proton2->p4();
+   genProtonPlus = genProton_plus;
+   genProtonMinus = genProton_minus;
 }
 
 int pflowId(std::string const& name){

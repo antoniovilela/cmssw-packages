@@ -78,7 +78,7 @@ void plotErrorBands(char const* drawOption = "", int rebin = 1){
 
   //dirs.push_back(std::make_pair("Energy scale #pm10%",TFile::Open("root/7TeV/Data/Run132605/histosErrorBands_MinimumBias_7TeV_eventSelectionBscMinBiasOR_EnergyScaleHCAL.root")));
   dirs.push_back(std::make_pair("p+p (7 TeV) BSC OR and Vertex",TFile::Open("root/7TeV/Data/Run132605/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root")));
-  dirs.push_back(std::make_pair("Pythia-6 DW",TFile::Open("root/7TeV/Pythia6DW/analysisMinBiasTTree_PYTHIADW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root")));
+  dirs.push_back(std::make_pair("PYTHIA6 DW",TFile::Open("root/7TeV/Pythia6DW/analysisMinBiasTTree_PYTHIADW_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root")));
   dirs.push_back(std::make_pair("PHOJET",TFile::Open("root/7TeV/Phojet/analysisMinBiasTTree_PHOJET_MinBias_7TeV_eventSelectionBscMinBiasOR_histos_All.root")));
 
   TH1F* h_EventSelectionData = static_cast<TH1F*>((dirs[0].second)->Get("EventSelection"));
@@ -175,34 +175,42 @@ void plotErrorBandsAll(){
   //std::string labelCMSPrel = "CMS Preliminary 2010";
   //std::string labelLum = "Run 132440 (L = 3.5#mub^{-1})";
   //std::string labelLum = "#sqrt{s} = 7 TeV  L = 20#mub^{-1}";  
-  TLatex* latexEnergy = new TLatex;
+  /*TLatex* latexEnergy = new TLatex;
   latexEnergy->SetNDC(); latexEnergy->SetTextSize(0.04); latexEnergy->SetTextAlign(31); // align right
   latexEnergy->SetText(0.98,0.96,"#sqrt{s} = 7 TeV");
   TLatex* latexLumi = static_cast<TLatex*>(latexEnergy->Clone());
   latexLumi->SetText(0.95,0.85,Form("#int#font[12]{L}dt = %.0f #mub^{-1}",lumi));
   TLatex* latexCMSPrel = static_cast<TLatex*>(latexEnergy->Clone());
   latexCMSPrel->SetTextAlign(11); // align left
+  latexCMSPrel->SetText(0.15,0.96,"CMS Preliminary 2010");*/
+  TLatex* latexLumiEnergy = new TLatex;
+  latexLumiEnergy->SetNDC();
+  latexLumiEnergy->SetTextSize(0.04);
+  latexLumiEnergy->SetTextAlign(31); // align right
+  latexLumiEnergy->SetText(0.98,0.96,Form("#sqrt{s} = 7 TeV   L = %.0f #mub^{-1}",lumi));
+  TLatex* latexCMSPrel = static_cast<TLatex*>(latexLumiEnergy->Clone());
+  latexCMSPrel->SetTextAlign(11); // align left
   latexCMSPrel->SetText(0.15,0.96,"CMS Preliminary 2010");
 
   std::string labelErrorBands = "Energy scale #pm10%";
   std::vector<std::string> labelsMC(filesMC.size());
-  labelsMC[0] = "PYTHIA-6 D6T";
-  labelsMC[1] = "PYTHIA-6 DW"; 
-  labelsMC[2] = "PYTHIA-6 CW";
-  labelsMC[3] = "PYTHIA-6 P0";
-  labelsMC[4] = "PYTHIA-6 Z1";
-  labelsMC[5] = "PYTHIA-8";
+  labelsMC[0] = "PYTHIA6 D6T";
+  labelsMC[1] = "PYTHIA6 DW"; 
+  labelsMC[2] = "PYTHIA6 CW";
+  labelsMC[3] = "PYTHIA6 P0";
+  labelsMC[4] = "PYTHIA6 Z1";
+  labelsMC[5] = "PYTHIA8";
   labelsMC[6] = "PHOJET";
-  /*labelsMC[0] = "PYTHIA-6 D6T";
-  labelsMC[1] = "PYTHIA-8";
+  /*labelsMC[0] = "PYTHIA6 D6T";
+  labelsMC[1] = "PYTHIA8";
   labelsMC[2] = "PHOJET";*/
   //labelsMC[0] = "p+p (Run 132440) (L = 3.5#mub^{-1})";
   std::vector<std::string> labelsMCComponent(filesMCComponent.size());
-  /*labelsMCComponent[0] = "PYTHIA-6 D6T Non-diffractive";
-  labelsMCComponent[1] = "PYTHIA-8 Non-diffractive";
+  /*labelsMCComponent[0] = "PYTHIA6 D6T Non-diffractive";
+  labelsMCComponent[1] = "PYTHIA8 Non-diffractive";
   labelsMCComponent[2] = "PHOJET Non-diffractive";*/
-  /*labelsMCComponent[2] = "PYTHIA-6 DW Non-diffractive";
-  labelsMCComponent[3] = "PYTHIA-6 CW Non-diffractive";*/ 
+  /*labelsMCComponent[2] = "PYTHIA6 DW Non-diffractive";
+  labelsMCComponent[3] = "PYTHIA6 CW Non-diffractive";*/ 
 
   std::vector<int> histColors(filesMC.size(),1);
   histColors[0] = 2;
@@ -368,9 +376,9 @@ void plotErrorBandsAll(){
      latexLum->SetTextAlign(12);
      latexLum->SetTextSize(0.04);
      latexLum->Draw("SAME");*/
-     latexEnergy->Draw("SAME");
+     latexLumiEnergy->Draw("SAME");
      latexCMSPrel->Draw("SAME");
-     latexLumi->Draw("SAME");
+     //latexLumi->Draw("SAME");
   }
 }
 
