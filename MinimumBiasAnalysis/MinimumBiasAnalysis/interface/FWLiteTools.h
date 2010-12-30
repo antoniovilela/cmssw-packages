@@ -13,6 +13,8 @@
 
 namespace minimumBiasAnalysis {
 
+enum calo_region_t {Barrel,Endcap,Transition,Forward};
+
 void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                                  math::XYZTLorentzVector& genAllParticles,
                                                                  math::XYZTLorentzVector& genAllParticlesHEPlus,
@@ -117,10 +119,18 @@ int pflowId(std::string const& name){
    else return -1;
 }
 
-bool pflowThreshold(reco::PFCandidate const& part, std::map<int,std::pair<double,double> > const& thresholds){
+bool pflowThreshold(reco::PFCandidate const& part, std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap){
 
    bool accept = true;
 
+   double eta = part.eta();
+   int region = -1;
+   if( (fabs(eta) >= 0.) && (fabs(eta) < 1.4) ) region = Barrel;
+   else if( (fabs(eta) >= 1.4) && (fabs(eta) < 2.6) ) region = Endcap;
+   else if( (fabs(eta) >= 2.6) && (fabs(eta) < 3.2) ) region = Transition;
+   else if( (fabs(eta) >= 3.2) ) region = Forward;
+   std::map<int,std::pair<double,double> > const& thresholds = thresholdMap.find(region)->second;
+   
    double ptThreshold = -1.0;
    double eThreshold = -1.0;
    int partType = part.particleId();
@@ -148,25 +158,25 @@ bool pflowThreshold(reco::PFCandidate const& part, std::map<int,std::pair<double
 }*/
 
 // FIXME: Generalize for any collection with changeable threshold scheme
-double MassColl(reco::PFCandidateCollection const& pflowCollection, std::map<int,std::pair<double,double> > const& thresholds){
+double MassColl(reco::PFCandidateCollection const& pflowCollection, std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap){
    math::XYZTLorentzVector allCands(0.,0.,0.,0.);
    reco::PFCandidateCollection::const_iterator part = pflowCollection.begin();
    reco::PFCandidateCollection::const_iterator pfCands_end = pflowCollection.end();
    for(; part != pfCands_end; ++part){
-      if(pflowThreshold(*part,thresholds)) allCands += part->p4();
+      if(pflowThreshold(*part,thresholdMap)) allCands += part->p4();
    }
 
    return allCands.M();
 }
 
-std::pair<double,double> xi(reco::PFCandidateCollection const& pflowCollection, double Ebeam,  std::map<int,std::pair<double,double> > const& thresholds){
+std::pair<double,double> xi(reco::PFCandidateCollection const& pflowCollection, double Ebeam, std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap){
 
    double xi_towers_plus = 0.;
    double xi_towers_minus = 0.;
    reco::PFCandidateCollection::const_iterator part = pflowCollection.begin();
    reco::PFCandidateCollection::const_iterator pfCands_end = pflowCollection.end();
    for(; part != pfCands_end; ++part){
-     if(!pflowThreshold(*part,thresholds)) continue;
+     if(!pflowThreshold(*part,thresholdMap)) continue;
 
      xi_towers_plus += part->et()*TMath::Exp(part->eta());
      xi_towers_minus += part->et()*TMath::Exp(-part->eta());
@@ -178,13 +188,13 @@ std::pair<double,double> xi(reco::PFCandidateCollection const& pflowCollection, 
    return std::make_pair(xi_towers_plus,xi_towers_minus);
 }
 
-std::pair<double,double> EPlusPz(reco::PFCandidateCollection const& pflowCollection, std::map<int,std::pair<double,double> > const& thresholds){
+std::pair<double,double> EPlusPz(reco::PFCandidateCollection const& pflowCollection, std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap){
    double e_plus_pz = 0.;
    double e_minus_pz = 0.;
    reco::PFCandidateCollection::const_iterator part = pflowCollection.begin();
    reco::PFCandidateCollection::const_iterator pfCands_end = pflowCollection.end();
    for(; part != pfCands_end; ++part){
-      if(!pflowThreshold(*part,thresholds)) continue;
+      if(!pflowThreshold(*part,thresholdMap)) continue;
 
       e_plus_pz += part->energy() + part->pz(); 
       e_minus_pz += part->energy() - part->pz();
@@ -193,12 +203,12 @@ std::pair<double,double> EPlusPz(reco::PFCandidateCollection const& pflowCollect
    return std::make_pair(e_plus_pz,e_minus_pz);
 }
 
-std::pair<double,double> etaMax(reco::PFCandidateCollection const& pflowCollection, std::map<int,std::pair<double,double> > const& thresholds){
+std::pair<double,double> etaMax(reco::PFCandidateCollection const& pflowCollection, std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap){
    std::vector<double> etaCands;
    reco::PFCandidateCollection::const_iterator part = pflowCollection.begin();
    reco::PFCandidateCollection::const_iterator pfCands_end = pflowCollection.end();
    for(; part != pfCands_end; ++part){                           
-      if(!pflowThreshold(*part,thresholds)) continue;            
+      if(!pflowThreshold(*part,thresholdMap)) continue;            
       etaCands.push_back( part->eta() );
    }                                                             
    double eta_max = etaCands.size() ? *( std::max_element(etaCands.begin(), etaCands.end()) ) : -999.;

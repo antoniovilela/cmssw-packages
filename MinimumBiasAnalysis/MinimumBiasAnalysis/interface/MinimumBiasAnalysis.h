@@ -32,6 +32,9 @@ class MinimumBiasAnalysis {
      void fillMultiplicities(EventData&, const edm::Event&, const edm::EventSetup&);
      void fillEventVariables(EventData&, const edm::Event&, const edm::EventSetup&);
 
+     void resetPFThresholds(std::map<int,std::pair<double,double> >&);
+     void setPFThresholds(std::map<int,std::pair<double,double> >&, edm::ParameterSet const&);
+
      edm::InputTag vertexTag_;
      edm::InputTag trackTag_;
      edm::InputTag metTag_;
@@ -53,7 +56,11 @@ class MinimumBiasAnalysis {
      std::string hltPathName_; 
      //std::string selectionPathName_;     
 
-     std::map<int,std::pair<double,double> > thresholdsPFlow_;
+     std::map<int,std::pair<double,double> > thresholdsPFlowBarrel_;
+     std::map<int,std::pair<double,double> > thresholdsPFlowEndcap_;
+     std::map<int,std::pair<double,double> > thresholdsPFlowTransition_;
+     std::map<int,std::pair<double,double> > thresholdsPFlowForward_;
+     std::map<int,std::map<int,std::pair<double,double> > > thresholdsPFlow_;
 
      /*math::XYZTLorentzVector genAllParticles_;
      math::XYZTLorentzVector genAllParticlesHEPlus_;

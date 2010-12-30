@@ -62,40 +62,44 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,std::max(energyThresholdHB_,energyThresholdHE_));
   thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,energyThresholdHF_);
   thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,energyThresholdHF_);*/
-  thresholdsPFlow_[reco::PFCandidate::X] = std::make_pair(-1.,-1.);
-  thresholdsPFlow_[reco::PFCandidate::h] = std::make_pair(-1.,-1.);
-  thresholdsPFlow_[reco::PFCandidate::e] = std::make_pair(-1.,-1.);
-  thresholdsPFlow_[reco::PFCandidate::mu] = std::make_pair(-1.,-1.);
-  thresholdsPFlow_[reco::PFCandidate::gamma] = std::make_pair(-1.,-1.);
-  thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,-1.);
-  thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,-1.);
-  thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,-1.);
+  resetPFThresholds(thresholdsPFlowBarrel_);
+  resetPFThresholds(thresholdsPFlowEndcap_);
+  resetPFThresholds(thresholdsPFlowTransition_);
+  resetPFThresholds(thresholdsPFlowForward_);
   if(pset.exists("PFlowThresholds")){ 
      edm::ParameterSet const& thresholdsPFPset = pset.getParameter<edm::ParameterSet>("PFlowThresholds");
-     std::vector<std::string> pfThresholdNames = thresholdsPFPset.getParameterNames();
-     std::vector<std::string>::const_iterator param = pfThresholdNames.begin();
-     std::vector<std::string>::const_iterator params_end = pfThresholdNames.end();  
-     for(; param != params_end; ++param){
-        //reco::PFCandidate::ParticleType particleType = pflowId(*param);
-        int particleType = pflowId(*param);
-        if(particleType == -1)
-           throw cms::Exception("Configuration") << "Parameter " << *param 
-                                                 << " does not correspond to any particle type (PF)";
+ 
+     edm::ParameterSet const& thresholdsBarrel = thresholdsPFPset.getParameter<edm::ParameterSet>("Barrel");
+     edm::ParameterSet const& thresholdsEndcap = thresholdsPFPset.getParameter<edm::ParameterSet>("Endcap");
+     edm::ParameterSet const& thresholdsTransition = thresholdsPFPset.getParameter<edm::ParameterSet>("Transition");
+     edm::ParameterSet const& thresholdsForward = thresholdsPFPset.getParameter<edm::ParameterSet>("Forward");
 
-        edm::ParameterSet const& typePSet = thresholdsPFPset.getParameter<edm::ParameterSet>(*param);
-        double ptThreshold = typePSet.getParameter<double>("ptMin");
-        double energyThreshold = typePSet.getParameter<double>("energyMin");
-        thresholdsPFlow_[particleType].first = ptThreshold;
-        thresholdsPFlow_[particleType].second = energyThreshold; 
-     }
+     setPFThresholds(thresholdsPFlowBarrel_,thresholdsBarrel);
+     setPFThresholds(thresholdsPFlowEndcap_,thresholdsEndcap);
+     setPFThresholds(thresholdsPFlowTransition_,thresholdsTransition);
+     setPFThresholds(thresholdsPFlowForward_,thresholdsForward);
   }
-  std::map<int,std::pair<double,double> >::const_iterator pfThreshold = thresholdsPFlow_.begin();
-  std::map<int,std::pair<double,double> >::const_iterator pfThresholds_end = thresholdsPFlow_.end(); 
+  thresholdsPFlow_[Barrel] = thresholdsPFlowBarrel_;
+  thresholdsPFlow_[Endcap] = thresholdsPFlowEndcap_; 
+  thresholdsPFlow_[Transition] = thresholdsPFlowTransition_;
+  thresholdsPFlow_[Forward] = thresholdsPFlowForward_;
+
+  std::map<int,std::pair<double,double> >::const_iterator pfThreshold = thresholdsPFlowBarrel_.begin();
+  std::map<int,std::pair<double,double> >::const_iterator pfThresholds_end = thresholdsPFlowBarrel_.end(); 
   std::ostringstream oss;
   oss << "Using the following PF thresholds:\n";
-  for(; pfThreshold != pfThresholds_end; ++pfThreshold) oss << "  " << pfThreshold->first << ": "
-                                                            << "(" << pfThreshold->second.first
-                                                            << "," << pfThreshold->second.second << ")\n";   
+  for(; pfThreshold != pfThresholds_end; ++pfThreshold){
+     int key = pfThreshold->first;    
+     oss << "  " << key << ": "
+                 << "(" << thresholdsPFlow_[Barrel][key].first
+                 << "," << thresholdsPFlow_[Barrel][key].second << ")  "
+                 << "(" << thresholdsPFlow_[Endcap][key].first
+                 << "," << thresholdsPFlow_[Endcap][key].second << ")  "
+                 << "(" << thresholdsPFlow_[Transition][key].first
+                 << "," << thresholdsPFlow_[Transition][key].second << ")  "
+                 << "(" << thresholdsPFlow_[Forward][key].first
+                 << "," << thresholdsPFlow_[Forward][key].second << ")\n";   
+  }
   LogDebug("Analysis") << oss.str();
 
   if(applyEnergyScaleHCAL_) energyScaleHCAL_ = pset.getParameter<double>("EnergyScaleFactorHCAL");
@@ -542,4 +546,35 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
 
   fillMultiplicities(eventData,event,setup);
 }
+
+void MinimumBiasAnalysis::resetPFThresholds(std::map<int,std::pair<double,double> >& thresholdsPFlow){
+  thresholdsPFlow[reco::PFCandidate::X] = std::make_pair(-1.,-1.);
+  thresholdsPFlow[reco::PFCandidate::h] = std::make_pair(-1.,-1.);
+  thresholdsPFlow[reco::PFCandidate::e] = std::make_pair(-1.,-1.);
+  thresholdsPFlow[reco::PFCandidate::mu] = std::make_pair(-1.,-1.);
+  thresholdsPFlow[reco::PFCandidate::gamma] = std::make_pair(-1.,-1.);
+  thresholdsPFlow[reco::PFCandidate::h0] = std::make_pair(-1.,-1.);
+  thresholdsPFlow[reco::PFCandidate::h_HF] = std::make_pair(-1.,-1.);
+  thresholdsPFlow[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,-1.);
+}
+
+void MinimumBiasAnalysis::setPFThresholds(std::map<int,std::pair<double,double> >& thresholdsPFlow, edm::ParameterSet const& thresholdsPFPset){
+  std::vector<std::string> pfThresholdNames = thresholdsPFPset.getParameterNames();
+  std::vector<std::string>::const_iterator param = pfThresholdNames.begin();
+  std::vector<std::string>::const_iterator params_end = pfThresholdNames.end();
+  for(; param != params_end; ++param){
+     //reco::PFCandidate::ParticleType particleType = pflowId(*param);
+     int particleType = pflowId(*param);
+     if(particleType == -1)
+        throw cms::Exception("Configuration") << "Parameter " << *param
+                                              << " does not correspond to any particle type (PF)";
+
+     edm::ParameterSet const& typePSet = thresholdsPFPset.getParameter<edm::ParameterSet>(*param);
+     double ptThreshold = typePSet.getParameter<double>("ptMin");
+     double energyThreshold = typePSet.getParameter<double>("energyMin");
+     thresholdsPFlow[particleType].first = ptThreshold;
+     thresholdsPFlow[particleType].second = energyThreshold;
+  }
+}
+
 } // namespace
