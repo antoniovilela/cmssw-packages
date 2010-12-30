@@ -18,12 +18,12 @@ namespace minimumBiasAnalysis {
   void bookHistos(HistoMapTH1F& histos, const Adaptor& adaptor){
      //pMakeTH1F = &Adaptor::template make<TH1F>;
 
-     double etaBinsHCALBoundaries = {0.000, 0.087, 0.174, 0.261, 0.348, 0.435, 0.522, 0.609, 0.696,
-                                     0.783, 0.870, 0.957, 1.044, 1.131, 1.218, 1.305, 1.392,
-                                     1.479, 1.566, 1.653, 1.740, 1.830, 1.930, 2.043, 2.172, 2.322,
-                                     2.500, 2.650, 2.868, 3.000,
-                                     3.152, 3.327, 3.503, 3.677, 3.853, 4.027, 4.204, 4.377, 4.552,
-                                     4.730, 4.903, 5.205}; // 41 bins
+     double etaBinsHCALBoundaries[] = {0.000, 0.087, 0.174, 0.261, 0.348, 0.435, 0.522, 0.609, 0.696,
+                                       0.783, 0.870, 0.957, 1.044, 1.131, 1.218, 1.305, 1.392,
+                                       1.479, 1.566, 1.653, 1.740, 1.830, 1.930, 2.043, 2.172, 2.322,
+                                       2.500, 2.650, 2.868, 3.000,
+                                       3.152, 3.327, 3.503, 3.677, 3.853, 4.027, 4.204, 4.377, 4.552,
+                                       4.730, 4.903, 5.205}; // 41 bins
 
      histos["nVertex"] = adaptor.template make<TH1F>("nVertex","Nr. of offline primary vertexes",10,0,10);
      histos["posXPrimVtx"] = adaptor.template make<TH1F>("posXPrimVtx","x position of primary vertexes",100,-1.,1.);
