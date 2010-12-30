@@ -74,7 +74,8 @@ def plotEventSelectionMC(dir,selectionRef,selectionEff,prefix,rebin=1):
     steps = [selectionRef,selectionEff]
 
     files = {}
-    processIds = ['All','SD','DD','Inelastic'] 
+    #processIds = ['All','SD','DD','Inelastic'] 
+    processIds = ['SD']
     for selection in steps:
         for type in processIds:
             fileName = "%s/%s_%s_histos_%s.root" % (dir, prefix, selection, type)

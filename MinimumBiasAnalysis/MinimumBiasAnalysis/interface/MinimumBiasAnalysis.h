@@ -3,7 +3,7 @@
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-#include "DataFormats/Math/interface/LorentzVector.h"
+//#include "DataFormats/Math/interface/LorentzVector.h"
 
 #include <vector>
 #include <string>
@@ -55,13 +55,13 @@ class MinimumBiasAnalysis {
 
      std::map<int,std::pair<double,double> > thresholdsPFlow_;
 
-     math::XYZTLorentzVector genAllParticles_;
+     /*math::XYZTLorentzVector genAllParticles_;
      math::XYZTLorentzVector genAllParticlesHEPlus_;
      math::XYZTLorentzVector genAllParticlesHEMinus_;
      math::XYZTLorentzVector genAllParticlesHFPlus_;
      math::XYZTLorentzVector genAllParticlesHFMinus_;
      math::XYZTLorentzVector genProtonPlus_;
-     math::XYZTLorentzVector genProtonMinus_;
+     math::XYZTLorentzVector genProtonMinus_;*/
 };
 
 } // namespace

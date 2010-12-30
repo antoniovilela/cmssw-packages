@@ -18,6 +18,7 @@
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/Math/interface/LorentzVector.h"
 #include "FWCore/Common/interface/TriggerNames.h" 
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -49,12 +50,8 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   energyScaleHCAL_(-1.),
   accessMCInfo_(pset.getUntrackedParameter<bool>("AccessMCInfo",false)),
   //hltPathNames_(pset.getParameter<std::vector<std::string> >("HLTPathNames")),
-  hltPathName_(pset.getParameter<std::string>("HLTPath")),
-  //selectionPathName_(pset.getParameter<std::string>("SelectionPath")),
-  genAllParticles_(0.,0.,0.,0.),
-  genAllParticlesHEPlus_(0.,0.,0.,0.),genAllParticlesHEMinus_(0.,0.,0.,0.),
-  genAllParticlesHFPlus_(0.,0.,0.,0.),genAllParticlesHFMinus_(0.,0.,0.,0.),
-  genProtonPlus_(0.,0.,0.,0.),genProtonMinus_(0.,0.,0.,0.)
+  hltPathName_(pset.getParameter<std::string>("HLTPath"))
+  //selectionPathName_(pset.getParameter<std::string>("SelectionPath"))
 {
   //FIXME
   /*thresholdsPFlow_[reco::PFCandidate::X] = std::make_pair(-1.,1.0);
@@ -456,23 +453,32 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
      event.getByLabel("genParticles",genParticlesCollectionH);
      const reco::GenParticleCollection& genParticles = *genParticlesCollectionH;   
 
-     setGenInfo(genParticles,Ebeam_,genAllParticles_,
-                                    genAllParticlesHEPlus_,genAllParticlesHEMinus_,
-                                    genAllParticlesHFPlus_,genAllParticlesHFMinus_,
-                                    genProtonPlus_,genProtonMinus_);
+     math::XYZTLorentzVector genAllParticles(0.,0.,0.,0.),
+                             genAllParticlesHEPlus(0.,0.,0.,0.),genAllParticlesHEMinus(0.,0.,0.,0.),
+                             genAllParticlesHFPlus(0.,0.,0.,0.),genAllParticlesHFMinus(0.,0.,0.,0.),
+                             genEtaMax(0.,0.,0.,0.),genEtaMin(0.,0.,0.,0.),
+                             genProtonPlus(0.,0.,0.,0.),genProtonMinus(0.,0.,0.,0.);
+
+     setGenInfo(genParticles,Ebeam_,genAllParticles,
+                                    genAllParticlesHEPlus,genAllParticlesHEMinus,
+                                    genAllParticlesHFPlus,genAllParticlesHFMinus,
+                                    genEtaMax,genEtaMin, 
+                                    genProtonPlus,genProtonMinus);
 
      double xigen_plus = -1.;
      double xigen_minus = -1.;
-     if(genProtonPlus_.pz() > 0.75*Ebeam_) xigen_plus = 1 - genProtonPlus_.pz()/Ebeam_;
-     if(genProtonMinus_.pz() < -0.75*Ebeam_) xigen_minus = 1 + genProtonMinus_.pz()/Ebeam_;
+     if(genProtonPlus.pz() > 0.75*Ebeam_) xigen_plus = 1 - genProtonPlus.pz()/Ebeam_;
+     if(genProtonMinus.pz() < -0.75*Ebeam_) xigen_minus = 1 + genProtonMinus.pz()/Ebeam_;
 
      eventData.xiGenPlus_ = xigen_plus;
      eventData.xiGenMinus_ = xigen_minus;
-     eventData.MxGen_ = genAllParticles_.mass();
-     eventData.sumEnergyHEPlusGen_ = genAllParticlesHEPlus_.energy();
-     eventData.sumEnergyHEMinusGen_ = genAllParticlesHEMinus_.energy();
-     eventData.sumEnergyHFPlusGen_ = genAllParticlesHFPlus_.energy();
-     eventData.sumEnergyHFMinusGen_ = genAllParticlesHFMinus_.energy();
+     eventData.MxGen_ = genAllParticles.mass();
+     eventData.sumEnergyHEPlusGen_ = genAllParticlesHEPlus.energy();
+     eventData.sumEnergyHEMinusGen_ = genAllParticlesHEMinus.energy();
+     eventData.sumEnergyHFPlusGen_ = genAllParticlesHFPlus.energy();
+     eventData.sumEnergyHFMinusGen_ = genAllParticlesHFMinus.energy();
+     eventData.etaMaxGen_ = genEtaMax.eta();
+     eventData.etaMinGen_ = genEtaMin.eta();
   } else{
      eventData.xiGenPlus_ = -1.;
      eventData.xiGenMinus_ = -1.;
@@ -481,6 +487,8 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
      eventData.sumEnergyHEMinusGen_ = -1.;
      eventData.sumEnergyHFPlusGen_ = -1.;
      eventData.sumEnergyHFMinusGen_ = -1.;
+     eventData.etaMaxGen_ = -999.;
+     eventData.etaMinGen_ = -999.;
   }
 
   /*edm::Handle<edm::View<reco::Jet> > jetCollectionH;

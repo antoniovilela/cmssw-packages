@@ -71,6 +71,8 @@ namespace minimumBiasAnalysis {
      data.Branch("MxFromTowers",&eventData.MxFromTowers_,"MxFromTowers/D");
      //data.Branch("MxFromJets",&eventData.MxFromJets_,"MxFromJets/D");
      data.Branch("MxFromPFCands",&eventData.MxFromPFCands_,"MxFromPFCands/D");
+     data.Branch("etaMaxGen",&eventData.etaMaxGen_,"etaMaxGen/D");
+     data.Branch("etaMinGen",&eventData.etaMinGen_,"etaMinGen/D");
      data.Branch("etaMaxFromPFCands",&eventData.etaMaxFromPFCands_,"etaMaxFromPFCands/D");
      data.Branch("etaMinFromPFCands",&eventData.etaMinFromPFCands_,"etaMinFromPFCands/D");
      data.Branch("sumET",&eventData.sumET_,"sumET/D");
@@ -151,6 +153,8 @@ namespace minimumBiasAnalysis {
      data.SetBranchAddress("MxFromTowers",&eventData.MxFromTowers_);
      //data.SetBranchAddress("MxFromJets",&eventData.MxFromJets_);
      data.SetBranchAddress("MxFromPFCands",&eventData.MxFromPFCands_);
+     data.SetBranchAddress("etaMaxGen",&eventData.etaMaxGen_);
+     data.SetBranchAddress("etaMinGen",&eventData.etaMinGen_);
      data.SetBranchAddress("etaMaxFromPFCands",&eventData.etaMaxFromPFCands_);
      data.SetBranchAddress("etaMinFromPFCands",&eventData.etaMinFromPFCands_);
      data.SetBranchAddress("sumET",&eventData.sumET_);

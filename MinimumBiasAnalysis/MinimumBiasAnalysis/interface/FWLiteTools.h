@@ -19,6 +19,8 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                                  math::XYZTLorentzVector& genAllParticlesHEMinus,
                                                                  math::XYZTLorentzVector& genAllParticlesHFPlus,
                                                                  math::XYZTLorentzVector& genAllParticlesHFMinus,
+                                                                 math::XYZTLorentzVector& genEtaMax,
+                                                                 math::XYZTLorentzVector& genEtaMin,
                                                                  math::XYZTLorentzVector& genProtonPlus,
                                                                  math::XYZTLorentzVector& genProtonMinus){
    /*fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
@@ -33,23 +35,32 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    
    reco::GenParticleCollection::const_iterator proton1 = genParticles.end();
    reco::GenParticleCollection::const_iterator proton2 = genParticles.end();
+   reco::GenParticleCollection::const_iterator etaMaxParticle = genParticles.end();
+   reco::GenParticleCollection::const_iterator etaMinParticle = genParticles.end(); 
    for(reco::GenParticleCollection::const_iterator genpart = genParticles.begin(); genpart != genParticles.end(); ++genpart){
       if(genpart->status() != 1) continue;
       //histosTH1F["EnergyVsEta"]->Fill(genpart->eta(),genpart->energy());      
+
+      double pz = genpart->pz();
+      if( (proton1 == genParticles.end()) &&
+          (genpart->pdgId() == 2212) && (pz > 0.75*Ebeam) ) proton1 = genpart;
+      if( (proton2 == genParticles.end()) &&
+          (genpart->pdgId() == 2212) && (pz < -0.75*Ebeam) ) proton2 = genpart;
+
       if(fabs(genpart->eta()) < 5.0) allGenParticles += genpart->p4();
       if( (genpart->eta() >= 1.3) && (genpart->eta() < 3.0) ) allGenParticlesHEPlus += genpart->p4();
       if( (genpart->eta() > -3.0) && (genpart->eta() <= -1.3) ) allGenParticlesHEMinus += genpart->p4();
       if( (genpart->eta() >= 3.0) && (genpart->eta() < 5.0) ) allGenParticlesHFPlus += genpart->p4();
       if( (genpart->eta() > -5.0) && (genpart->eta() <= -3.0) ) allGenParticlesHFMinus += genpart->p4(); 
 
-      double pz = genpart->pz();
-      if((proton1 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz > 0.75*Ebeam)) proton1 = genpart;
-      else if((proton2 == genParticles.end())&&(genpart->pdgId() == 2212)&&(pz < -0.75*Ebeam)) proton2 = genpart;
+      //if(fabs(genpart->eta()) < 7.0){ 
+       if( (genpart != proton1) && (genpart != proton2) ){
+         if( ( etaMaxParticle == genParticles.end() ) ||
+             ( genpart->eta() > etaMaxParticle->eta() ) ) etaMaxParticle = genpart;
+         if( ( etaMinParticle == genParticles.end() ) ||
+             ( genpart->eta() < etaMinParticle->eta() ) ) etaMinParticle = genpart;
+      }
    }
-   math::XYZTLorentzVector genProton_plus(0.,0.,0.,0.);
-   math::XYZTLorentzVector genProton_minus(0.,0.,0.,0.);
-   if(proton1 != genParticles.end()) genProton_plus = proton1->p4();
-   if(proton2 != genParticles.end()) genProton_minus = proton2->p4();
 
    // Commit
    genAllParticles = allGenParticles;
@@ -58,8 +69,11 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    genAllParticlesHFPlus = allGenParticlesHFPlus;
    genAllParticlesHFMinus = allGenParticlesHFMinus;
  
-   genProtonPlus = genProton_plus;
-   genProtonMinus = genProton_minus;
+   if( proton1 != genParticles.end() ) genProtonPlus = proton1->p4();
+   if( proton2 != genParticles.end() ) genProtonMinus = proton2->p4();
+
+   if( etaMaxParticle != genParticles.end() ) genEtaMax = etaMaxParticle->p4();
+   if( etaMinParticle != genParticles.end() ) genEtaMin = etaMinParticle->p4();
 }
 
 int pflowId(std::string const& name){
