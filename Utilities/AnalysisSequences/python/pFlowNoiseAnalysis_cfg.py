@@ -33,14 +33,14 @@ process.vertexVeto = cms.Sequence(~process.primaryVertexFilter)
 process.trackVeto = cms.Sequence(~process.generalTracksFilter + ~process.pixelTracksFilter) 
 #############
 
-process.pFlowAnalysisNoSel = process.pFlowAnalysis.clone()
-process.pFlowAnalysisColl = process.pFlowAnalysis.clone()
-process.pFlowAnalysisNoColl = process.pFlowAnalysis.clone()
-process.pFlowAnalysisNoCollNoVtx = process.pFlowAnalysis.clone()
-process.pFlowAnalysisNoCollNoTrk = process.pFlowAnalysis.clone()
-process.pFlowAnalysisBPTXPlusOrMinusOnly = process.pFlowAnalysis.clone()
-process.pFlowAnalysisBPTXPlusOrMinusOnlyNoVtx = process.pFlowAnalysis.clone()
-process.pFlowAnalysisBPTXPlusOrMinusOnlyNoTrk = process.pFlowAnalysis.clone()
+process.pFlowAnalysisNoSel = process.pFlowNoiseAnalyzer.clone()
+process.pFlowAnalysisColl = process.pFlowNoiseAnalyzer.clone()
+process.pFlowAnalysisNoColl = process.pFlowNoiseAnalyzer.clone()
+process.pFlowAnalysisNoCollNoVtx = process.pFlowNoiseAnalyzer.clone()
+process.pFlowAnalysisNoCollNoTrk = process.pFlowNoiseAnalyzer.clone()
+process.pFlowAnalysisBPTXPlusOrMinusOnly = process.pFlowNoiseAnalyzer.clone()
+process.pFlowAnalysisBPTXPlusOrMinusOnlyNoVtx = process.pFlowNoiseAnalyzer.clone()
+process.pFlowAnalysisBPTXPlusOrMinusOnlyNoTrk = process.pFlowNoiseAnalyzer.clone()
 
 process.analysisNoSel = cms.Path(process.pFlowAnalysisNoSel)
 process.analysisColl = cms.Path(process.l1CollBscOr+
