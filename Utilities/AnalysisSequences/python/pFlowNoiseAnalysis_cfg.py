@@ -17,12 +17,11 @@ process.TFileService = cms.Service("TFileService",
 )
 
 #############
-process.load('Utilities.AnalysisTools.pFlowNoiseAnalyzer_cfi')
+process.load('Utilities.AnalysisSequences.minimumBiasAnalysisSequences_cff')
 process.load('Utilities.AnalysisSequences.hltFilter_cfi')
 process.hltBPTXPlusOrMinusOnly = process.hltFilter.clone(
     HLTPaths = ['HLT_L1_BPTX_PlusOnly','HLT_L1_BPTX_MinusOnly']
 )
-#############
 process.load('Utilities.AnalysisSequences.primaryVertexFilter_cfi')
 process.load('Utilities.AnalysisSequences.trackCountFilter_cfi')
 process.generalTracksFilter = process.trackCountFilter.clone(src = 'generalTracks')
@@ -33,6 +32,7 @@ process.vertexVeto = cms.Sequence(~process.primaryVertexFilter)
 process.trackVeto = cms.Sequence(~process.generalTracksFilter + ~process.pixelTracksFilter) 
 #############
 
+process.load('Utilities.AnalysisTools.pFlowNoiseAnalyzer_cfi')
 process.pFlowAnalysisNoSel = process.pFlowNoiseAnalyzer.clone()
 process.pFlowAnalysisColl = process.pFlowNoiseAnalyzer.clone()
 process.pFlowAnalysisNoColl = process.pFlowNoiseAnalyzer.clone()

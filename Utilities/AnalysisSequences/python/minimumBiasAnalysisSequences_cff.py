@@ -25,7 +25,7 @@ from Utilities.AnalysisSequences.filterScraping_cfi import *
 
 from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import *
 
-from MinimumBiasAnalysis.MinimumBiasAnalysis.analysisTracks_cfi import *
+from Utilities.AnalysisTools.analysisTracks_cfi import *
 
 #from PhysicsTools.RecoAlgos.recoTrackSelector_cfi import *
 #recoTrackSelector.src = "generalTracks"
