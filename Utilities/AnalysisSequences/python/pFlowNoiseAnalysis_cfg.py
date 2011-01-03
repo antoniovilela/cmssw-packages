@@ -23,18 +23,12 @@ process.hltBPTXPlusOrMinusOnly = process.hltFilter.clone(
     HLTPaths = ['HLT_L1_BPTX_PlusOnly','HLT_L1_BPTX_MinusOnly']
 )
 #############
-process.generalTracksFilter = cms.EDFilter("TrackCountFilter",
-    src = cms.InputTag('generalTracks'),
-    minNumber = cms.uint32(1) 
-)
-#process.pixelLessTracksFilter = cms.EDFilter("TrackCountFilter",
-#    src = cms.InputTag('ctfPixelLess'),
-#    minNumber = cms.uint32(1) 
-#)
-process.pixelTracksFilter = cms.EDFilter("TrackCountFilter",
-    src = cms.InputTag('pixelTracks'),
-    minNumber = cms.uint32(1) 
-)
+process.load('Utilities.AnalysisSequences.primaryVertexFilter_cfi')
+process.load('Utilities.AnalysisSequences.trackCountFilter_cfi')
+process.generalTracksFilter = process.trackCountFilter.clone(src = 'generalTracks')
+#process.pixelLessTracksFilter = process.trackCountFilter.clone(src = 'ctfPixelLess')
+process.pixelTracksFilter = process.trackCountFilter.clone(src = 'pixelTracks')
+
 process.vertexVeto = cms.Sequence(~process.primaryVertexFilter)
 process.trackVeto = cms.Sequence(~process.generalTracksFilter + ~process.pixelTracksFilter) 
 #############
@@ -68,4 +62,3 @@ process.analysisBPTXPlusOrMinusOnlyNoVtx = cms.Path(process.hltBPTXPlusOrMinusOn
 process.analysisBPTXPlusOrMinusOnlyNoTrk = cms.Path(process.hltBPTXPlusOrMinusOnly+
                                                     process.trackVeto+
                                                     process.pFlowAnalysisBPTXPlusOrMinusOnly)
-
