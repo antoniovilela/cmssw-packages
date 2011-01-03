@@ -6,6 +6,7 @@
   <use name="DataFormats/ParticleFlowCandidate"/> 
   <use name="Geometry/CaloTopology"/>
   <use name="Geometry/CaloGeometry"/>
+  <use name="Geometry/TrackerGeometryBuilder"/>
   <use name="CommonTools/UtilAlgos"/>
   <use name="CommonTools/RecoAlgos"/> 
   <use name="Utilities/AnalysisTools"/>
