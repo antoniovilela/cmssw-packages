@@ -1,0 +1,25 @@
+import FWCore.ParameterSet.Config as cms
+
+caloTowerNoiseAnalyzer = cms.EDAnalyzer("CaloTowerNoiseAnalyzer",
+    CaloTowersTag = cms.InputTag("towerMaker"),
+    AccessRecHits = cms.untracked.bool(False),
+    HFRecHitsLabel = cms.untracked.InputTag("hfreco"),
+    NBinsHB = cms.untracked.int32(20),
+    NBinsHE = cms.untracked.int32(20),
+    NBinsHF = cms.untracked.int32(20),
+    NBinsEB = cms.untracked.int32(20),
+    NBinsEE = cms.untracked.int32(20),
+    NumberOfTresholds = cms.uint32(10),
+    TowerEnergyTresholdHBMin = cms.double(0.0),
+    TowerEnergyTresholdHBMax = cms.double(10.0),
+    TowerEnergyTresholdHEMin = cms.double(0.0),
+    TowerEnergyTresholdHEMax = cms.double(10.0),
+    TowerEnergyTresholdHFMin = cms.double(0.0),
+    TowerEnergyTresholdHFMax = cms.double(10.0),
+    TowerEnergyTresholdEBMin = cms.double(0.0),
+    TowerEnergyTresholdEBMax = cms.double(10.0),
+    TowerEnergyTresholdEEMin = cms.double(0.0),
+    TowerEnergyTresholdEEMax = cms.double(10.0), 
+    ReweightHFTower = cms.bool(False),
+    #ReweightHistoName = cms.vstring("","")
+)
