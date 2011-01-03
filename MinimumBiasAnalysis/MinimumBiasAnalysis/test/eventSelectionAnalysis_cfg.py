@@ -86,9 +86,9 @@ if not config.runOnMC:
     process.load('Utilities.AnalysisTools.lumiWeight_cfi')
     process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
 
-process.xiTower.comEnergy = config.comEnergy
-process.xiFromCaloTowers.comEnergy = config.comEnergy
-process.xiFromJets.comEnergy = config.comEnergy
+#process.xiTower.comEnergy = config.comEnergy
+#process.xiFromCaloTowers.comEnergy = config.comEnergy
+#process.xiFromJets.comEnergy = config.comEnergy
 process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
 if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco

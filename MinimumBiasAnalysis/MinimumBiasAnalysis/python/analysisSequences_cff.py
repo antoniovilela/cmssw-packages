@@ -43,8 +43,8 @@ from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasHLTPaths_cfi import *
 #hltMinBiasPixelSingleTrackFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_MinBiasPixel_SingleTrack'])
 hltBscMinBiasORBptxPlusORMinusFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_L1_BscMinBiasOR_BptxPlusORMinus'])
 
-from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.leadingJets_cfi import *
-leadingJets.src = "ak5PFJets"
+#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.leadingJets_cfi import *
+#leadingJets.src = "ak5PFJets"
 
 #from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectGoodTracks_cfi import *
 #selectGoodTracks.cut = "pt > 0.5 & numberOfValidHits > 7 & d0 <= 3.5"
@@ -58,24 +58,24 @@ selectGoodTracks = recoTrackSelector
 from MinimumBiasAnalysis.MinimumBiasAnalysis.analysisTracks_cfi import *
 #analysisTracks.src = "selectGoodTracks"
 
-from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import selectTracksAssociatedToPV as tracksAssociatedToPV
-tracksAssociatedToPV.src = "analysisTracks"
-tracksAssociatedToPV.MaxDistanceFromVertex = 1.0
+#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import selectTracksAssociatedToPV as tracksAssociatedToPV
+#tracksAssociatedToPV.src = "analysisTracks"
+#tracksAssociatedToPV.MaxDistanceFromVertex = 1.0
 
-from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
-tracksOutsideJets.src = "analysisTracks" 
-tracksOutsideJets.JetTag = "leadingJets"
-tracksOutsideJets.JetConeSize = 0.5
+#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
+#tracksOutsideJets.src = "analysisTracks" 
+#tracksOutsideJets.JetTag = "leadingJets"
+#tracksOutsideJets.JetConeSize = 0.5
 
-from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksTransverseRegion_cfi import *
-tracksTransverseRegion.src = "analysisTracks"
-tracksTransverseRegion.JetTag = "leadingJets"
+#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksTransverseRegion_cfi import *
+#tracksTransverseRegion.src = "analysisTracks"
+#tracksTransverseRegion.JetTag = "leadingJets"
 
-from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.trackMultiplicity_cfi import * 
-trackMultiplicity.TracksTag = "analysisTracks"
-trackMultiplicityAssociatedToPV = trackMultiplicity.clone(TracksTag = "tracksAssociatedToPV")
-trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
-trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
+#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.trackMultiplicity_cfi import * 
+#trackMultiplicity.TracksTag = "analysisTracks"
+#trackMultiplicityAssociatedToPV = trackMultiplicity.clone(TracksTag = "tracksAssociatedToPV")
+#trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
+#trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
 
 from Utilities.AnalysisTools.hcalActivitySummary_cfi import *
 hcalActivitySummary.DiscardFlaggedTowers = False
@@ -89,15 +89,15 @@ hcalActivitySummaryScale105 = hcalActivitySummary.clone(ApplyEnergyScale = True,
 hcalActivitySummaryScale108 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.08,EnergyScaleFactorHE = 1.08,EnergyScaleFactorHF = 1.08,EnergyScaleFactorEB = 1.08,EnergyScaleFactorEE = 1.08)
 hcalActivitySummaryScale110 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.10,EnergyScaleFactorHE = 1.10,EnergyScaleFactorHF = 1.10,EnergyScaleFactorEB = 1.10,EnergyScaleFactorEE = 1.10)
 
-from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
-from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import *
-from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromJets_cfi import *
-xiTower.UseMETInfo = False
-xiTower.comEnergy = 7000.0
-xiFromCaloTowers.UseMETInfo = False
-xiFromCaloTowers.comEnergy = 7000.0
-xiFromJets.UseMETInfo = False
-xiFromJets.comEnergy = 7000.0
+#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
+#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import *
+#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromJets_cfi import *
+#xiTower.UseMETInfo = False
+#xiTower.comEnergy = 7000.0
+#xiFromCaloTowers.UseMETInfo = False
+#xiFromCaloTowers.comEnergy = 7000.0
+#xiFromJets.UseMETInfo = False
+#xiFromJets.comEnergy = 7000.0
 
 """
 hltMinBiasBSCOR = cms.Sequence(l1CollBscOr)
@@ -195,9 +195,15 @@ eventSelectionBscMinBiasORSumETMaxHFMinus20 = cms.Sequence(eventSelectionBscMinB
 #                      tracksTransverseRegion) 
 #tracks = cms.Sequence(selectGoodTracks*analysisTracks)
 tracks = cms.Sequence(analysisTracks)
+"""
 edmDump = cms.Sequence(trackMultiplicity+
                        hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
                        hcalActivitySummaryScale095+hcalActivitySummaryScale098+
                        hcalActivitySummaryScale102+hcalActivitySummaryScale105+
                        hcalActivitySummaryScale108+hcalActivitySummaryScale110+
                        xiTower+xiFromCaloTowers+xiFromJets)
+"""
+edmDump = cms.Sequence(hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
+                       hcalActivitySummaryScale095+hcalActivitySummaryScale098+
+                       hcalActivitySummaryScale102+hcalActivitySummaryScale105+
+                       hcalActivitySummaryScale108+hcalActivitySummaryScale110)

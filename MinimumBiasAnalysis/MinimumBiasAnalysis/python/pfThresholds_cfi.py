@@ -11,7 +11,7 @@ pfThresholds = cms.PSet(
         hadronCharged = cms.PSet( ptMin = cms.double(0.5), energyMin = cms.double(0.0) ),
         hadronNeutral = cms.PSet( ptMin = cms.double(0.0), energyMin = cms.double(2.7) ),
         electron = cms.PSet( ptMin = cms.double(0.5), energyMin = cms.double(0.0) ),
-        gamma = cms.PSet( ptMin = cms.double(0.0), energyMin = cms.double(1.8) )
+        gamma = cms.PSet( ptMin = cms.double(0.0), energyMin = cms.double(2.5) )
     ),
     Transition = cms.PSet(
         hadronCharged = cms.PSet( ptMin = cms.double(0.5), energyMin = cms.double(0.0) ),
