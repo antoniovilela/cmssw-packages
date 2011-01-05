@@ -570,8 +570,10 @@ void MinimumBiasAnalysis::setPFThresholds(std::map<int,std::pair<double,double> 
                                               << " does not correspond to any particle type (PF)";
 
      edm::ParameterSet const& typePSet = thresholdsPFPset.getParameter<edm::ParameterSet>(*param);
-     double ptThreshold = typePSet.getParameter<double>("ptMin");
-     double energyThreshold = typePSet.getParameter<double>("energyMin");
+     double ptThreshold = -1.;
+     if(typePSet.exists("pt")) ptThreshold = typePSet.getParameter<double>("pt");
+     double energyThreshold = -1.;
+     if(typePSet.exists("energy")) energyThreshold = typePSet.getParameter<double>("energy");
      thresholdsPFlow[particleType].first = ptThreshold;
      thresholdsPFlow[particleType].second = energyThreshold;
   }
