@@ -58,7 +58,7 @@ process.analysisBPTXPlusOrMinusOnly = cms.Path(process.hltBPTXPlusOrMinusOnly+
                                                process.pFlowAnalysisBPTXPlusOrMinusOnly) 
 process.analysisBPTXPlusOrMinusOnlyNoVtx = cms.Path(process.hltBPTXPlusOrMinusOnly+
                                                     process.vertexVeto+
-                                                    process.pFlowAnalysisBPTXPlusOrMinusOnly)
+                                                    process.pFlowAnalysisBPTXPlusOrMinusOnlyNoVtx)
 process.analysisBPTXPlusOrMinusOnlyNoTrk = cms.Path(process.hltBPTXPlusOrMinusOnly+
                                                     process.trackVeto+
-                                                    process.pFlowAnalysisBPTXPlusOrMinusOnly)
+                                                    process.pFlowAnalysisBPTXPlusOrMinusOnlyNoTrk)
