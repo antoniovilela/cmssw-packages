@@ -99,6 +99,22 @@ hcalActivitySummaryScale110 = hcalActivitySummary.clone(ApplyEnergyScale = True,
 #xiFromJets.UseMETInfo = False
 #xiFromJets.comEnergy = 7000.0
 
+from ForwardAnalysis.Utilities.pfCandidateSelector_cfi import pfCandidateSelector as pfCandidateNoiseThresholds
+from ForwardAnalysis.Utilities.PFCandidateNoiseStringCut import PFCandidateNoiseStringCut
+# Change thresholds here if needed
+from ForwardAnalysis.Utilities.pfThresholds_cfi import pfThresholds
+pfCandidateNoiseThresholds.cut = PFCandidateNoiseStringCut(pfThresholds).cut()
+from ForwardAnalysis.Utilities.etaMaxCandViewSelector_cfi import etaMaxCandViewSelector as etaMaxPFCands
+from ForwardAnalysis.Utilities.etaMinCandViewSelector_cfi import etaMinCandViewSelector as etaMinPFCands
+etaMaxPFCands.src = "pfCandidateNoiseThresholds"
+etaMinPFCands.src = "pfCandidateNoiseThresholds"
+
+from Utilities.AnalysisSequences.genChargedParticles_cfi import genChargedParticles
+from Utilities.AnalysisSequences.genStableParticles_cfi import genStableParticles
+genStableParticles.cut = 'status = 1 & ( ( pdgId != 2212 ) | ( pdgId == 2212 & abs(pz) < %f ) )' % (0.75*7000)
+etaMaxGen = etaMaxPFCands.clone(src = "genStableParticles")
+etaMinGen = etaMinPFCands.clone(src = "genStableParticles")
+
 """
 hltMinBiasBSCOR = cms.Sequence(l1CollBscOr)
 hltMinBiasBSCAND = cms.Sequence(l1CollBscAnd)
@@ -195,6 +211,7 @@ eventSelectionBscMinBiasORSumETMaxHFMinus20 = cms.Sequence(eventSelectionBscMinB
 #                      tracksTransverseRegion) 
 #tracks = cms.Sequence(selectGoodTracks*analysisTracks)
 tracks = cms.Sequence(analysisTracks)
+pfCandidates = cms.Sequence(pfCandidateNoiseThresholds)
 """
 edmDump = cms.Sequence(trackMultiplicity+
                        hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
@@ -206,4 +223,5 @@ edmDump = cms.Sequence(trackMultiplicity+
 edmDump = cms.Sequence(hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
                        hcalActivitySummaryScale095+hcalActivitySummaryScale098+
                        hcalActivitySummaryScale102+hcalActivitySummaryScale105+
-                       hcalActivitySummaryScale108+hcalActivitySummaryScale110)
+                       hcalActivitySummaryScale108+hcalActivitySummaryScale110+
+                       etaMaxPFCands+etaMinPFCands)

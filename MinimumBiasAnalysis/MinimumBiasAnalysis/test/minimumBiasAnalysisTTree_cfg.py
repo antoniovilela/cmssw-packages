@@ -92,7 +92,7 @@ from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
 #process.xiTower.comEnergy = config.comEnergy
 #process.xiFromCaloTowers.comEnergy = config.comEnergy
 #process.xiFromJets.comEnergy = config.comEnergy
-process.recoSequence = cms.Sequence(process.tracks*process.edmDump)
+process.recoSequence = cms.Sequence(process.tracks*process.pfCandidates*process.edmDump)
 if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
 process.reflagging_step = cms.Path(process.hfrecoReflagged+process.hbherecoReflagged)
@@ -106,8 +106,8 @@ process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
 if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.eventSelection+process.recoSequence)
 if config.runOnMC:
-    process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.genChargedParticles_cfi')
-    process.gen_step = cms.Path(process.genChargedParticles)
+    process.gen_step = cms.Path(process.genChargedParticles+process.genStableParticles*
+                                process.etaMaxGen+process.etaMinGen)
 
 # Path for event counting  
 process.countsAll = countsAnalyzer.clone()
