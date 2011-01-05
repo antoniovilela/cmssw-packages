@@ -2,19 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("Analysis")
 
-process.load("FWCore.MessageLogger.MessageLogger_cfi")
-
-process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-
-process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring()
-)
-
-process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('analysisHistos_pFlowNoiseAnalysis.root')
-)
+process.load('Utilities.AnalysisSequences.defaultSequences_cff')
+process.TFileService.fileName = 'analysisHistos_pFlowNoiseAnalysis.root'
 
 #############
 process.load('Utilities.AnalysisSequences.minimumBiasAnalysisSequences_cff')
