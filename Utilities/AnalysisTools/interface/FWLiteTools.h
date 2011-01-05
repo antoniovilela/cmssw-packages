@@ -77,6 +77,15 @@ double MassColl(PartColl& partCollection, double ptThreshold = -1.,
    return allCands.M();
 }
 
+template <class PartColl>
+double MassColl(PartColl& partCollection){
+   math::XYZTLorentzVector allCands(0.,0.,0.,0.);
+   for(typename PartColl::const_iterator part = partCollection.begin();
+                                         part != partCollection.end(); ++part) allCands += part->p4();
+
+   return allCands.M();
+}
+
 template <class Coll>
 std::pair<double,double> xi(Coll& partCollection, double Ebeam, double ptThreshold = -1.,
                             double energyHBThreshold = -1., double energyHEThreshold = -1.,
@@ -114,6 +123,24 @@ std::pair<double,double> xi(Coll& partCollection, double Ebeam, double ptThresho
 }
 
 template <class Coll>
+std::pair<double,double> xi(Coll& partCollection, double Ebeam){
+
+   double xi_towers_plus = 0.;
+   double xi_towers_minus = 0.;
+   for(typename Coll::const_iterator part = partCollection.begin(); part != partCollection.end(); ++part){
+      double part_et = part->et();
+      double part_eta = part->eta();
+
+      xi_towers_plus += part_et*TMath::Exp(part_eta);
+      xi_towers_minus += part_et*TMath::Exp(-part_eta);
+   }
+   xi_towers_plus /= 2*Ebeam;
+   xi_towers_minus /= 2*Ebeam;
+
+   return std::make_pair(xi_towers_plus,xi_towers_minus);
+}
+
+template <class Coll>
 std::pair<double,double> EPlusPz(Coll& partCollection, double ptThreshold = -1.,
                                  double energyHBThreshold = -1., double energyHEThreshold = -1.,
                                  double energyHFThreshold = -1., double energyScale = -1.){
@@ -137,6 +164,23 @@ std::pair<double,double> EPlusPz(Coll& partCollection, double ptThreshold = -1.,
       if((fabs(part->eta()) >= 3.0) && ((fabs(part->eta()) <= 5.0)) && (part_energy < energyHFThreshold)) continue;
 
       e_plus_pz += part_energy + part_pz; 
+      e_minus_pz += part_energy - part_pz;
+   }
+
+   return std::make_pair(e_plus_pz,e_minus_pz);
+}
+
+template <class Coll>
+std::pair<double,double> EPlusPz(Coll& partCollection){
+   double e_plus_pz = 0.;
+   double e_minus_pz = 0.;
+   typename Coll::const_iterator part = partCollection.begin();
+   typename Coll::const_iterator part_end = partCollection.end();
+   for(; part != part_end; ++part){
+      double part_energy = part->energy();
+      double part_pz = part->pz();
+
+      e_plus_pz += part_energy + part_pz;
       e_minus_pz += part_energy - part_pz;
    }
 
@@ -182,5 +226,5 @@ double sumEHCALiEta(const std::map<unsigned int, std::vector<double> >& iEtaSumE
    return sumE_ieta;
 }
 
-}
+} // namespace
 #endif
