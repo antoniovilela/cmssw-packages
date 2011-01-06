@@ -474,6 +474,12 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
      if(genProtonPlus.pz() > 0.75*Ebeam_) xigen_plus = 1 - genProtonPlus.pz()/Ebeam_;
      if(genProtonMinus.pz() < -0.75*Ebeam_) xigen_minus = 1 + genProtonMinus.pz()/Ebeam_;
 
+     edm::Handle<std::vector<float> > edmNtupleEtaMaxGen;
+     event.getByLabel(edm::InputTag("edmNtupleEtaMaxGen","etaMax"),edmNtupleEtaMaxGen);
+
+     edm::Handle<std::vector<float> > edmNtupleEtaMinGen;
+     event.getByLabel(edm::InputTag("edmNtupleEtaMinGen","etaMin"),edmNtupleEtaMinGen);
+
      eventData.xiGenPlus_ = xigen_plus;
      eventData.xiGenMinus_ = xigen_minus;
      eventData.MxGen_ = genAllParticles.mass();
@@ -483,6 +489,8 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
      eventData.sumEnergyHFMinusGen_ = genAllParticlesHFMinus.energy();
      eventData.etaMaxGen_ = genEtaMax.eta();
      eventData.etaMinGen_ = genEtaMin.eta();
+     eventData.etaMaxGenNew_ = (*edmNtupleEtaMaxGen)[0];
+     eventData.etaMinGenNew_ = (*edmNtupleEtaMinGen)[0];
   } else{
      eventData.xiGenPlus_ = -1.;
      eventData.xiGenMinus_ = -1.;
@@ -493,6 +501,8 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
      eventData.sumEnergyHFMinusGen_ = -1.;
      eventData.etaMaxGen_ = -999.;
      eventData.etaMinGen_ = -999.;
+     eventData.etaMaxGenNew_ = -999.;
+     eventData.etaMinGenNew_ = -999.;
   }
 
   /*edm::Handle<edm::View<reco::Jet> > jetCollectionH;
@@ -543,6 +553,19 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
   std::pair<double,double> etaMaxFromPFCands = etaMax(*particleFlowCollectionH,thresholdsPFlow_);
   eventData.etaMaxFromPFCands_ = etaMaxFromPFCands.first;
   eventData.etaMinFromPFCands_ = etaMaxFromPFCands.second;
+
+  edm::Handle<std::vector<float> > edmNtupleEtaMax;
+  event.getByLabel(edm::InputTag("edmNtupleEtaMax","etaMax"),edmNtupleEtaMax);
+
+  edm::Handle<std::vector<float> > edmNtupleEtaMin;
+  event.getByLabel(edm::InputTag("edmNtupleEtaMin","etaMin"),edmNtupleEtaMin);
+
+  //LogDebug("Analysis") << ">>>> edmNtupleEtaMax size: " << edmNtupleEtaMax->size();
+
+  float etaMax_pfCands = edmNtupleEtaMax->size() ? (*edmNtupleEtaMax)[0] : -999.;
+  float etaMin_pfCands = edmNtupleEtaMin->size() ? (*edmNtupleEtaMin)[0] : -999.; 
+  eventData.etaMaxFromPFCandsNew_ = etaMax_pfCands;
+  eventData.etaMinFromPFCandsNew_ = etaMin_pfCands;
 
   fillMultiplicities(eventData,event,setup);
 }

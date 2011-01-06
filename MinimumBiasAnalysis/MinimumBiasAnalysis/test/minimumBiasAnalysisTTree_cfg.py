@@ -107,7 +107,8 @@ if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSe
 process.reco_step = cms.Path(process.eventSelection+process.recoSequence)
 if config.runOnMC:
     process.gen_step = cms.Path(process.genChargedParticles+process.genStableParticles*
-                                process.etaMaxGen+process.etaMinGen)
+                                process.etaMaxGen+process.etaMinGen*
+                                process.edmNtupleEtaMaxGen+process.edmNtupleEtaMinGen)
 
 # Path for event counting  
 process.countsAll = countsAnalyzer.clone()

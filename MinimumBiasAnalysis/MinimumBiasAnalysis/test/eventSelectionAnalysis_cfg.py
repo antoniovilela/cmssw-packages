@@ -29,7 +29,7 @@ process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.cerr.threshold = 'DEBUG'
-process.MessageLogger.debugModules = cms.untracked.vstring('minimumBiasTTreeAnalysisVertexFilter')
+process.MessageLogger.debugModules = cms.untracked.vstring('minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus')
 process.MessageLogger.categories.append('Analysis')
 process.MessageLogger.cerr.DEBUG = cms.untracked.PSet(limit = cms.untracked.int32(0))
 process.MessageLogger.cerr.Analysis = cms.untracked.PSet(limit = cms.untracked.int32(-1)) 
@@ -102,7 +102,8 @@ if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSe
 process.reco_step = cms.Path(process.recoSequence)
 if config.runOnMC:
     process.gen_step = cms.Path(process.genChargedParticles+process.genStableParticles*
-                                process.etaMaxGen+process.etaMinGen)
+                                process.etaMaxGen+process.etaMinGen*
+                                process.edmNtupleEtaMaxGen+process.edmNtupleEtaMinGen)
 
 # Analysis modules
 from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi import minimumBiasTTreeAnalysis

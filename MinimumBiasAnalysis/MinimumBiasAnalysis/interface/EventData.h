@@ -77,6 +77,10 @@ namespace minimumBiasAnalysis {
      double etaMinGen_;
      double etaMaxFromPFCands_;
      double etaMinFromPFCands_;
+     double etaMaxGenNew_;
+     double etaMinGenNew_;
+     double etaMaxFromPFCandsNew_;
+     double etaMinFromPFCandsNew_;
      double sumET_;
      double MEx_;
      double MEy_;

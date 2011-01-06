@@ -111,9 +111,21 @@ etaMinPFCands.src = "pfCandidateNoiseThresholds"
 
 from Utilities.AnalysisSequences.genChargedParticles_cfi import genChargedParticles
 from Utilities.AnalysisSequences.genStableParticles_cfi import genStableParticles
-genStableParticles.cut = 'status = 1 & ( ( pdgId != 2212 ) | ( pdgId == 2212 & abs(pz) < %f ) )' % (0.75*7000)
+genStableParticles.cut = 'status = 1 & ( ( pdgId != 2212 ) | ( pdgId == 2212 & abs(pz) < %f ) )' % (0.75*3500.0)
+#genStableParticles.cut = 'status = 1 & ( pdgId != 9902210 )'
 etaMaxGen = etaMaxPFCands.clone(src = "genStableParticles")
 etaMinGen = etaMinPFCands.clone(src = "genStableParticles")
+
+from Utilities.AnalysisSequences.edmNtupleCandView_cfi import edmNtupleCandView
+edmNtupleEtaMax = edmNtupleCandView.clone(src = "etaMaxPFCands")
+edmNtupleEtaMax.variables = cms.VPSet( cms.PSet( tag = cms.untracked.string("etaMax"),
+                                                 quantity = cms.untracked.string("eta") ) )
+edmNtupleEtaMin = edmNtupleCandView.clone(src = "etaMinPFCands")
+edmNtupleEtaMin.variables = cms.VPSet( cms.PSet( tag = cms.untracked.string("etaMin"),
+                                                 quantity = cms.untracked.string("eta") ) )
+
+edmNtupleEtaMaxGen = edmNtupleEtaMax.clone(src = "etaMaxGen")
+edmNtupleEtaMinGen = edmNtupleEtaMin.clone(src = "etaMinGen")
 
 """
 hltMinBiasBSCOR = cms.Sequence(l1CollBscOr)
@@ -211,7 +223,7 @@ eventSelectionBscMinBiasORSumETMaxHFMinus20 = cms.Sequence(eventSelectionBscMinB
 #                      tracksTransverseRegion) 
 #tracks = cms.Sequence(selectGoodTracks*analysisTracks)
 tracks = cms.Sequence(analysisTracks)
-pfCandidates = cms.Sequence(pfCandidateNoiseThresholds)
+pfCandidates = cms.Sequence(pfCandidateNoiseThresholds*etaMaxPFCands+etaMinPFCands)
 """
 edmDump = cms.Sequence(trackMultiplicity+
                        hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
@@ -224,4 +236,4 @@ edmDump = cms.Sequence(hcalActivitySummary+hcalActivitySummaryScale090+hcalActiv
                        hcalActivitySummaryScale095+hcalActivitySummaryScale098+
                        hcalActivitySummaryScale102+hcalActivitySummaryScale105+
                        hcalActivitySummaryScale108+hcalActivitySummaryScale110+
-                       etaMaxPFCands+etaMinPFCands)
+                       edmNtupleEtaMax+edmNtupleEtaMin)
