@@ -55,10 +55,12 @@ def plotEventSelectionMC(dir,selectionRef,selectionEff,prefix,rebin=1):
         'multiplicityTracks',
         'sumEnergyHFPlus',
         'sumEnergyHFMinus',
-        'etaMaxFromPFCands',
-        'etaMinFromPFCands',
+        'etaMaxFromPFCandsVarBin',
+        'etaMinFromPFCandsVarBin',
         'xiPlusFromPFCands',
         'xiMinusFromPFCands',
+        'etaMaxGen',
+        'etaMinGen',
         'xiGenPlus',
         'xiGenMinus'
     ]
@@ -75,7 +77,9 @@ def plotEventSelectionMC(dir,selectionRef,selectionEff,prefix,rebin=1):
 
     files = {}
     #processIds = ['All','SD','DD','Inelastic'] 
-    processIds = ['SD']
+    processIds = ['SD','DD','Inelastic']
+    #processIds = ['All_EtaMaxGen']
+    #processIds =['SD']
     for selection in steps:
         for type in processIds:
             fileName = "%s/%s_%s_histos_%s.root" % (dir, prefix, selection, type)

@@ -24,6 +24,7 @@ void setDirsPYTHIAPHOJET(std::vector<std::pair<std::string,TDirectory*> >& dirs,
 void setDirsDataMC(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsDataMCComponents(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsCompareData(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
+void setDirsDataMCGenSel(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 
 void plot(const char* drawOption = "", std::string const& selection = "NoSel", int rebin = 1){
    std::vector<std::string> variables;
@@ -41,8 +42,12 @@ void plot(const char* drawOption = "", std::string const& selection = "NoSel", i
    variables.push_back("EPlusPzFromPFCands");
    variables.push_back("EMinusPzFromPFCands");
    variables.push_back("MxFromPFCands");
-   variables.push_back("etaMaxFromPFCands");
-   variables.push_back("etaMinFromPFCands");
+   variables.push_back("etaMaxFromPFCandsVarBin");
+   variables.push_back("etaMinFromPFCandsVarBin");
+   /*variables.push_back("xiGenPlus");
+   variables.push_back("xiGenMinus");
+   variables.push_back("etaMaxGen");
+   variables.push_back("etaMinGen");*/
  
    std::vector<std::pair<std::string,TDirectory*> > dirs;
    std::vector<double> normFactors;
@@ -50,7 +55,8 @@ void plot(const char* drawOption = "", std::string const& selection = "NoSel", i
    //setDirsPYTHIAPHOJET(dirs,normFactors);
    //setDirsMCComponents(selection,dirs,normFactors);
    //setDirsDataMC(selection,dirs,normFactors);
-   setDirsDataMCComponents(selection,dirs,normFactors);
+   setDirsDataMCGenSel(selection,dirs,normFactors);
+   //setDirsDataMCComponents(selection,dirs,normFactors);
    //setDirsCompareData(dirs,normFactors);
 
    //Plotter<NumberEntriesNorm> plotter;
@@ -58,19 +64,33 @@ void plot(const char* drawOption = "", std::string const& selection = "NoSel", i
    //int colors[] = {kBlack,kRed,kBlue};
    //int colors[] = {kBlack,kRed,kOrange,kMagenta,kYellow,kBlue};
    //int colors[] = {kRed,kBlue};
-   int colors[] = {kBlue,kOrange,kRed};
+   //int colors[] = {kBlue,kOrange,kRed};
+   int colors[] = {kBlack,kBlack,kBlue}; 
+   //int colors[] = {kBlack,kBlue};
    std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
    //int linestyles[] = {kSolid,kDashed,kDashDotted,kSolid,kDashed,kDashDotted};
    //int linestyles[] = {1,2,3,9,10,2};
-   int linestyles[] = {1,9,10};
+   //int linestyles[] = {1,9,10};
+   int linestyles[] = {kSolid,kSolid,kDashed};
+   //int linestyles[] = {kSolid,kDashed};
    std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
-   plotter.SetColors(histColors);
+   //int markerstyles[] = {1,1,1};
+   int markerstyles[] = {20,1,1};
+   //int markerstyles[] = {1,1};
+   std::vector<int> histMarkerStyles = std::vector<int>(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
+   plotter.SetLineColors(histColors);
    plotter.SetLineStyles(histLineStyles);
+   plotter.SetFillColors(std::vector<int>(1,0));
+   //plotter.SetFillColors(histColors);
+   plotter.SetFillStyles(std::vector<int>(1,0));
+   plotter.SetMarkerColors(histColors);
+   plotter.SetMarkerStyles(histMarkerStyles);
+   plotter.SetMarkerSizes(std::vector<float>(1,1.4));
    plotter.SetStats(false);
    plotter.SetRebin(rebin);
    //plotter.plot(variables,dirs,drawOption);
-   //plotter.plot(variables,dirs,normFactors,drawOption);
-   plotter.plotComponents(variables,dirs,normFactors,drawOption);
+   plotter.plot(variables,dirs,normFactors,drawOption);
+   //plotter.plotComponents(variables,dirs,normFactors,drawOption);
 }
 
 void setDirsMCComponents(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
@@ -169,21 +189,25 @@ void setDirsDataMC(std::string const& selection, std::vector<std::pair<std::stri
 
 void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
    run_range_t runRange = Data7TeV;
+   generator_t genType = PYTHIA8;
    //generator_t genType = PYTHIAD6T;
-   generator_t genType = PHOJET;
-   std::string eventSelection = "minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection";
+   //generator_t genType = PHOJET;
+   //std::string eventSelection = "minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection";
+   std::string eventSelection = selection;
    std::string dirData = "root/7TeV/Data/Run132605/eventSelection";
+   std::string dirMC = "root/7TeV/Pythia8/eventSelection";
    //std::string dirMC = "root/7TeV/Pythia6D6T/eventSelection";
-   std::string dirMC = "root/7TeV/Phojet/eventSelection";
+   //std::string dirMC = "root/7TeV/Phojet/eventSelection";
 
    TFile* file_Data = TFile::Open((dirData + "/" + getHistosFileName(runRange,eventSelection)).c_str());
    TH1F* h_EventSelection_Data = static_cast<TH1F*>(file_Data->Get("EventSelection"));
-   double nEventsFullSel_Data = h_EventSelection_Data->GetBinContent(11);
+   int binNumber = h_EventSelection_Data->GetNbinsX();
+   double nEventsFullSel_Data = h_EventSelection_Data->GetBinContent(binNumber);
 
    TFile* fileMC_All = TFile::Open((dirMC + "/" + getHistosFileName(genType,runRange,All,eventSelection)).c_str());
    TH1F* h_EventSelection_All = static_cast<TH1F*>(fileMC_All->Get("EventSelection"));
    double nEvents_All = h_EventSelection_All->GetBinContent(1);
-   double nEventsFullSel_All = h_EventSelection_All->GetBinContent(11);
+   double nEventsFullSel_All = h_EventSelection_All->GetBinContent(binNumber);
 
    TFile* fileMC_SD = TFile::Open((dirMC + "/" + getHistosFileName(genType,runRange,SD,eventSelection)).c_str());
    TH1F* h_EventSelection_SD = static_cast<TH1F*>(fileMC_SD->Get("EventSelection"));
@@ -198,9 +222,9 @@ void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair
    double nEvents_QCD = h_EventSelection_QCD->GetBinContent(1);
 
    dirs.push_back(std::make_pair("p+p 7 TeV",file_Data));
-   dirs.push_back(std::make_pair("PYTHIA - SD",fileMC_SD));
-   dirs.push_back(std::make_pair("PYTHIA - DD",fileMC_DD)); 
-   dirs.push_back(std::make_pair("PYTHIA - Inel. non-diffractive",fileMC_QCD));
+   dirs.push_back(std::make_pair("PYTHIA8 - SD",fileMC_SD));
+   dirs.push_back(std::make_pair("PYTHIA8 - DD",fileMC_DD)); 
+   dirs.push_back(std::make_pair("PYTHIA8 - Inel. non-diffractive",fileMC_QCD));
    /*dirs.push_back(std::make_pair("MinBias PHOJET - SD",fileMC_SD));
    dirs.push_back(std::make_pair("MinBias PHOJET - DD",fileMC_DD)); 
    dirs.push_back(std::make_pair("MinBias PHOJET - Inel. non-diffractive",fileMC_QCD));*/
@@ -227,6 +251,51 @@ void setDirsCompareData(std::vector<std::pair<std::string,TDirectory*> >& dirs, 
    dirs.push_back(std::make_pair("Run 124120 - 2360 GeV",file_Comp));
    normFactors.push_back(1./nEventsPreSel_Ref);
    normFactors.push_back(1./nEventsPreSel_Comp);
+}
+
+void setDirsDataMCGenSel(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
+   run_range_t runRange = Data7TeV;
+   generator_t genType = PYTHIA8;
+   //generator_t genType = PYTHIAD6T;
+   //generator_t genType = PHOJET;
+   //std::string eventSelection = "minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection";
+   std::string eventSelection = selection;
+   std::string genSelection = "EtaMaxGen";
+   std::string dirData = "root/7TeV/Data/Run132605/eventSelection";
+   std::string dirMC = "root/7TeV/Pythia8/eventSelection";
+   //std::string dirMC = "root/7TeV/Pythia6D6T/eventSelection";
+   //std::string dirMC = "root/7TeV/Phojet/eventSelection";
+
+   TFile* file_Data = TFile::Open((dirData + "/" + getHistosFileName(runRange,eventSelection)).c_str());
+   TH1F* h_EventSelection_Data = static_cast<TH1F*>(file_Data->Get("EventSelection"));
+   int binNumber = h_EventSelection_Data->GetNbinsX();
+   double nEventsFullSel_Data = h_EventSelection_Data->GetBinContent(binNumber);
+
+   TFile* fileMC_All = TFile::Open((dirMC + "/" + getHistosFileName(genType,runRange,All,eventSelection)).c_str());
+   TH1F* h_EventSelection_All = static_cast<TH1F*>(fileMC_All->Get("EventSelection"));
+   double nEvents_All = h_EventSelection_All->GetBinContent(1);
+   double nEventsFullSel_All = h_EventSelection_All->GetBinContent(binNumber);
+
+   std::string histosFileName = "analysisMinBiasTTree_";
+   histosFileName += getDataLabel(genType,runRange);
+   histosFileName += "_" + eventSelection + "_histos_";
+   histosFileName += getProcessCategoryName(All) + "_" + genSelection + ".root";
+   TFile* fileMC_GenSel = TFile::Open((dirMC + "/" + histosFileName).c_str());
+   TH1F* h_EventSelection_GenSel = static_cast<TH1F*>(fileMC_GenSel->Get("EventSelection"));
+   double nEvents_GenSel = h_EventSelection_GenSel->GetBinContent(1);
+   double nEventsFullSel_GenSel = h_EventSelection_GenSel->GetBinContent(binNumber);
+
+   dirs.push_back(std::make_pair("p+p 7 TeV",file_Data));
+   dirs.push_back(std::make_pair("PYTHIA8 - All",fileMC_All));
+   dirs.push_back(std::make_pair("PYTHIA8 - #eta^{Gen}_{max} < 0",fileMC_GenSel));
+
+   normFactors.push_back(1.);
+   normFactors.push_back(nEventsFullSel_Data/nEventsFullSel_All);
+   //normFactors.push_back(nEventsFullSel_Data/nEventsFullSel_All);
+   normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_GenSel));   
+   /*normFactors.push_back(1./nEventsFullSel_All);
+   normFactors.push_back((1./nEventsFullSel_All)*(nEvents_All/nEvents_GenSel));*/
+   
 }
 
 /*

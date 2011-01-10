@@ -7,36 +7,46 @@
 #include <string>
 #include <map>
 
-void runEventSelectionAnalysis(){
+#include "fileNames_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_eventSelection-v4.C"
+
+void runEventSelectionAnalysisMC(){
    gROOT->ProcessLine(".L minimumBiasTTreeAnalysis.C+");
 
    //run_range_t runRange = Data900GeV;
    //run_range_t runRange = Data2360GeV;
    run_range_t runRange = Data7TeV;
-   generator_t genType = PYTHIA;
-   generator_t genTune = PYTHIAD6T;
+   generator_t genType = PYTHIA8;
+   generator_t genTune = PYTHIA8;
    //generator_t genType = PHOJET;
    //generator_t genTune = PHOJET;
 
-   std::string outDir = "root/7TeV/EventSelection/PYTHIA6D6T";
+   //std::string outDir = "root/7TeV/Pythia8/eventSelection";
+   //std::string outDir = "root/7TeV/Pythia8/eventSelection/doEtaMaxGenSelection";
+   //std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection";
+   //std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doEtaMaxGenSelection";
+   //std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doXiPlusSelection";
+   std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doXiPlusSelection/doEtaMaxGenSelection";
 
-   std::vector<std::string> fileNames(1,"eventSelectionAnalysis_TTree_MinimumBias.root");
-    
+   std::vector<std::string> fileNames;
+   setFileNamesPythia8(fileNames);
+ 
    bool verbose = false;
 
    std::vector<std::string> selections;
-   selections.push_back("minimumBiasTTreeAnalysisAll");
-   selections.push_back("minimumBiasTTreeAnalysisL1CollBscOr");
-   selections.push_back("minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus");
-   selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
-   selections.push_back("minimumBiasTTreeAnalysisFilterScraping");
+   //selections.push_back("minimumBiasTTreeAnalysisAll");
+   //selections.push_back("minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus");
+   //selections.push_back("minimumBiasTTreeAnalysisBPTX");
+   //selections.push_back("minimumBiasTTreeAnalysisBscOr");
+   //selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
+   //selections.push_back("minimumBiasTTreeAnalysisBeamHaloVeto");
+   //selections.push_back("minimumBiasTTreeAnalysisFilterScraping");
    selections.push_back("minimumBiasTTreeAnalysisHBHENoiseFilter");
  
    std::vector<int> processTypes;
    processTypes.push_back(All);
    processTypes.push_back(SD);
    processTypes.push_back(DD);
-   processTypes.push_back(Diff);
+   //processTypes.push_back(Diff);
    processTypes.push_back(Inelastic);
 
    for(size_t isel = 0; isel < selections.size(); ++isel){

@@ -145,6 +145,12 @@ void minimumBiasTTreeAnalysis(TTree* data,
       for(size_t iprocess = 0; iprocess < processIDs.size(); ++iprocess) histosTH1F["ProcessId"] ->GetXaxis()->SetBinLabel(iprocess + 1,processNames[iprocess].c_str());
    }
 
+   bool doEtaMaxGenSelection= true;
+   bool doEtaMinGenSelection= false;
+   double etaMaxGenMax = 0.;
+   double etaMinGenMin = 0.; 
+
+   // Event selection
    bool doTriggerSelection = false;
    bool doHcalNoiseSelection = true;
    /*// Pre-selection
@@ -167,6 +173,10 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doMxSelection = false;
    double MxMin = 100.;
    double MxMax = 999.;
+   // Xi
+   bool doXiPlusSelection = true;
+   bool doXiMinusSelection = false;
+   double xiMax = 0.01;
 
    double eventWeight = 1.0;
    //std::vector<std::pair<int,int> > selectedEvents;
@@ -195,6 +205,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
       if(accessMCInfo){
          int processId = eventData.processId_;
          if(selectProcessIds && std::find(selectedProcIds.begin(),selectedProcIds.end(),processId) == selectedProcIds.end()) continue;
+         if(doEtaMaxGenSelection && eventData.etaMaxGen_ > etaMaxGenMax) continue;
+         if(doEtaMinGenSelection && eventData.etaMinGen_ < etaMinGenMin) continue;
 
          std::vector<int>::const_iterator it_processId = std::find(processIDs.begin(),processIDs.end(),processId);
          if(it_processId != processIDs.end()){
@@ -280,6 +292,11 @@ void minimumBiasTTreeAnalysis(TTree* data,
       // Mx
       if(doMxSelection && ((eventData.MxFromPFCands_ < MxMin)||eventData.MxFromPFCands_ > MxMax)) continue;
       histosTH1F["EventSelection"]->Fill("MxSelection",eventWeight);
+
+      // Xi
+      if( doXiPlusSelection && (eventData.xiPlusFromPFCands_ > xiMax) ) continue;
+      if( doXiMinusSelection && (eventData.xiMinusFromPFCands_ > xiMax) ) continue;
+      histosTH1F["EventSelection"]->Fill("XiSelection",eventWeight); 
 
       // Fill Histos
       // SumET
@@ -418,12 +435,23 @@ void minimumBiasTTreeAnalysis(TTree* data,
       double etaMinFromPFCands = eventData.etaMinFromPFCands_;
       histosTH1F["etaMaxFromPFCands"]->Fill(etaMaxFromPFCands);
       histosTH1F["etaMinFromPFCands"]->Fill(etaMinFromPFCands);
+      histosTH1F["etaMaxFromPFCandsVarBin"]->Fill(etaMaxFromPFCands);
+      histosTH1F["etaMinFromPFCandsVarBin"]->Fill(etaMinFromPFCands);
 
       if(accessMCInfo){
+         double etaMaxGen = eventData.etaMaxGen_;
+         double etaMinGen = eventData.etaMinGen_;
+
          double sumEHEGen_plus = eventData.sumEnergyHEPlusGen_;
          double sumEHEGen_minus = eventData.sumEnergyHEMinusGen_;
          double sumEHFGen_plus = eventData.sumEnergyHFPlusGen_;
          double sumEHFGen_minus = eventData.sumEnergyHFMinusGen_;
+  
+         histosTH1F["etaMaxGen"]->Fill(etaMaxGen);
+         histosTH1F["etaMinGen"]->Fill(etaMinGen);
+         histosTH2F["etaMaxFromPFCandsVsetaMaxGen"]->Fill(etaMaxGen,etaMaxFromPFCands);
+         histosTH2F["etaMinFromPFCandsVsetaMinGen"]->Fill(etaMinGen,etaMinFromPFCands);
+
          histosTH1F["sumEnergyHEPlusGen"]->Fill(sumEHEGen_plus);
          histosTH1F["sumEnergyHEMinusGen"]->Fill(sumEHEGen_minus);
          histosTH1F["sumEnergyHFPlusGen"]->Fill(sumEHFGen_plus);
