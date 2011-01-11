@@ -11,6 +11,20 @@
 void scaleByWidthHistos(std::string const& fileName, std::string const& dirName, std::vector<std::string> variables, bool saveHistos);
 void scaleByWidth(TH1F*);
 
+void scaleByWidthPFHistos(std::string const& fileName, std::string const& dirName, bool saveHistos = false){
+
+  std::vector<std::string> variables;
+  variables.push_back("xiPlusFromPFCands");
+  variables.push_back("xiMinusFromPFCands");
+  variables.push_back("EPlusPzFromPFCands");
+  variables.push_back("EMinusPzFromPFCands");
+  variables.push_back("MxFromPFCands");
+  variables.push_back("etaMaxFromPFCandsVarBin");
+  variables.push_back("etaMinFromPFCandsVarBin"); 
+
+  scaleByWidthHistos(fileName,dirName,variables,saveHistos);
+}
+
 void scaleByWidthTrackHistos(std::string const& fileName, std::string const& dirName, bool saveHistos = false){
 
   std::vector<std::string> variables;
