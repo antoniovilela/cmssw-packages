@@ -31,17 +31,21 @@ l1NoCollBscOr = cms.Sequence(~bptx+bscOr+beamHaloVeto)
 l1NoBPTX = cms.Sequence(beamHaloVeto)
 l1NoBPTXBscOr = cms.Sequence(bscOr+beamHaloVeto)
 
-from MinimumBiasAnalysis.MinimumBiasAnalysis.primaryVertexFilter_cfi import *
+from Utilities.AnalysisSequences.primaryVertexFilter_cfi import *
+primaryVertexFilterLoose = primaryVertexFilter.clone()
+primaryVertexFilterLoose.cut = cms.string("!isFake && ndof > 2 && abs(z) <= 15 && position.Rho <= 2")
 
-from MinimumBiasAnalysis.MinimumBiasAnalysis.filterScraping_cfi import *
+from Utilities.AnalysisSequences.filterScraping_cfi import *
 
 from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import *
 
-from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasHLTPaths_cfi import *
+#from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasHLTPaths_cfi import *
 #hltPhysicsDeclared = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_PhysicsDeclared'])
 #hltMinBiasBSCORFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_MinBiasBSC_OR'])
 #hltMinBiasPixelSingleTrackFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_MinBiasPixel_SingleTrack'])
-hltBscMinBiasORBptxPlusORMinusFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_L1_BscMinBiasOR_BptxPlusORMinus'])
+#hltBscMinBiasORBptxPlusORMinusFilter = minimumBiasHLTFilter.clone(HLTPaths = ['HLT_L1_BscMinBiasOR_BptxPlusORMinus'])
+from Utilities.AnalysisSequences.hltFilter_cfi import *
+hltBscMinBiasORBptxPlusORMinusFilter = hltFilter.clone(HLTPaths = ['HLT_L1_BscMinBiasOR_BptxPlusORMinus'])
 
 #from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.leadingJets_cfi import *
 #leadingJets.src = "ak5PFJets"
@@ -102,7 +106,8 @@ hcalActivitySummaryScale110 = hcalActivitySummary.clone(ApplyEnergyScale = True,
 from ForwardAnalysis.Utilities.pfCandidateSelector_cfi import pfCandidateSelector as pfCandidateNoiseThresholds
 from ForwardAnalysis.Utilities.PFCandidateNoiseStringCut import PFCandidateNoiseStringCut
 # Change thresholds here if needed
-from ForwardAnalysis.Utilities.pfThresholds_cfi import pfThresholds
+#from ForwardAnalysis.Utilities.pfThresholds_cfi import pfThresholds
+from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_cfi import pfThresholds
 pfCandidateNoiseThresholds.cut = PFCandidateNoiseStringCut(pfThresholds).cut()
 from ForwardAnalysis.Utilities.etaMaxCandViewSelector_cfi import etaMaxCandViewSelector as etaMaxPFCands
 from ForwardAnalysis.Utilities.etaMinCandViewSelector_cfi import etaMinCandViewSelector as etaMinPFCands
@@ -142,6 +147,8 @@ hltBscMinBiasORBPTXOR = cms.Sequence(l1NoBPTXBscOr + hltBscMinBiasORBptxPlusORMi
 
 #preSelection = cms.Sequence()
 offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping+HBHENoiseFilter)
+offlineSelectionLoose = cms.Sequence(primaryVertexFilterLoose+filterScraping+HBHENoiseFilter)
+offlineSelectionNoVertex = cms.Sequence(filterScraping+HBHENoiseFilter)
 eventSelection = cms.Sequence(offlineSelection)
 eventSelectionBPTX = cms.Sequence(bptx+offlineSelection)
 eventSelectionL1Tech4 = cms.Sequence(l1Tech4+offlineSelection)
@@ -155,7 +162,11 @@ eventSelectionMinBiasBSCORNoBPTX = cms.Sequence(preSelection+hltMinBiasBSCORNoBP
 eventSelectionMinBiasPixelNoBPTX = cms.Sequence(preSelection+hltMinBiasPixelNoBPTX+offlineSelection)
 """
 eventSelectionBscMinBiasOR = cms.Sequence(hltBscMinBiasOR+offlineSelection)
+eventSelectionBscMinBiasORLoose = cms.Sequence(hltBscMinBiasOR+offlineSelectionLoose)
+eventSelectionBscMinBiasORNoVertex = cms.Sequence(hltBscMinBiasOR+offlineSelectionNoVertex)
 eventSelectionBscMinBiasORNoColl = cms.Sequence(hltBscMinBiasORNoColl+offlineSelection)
+eventSelectionBscMinBiasORNoCollLoose = cms.Sequence(hltBscMinBiasORNoColl+offlineSelectionLoose)
+eventSelectionBscMinBiasORNoCollNoVertex = cms.Sequence(hltBscMinBiasORNoColl+offlineSelectionNoVertex)
 eventSelectionBscMinBiasORBPTXOR = cms.Sequence(hltBscMinBiasORBPTXOR+offlineSelection) 
 
 from Utilities.AnalysisTools.hcalActivityFilter_cfi import hcalActivityFilter
