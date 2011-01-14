@@ -62,7 +62,9 @@ def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1):
         'etaMaxGen',
         'etaMinGen',
         'xiGenPlus',
-        'xiGenMinus'
+        'xiGenMinus',
+        'logXiGenPlus',
+        'logXiGenMinus'
     ]
 
     """

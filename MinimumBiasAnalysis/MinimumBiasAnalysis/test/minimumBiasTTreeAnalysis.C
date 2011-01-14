@@ -115,7 +115,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
    HistoMapTH1F histosTH1F;
    bookHistos(histosTH1F,StdAllocatorAdaptor());
-   float minEVarBin = 0.; 
+   /*float minEVarBin = 0.; 
    Float_t binningEPlusPz[]={minEVarBin,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
                              100.,120.,140.,160.,180.,200.,225.,250.,
                              275.,300.,350.,400.};
@@ -127,8 +127,13 @@ void minimumBiasTTreeAnalysis(TTree* data,
    histosTH1F["sumEnergyHFPlusVarBin"] = new TH1F("sumEnergyHFPlusVarBin","sumEnergyHFPlusVarBin",18,binningESumHF);
    histosTH1F["sumEnergyHFMinusVarBin"] = new TH1F("sumEnergyHFMinusVarBin","sumEnergyHFMinusVarBin",18,binningESumHF);
    histosTH1F["multiplicityHFPlusVarBin"] = new TH1F("multiplicityHFPlusVarBin","multiplicityHFPlusVarBin",20,-0.5,19.5);
-   histosTH1F["multiplicityHFMinusVarBin"] = new TH1F("multiplicityHFMinusVarBin","multiplicityHFMinusVarBin",20,-0.5,19.5);
+   histosTH1F["multiplicityHFMinusVarBin"] = new TH1F("multiplicityHFMinusVarBin","multiplicityHFMinusVarBin",20,-0.5,19.5);*/
    histosTH1F["EventsPerBunchCrossing"] = new TH1F("EventsPerBunchCrossing","EventsPerBunchCrossing",3565,0,3565); 
+   histosTH1F["sumEnergyHFPlusGen_Ntrk0_5"] = new TH1F("sumEnergyHFPlusGen_Ntrk0_5","sumEnergyHFPlusGen_Ntrk0_5",100,0.,100.);
+   histosTH1F["sumEnergyHFPlusGen_Ntrk6_10"] = new TH1F("sumEnergyHFPlusGen_Ntrk6_10","sumEnergyHFPlusGen_Ntrk6_10",100,0.,100.);
+   histosTH1F["sumEnergyHFPlusGen_Ntrk11_15"] = new TH1F("sumEnergyHFPlusGen_Ntrk11_15","sumEnergyHFPlusGen_Ntrk11_15",100,0.,100.);
+   histosTH1F["sumEnergyHFPlusGen_Ntrk16_25"] = new TH1F("sumEnergyHFPlusGen_Ntrk16_25","sumEnergyHFPlusGen_Ntrk16_25",100,0.,100.);
+   histosTH1F["sumEnergyHFPlusGen_Ntrk26_100"] = new TH1F("sumEnergyHFPlusGen_Ntrk26_100","sumEnergyHFPlusGen_Ntrk26_100",100,0.,100.);
 
    HistoMapTH2F histosTH2F;
    bookHistos(histosTH2F,StdAllocatorAdaptor());
@@ -145,7 +150,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
       for(size_t iprocess = 0; iprocess < processIDs.size(); ++iprocess) histosTH1F["ProcessId"] ->GetXaxis()->SetBinLabel(iprocess + 1,processNames[iprocess].c_str());
    }
 
-   bool doEtaMaxGenSelection= true;
+   bool doEtaMaxGenSelection= false;
    bool doEtaMinGenSelection= false;
    double etaMaxGenMax = 0.;
    double etaMinGenMin = 0.; 
@@ -174,9 +179,14 @@ void minimumBiasTTreeAnalysis(TTree* data,
    double MxMin = 100.;
    double MxMax = 999.;
    // Xi
-   bool doXiPlusSelection = true;
+   bool doXiPlusSelection = false;
    bool doXiMinusSelection = false;
    double xiMax = 0.01;
+   // EtaMax
+   bool doEtaMaxSelection = true;
+   bool doEtaMinSelection = false;
+   double etaMaxMax = 0.0;
+   double etaMinMin = 0.0;
 
    double eventWeight = 1.0;
    //std::vector<std::pair<int,int> > selectedEvents;
@@ -295,8 +305,15 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
       // Xi
       if( doXiPlusSelection && (eventData.xiPlusFromPFCands_ > xiMax) ) continue;
+      histosTH1F["EventSelection"]->Fill("XiPlusSelection",eventWeight);
       if( doXiMinusSelection && (eventData.xiMinusFromPFCands_ > xiMax) ) continue;
-      histosTH1F["EventSelection"]->Fill("XiSelection",eventWeight); 
+      histosTH1F["EventSelection"]->Fill("XiMinusSelection",eventWeight); 
+
+      // EtaMax
+      if( doEtaMaxSelection && (eventData.etaMaxFromPFCands_ > etaMaxMax) ) continue;
+      histosTH1F["EventSelection"]->Fill("EtaMaxSelection",eventWeight);
+      if( doEtaMinSelection && (eventData.etaMinFromPFCands_ < etaMinMin) ) continue;
+      histosTH1F["EventSelection"]->Fill("EtaMinSelection",eventWeight);
 
       // Fill Histos
       // SumET
@@ -362,18 +379,22 @@ void minimumBiasTTreeAnalysis(TTree* data,
          double xigen_plus = eventData.xiGenPlus_;
          double xigen_minus = eventData.xiGenMinus_;
          if(xigen_plus > 0. && xigen_plus <= 0.1){
-            histosTH1F["xiGenPlus"]->Fill(xigen_plus); 
+            histosTH1F["xiGenPlus"]->Fill(xigen_plus);
+            histosTH1F["logXiGenPlus"]->Fill( log10(xigen_plus) ); 
             histosTH1F["ResXiPlusFromTowers"]->Fill(xiPlusFromTowers - xigen_plus);
             histosTH1F["ResXiPlusFromPFCands"]->Fill(xiPlusFromPFCands - xigen_plus);
             histosTH2F["xiFromTowersVsxiGenPlus"]->Fill(xigen_plus,xiPlusFromTowers);
             histosTH2F["xiFromPFCandsVsxiGenPlus"]->Fill(xigen_plus,xiPlusFromPFCands);
+            histosTH2F["xiFromTowersVslogXiGenPlus"]->Fill( log10(xigen_plus),xiPlusFromTowers );
+            histosTH2F["xiFromPFCandsVslogXiGenPlus"]->Fill( log10(xigen_plus),xiPlusFromPFCands );
          }
          if(xigen_minus > 0. && xigen_minus <= 0.1){
             histosTH1F["xiGenMinus"]->Fill(xigen_minus);
+            histosTH1F["logXiGenMinus"]->Fill( log10(xigen_minus) );
             histosTH1F["ResXiMinusFromTowers"]->Fill(xiMinusFromTowers - xigen_minus);
             histosTH1F["ResXiMinusFromPFCands"]->Fill(xiMinusFromPFCands - xigen_minus);
-            histosTH2F["xiFromTowersVsxiGenMinus"]->Fill(xigen_minus,xiMinusFromTowers);
-            histosTH2F["xiFromPFCandsVsxiGenMinus"]->Fill(xigen_minus,xiMinusFromPFCands);
+            histosTH2F["xiFromTowersVslogXiGenMinus"]->Fill( log10(xigen_minus),xiMinusFromTowers );
+            histosTH2F["xiFromPFCandsVslogXiGenMinus"]->Fill( log10(xigen_minus),xiMinusFromPFCands );
          }
       }
 

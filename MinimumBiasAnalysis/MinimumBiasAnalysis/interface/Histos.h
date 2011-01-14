@@ -24,7 +24,7 @@ namespace minimumBiasAnalysis {
                                        2.500, 2.650, 2.868, 3.000,
                                        3.152, 3.327, 3.503, 3.677, 3.853, 4.027, 4.204, 4.377, 4.552,
                                        4.730, 4.903, 5.205}; // 41 bins*/
-     double etaBinsHCALBoundaries[] = {-5.205, -4.903, -4.730,
+     float etaBinsHCALBoundaries[] = {-5.205, -4.903, -4.730,
                                        -4.552, -4.377, -4.204, -4.027, -3.853, -3.677, -3.503, -3.327, -3.152,
                                        -3.000, -2.868, -2.650, -2.500, 
                                        -2.322, -2.172, -2.043, -1.930, -1.830, -1.740, -1.653, -1.566, -1.479,
@@ -36,6 +36,13 @@ namespace minimumBiasAnalysis {
                                        2.500, 2.650, 2.868, 3.000,
                                        3.152, 3.327, 3.503, 3.677, 3.853, 4.027, 4.204, 4.377, 4.552,
                                        4.730, 4.903, 5.205}; // 41 + 41 bins
+
+     float minEVarBin = 0.; 
+     float binningEPlusPz[]={minEVarBin,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
+                               100.,120.,140.,160.,180.,200.,225.,250.,
+                               275.,300.,350.,400.}; // 24 bins
+     float binningESumHF[]={minEVarBin,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
+                               100.,120.,140.,160.,180.,200.}; // 18 bins
 
      histos["nVertex"] = adaptor.template make<TH1F>("nVertex","Nr. of offline primary vertexes",10,0,10);
      histos["posXPrimVtx"] = adaptor.template make<TH1F>("posXPrimVtx","x position of primary vertexes",100,-1.,1.);
@@ -49,6 +56,7 @@ namespace minimumBiasAnalysis {
      histos["leadingJetPhi"] = adaptor.template make<TH1F>("leadingJetPhi","leadingJetPhi",100,-1.1*M_PI,1.1*M_PI);
      histos["trackMultiplicity"] = adaptor.template make<TH1F>("trackMultiplicity","trackMultiplicity",20,0,20);
      histos["trackMultiplicityAssociatedToPV"] = adaptor.template make<TH1F>("trackMultiplicityAssociatedToPV","trackMultiplicityAssociatedToPV",20,0,20);
+
      histos["multiplicityHEPlus"] = adaptor.template make<TH1F>("multiplicityHEPlus","multiplicityHEPlus",20,0,20);
      histos["multiplicityHEMinus"] = adaptor.template make<TH1F>("multiplicityHEMinus","multiplicityHEMinus",20,0,20);
      histos["sumEnergyHEPlus"] = adaptor.template make<TH1F>("sumEnergyHEPlus","sumEnergyHEPlus",100,0.,100.);
@@ -57,6 +65,11 @@ namespace minimumBiasAnalysis {
      histos["multiplicityHFMinus"] = adaptor.template make<TH1F>("multiplicityHFMinus","multiplicityHFMinus",20,0,20);
      histos["sumEnergyHFPlus"] = adaptor.template make<TH1F>("sumEnergyHFPlus","sumEnergyHFPlus",100,0.,100.);
      histos["sumEnergyHFMinus"] = adaptor.template make<TH1F>("sumEnergyHFMinus","sumEnergyHFMinus",100,0.,100.);
+     histos["sumEnergyHFPlusVarBin"] = adaptor.template make<TH1F>("sumEnergyHFPlusVarBin","sumEnergyHFPlusVarBin",18,binningESumHF);
+     histos["sumEnergyHFMinusVarBin"] = adaptor.template make<TH1F>("sumEnergyHFMinusVarBin","sumEnergyHFMinusVarBin",18,binningESumHF);
+     histos["multiplicityHFPlusVarBin"] = adaptor.template make<TH1F>("multiplicityHFPlusVarBin","multiplicityHFPlusVarBin",20,-0.5,19.5);
+     histos["multiplicityHFMinusVarBin"] = adaptor.template make<TH1F>("multiplicityHFMinusVarBin","multiplicityHFMinusVarBin",20,-0.5,19.5);
+
      histos["xiTowerPlus"] = adaptor.template make<TH1F>("xiTowerPlus","xiTowerPlus",200,0.,1.);
      histos["xiTowerMinus"] = adaptor.template make<TH1F>("xiTowerMinus","xiTowerMinus",200,0.,1.);
      histos["xiPlusFromJets"] = adaptor.template make<TH1F>("xiPlusFromJets","xiPlusFromJets",200,0.,1.);
@@ -65,6 +78,7 @@ namespace minimumBiasAnalysis {
      histos["xiMinusFromTowers"] = adaptor.template make<TH1F>("xiMinusFromTowers","xiMinusFromTowers",200,0.,1.);
      histos["xiPlusFromPFCands"] = adaptor.template make<TH1F>("xiPlusFromPFCands","xiPlusFromPFCands",200,0.,1.);
      histos["xiMinusFromPFCands"] = adaptor.template make<TH1F>("xiMinusFromPFCands","xiMinusFromPFCands",200,0.,1.);
+
      histos["missingMassFromXiTower"] = adaptor.template make<TH1F>("missingMassFromXiTower","missingMassFromXiTower",200,-10.,800.);
      histos["missingMassFromXiFromTowers"] = adaptor.template make<TH1F>("missingMassFromXiFromTowers","missingMassFromXiFromTowers",200,-10.,800.);
      histos["missingMassFromXiFromJets"] = adaptor.template make<TH1F>("missingMassFromXiFromJets","missingMassFromXiFromJets",200,-10.,800.);
@@ -88,21 +102,25 @@ namespace minimumBiasAnalysis {
      histos["EMinusPzFromTowers"] = adaptor.template make<TH1F>("EMinusPzFromTowers","EMinusPzFromTowers",200,0.,600.);
      histos["EPlusPzFromPFCands"] = adaptor.template make<TH1F>("EPlusPzFromPFCands","EPlusPzFromPFCands",200,0.,600.);
      histos["EMinusPzFromPFCands"] = adaptor.template make<TH1F>("EMinusPzFromPFCands","EMinusPzFromPFCands",200,0.,600.);
+     histos["EPlusPzFromTowersVarBin"] = adaptor.template make<TH1F>("EPlusPzFromTowersVarBin","EPlusPzFromTowersVarBin",24,binningEPlusPz);
+     histos["EMinusPzFromTowersVarBin"] = adaptor.template make<TH1F>("EMinusPzFromTowersVarBin","EMinusPzFromTowersVarBin",24,binningEPlusPz);
 
      histos["MxGen"] = adaptor.template make<TH1F>("MxGen","MxGen",200,-10.,400.);
      histos["xiGenPlus"] = adaptor.template make<TH1F>("xiGenPlus","xiGenPlus",500,0.,1.);
      histos["xiGenMinus"] = adaptor.template make<TH1F>("xiGenMinus","xiGenMinus",500,0.,1.);
+     histos["logXiGenPlus"] = adaptor.template make<TH1F>("logXiGenPlus","logXiGenPlus",200,-5.,0.);
+     histos["logXiGenMinus"] = adaptor.template make<TH1F>("logXiGenMinus","logXiGenMinus",200,-5.,0.);
      histos["etaMaxGen"] = adaptor.template make<TH1F>("etaMaxGen","etaMaxGen",200,-10.,10.);
      histos["etaMinGen"] = adaptor.template make<TH1F>("etaMinGen","etaMinGen",200,-10.,10.);
 
      histos["sumEnergyHEPlusGen"] = adaptor.template make<TH1F>("sumEnergyHEPlusGen","sumEnergyHEPlusGen",100,0.,100.);
      histos["sumEnergyHEMinusGen"] = adaptor.template make<TH1F>("sumEnergyHEMinusGen","sumEnergyHEMinusGen",100,0.,100.);
      histos["sumEnergyHFPlusGen"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen","sumEnergyHFPlusGen",100,0.,100.);
-     histos["sumEnergyHFPlusGen_Ntrk0_5"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk0_5","sumEnergyHFPlusGen_Ntrk0_5",100,0.,100.);
+     /*histos["sumEnergyHFPlusGen_Ntrk0_5"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk0_5","sumEnergyHFPlusGen_Ntrk0_5",100,0.,100.);
      histos["sumEnergyHFPlusGen_Ntrk6_10"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk6_10","sumEnergyHFPlusGen_Ntrk6_10",100,0.,100.);
      histos["sumEnergyHFPlusGen_Ntrk11_15"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk11_15","sumEnergyHFPlusGen_Ntrk11_15",100,0.,100.);
      histos["sumEnergyHFPlusGen_Ntrk16_25"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk16_25","sumEnergyHFPlusGen_Ntrk16_25",100,0.,100.);
-     histos["sumEnergyHFPlusGen_Ntrk26_100"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk26_100","sumEnergyHFPlusGen_Ntrk26_100",100,0.,100.);
+     histos["sumEnergyHFPlusGen_Ntrk26_100"] = adaptor.template make<TH1F>("sumEnergyHFPlusGen_Ntrk26_100","sumEnergyHFPlusGen_Ntrk26_100",100,0.,100.);*/
      histos["sumEnergyHFMinusGen"] = adaptor.template make<TH1F>("sumEnergyHFMinusGen","sumEnergyHFMinusGen",100,0.,100.);
      histos["ResMxFromTowers"] = adaptor.template make<TH1F>("ResMxFromTowers","ResMxFromTowers",100,-50.,50.);
      histos["ResXiPlusFromTowers"] = adaptor.template make<TH1F>("ResXiPlusFromTowers","ResXiPlusFromTowers",100,-0.1,0.1);
@@ -119,7 +137,7 @@ namespace minimumBiasAnalysis {
      histos["HcalNoiseId"]->GetXaxis()->SetBinLabel(1,"LooseNoiseFilter");
      histos["HcalNoiseId"]->GetXaxis()->SetBinLabel(2,"TightNoiseFilter");
 
-     histos["EventSelection"] = adaptor.template make<TH1F>("EventSelection","EventSelection",12,0,12);
+     histos["EventSelection"] = adaptor.template make<TH1F>("EventSelection","EventSelection",15,0,15);
      histos["EventSelection"]->GetXaxis()->SetBinLabel(1,"All");
      histos["EventSelection"]->GetXaxis()->SetBinLabel(2,"ProcessIdOrRunSelection");
      histos["EventSelection"]->GetXaxis()->SetBinLabel(3,"TriggerSelection");
@@ -131,7 +149,10 @@ namespace minimumBiasAnalysis {
      histos["EventSelection"]->GetXaxis()->SetBinLabel(9,"HCALSelection");
      histos["EventSelection"]->GetXaxis()->SetBinLabel(10,"SumETSelection");
      histos["EventSelection"]->GetXaxis()->SetBinLabel(11,"MxSelection");
-     histos["EventSelection"]->GetXaxis()->SetBinLabel(12,"XiSelection");
+     histos["EventSelection"]->GetXaxis()->SetBinLabel(12,"XiPlusSelection"); 
+     histos["EventSelection"]->GetXaxis()->SetBinLabel(13,"XiMinusSelection");
+     histos["EventSelection"]->GetXaxis()->SetBinLabel(14,"EtaMaxSelection");
+     histos["EventSelection"]->GetXaxis()->SetBinLabel(15,"EtaMinSelection");
   }
 
   template <class Adaptor>
@@ -142,10 +163,14 @@ namespace minimumBiasAnalysis {
      histos["multiplicityHFvsHEPlus"] = adaptor.template make<TH2F>("multiplicityHFvsHEPlus","multiplicityHFvsHEPlus",20,0,20,20,0,20);
      histos["multiplicityHFvsHEMinus"] = adaptor.template make<TH2F>("multiplicityHFvsHEMinus","multiplicityHFvsHEMinus",20,0,20,20,0,20);
 
-     histos["xiFromTowersVsxiGenPlus"] = adaptor.template make<TH2F>("xiFromTowersVsxiGenPlus","xiFromTowersVsxiGenPlus",100,0.,0.2,100,0.,0.2);
-     histos["xiFromTowersVsxiGenMinus"] = adaptor.template make<TH2F>("xiFromTowersVsxiGenMinus","xiFromTowersVsxiGenMinus",100,0.,0.2,100,0.,0.2);
-     histos["xiFromPFCandsVsxiGenPlus"] = adaptor.template make<TH2F>("xiFromPFCandsVsxiGenPlus","xiFromPFCandsVsxiGenPlus",100,0.,0.2,100,0.,0.2);
-     histos["xiFromPFCandsVsxiGenMinus"] = adaptor.template make<TH2F>("xiFromPFCandsVsxiGenMinus","xiFromPFCandsVsxiGenMinus",100,0.,0.2,100,0.,0.2);
+     histos["xiFromTowersVsxiGenPlus"] = adaptor.template make<TH2F>("xiFromTowersVsxiGenPlus","xiFromTowersVsxiGenPlus",500,0.,0.2,100,0.,0.2);
+     histos["xiFromTowersVsxiGenMinus"] = adaptor.template make<TH2F>("xiFromTowersVsxiGenMinus","xiFromTowersVsxiGenMinus",500,0.,0.2,100,0.,0.2);
+     histos["xiFromPFCandsVsxiGenPlus"] = adaptor.template make<TH2F>("xiFromPFCandsVsxiGenPlus","xiFromPFCandsVsxiGenPlus",500,0.,0.2,100,0.,0.2);
+     histos["xiFromPFCandsVsxiGenMinus"] = adaptor.template make<TH2F>("xiFromPFCandsVsxiGenMinus","xiFromPFCandsVsxiGenMinus",500,0.,0.2,100,0.,0.2);
+     histos["xiFromTowersVslogXiGenPlus"] = adaptor.template make<TH2F>("xiFromTowersVslogXiGenPlus","xiFromTowersVslogXiGenPlus",200,-5.,0.,100,0.,0.2);
+     histos["xiFromTowersVslogXiGenMinus"] = adaptor.template make<TH2F>("xiFromTowersVslogXiGenMinus","xiFromTowersVslogXiGenMinus",200,-5.,0.,100,0.,0.2);
+     histos["xiFromPFCandsVslogXiGenPlus"] = adaptor.template make<TH2F>("xiFromPFCandsVslogXiGenPlus","xiFromPFCandsVslogXiGenPlus",200,-5.,0.,100,0.,0.2);
+     histos["xiFromPFCandsVslogXiGenMinus"] = adaptor.template make<TH2F>("xiFromPFCandsVslogXiGenMinus","xiFromPFCandsVslogXiGenMinus",200,-5.,0.,100,0.,0.2);
 
      histos["etaMaxFromPFCandsVsetaMaxGen"] = adaptor.template make<TH2F>("etaMaxFromPFCandsVsetaMaxGen","etaMaxFromPFCandsVsetaMaxGen",200,-10.,10.,200,-7.,7.);
      histos["etaMinFromPFCandsVsetaMinGen"] = adaptor.template make<TH2F>("etaMinFromPFCandsVsetaMinGen","etaMinFromPFCandsVsetaMinGen",200,-10.,10.,200,-7.,7.);

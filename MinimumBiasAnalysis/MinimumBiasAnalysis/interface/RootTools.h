@@ -7,7 +7,7 @@
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 
 enum generator_t {PYTHIA,PHOJET,PYTHIA8,PYTHIAD6T,PYTHIADW,PYTHIAP0,PYTHIAProQ20,PYTHIACW,PYTHIAZ1};
-enum process_category_t {All,SD,NonSD,Inelastic,DD,Diff};
+enum process_category_t {All,SD,NonSD,Inelastic,DD,Diff,SDPlus,SDMinus};
 enum run_range_t {Data900GeV,Data2360GeV,Data7TeV};
 
 std::string getProcessCategoryName(int processCategory);
@@ -149,6 +149,8 @@ std::string getProcessCategoryName(int processCategory){
       case Inelastic: processName = "Inelastic";break;
       case DD: processName = "DD";break;
       case Diff: processName = "Diff";break;
+      case SDPlus: processName = "SDPlus";break;
+      case SDMinus: processName = "SDMinus";break;
    }
    return processName;
 }
@@ -239,6 +241,12 @@ void getSelectedProcIdsPYTHIA(int processCategory,std::vector<int>& selectedProc
          selectedProcIds.push_back(93); //SD AB->AX
          selectedProcIds.push_back(94); //DD
          break;
+      case SDPlus:
+         selectedProcIds.push_back(93); //SD AB->AX
+         break;
+      case SDMinus:
+         selectedProcIds.push_back(92); //SD AB->XB
+         break; 
    }  
 }
 
@@ -289,6 +297,12 @@ void getSelectedProcIdsPYTHIA8(int processCategory,std::vector<int>& selectedPro
          selectedProcIds.push_back(103);
          selectedProcIds.push_back(104);
          selectedProcIds.push_back(105);
+         break;
+      case SDPlus:
+         selectedProcIds.push_back(104);
+         break;
+      case SDMinus:
+         selectedProcIds.push_back(103);
          break;
    }
 }
