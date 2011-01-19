@@ -3,6 +3,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
+#include <vector>
+
 class TFileService;
 class TH1F;
 //class TH2F;
@@ -20,6 +22,8 @@ class SimpleTrackAnalyzer: public edm::EDAnalyzer
   private:
     void bookHistos(HistoMapTH1F&, edm::Service<TFileService> const&);    
 
+    static const int nVarBinsMax_;
+
     edm::InputTag trackTag_;
 
     double minPt_;
@@ -34,6 +38,11 @@ class SimpleTrackAnalyzer: public edm::EDAnalyzer
     unsigned int minNTracks_;
     unsigned int maxNTracks_;
     unsigned int nBinsNTracks_;
+
+    std::vector<double> boundariesPt;
+    std::vector<double> boundariesEta;
+    std::vector<double> boundariesPtSum;
+    std::vector<double> boundariesNTracks; 
 
     HistoMapTH1F histosTH1F_;
     //HistoMapTH2F histosTH2F_;
@@ -56,6 +65,8 @@ class SimpleTrackAnalyzer: public edm::EDAnalyzer
 #include "TH1F.h"
 #include "TH2F.h"
 
+const int SimpleTrackAnalyzer::nVarBinsMax_ = 1000;
+
 SimpleTrackAnalyzer::SimpleTrackAnalyzer(edm::ParameterSet const& pset):
   trackTag_(pset.getParameter<edm::InputTag>("TrackTag")),
   minPt_(pset.getParameter<double>("MinPt")),
@@ -69,7 +80,19 @@ SimpleTrackAnalyzer::SimpleTrackAnalyzer(edm::ParameterSet const& pset):
   nBinsPtSum_(pset.getParameter<unsigned int>("NBinsPtSum")),
   minNTracks_(pset.getParameter<unsigned int>("MinNTracks")),
   maxNTracks_(pset.getParameter<unsigned int>("MaxNTracks")),
-  nBinsNTracks_(pset.getParameter<unsigned int>("NBinsNTracks")) {}
+  nBinsNTracks_(pset.getParameter<unsigned int>("NBinsNTracks")) {
+    if( pset.exists("VarBin") ){
+       edm::ParameterSet const& psetVarBin = pset.getParameter<edm::ParameterSet>("VarBin");
+       if( psetVarBin.exists("pt") )
+          boundariesPt = psetVarBin.getParameter<std::vector<double> >("pt");
+       if( psetVarBin.exists("eta") )
+          boundariesEta = psetVarBin.getParameter<std::vector<double> >("eta");
+       if( psetVarBin.exists("ptSum") )
+          boundariesPtSum = psetVarBin.getParameter<std::vector<double> >("ptSum");
+       if( psetVarBin.exists("nTracks") )
+          boundariesNTracks = psetVarBin.getParameter<std::vector<double> >("nTracks");
+    }
+}
 
 SimpleTrackAnalyzer::~SimpleTrackAnalyzer(){}
 
@@ -98,9 +121,18 @@ void SimpleTrackAnalyzer::analyze(const edm::Event& event, const edm::EventSetup
      ptSum += track->pt();
      histosTH1F_["TrackPt"]->Fill( track->pt() );
      histosTH1F_["TrackEta"]->Fill( track->eta() );
+     if(histosTH1F_.find("TrackPtVarBin") != histosTH1F_.end())
+        histosTH1F_["TrackPtVarBin"]->Fill( track->pt() );
+     if(histosTH1F_.find("TrackEtaVarBin") != histosTH1F_.end())
+        histosTH1F_["TrackEtaVarBin"]->Fill( track->eta() );
+     
   }
   histosTH1F_["TrackPtSum"]->Fill( ptSum );
   histosTH1F_["NTracks"]->Fill( nTracks ); 
+  if(histosTH1F_.find("TrackPtSumVarBin") != histosTH1F_.end())
+     histosTH1F_["TrackPtSumVarBin"]->Fill( ptSum );
+  if(histosTH1F_.find("NTracksVarBin") != histosTH1F_.end())
+     histosTH1F_["NTracksVarBin"]->Fill( nTracks );  
 }
 
 void SimpleTrackAnalyzer::bookHistos(HistoMapTH1F& histos, edm::Service<TFileService> const& fs){
@@ -108,6 +140,27 @@ void SimpleTrackAnalyzer::bookHistos(HistoMapTH1F& histos, edm::Service<TFileSer
   histos["TrackEta"] = fs->make<TH1F>("TrackEta","TrackEta",nBinsEta_,minEta_,maxEta_);
   histos["TrackPtSum"] = fs->make<TH1F>("TrackPtSum","TrackPtSum",nBinsPtSum_,minPtSum_,maxPtSum_);
   histos["NTracks"] = fs->make<TH1F>("NTracks","NTracks",nBinsNTracks_,minNTracks_,maxNTracks_);
+
+  if( boundariesPt.size() ){
+     float ptBins[nVarBinsMax_];
+     std::copy(boundariesPt.begin(),boundariesPt.end(),ptBins);
+     histos["TrackPtVarBin"] = fs->make<TH1F>("TrackPtVarBin","TrackPtVarBin",(boundariesPt.size() - 1),ptBins);
+  }
+  if( boundariesEta.size() ){
+     float etaBins[nVarBinsMax_];
+     std::copy(boundariesEta.begin(),boundariesEta.end(),etaBins);
+     histos["TrackEtaVarBin"] = fs->make<TH1F>("TrackEtaVarBin","TrackEtaVarBin",(boundariesEta.size() - 1),etaBins); 
+  } 
+  if( boundariesPtSum.size() ){
+     float ptSumBins[nVarBinsMax_];
+     std::copy(boundariesPtSum.begin(),boundariesPtSum.end(),ptSumBins);
+     histos["TrackPtSumVarBin"] = fs->make<TH1F>("TrackPtSumVarBin","TrackPtSumVarBin",(boundariesPtSum.size() - 1),ptSumBins);
+  }
+  if( boundariesNTracks.size() ){
+     float nTracksBins[nVarBinsMax_];
+     std::copy(boundariesNTracks.begin(),boundariesNTracks.end(),nTracksBins);
+     histos["NTracksVarBin"] = fs->make<TH1F>("NTracksVarBin","NTracksVarBin",(boundariesNTracks.size() - 1),nTracksBins);
+  }
 }
 
 DEFINE_FWK_MODULE(SimpleTrackAnalyzer);
