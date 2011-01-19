@@ -12,19 +12,25 @@ def addProcessIdFilters(process,generator):
     processIdFilters = None 
     if generator == 'Pythia6': 
         process.processIdPythia6_SD = processIdFilter.clone(ProcessIds = [92,93])
+        process.processIdPythia6_SDPlus = processIdFilter.clone(ProcessIds = [93])
+        process.processIdPythia6_SDMinus = processIdFilter.clone(ProcessIds = [92])
         process.processIdPythia6_DD = processIdFilter.clone(ProcessIds = [94])
         process.processIdPythia6_Diff = processIdFilter.clone(ProcessIds = [92,93,94])
         process.processIdPythia6_ND = cms.Sequence(~process.processIdPythia6_Diff)
         
-        processIdFilters = ['processIdPythia6_SD','processIdPythia6_DD',
-                           'processIdPythia6_Diff','processIdPythia6_ND']
+        processIdFilters = ['processIdPythia6_SD','processIdPythia6_SDPlus','processIdPythia6_SDMinus',
+                            'processIdPythia6_DD',
+                            'processIdPythia6_Diff','processIdPythia6_ND']
     elif generator == 'Pythia8':
         process.processIdPythia8_SD = processIdFilter.clone(ProcessIds = [103,104])
+        process.processIdPythia8_SDPlus = processIdFilter.clone(ProcessIds = [104])
+        process.processIdPythia8_SDMinus = processIdFilter.clone(ProcessIds = [103])
         process.processIdPythia8_DD = processIdFilter.clone(ProcessIds = [105])
         process.processIdPythia8_Diff = processIdFilter.clone(ProcessIds = [103,104,105])
         process.processIdPythia8_ND = cms.Sequence(~process.processIdPythia8_Diff)
 
-        processIdFilters = ['processIdPythia8_SD','processIdPythia8_DD',
+        processIdFilters = ['processIdPythia8_SD','processIdPythia8_SDPlus','processIdPythia8_SDMinus',
+                            'processIdPythia8_DD',
                             'processIdPythia8_Diff','processIdPythia8_ND']
     elif generator == 'Phojet':
         process.processIdPhojet_SD = processIdFilter.clone(GeneratorTag = "source", ProcessIds = [5,6])

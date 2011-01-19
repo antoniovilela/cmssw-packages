@@ -99,10 +99,14 @@ SimpleTrackAnalyzer::~SimpleTrackAnalyzer(){}
 void SimpleTrackAnalyzer::beginJob(){
   edm::Service<TFileService> fs;
 
-  TH1::SetDefaultSumw2(true);
+  bool sumw2 = TH1::GetDefaultSumw2();
+  TH1::SetDefaultSumw2(false);
 
   bookHistos(histosTH1F_,fs);
   //bookHistos(histosTH2F_,fs);
+  for(HistoMapTH1F::const_iterator it = histosTH1F_.begin(); it != histosTH1F_.end(); ++it) it->second->Sumw2();
+
+  TH1::SetDefaultSumw2(sumw2);
 }
 
 void SimpleTrackAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup){
