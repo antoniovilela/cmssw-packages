@@ -111,7 +111,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    TFile* hfile = new TFile(outFileName.c_str(),"recreate","data histograms");
 
    // Book Histograms
-   TH1::SetDefaultSumw2(true);
+   //TH1::SetDefaultSumw2(true);
 
    HistoMapTH1F histosTH1F;
    bookHistos(histosTH1F,StdAllocatorAdaptor());
@@ -138,6 +138,11 @@ void minimumBiasTTreeAnalysis(TTree* data,
    HistoMapTH2F histosTH2F;
    bookHistos(histosTH2F,StdAllocatorAdaptor());
 
+   for(HistoMapTH1F::const_iterator it = histosTH1F.begin(); it != histosTH1F.end(); ++it)
+      it->second->Sumw2();
+   for(HistoMapTH2F::const_iterator it = histosTH2F.begin(); it != histosTH2F.end(); ++it)
+      it->second->Sumw2();
+ 
    std::vector<int> processIDs;
    std::vector<std::string> processNames;
    if(accessMCInfo){ 
@@ -183,7 +188,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doXiMinusSelection = false;
    double xiMax = 0.01;
    // EtaMax
-   bool doEtaMaxSelection = true;
+   bool doEtaMaxSelection = false;
    bool doEtaMinSelection = false;
    double etaMaxMax = 0.0;
    double etaMinMin = 0.0;
