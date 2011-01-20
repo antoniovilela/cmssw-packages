@@ -274,6 +274,12 @@ void getSelectedProcIdsPHOJET(int processCategory,std::vector<int>& selectedProc
          selectedProcIds.push_back(6);
          selectedProcIds.push_back(7);
          break;
+      case SDPlus:
+         selectedProcIds.push_back(5);
+         break;
+      case SDMinus:
+         selectedProcIds.push_back(6);
+         break;
    }
 }
 

@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-#from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_cfi import pfThresholds
-from ForwardAnalysis.Utilities.pfThresholds_cfi import pfThresholds
+from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_cfi import pfThresholds
+#from ForwardAnalysis.Utilities.pfThresholds_cfi import pfThresholds
 
 MinimumBiasAnalysis = cms.PSet(
     # Input tags
