@@ -41,16 +41,18 @@ def eventCountsFiles(fileNames,histoName="EventSelection",binNumber=-1):
         
    return nEvents
 
-def eventCountsProcessIds(dir,prefix):
+def eventCountsProcessIds(processIds,dir,prefix):
 
    steps = [
         'minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus',
         'minimumBiasTTreeAnalysisBscOr',
         'minimumBiasTTreeAnalysisVertexFilter',
-        'minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection'
+        'minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection',
+        'minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelectionEtaMaxSelection'
    ]
 
-   processIds = ('All','SD','DD','Inelastic')
+   #processIds = ('All','SD','DD','Inelastic')
+   #processIds = ('SDPlus','SDMinus')
 
    for type in processIds:
        fileNames = ["%s/%s_%s_histos_%s.root" % (dir,prefix,item,type) for item in steps]

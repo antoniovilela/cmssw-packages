@@ -53,6 +53,7 @@ def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1):
 
     variables = [
         'multiplicityTracks',
+        'multiplicityTracksGen',
         'sumEnergyHFPlusVarBin',
         'sumEnergyHFMinusVarBin',
         'etaMaxFromPFCandsVarBin',

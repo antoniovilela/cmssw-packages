@@ -44,13 +44,13 @@ void runEventSelectionAnalysisMC(){
    selections.push_back("minimumBiasTTreeAnalysisHBHENoiseFilter");
  
    std::vector<int> processTypes;
-   /*processTypes.push_back(All);
-   processTypes.push_back(SD);
+   //processTypes.push_back(All);
+   //processTypes.push_back(SD);
    processTypes.push_back(DD);
    //processTypes.push_back(Diff);
-   processTypes.push_back(Inelastic);*/
-   processTypes.push_back(SDPlus);
-   processTypes.push_back(SDMinus);
+   //processTypes.push_back(Inelastic);
+   //processTypes.push_back(SDPlus);
+   //processTypes.push_back(SDMinus);
 
    for(size_t isel = 0; isel < selections.size(); ++isel){
       std::string treeName = selections[isel] + "/data";
