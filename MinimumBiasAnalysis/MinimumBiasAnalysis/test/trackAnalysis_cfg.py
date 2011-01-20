@@ -22,7 +22,8 @@ inputOptions = parseInput(inputFields)
 # Settings
 class config: pass
 #config.fileNames = ['file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root']
-config.fileNames = ['file:/storage1/antoniov/data1/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
+#config.fileNames = ['file:/storage1/antoniov/data1/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
+config.fileNames = ['file:/storage1/antoniov/data1/MinBias_7TeV-phojet_START36_V10_362-HLT-v1_PrivateProd-START36_V10_362_RECO-v1/MinBias_7TeV-phojet_START36_V10_362-HLT-v1_PrivateProd-START36_V10_362_RECO-v1_step2_RAW2DIGI_L1Reco_RECO_VALIDATION_80_1_dtB.root']
 config.verbose = True
 if not hasattr(inputOptions,'runOnMC'): config.runOnMC = False
 else: config.runOnMC = inputOptions.runOnMC
@@ -147,15 +148,15 @@ process.trackHistoAnalyzer.TrackTag = config.trackTagName
 maxPt = process.trackHistoAnalyzer.MaxPt.value()
 minPt = process.trackHistoAnalyzer.MinPt.value()
 nBinsPt = process.trackHistoAnalyzer.NBinsPt.value()
-ptBins = getBinBoundaries(minPt,maxPt,(maxPt-minPt)/nBinsPt,nDivisions=5)
+ptBins = getBinBoundaries(minPt,maxPt,(maxPt-minPt)/nBinsPt,nDivisions=6)
 maxPtSum = process.trackHistoAnalyzer.MaxPtSum.value()
 minPtSum = process.trackHistoAnalyzer.MinPtSum.value()
 nBinsPtSum = process.trackHistoAnalyzer.NBinsPtSum.value()
-ptSumBins = getBinBoundaries(minPtSum,maxPtSum,(maxPtSum-minPtSum)/nBinsPtSum,nDivisions=4)
+ptSumBins = getBinBoundaries(minPtSum,maxPtSum,(maxPtSum-minPtSum)/nBinsPtSum,nDivisions=5)
 maxNTracks = process.trackHistoAnalyzer.MaxNTracks.value()
 minNTracks = process.trackHistoAnalyzer.MinNTracks.value()
 nBinsNTracks = process.trackHistoAnalyzer.NBinsNTracks.value()
-nTracksBins = getBinBoundaries(minNTracks,maxNTracks,(maxNTracks-minNTracks)/nBinsNTracks,nDivisions=2)
+nTracksBins = getBinBoundaries(minNTracks,maxNTracks,(maxNTracks-minNTracks)/nBinsNTracks,nDivisions=4)
 process.trackHistoAnalyzer.VarBin = cms.PSet(
     pt = cms.vdouble(ptBins),
     ptSum = cms.vdouble(ptSumBins),

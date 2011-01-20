@@ -34,11 +34,14 @@ def addProcessIdFilters(process,generator):
                             'processIdPythia8_Diff','processIdPythia8_ND']
     elif generator == 'Phojet':
         process.processIdPhojet_SD = processIdFilter.clone(GeneratorTag = "source", ProcessIds = [5,6])
+        process.processIdPhojet_SDPlus = processIdFilter.clone(GeneratorTag = "source", ProcessIds = [5])
+        process.processIdPhojet_SDMinus = processIdFilter.clone(GeneratorTag = "source", ProcessIds = [6])
         process.processIdPhojet_DD = processIdFilter.clone(GeneratorTag = "source", ProcessIds = [7])
         process.processIdPhojet_Diff = processIdFilter.clone(GeneratorTag = "source", ProcessIds = [4,5,6,7])
         process.processIdPhojet_ND = cms.Sequence(~process.processIdPhojet_Diff)
 
-        processIdFilters = ['processIdPhojet_SD','processIdPhojet_DD',
+        processIdFilters = ['processIdPhojet_SD','processIdPhojet_SDPlus','processIdPhojet_SDMinus',
+                            'processIdPhojet_DD',
                             'processIdPhojet_Diff','processIdPhojet_ND']
 
     return processIdFilters

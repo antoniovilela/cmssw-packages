@@ -167,6 +167,8 @@ process.countEvents_step = cms.Path(    process.countsAll +
                                         process.countsHBHENoiseFilter +
                                         process.minimumBiasTTreeAnalysisHBHENoiseFilter)  
 
+process.countEvents_step.replace(process.primaryVertexFilter,process.primaryVertexFilterLoose)
+
 ###################################################################################
 
 # Add MC-specific paths
