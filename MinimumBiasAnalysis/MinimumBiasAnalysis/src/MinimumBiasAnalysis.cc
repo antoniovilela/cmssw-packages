@@ -458,12 +458,14 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
      const reco::GenParticleCollection& genParticles = *genParticlesCollectionH;   
 
      math::XYZTLorentzVector genAllParticles(0.,0.,0.,0.),
+                             genAllParticlesInRange(0.,0.,0.,0.),
                              genAllParticlesHEPlus(0.,0.,0.,0.),genAllParticlesHEMinus(0.,0.,0.,0.),
                              genAllParticlesHFPlus(0.,0.,0.,0.),genAllParticlesHFMinus(0.,0.,0.,0.),
                              genEtaMax(0.,0.,0.,0.),genEtaMin(0.,0.,0.,0.),
                              genProtonPlus(0.,0.,0.,0.),genProtonMinus(0.,0.,0.,0.);
 
      setGenInfo(genParticles,Ebeam_,genAllParticles,
+                                    genAllParticlesInRange,
                                     genAllParticlesHEPlus,genAllParticlesHEMinus,
                                     genAllParticlesHFPlus,genAllParticlesHFMinus,
                                     genEtaMax,genEtaMin, 
@@ -471,8 +473,26 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
 
      double xigen_plus = -1.;
      double xigen_minus = -1.;
-     if(genProtonPlus.pz() > 0.75*Ebeam_) xigen_plus = 1 - genProtonPlus.pz()/Ebeam_;
-     if(genProtonMinus.pz() < -0.75*Ebeam_) xigen_minus = 1 + genProtonMinus.pz()/Ebeam_;
+     //if(genProtonPlus.pz() > 0.75*Ebeam_) xigen_plus = 1 - genProtonPlus.pz()/Ebeam_;
+     //if(genProtonMinus.pz() < -0.75*Ebeam_) xigen_minus = 1 + genProtonMinus.pz()/Ebeam_;
+     xigen_plus = 1 - genProtonPlus.pz()/Ebeam_;
+     xigen_minus = 1 + genProtonMinus.pz()/Ebeam_;
+
+     eventData.xiGenPlus_ = xigen_plus;
+     eventData.xiGenMinus_ = xigen_minus;
+     eventData.MxGen_ = genAllParticles.mass();
+     eventData.MxGenRange_ = genAllParticlesInRange.mass(); 
+     eventData.sumEnergyHEPlusGen_ = genAllParticlesHEPlus.energy();
+     eventData.sumEnergyHEMinusGen_ = genAllParticlesHEMinus.energy();
+     eventData.sumEnergyHFPlusGen_ = genAllParticlesHFPlus.energy();
+     eventData.sumEnergyHFMinusGen_ = genAllParticlesHFMinus.energy();
+     eventData.etaMaxGen_ = genEtaMax.eta();
+     eventData.etaMinGen_ = genEtaMin.eta();
+
+     edm::Handle<std::vector<float> > edmNtupleMxGen;
+     event.getByLabel(edm::InputTag("edmNtupleMxGen","Mx"),edmNtupleMxGen);
+ 
+     eventData.MxGenNew_ = (edmNtupleMxGen.isValid() && edmNtupleMxGen->size()) ? (*edmNtupleMxGen)[0] : -999.;
 
      edm::Handle<std::vector<float> > edmNtupleEtaMaxGen;
      event.getByLabel(edm::InputTag("edmNtupleEtaMaxGen","etaMax"),edmNtupleEtaMaxGen);
@@ -480,21 +500,14 @@ void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Ev
      edm::Handle<std::vector<float> > edmNtupleEtaMinGen;
      event.getByLabel(edm::InputTag("edmNtupleEtaMinGen","etaMin"),edmNtupleEtaMinGen);
 
-     eventData.xiGenPlus_ = xigen_plus;
-     eventData.xiGenMinus_ = xigen_minus;
-     eventData.MxGen_ = genAllParticles.mass();
-     eventData.sumEnergyHEPlusGen_ = genAllParticlesHEPlus.energy();
-     eventData.sumEnergyHEMinusGen_ = genAllParticlesHEMinus.energy();
-     eventData.sumEnergyHFPlusGen_ = genAllParticlesHFPlus.energy();
-     eventData.sumEnergyHFMinusGen_ = genAllParticlesHFMinus.energy();
-     eventData.etaMaxGen_ = genEtaMax.eta();
-     eventData.etaMinGen_ = genEtaMin.eta();
-     eventData.etaMaxGenNew_ = (*edmNtupleEtaMaxGen)[0];
-     eventData.etaMinGenNew_ = (*edmNtupleEtaMinGen)[0];
+     eventData.etaMaxGenNew_ = (edmNtupleEtaMaxGen.isValid() && edmNtupleEtaMaxGen->size()) ? (*edmNtupleEtaMaxGen)[0] : -999.;
+     eventData.etaMinGenNew_ = (edmNtupleEtaMinGen.isValid() && edmNtupleEtaMinGen->size()) ? (*edmNtupleEtaMinGen)[0] : -999.;
   } else{
      eventData.xiGenPlus_ = -1.;
      eventData.xiGenMinus_ = -1.;
      eventData.MxGen_ = -1.;
+     eventData.MxGenNew_ = -1.;
+     eventData.MxGenRange_ = -1.;
      eventData.sumEnergyHEPlusGen_ = -1.;
      eventData.sumEnergyHEMinusGen_ = -1.;
      eventData.sumEnergyHFPlusGen_ = -1.;

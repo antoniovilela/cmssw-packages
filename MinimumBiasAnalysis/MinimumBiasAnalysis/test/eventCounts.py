@@ -9,7 +9,8 @@ def eventCounts(fileName):
              'countsVertexFilter',
              'countsBeamHaloVeto',
              'countsFilterScraping',
-             'countsHBHENoiseFilter']
+             'countsHBHENoiseFilter',
+             'countsEtaMaxFilter']
 
     file = ROOT.TFile(fileName,'READ')
 

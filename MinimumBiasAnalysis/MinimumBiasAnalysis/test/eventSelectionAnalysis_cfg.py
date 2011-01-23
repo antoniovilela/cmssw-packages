@@ -101,7 +101,9 @@ process.rereco_step = cms.Path(process.caloTowersRec
 if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.recoSequence)
 if config.runOnMC:
-    process.gen_step = cms.Path(process.genChargedParticles+process.genStableParticles*
+    process.gen_step = cms.Path(process.genChargedParticles+
+                                process.genProtonDissociative*process.edmNtupleMxGen+
+                                process.genStableParticles*
                                 process.etaMaxGen+process.etaMinGen*
                                 process.edmNtupleEtaMaxGen+process.edmNtupleEtaMinGen)
 
@@ -117,6 +119,7 @@ process.minimumBiasTTreeAnalysisVertexFilter = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisBeamHaloVeto = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisFilterScraping = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisHBHENoiseFilter = minimumBiasTTreeAnalysis.clone()
+process.minimumBiasTTreeAnalysisEtaMaxFilter = minimumBiasTTreeAnalysis.clone()
 
 process.load('Utilities.AnalysisTools.trackHistos_cfi')
 process.trackHistos.src = config.trackTagName
@@ -142,6 +145,7 @@ process.countsVertexFilter = countsAnalyzer.clone()
 process.countsBeamHaloVeto = countsAnalyzer.clone()
 process.countsFilterScraping = countsAnalyzer.clone()
 process.countsHBHENoiseFilter = countsAnalyzer.clone()
+process.countsEtaMaxFilter = countsAnalyzer.clone()
 
 process.countEvents_step = cms.Path(    process.countsAll +
                                         #process.minimumBiasTTreeAnalysisAll +
@@ -165,7 +169,10 @@ process.countEvents_step = cms.Path(    process.countsAll +
                                         process.minimumBiasTTreeAnalysisFilterScraping +
                                     process.HBHENoiseFilter +
                                         process.countsHBHENoiseFilter +
-                                        process.minimumBiasTTreeAnalysisHBHENoiseFilter)  
+                                        process.minimumBiasTTreeAnalysisHBHENoiseFilter +
+                                    process.etaMaxFilter +
+                                        process.countsEtaMaxFilter +
+                                        process.minimumBiasTTreeAnalysisEtaMaxFilter)  
 
 process.countEvents_step.replace(process.primaryVertexFilter,process.primaryVertexFilterLoose)
 

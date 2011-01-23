@@ -17,7 +17,7 @@ etaMinPFCands.src = "pfCandidateNoiseThresholds"
 from Utilities.AnalysisSequences.genChargedParticles_cfi import genChargedParticles
 from Utilities.AnalysisSequences.genStableParticles_cfi import genStableParticles
 genStableParticles.cut = 'status = 1 & ( ( pdgId != 2212 ) | ( pdgId == 2212 & abs(pz) < %f ) )' % (0.75*3500.0)
-#genStableParticles.cut = 'status = 1 & ( pdgId != 9902210 )'
+genProtonDissociative = genStableParticles.clone( cut = 'pdgId == 9902210' )
 etaMaxGen = etaMaxPFCands.clone(src = "genStableParticles")
 etaMinGen = etaMinPFCands.clone(src = "genStableParticles")
 
@@ -29,8 +29,19 @@ edmNtupleEtaMin = edmNtupleCandView.clone(src = "etaMinPFCands")
 edmNtupleEtaMin.variables = cms.VPSet( cms.PSet( tag = cms.untracked.string("etaMin"),
                                                  quantity = cms.untracked.string("eta") ) )
 
+edmNtupleMxGen = edmNtupleCandView.clone(src = "genProtonDissociative")
+edmNtupleMxGen.variables = cms.VPSet( cms.PSet( tag = cms.untracked.string("Mx"),
+                                                quantity = cms.untracked.string("mass") ) )
 edmNtupleEtaMaxGen = edmNtupleEtaMax.clone(src = "etaMaxGen")
 edmNtupleEtaMinGen = edmNtupleEtaMin.clone(src = "etaMinGen")
+
+from Utilities.AnalysisSequences.etaMaxSelector_cfi import etaMaxSelector as etaMaxFilter
+etaMaxFilter.src = "etaMaxPFCands"
+from Utilities.AnalysisSequences.etaMinSelector_cfi import etaMinSelector as etaMinFilter
+etaMinFilter.src = "etaMinPFCands"
+
+etaMaxGenFilter = etaMaxFilter.clone(src = "etaMaxGen")
+etaMinGenFilter = etaMinFilter.clone(src = "etaMinGen")
 
 ############
 primaryVertexFilterLoose = primaryVertexFilter.clone()

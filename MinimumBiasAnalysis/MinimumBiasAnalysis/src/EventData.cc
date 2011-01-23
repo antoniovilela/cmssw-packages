@@ -68,6 +68,8 @@ namespace minimumBiasAnalysis {
      data.Branch("EPlusPzFromPFCands",&eventData.EPlusPzFromPFCands_,"EPlusPzFromPFCands/D");
      data.Branch("EMinusPzFromPFCands",&eventData.EMinusPzFromPFCands_,"EMinusPzFromPFCands/D");
      data.Branch("MxGen",&eventData.MxGen_,"MxGen/D");
+     data.Branch("MxGenNew",&eventData.MxGenNew_,"MxGenNew/D");
+     data.Branch("MxGenRange",&eventData.MxGenRange_,"MxGenRange/D");
      data.Branch("MxFromTowers",&eventData.MxFromTowers_,"MxFromTowers/D");
      //data.Branch("MxFromJets",&eventData.MxFromJets_,"MxFromJets/D");
      data.Branch("MxFromPFCands",&eventData.MxFromPFCands_,"MxFromPFCands/D");
@@ -154,6 +156,8 @@ namespace minimumBiasAnalysis {
      data.SetBranchAddress("EPlusPzFromPFCands",&eventData.EPlusPzFromPFCands_);
      data.SetBranchAddress("EMinusPzFromPFCands",&eventData.EMinusPzFromPFCands_);
      data.SetBranchAddress("MxGen",&eventData.MxGen_);
+     data.SetBranchAddress("MxGenNew",&eventData.MxGenNew_);
+     data.SetBranchAddress("MxGenRange",&eventData.MxGenRange_); 
      data.SetBranchAddress("MxFromTowers",&eventData.MxFromTowers_);
      //data.SetBranchAddress("MxFromJets",&eventData.MxFromJets_);
      data.SetBranchAddress("MxFromPFCands",&eventData.MxFromPFCands_);

@@ -32,6 +32,9 @@ void scaleByWidthTrackHistos(std::string const& fileName, std::string const& dir
   variables.push_back("TrackPt");
   variables.push_back("NTracks");
   variables.push_back("TrackPtSum");
+  variables.push_back("TrackPtVarBin");
+  variables.push_back("NTracksVarBin");
+  variables.push_back("TrackPtSumVarBin");
 
   scaleByWidthHistos(fileName,dirName,variables,saveHistos);
 }

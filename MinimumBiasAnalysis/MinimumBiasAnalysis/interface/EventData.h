@@ -70,6 +70,8 @@ namespace minimumBiasAnalysis {
      double EPlusPzFromPFCands_;
      double EMinusPzFromPFCands_;
      double MxGen_;
+     double MxGenNew_; 
+     double MxGenRange_;
      double MxFromTowers_;
      //double MxFromJets_;
      double MxFromPFCands_;

@@ -17,6 +17,7 @@ enum calo_region_t {Barrel,Endcap,Transition,Forward};
 
 void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                                  math::XYZTLorentzVector& genAllParticles,
+                                                                 math::XYZTLorentzVector& genAllParticlesInRange,
                                                                  math::XYZTLorentzVector& genAllParticlesHEPlus,
                                                                  math::XYZTLorentzVector& genAllParticlesHEMinus,
                                                                  math::XYZTLorentzVector& genAllParticlesHFPlus,
@@ -30,6 +31,7 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    const reco::GenParticleCollection& genParticles = *genParticlesCollection;*/
 
    math::XYZTLorentzVector allGenParticles(0.,0.,0.,0.);
+   math::XYZTLorentzVector allGenParticlesInRange(0.,0.,0.,0.);
    math::XYZTLorentzVector allGenParticlesHEPlus(0.,0.,0.,0.);
    math::XYZTLorentzVector allGenParticlesHEMinus(0.,0.,0.,0.);
    math::XYZTLorentzVector allGenParticlesHFPlus(0.,0.,0.,0.);
@@ -37,26 +39,37 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    
    reco::GenParticleCollection::const_iterator proton1 = genParticles.end();
    reco::GenParticleCollection::const_iterator proton2 = genParticles.end();
+   for(reco::GenParticleCollection::const_iterator genpart = genParticles.begin(); genpart != genParticles.end();
+ ++genpart){
+      if( genpart->status() != 1 ) continue;
+      if( genpart->pdgId() != 2212 ) continue;
+ 
+      if( ( genpart->pz() > 0.50*Ebeam ) && ( ( proton1 == genParticles.end() ) ||
+                                              ( genpart->pz() > proton1->pz() ) ) ) proton1 = genpart;
+      if( ( genpart->pz() < -0.50*Ebeam ) && ( ( proton2 == genParticles.end() ) ||
+                                               ( genpart->pz() < proton2->pz() ) ) ) proton2 = genpart;
+   }
+
    reco::GenParticleCollection::const_iterator etaMaxParticle = genParticles.end();
    reco::GenParticleCollection::const_iterator etaMinParticle = genParticles.end(); 
    for(reco::GenParticleCollection::const_iterator genpart = genParticles.begin(); genpart != genParticles.end(); ++genpart){
       if(genpart->status() != 1) continue;
       //histosTH1F["EnergyVsEta"]->Fill(genpart->eta(),genpart->energy());      
 
-      double pz = genpart->pz();
+      /*double pz = genpart->pz();
       if( (proton1 == genParticles.end()) &&
-          (genpart->pdgId() == 2212) && (pz > 0.75*Ebeam) ) proton1 = genpart;
+          (genpart->pdgId() == 2212) && (pz > 0.50*Ebeam) ) proton1 = genpart;
       if( (proton2 == genParticles.end()) &&
-          (genpart->pdgId() == 2212) && (pz < -0.75*Ebeam) ) proton2 = genpart;
+          (genpart->pdgId() == 2212) && (pz < -0.50*Ebeam) ) proton2 = genpart;*/
 
-      if(fabs(genpart->eta()) < 5.0) allGenParticles += genpart->p4();
+      allGenParticles += genpart->p4();
+      if(fabs(genpart->eta()) < 5.0) allGenParticlesInRange += genpart->p4();
       if( (genpart->eta() >= 1.3) && (genpart->eta() < 3.0) ) allGenParticlesHEPlus += genpart->p4();
       if( (genpart->eta() > -3.0) && (genpart->eta() <= -1.3) ) allGenParticlesHEMinus += genpart->p4();
       if( (genpart->eta() >= 3.0) && (genpart->eta() < 5.0) ) allGenParticlesHFPlus += genpart->p4();
       if( (genpart->eta() > -5.0) && (genpart->eta() <= -3.0) ) allGenParticlesHFMinus += genpart->p4(); 
 
-      //if(fabs(genpart->eta()) < 7.0){ 
-       if( (genpart != proton1) && (genpart != proton2) ){
+      if( (genpart != proton1) && (genpart != proton2) ){
          if( ( etaMaxParticle == genParticles.end() ) ||
              ( genpart->eta() > etaMaxParticle->eta() ) ) etaMaxParticle = genpart;
          if( ( etaMinParticle == genParticles.end() ) ||
@@ -65,7 +78,11 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    }
 
    // Commit
+   if( proton1 != genParticles.end() ) allGenParticles -= proton1->p4();
+   if( proton2 != genParticles.end() ) allGenParticles -= proton2->p4();
+
    genAllParticles = allGenParticles;
+   genAllParticlesInRange = allGenParticlesInRange;
    genAllParticlesHEPlus = allGenParticlesHEPlus;
    genAllParticlesHEMinus = allGenParticlesHEMinus;
    genAllParticlesHFPlus = allGenParticlesHFPlus;
