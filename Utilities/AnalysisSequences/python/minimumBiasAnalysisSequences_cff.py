@@ -25,8 +25,11 @@ from Utilities.AnalysisSequences.filterScraping_cfi import *
 
 from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import *
 
+from Utilities.AnalysisTools.hcalNoiseFilter_cfi import *
+
 from Utilities.AnalysisTools.analysisTracks_cfi import *
 
+"""
 #from PhysicsTools.RecoAlgos.recoTrackSelector_cfi import *
 #recoTrackSelector.src = "generalTracks"
 #recoTrackSelector.minRapidity = -2.4
@@ -34,38 +37,45 @@ from Utilities.AnalysisTools.analysisTracks_cfi import *
 #recoTrackSelector.ptMin = 0.5
 #recoTrackSelector.quality = ["highPurity"]
 #selectGoodTracks = recoTrackSelector
-
-#from Utilities.AnalysisSequences.leadingJets_cfi import *
-#leadingJets.src = "ak5PFJets"
-
-#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import selectTracksAssociatedToPV as tracksAssociatedToPV
-#tracksAssociatedToPV.src = "analysisTracks"
-#tracksAssociatedToPV.MaxDistanceFromVertex = 1.0
-
-#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
-#tracksOutsideJets.src = "analysisTracks" 
-#tracksOutsideJets.JetTag = "leadingJets"
-#tracksOutsideJets.JetConeSize = 0.5
-
-#from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksTransverseRegion_cfi import *
-#tracksTransverseRegion.src = "analysisTracks"
-#tracksTransverseRegion.JetTag = "leadingJets"
-
-#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.trackMultiplicity_cfi import * 
-#trackMultiplicity.TracksTag = "analysisTracks"
-#trackMultiplicityAssociatedToPV = trackMultiplicity.clone(TracksTag = "tracksAssociatedToPV")
-#trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
-#trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
-
-#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
-#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import *
-#from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromJets_cfi import *
-#xiTower.UseMETInfo = False
-#xiTower.comEnergy = 7000.0
-#xiFromCaloTowers.UseMETInfo = False
-#xiFromCaloTowers.comEnergy = 7000.0
-#xiFromJets.UseMETInfo = False
-#xiFromJets.comEnergy = 7000.0
+"""
+"""
+from Utilities.AnalysisSequences.leadingJets_cfi import *
+leadingJets.src = ""
+"""
+"""
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.selectTracksAssociatedToPV_cfi import selectTracksAssociatedToPV as tracksAssociatedToPV
+tracksAssociatedToPV.src = "analysisTracks"
+tracksAssociatedToPV.MaxDistanceFromVertex = 1.0
+"""
+"""
+from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksOutsideJets_cfi import *
+tracksOutsideJets.src = "analysisTracks" 
+tracksOutsideJets.JetTag = "leadingJets"
+tracksOutsideJets.JetConeSize = 0.5
+"""
+"""
+from ExclusiveDijetsAnalysis.ExclusiveDijetsAnalysis.tracksTransverseRegion_cfi import *
+tracksTransverseRegion.src = "analysisTracks"
+tracksTransverseRegion.JetTag = "leadingJets"
+"""
+"""
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.trackMultiplicity_cfi import * 
+trackMultiplicity.TracksTag = "analysisTracks"
+trackMultiplicityAssociatedToPV = trackMultiplicity.clone(TracksTag = "tracksAssociatedToPV")
+trackMultiplicityOutsideJets = trackMultiplicity.clone(TracksTag = "tracksOutsideJets")
+trackMultiplicityTransverseRegion = trackMultiplicity.clone(TracksTag = "tracksTransverseRegion")
+"""
+"""
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiTower_cfi import *
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromCaloTowers_cfi import *
+from DiffractiveForwardAnalysis.SingleDiffractiveWAnalysis.xiFromJets_cfi import *
+xiTower.UseMETInfo = False
+xiTower.comEnergy = 7000.0
+xiFromCaloTowers.UseMETInfo = False
+xiFromCaloTowers.comEnergy = 7000.0
+xiFromJets.UseMETInfo = False
+xiFromJets.comEnergy = 7000.0
+"""
 
 ############
 from Utilities.AnalysisTools.hcalActivitySummary_cfi import *
