@@ -1,4 +1,4 @@
-#include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/interface/TrackOutsideJetsSelector.h"
+#include "Utilities/AnalysisTools/interface/TrackOutsideJetsSelector.h"
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Framework/interface/Event.h"

@@ -1,5 +1,5 @@
-#ifndef ExclusiveDijetsAnalysis_TrackWithJetSelector_h
-#define ExclusiveDijetsAnalysis_TrackWithJetSelector_h
+#ifndef Utilities_AnalysisTools_TrackWithJetSelector_h
+#define Utilities_AnalysisTools_TrackWithJetSelector_h
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"

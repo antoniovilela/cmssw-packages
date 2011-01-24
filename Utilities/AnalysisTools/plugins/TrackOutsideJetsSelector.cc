@@ -1,7 +1,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "CommonTools/RecoAlgos/interface/TrackFullCloneSelectorBase.h"
-#include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/interface/TrackOutsideJetsSelector.h"
+#include "Utilities/AnalysisTools/interface/TrackOutsideJetsSelector.h"
 
 namespace reco { 
   namespace modules {
