@@ -31,7 +31,6 @@ HcalNoiseFilter::HcalNoiseFilter(edm::ParameterSet const& pset): loose_(true),ti
 HcalNoiseFilter::~HcalNoiseFilter() {}
 
 bool HcalNoiseFilter::filter(edm::Event& event, edm::EventSetup const& setup){
-  bool accept = false;
 
   edm::Handle<HcalNoiseSummary> noiseSummaryH;
   event.getByLabel("hcalnoise",noiseSummaryH);   
@@ -39,6 +38,7 @@ bool HcalNoiseFilter::filter(edm::Event& event, edm::EventSetup const& setup){
   bool passNoiseLoose = noiseSummaryH->passLooseNoiseFilter();
   bool passNoiseTight = noiseSummaryH->passTightNoiseFilter();
 
+  bool accept = true;
   if(loose_ && !passNoiseLoose) accept = false;
   if(tight_ && !passNoiseTight) accept = false;
   
