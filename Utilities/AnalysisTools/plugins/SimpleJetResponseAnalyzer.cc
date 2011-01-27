@@ -10,8 +10,10 @@ class SimpleJetResponseAnalyzer: public edm::EDAnalyzer
      explicit SimpleJetResponseAnalyzer(const edm::ParameterSet&);
      ~SimpleJetResponseAnalyzer();
 
-     virtual void beginJob(const edm::EventSetup&);
+     virtual void beginJob();
      virtual void analyze(const edm::Event&, const edm::EventSetup&);
+    
+    
   private:
      //edm::InputTag genJetTag_;
      edm::InputTag genToRecoJetMatchTag_;
@@ -54,7 +56,7 @@ SimpleJetResponseAnalyzer::SimpleJetResponseAnalyzer(const edm::ParameterSet& ps
 
 SimpleJetResponseAnalyzer::~SimpleJetResponseAnalyzer() {}
 
-void SimpleJetResponseAnalyzer::beginJob(const edm::EventSetup& setup){
+void SimpleJetResponseAnalyzer::beginJob(){
    edm::Service<TFileService> fs;
 
    data_ = fs->make<TTree>("data","data");
