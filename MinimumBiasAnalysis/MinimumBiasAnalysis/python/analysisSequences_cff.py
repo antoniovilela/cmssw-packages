@@ -44,15 +44,17 @@ etaMaxGenFilter = etaMaxFilter.clone(src = "etaMaxGen")
 etaMinGenFilter = etaMinFilter.clone(src = "etaMinGen")
 
 ############
-primaryVertexFilterLoose = primaryVertexFilter.clone()
-primaryVertexFilterLoose.cut = cms.string("!isFake && ndof > 2 && abs(z) <= 15 && position.Rho <= 2")
+primaryVertexFilterLooseNDOF2 = primaryVertexFilter.clone()
+primaryVertexFilterLooseNDOF2.cut = cms.string("!isFake && ndof > 2 && abs(z) <= 15 && position.Rho <= 2")
+primaryVertexFilterLooseNDOF0 = primaryVertexFilter.clone()
+primaryVertexFilterLooseNDOF0.cut = cms.string("!isFake && ndof > 0 && abs(z) <= 15 && position.Rho <= 2")
 
-offlineSelectionLoose = cms.Sequence(primaryVertexFilterLoose+filterScraping+HBHENoiseFilter)
+offlineSelectionLooseNDOF0 = cms.Sequence(primaryVertexFilterLooseNDOF0+filterScraping+HBHENoiseFilter)
 offlineSelectionNoVertex = cms.Sequence(filterScraping+HBHENoiseFilter)
 
-eventSelectionBscMinBiasORLoose = cms.Sequence(hltBscMinBiasOR+offlineSelectionLoose)
+eventSelectionBscMinBiasORLooseNDOF0 = cms.Sequence(hltBscMinBiasOR+offlineSelectionLooseNDOF0)
 eventSelectionBscMinBiasORNoVertex = cms.Sequence(hltBscMinBiasOR+offlineSelectionNoVertex)
-eventSelectionBscMinBiasORNoCollLoose = cms.Sequence(hltBscMinBiasORNoColl+offlineSelectionLoose)
+eventSelectionBscMinBiasORNoCollLooseNDOF0 = cms.Sequence(hltBscMinBiasORNoColl+offlineSelectionLooseNDOF0)
 eventSelectionBscMinBiasORNoCollNoVertex = cms.Sequence(hltBscMinBiasORNoColl+offlineSelectionNoVertex)
 
 tracks = cms.Sequence(analysisTracks)

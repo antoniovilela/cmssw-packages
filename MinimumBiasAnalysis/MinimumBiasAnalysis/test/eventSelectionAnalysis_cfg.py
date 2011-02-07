@@ -22,8 +22,8 @@ config.trackTagName = 'analysisTracks'
 config.triggerResultsProcessNameMC = inputOptions.hltProcessNameMC
 config.instLumiROOTFile = 'lumibylsXing_132440-137028_June14thReReco_Collisions10_JSON_v2_sub_132440.root'
 
-if config.runOnMC: config.fileNames = ['file:/storage1/antoniov/data1/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
-else: config.fileNames = ['file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root']
+if config.runOnMC: config.fileNames = ['file:/storage2/antoniov/data1/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
+else: config.fileNames = ['file:/storage1/antoniov/data1/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root']
 
 process = cms.Process("Analysis")
 
@@ -118,7 +118,7 @@ process.minimumBiasTTreeAnalysisBscOr = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisVertexFilter = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisBeamHaloVeto = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisFilterScraping = minimumBiasTTreeAnalysis.clone()
-process.minimumBiasTTreeAnalysisHBHENoiseFilter = minimumBiasTTreeAnalysis.clone()
+process.minimumBiasTTreeAnalysisHcalNoiseFilter = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisEtaMaxFilter = minimumBiasTTreeAnalysis.clone()
 
 process.load('Utilities.AnalysisTools.trackHistos_cfi')
@@ -144,7 +144,7 @@ process.countsBscOr = countsAnalyzer.clone()
 process.countsVertexFilter = countsAnalyzer.clone()
 process.countsBeamHaloVeto = countsAnalyzer.clone()
 process.countsFilterScraping = countsAnalyzer.clone()
-process.countsHBHENoiseFilter = countsAnalyzer.clone()
+process.countsHcalNoiseFilter = countsAnalyzer.clone()
 process.countsEtaMaxFilter = countsAnalyzer.clone()
 
 process.countEvents_step = cms.Path(    process.countsAll +
@@ -167,14 +167,14 @@ process.countEvents_step = cms.Path(    process.countsAll +
                                     process.filterScraping +
                                         process.countsFilterScraping + 
                                         process.minimumBiasTTreeAnalysisFilterScraping +
-                                    process.HBHENoiseFilter +
-                                        process.countsHBHENoiseFilter +
-                                        process.minimumBiasTTreeAnalysisHBHENoiseFilter +
+                                    process.HBHENoiseFilter+process.hcalNoiseFilter +
+                                        process.countsHcalNoiseFilter +
+                                        process.minimumBiasTTreeAnalysisHcalNoiseFilter +
                                     process.etaMaxFilter +
                                         process.countsEtaMaxFilter +
                                         process.minimumBiasTTreeAnalysisEtaMaxFilter)  
 
-process.countEvents_step.replace(process.primaryVertexFilter,process.primaryVertexFilterLoose)
+process.countEvents_step.replace(process.primaryVertexFilter,process.primaryVertexFilterLooseNDOF0)
 
 ###################################################################################
 

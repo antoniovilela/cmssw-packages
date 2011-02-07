@@ -7,7 +7,9 @@
 #include <string>
 #include <map>
 
-#include "fileNames_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_eventSelection-v4.C"
+//#include "fileNames_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_eventSelection-v4.C"
+//#include "fileNames_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_eventSelection-v5.C"
+#include "fileNames_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_eventSelection-v6.C"
 
 void runEventSelectionAnalysisMC(){
    gROOT->ProcessLine(".L minimumBiasTTreeAnalysis.C+");
@@ -20,13 +22,18 @@ void runEventSelectionAnalysisMC(){
    //generator_t genType = PHOJET;
    //generator_t genTune = PHOJET;
 
-   //std::string outDir = "root/7TeV/Pythia8/eventSelection";
-   //std::string outDir = "root/7TeV/Pythia8/eventSelection/doEtaMaxGenSelection";
-   //std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection";
-   //std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doEtaMaxGenSelection";
-   //std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doXiPlusSelection";
+   /*std::string outDir = "root/7TeV/Pythia8/eventSelection";
+   std::string outDir = "root/7TeV/Pythia8/eventSelection/doEtaMaxGenSelection";
+   std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection";
+   std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doEtaMaxGenSelection";
+   std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doXiPlusSelection";
    std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doEtaMaxSelection";
-   //std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doXiPlusSelection/doEtaMaxGenSelection";
+   std::string outDir = "root/7TeV/Pythia8/eventSelection/doHcalNoiseSelection/doXiPlusSelection/doEtaMaxGenSelection";*/
+
+   std::string outDir;
+   outDir = "root/7TeV/Pythia8/eventSelection-v6";
+   //outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMaxSelection_etaMax0";
+   //outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMaxSelection_etaMax1";
 
    std::vector<std::string> fileNames;
    setFileNamesPythia8(fileNames);
@@ -35,22 +42,23 @@ void runEventSelectionAnalysisMC(){
 
    std::vector<std::string> selections;
    //selections.push_back("minimumBiasTTreeAnalysisAll");
-   //selections.push_back("minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus");
+   selections.push_back("minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus");
    //selections.push_back("minimumBiasTTreeAnalysisBPTX");
-   //selections.push_back("minimumBiasTTreeAnalysisBscOr");
-   //selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
+   selections.push_back("minimumBiasTTreeAnalysisBscOr");
+   selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
    //selections.push_back("minimumBiasTTreeAnalysisBeamHaloVeto");
    //selections.push_back("minimumBiasTTreeAnalysisFilterScraping");
-   selections.push_back("minimumBiasTTreeAnalysisHBHENoiseFilter");
+   selections.push_back("minimumBiasTTreeAnalysisHcalNoiseFilter");
+   selections.push_back("minimumBiasTTreeAnalysisEtaMaxFilter");
  
    std::vector<int> processTypes;
    //processTypes.push_back(All);
    //processTypes.push_back(SD);
-   processTypes.push_back(DD);
+   //processTypes.push_back(DD);
    //processTypes.push_back(Diff);
    //processTypes.push_back(Inelastic);
-   //processTypes.push_back(SDPlus);
-   //processTypes.push_back(SDMinus);
+   processTypes.push_back(SDPlus);
+   processTypes.push_back(SDMinus);
 
    for(size_t isel = 0; isel < selections.size(); ++isel){
       std::string treeName = selections[isel] + "/data";

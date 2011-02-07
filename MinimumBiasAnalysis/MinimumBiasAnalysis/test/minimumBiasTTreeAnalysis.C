@@ -149,7 +149,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
    // Event selection
    bool doTriggerSelection = false;
-   bool doHcalNoiseSelection = true;
+   bool doHcalNoiseSelection = false;
    /*// Pre-selection
    bool doGoodVertexSelection = false;
    bool doHighQualityTracksSelection = true;*/
@@ -175,7 +175,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doXiMinusSelection = false;
    double xiMax = 0.01;
    // EtaMax
-   bool doEtaMaxSelection = true;
+   bool doEtaMaxSelection = false;
    bool doEtaMinSelection = false;
    double etaMaxMax = 0.0;
    double etaMinMin = 0.0;
