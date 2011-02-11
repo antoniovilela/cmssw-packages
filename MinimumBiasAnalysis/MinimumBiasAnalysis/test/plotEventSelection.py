@@ -60,12 +60,18 @@ def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1):
         'etaMinFromPFCandsVarBin',
         'xiPlusFromPFCands',
         'xiMinusFromPFCands',
+        'logXiPlusFromPFCands',
+        'logXiMinusFromPFCands', 
+        'logXiPlusFromPFCandsVarBin',
+        'logXiMinusFromPFCandsVarBin',
         'etaMaxGen',
         'etaMinGen',
         'xiGenPlus',
         'xiGenMinus',
         'logXiGenPlus',
-        'logXiGenMinus'
+        'logXiGenMinus',
+        'logXiGenPlusVarBin',
+        'logXiGenMinusVarBin'
     ]
 
     """

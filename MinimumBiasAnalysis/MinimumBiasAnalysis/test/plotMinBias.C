@@ -108,6 +108,23 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
       plotter.plot(variables,dirs,normFactors,drawOption);
    } else if(mode == "setDirsMCComponents"){
       setDirsMCComponents(selection,dirs,normFactors);
+      int colors[] = {kBlack,kBlue,kMagenta,kOrange,kRed};
+      int linestyles[] = {1,2,3,9,10};
+      int markerstyles[] = {1,1,1,1,1};
+      int fillcolors[] = {0,kBlue,kMagenta,kOrange,kRed};
+      int fillstyles[] = {0,3004,3006,3005,3007,3013};
+      std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
+      std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));
+      std::vector<int> histMarkerStyles = std::vector<int>(markerstyles,markerstyles + sizeof(markerstyles)/sizeof(int));
+      std::vector<int> histFillColors(fillcolors,fillcolors + sizeof(fillcolors)/sizeof(int));
+      std::vector<int> histFillStyles(fillstyles,fillstyles + sizeof(fillstyles)/sizeof(int));
+      plotter.SetLineColors(histColors);
+      plotter.SetLineStyles(histLineStyles);
+      plotter.SetFillColors(histFillColors);
+      plotter.SetFillStyles(histFillStyles);
+      plotter.SetMarkerColors(histColors);
+      plotter.SetMarkerStyles(histMarkerStyles);
+      plotter.SetRefHisto(true);
       plotter.plot(variables,dirs,normFactors,drawOption);
    } else if(mode == "setDirsDataMC"){
       setDirsDataMC(selection,dirs,normFactors);
@@ -163,18 +180,26 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
 
 void setDirsMCComponents(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
    run_range_t runRange = Data7TeV;
-   generator_t genType = PYTHIAD6T;
-   //std::string eventSelection = "minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection";
+   generator_t genType = PYTHIA8;
    std::string eventSelection = selection;
-   std::string dir = "root/7TeV/Pythia6D6T/eventSelection";   
+   //std::string dir = "root/7TeV/Pythia6D6T/eventSelection";   
+   std::string dir = "root/7TeV/Pythia8/eventSelection-v6";
 
    TFile* fileMC_All = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,All,eventSelection)).c_str());
    TH1F* h_EventSelection_All = static_cast<TH1F*>(fileMC_All->Get("EventSelection"));
    double nEvents_All = h_EventSelection_All->GetBinContent(1);
 
-   TFile* fileMC_SD = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,SD,eventSelection)).c_str());
+   /*TFile* fileMC_SD = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,SD,eventSelection)).c_str());
    TH1F* h_EventSelection_SD = static_cast<TH1F*>(fileMC_SD->Get("EventSelection"));
-   double nEvents_SD = h_EventSelection_SD->GetBinContent(1);
+   double nEvents_SD = h_EventSelection_SD->GetBinContent(1);*/
+  
+   TFile* fileMC_SDPlus = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,SDPlus,eventSelection)).c_str());
+   TH1F* h_EventSelection_SDPlus = static_cast<TH1F*>(fileMC_SDPlus->Get("EventSelection"));
+   double nEvents_SDPlus = h_EventSelection_SDPlus->GetBinContent(1);
+
+   TFile* fileMC_SDMinus = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,SDMinus,eventSelection)).c_str());
+   TH1F* h_EventSelection_SDMinus = static_cast<TH1F*>(fileMC_SDMinus->Get("EventSelection"));
+   double nEvents_SDMinus = h_EventSelection_SDMinus->GetBinContent(1);
 
    TFile* fileMC_DD = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,DD,eventSelection)).c_str());
    TH1F* h_EventSelection_DD = static_cast<TH1F*>(fileMC_DD->Get("EventSelection"));
@@ -185,11 +210,15 @@ void setDirsMCComponents(std::string const& selection, std::vector<std::pair<std
    double nEvents_QCD = h_EventSelection_QCD->GetBinContent(1);
 
    dirs.push_back(std::make_pair("PYTHIA-6 D6T",fileMC_All));
-   dirs.push_back(std::make_pair("Single-diffractive",fileMC_SD));
+   //dirs.push_back(std::make_pair("Single-diffractive",fileMC_SD));
+   dirs.push_back(std::make_pair("Single-diffractive (pp #rightarrow pX)",fileMC_SDPlus));
+   dirs.push_back(std::make_pair("Single-diffractive (pp #rightarrow Xp)",fileMC_SDMinus));
    dirs.push_back(std::make_pair("Double-diffractive",fileMC_DD));
    dirs.push_back(std::make_pair("Inel. non-diffractive",fileMC_QCD));
    normFactors.push_back(1./nEvents_All);
-   normFactors.push_back(1./nEvents_SD);
+   //normFactors.push_back(1./nEvents_SD);
+   normFactors.push_back(1./nEvents_SDPlus);
+   normFactors.push_back(1./nEvents_SDMinus);
    normFactors.push_back(1./nEvents_DD);
    normFactors.push_back(1./nEvents_QCD);
 }

@@ -8,6 +8,7 @@
         gStyle->SetMarkerStyle(23);
         gStyle->SetMarkerSize(0.3);
         gStyle->SetErrorX(0.5);
+        gStyle->SetPalette(1);
 
         gSystem->Load("libFWCoreFWLite");
         AutoLibraryLoader::enable();

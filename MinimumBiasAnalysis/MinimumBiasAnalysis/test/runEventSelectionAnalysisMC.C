@@ -33,7 +33,7 @@ void runEventSelectionAnalysisMC(){
    std::string outDir;
    outDir = "root/7TeV/Pythia8/eventSelection-v6";
    //outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMaxSelection_etaMax0";
-   //outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMaxSelection_etaMax1";
+   //outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMaxSelection_etaMax1_test";
 
    std::vector<std::string> fileNames;
    setFileNamesPythia8(fileNames);
@@ -44,17 +44,17 @@ void runEventSelectionAnalysisMC(){
    //selections.push_back("minimumBiasTTreeAnalysisAll");
    selections.push_back("minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus");
    //selections.push_back("minimumBiasTTreeAnalysisBPTX");
-   selections.push_back("minimumBiasTTreeAnalysisBscOr");
-   selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
+   //selections.push_back("minimumBiasTTreeAnalysisBscOr");
+   //selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
    //selections.push_back("minimumBiasTTreeAnalysisBeamHaloVeto");
    //selections.push_back("minimumBiasTTreeAnalysisFilterScraping");
-   selections.push_back("minimumBiasTTreeAnalysisHcalNoiseFilter");
+   //selections.push_back("minimumBiasTTreeAnalysisHcalNoiseFilter");
    selections.push_back("minimumBiasTTreeAnalysisEtaMaxFilter");
  
    std::vector<int> processTypes;
    //processTypes.push_back(All);
    //processTypes.push_back(SD);
-   //processTypes.push_back(DD);
+   processTypes.push_back(DD);
    //processTypes.push_back(Diff);
    //processTypes.push_back(Inelastic);
    processTypes.push_back(SDPlus);

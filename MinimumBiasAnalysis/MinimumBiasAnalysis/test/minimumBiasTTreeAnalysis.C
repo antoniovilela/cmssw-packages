@@ -177,8 +177,10 @@ void minimumBiasTTreeAnalysis(TTree* data,
    // EtaMax
    bool doEtaMaxSelection = false;
    bool doEtaMinSelection = false;
-   double etaMaxMax = 0.0;
+   double etaMaxMax = 1.0;
    double etaMinMin = 0.0;
+   // Xi correction factor
+   double xiCorrectionFactor = 2.0;
 
    double eventWeight = 1.0;
    //std::vector<std::pair<int,int> > selectedEvents;
@@ -349,8 +351,20 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
       double xiPlusFromPFCands = eventData.xiPlusFromPFCands_;
       double xiMinusFromPFCands = eventData.xiMinusFromPFCands_;
+      // Apply correction factor
+      xiPlusFromPFCands *= xiCorrectionFactor;
+      xiMinusFromPFCands *= xiCorrectionFactor;
+
       histosTH1F["xiPlusFromPFCands"]->Fill(xiPlusFromPFCands);
       histosTH1F["xiMinusFromPFCands"]->Fill(xiMinusFromPFCands);
+      if(xiPlusFromPFCands){
+         histosTH1F["logXiPlusFromPFCands"]->Fill( log10(xiPlusFromPFCands) );
+         histosTH1F["logXiPlusFromPFCandsVarBin"]->Fill( log10(xiPlusFromPFCands) );
+      }
+      if(xiMinusFromPFCands){
+         histosTH1F["logXiMinusFromPFCands"]->Fill( log10(xiMinusFromPFCands) );
+         histosTH1F["logXiMinusFromPFCandsVarBin"]->Fill( log10(xiMinusFromPFCands) );
+      }
 
       double EPlusPzFromTowers = eventData.EPlusPzFromTowers_;
       double EMinusPzFromTowers = eventData.EMinusPzFromTowers_;
@@ -372,23 +386,39 @@ void minimumBiasTTreeAnalysis(TTree* data,
          double xigen_minus = eventData.xiGenMinus_;
          if(xigen_plus > 0. && xigen_plus <= 0.1){
             histosTH1F["xiGenPlus"]->Fill(xigen_plus);
-            histosTH1F["logXiGenPlus"]->Fill( log10(xigen_plus) ); 
+            histosTH1F["logXiGenPlus"]->Fill( log10(xigen_plus) );
+            histosTH1F["logXiGenPlusVarBin"]->Fill( log10(xigen_plus) ); 
             histosTH1F["ResXiPlusFromTowers"]->Fill((xiPlusFromTowers - xigen_plus)/xigen_plus);
             histosTH1F["ResXiPlusFromPFCands"]->Fill((xiPlusFromPFCands - xigen_plus)/xigen_plus);
             histosTH2F["xiFromTowersVsxiGenPlus"]->Fill(xigen_plus,xiPlusFromTowers);
             histosTH2F["xiFromPFCandsVsxiGenPlus"]->Fill(xigen_plus,xiPlusFromPFCands);
             histosTH2F["xiFromTowersVslogXiGenPlus"]->Fill( log10(xigen_plus),xiPlusFromTowers );
             histosTH2F["xiFromPFCandsVslogXiGenPlus"]->Fill( log10(xigen_plus),xiPlusFromPFCands );
-            if(xiPlusFromPFCands > 0.) histosTH2F["logXiFromPFCandsVslogXiGenPlus"]->Fill( log10(xigen_plus),log10(xiPlusFromPFCands) );
+            if(xiPlusFromPFCands > 0.){
+               histosTH2F["logXiFromPFCandsVslogXiGenPlus"]->Fill( log10(xigen_plus),log10(xiPlusFromPFCands) );
+               bool sameBin = ( histosTH1F["logXiPlusFromPFCands"]->FindBin(log10(xiPlusFromPFCands)) == histosTH1F["logXiGenPlus"]->FindBin(log10(xigen_plus)) );
+               if(sameBin) histosTH1F["logXiFromPFCandsANDXiGenPlus"]->Fill(log10(xigen_plus)); 
+
+               bool sameBinVarBin = ( histosTH1F["logXiPlusFromPFCandsVarBin"]->FindBin(log10(xiPlusFromPFCands)) == histosTH1F["logXiGenPlusVarBin"]->FindBin(log10(xigen_plus)) );
+               if(sameBinVarBin) histosTH1F["logXiFromPFCandsANDXiGenPlusVarBin"]->Fill(log10(xigen_plus));  
+            }
          }
          if(xigen_minus > 0. && xigen_minus <= 0.1){
             histosTH1F["xiGenMinus"]->Fill(xigen_minus);
             histosTH1F["logXiGenMinus"]->Fill( log10(xigen_minus) );
+            histosTH1F["logXiGenMinusVarBin"]->Fill( log10(xigen_minus) );
             histosTH1F["ResXiMinusFromTowers"]->Fill((xiMinusFromTowers - xigen_minus)/xigen_minus);
             histosTH1F["ResXiMinusFromPFCands"]->Fill((xiMinusFromPFCands - xigen_minus)/xigen_minus);
             histosTH2F["xiFromTowersVslogXiGenMinus"]->Fill( log10(xigen_minus),xiMinusFromTowers );
             histosTH2F["xiFromPFCandsVslogXiGenMinus"]->Fill( log10(xigen_minus),xiMinusFromPFCands );
-            if(xiMinusFromPFCands > 0.) histosTH2F["logXiFromPFCandsVslogXiGenMinus"]->Fill( log10(xigen_minus),log10(xiMinusFromPFCands) );
+            if(xiMinusFromPFCands > 0.){
+               histosTH2F["logXiFromPFCandsVslogXiGenMinus"]->Fill( log10(xigen_minus),log10(xiMinusFromPFCands) );
+               bool sameBin = ( histosTH1F["logXiMinusFromPFCands"]->FindBin(log10(xiMinusFromPFCands)) == histosTH1F["logXiGenMinus"]->FindBin(log10(xigen_minus)) );
+               if(sameBin) histosTH1F["logXiFromPFCandsANDXiGenMinus"]->Fill(log10(xigen_minus));
+
+               bool sameBinVarBin = ( histosTH1F["logXiMinusFromPFCandsVarBin"]->FindBin(log10(xiMinusFromPFCands)) == histosTH1F["logXiGenMinusVarBin"]->FindBin(log10(xigen_minus)) );
+               if(sameBinVarBin) histosTH1F["logXiFromPFCandsANDXiGenMinusVarBin"]->Fill(log10(xigen_minus)); 
+            }
          }
       }
 
