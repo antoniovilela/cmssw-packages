@@ -96,7 +96,7 @@ hltBscMinBiasORNoColl = cms.Sequence(l1NoCollBscOr + hltBscMinBiasORBptxPlusORMi
 hltBscMinBiasORBPTXOR = cms.Sequence(l1NoBPTXBscOr + hltBscMinBiasORBptxPlusORMinusFilter)
 
 #preSelection = cms.Sequence()
-offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping+HBHENoiseFilter)
+offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping+HBHENoiseFilter+hcalNoiseFilter)
 eventSelection = cms.Sequence(offlineSelection)
 eventSelectionBPTX = cms.Sequence(bptx+offlineSelection)
 eventSelectionL1Tech4 = cms.Sequence(l1Tech4+offlineSelection)

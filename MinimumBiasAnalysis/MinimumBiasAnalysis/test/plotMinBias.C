@@ -334,13 +334,16 @@ void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair
    dirs.push_back(std::make_pair("Single-diffractive (pp #rightarrow pX)",fileMC_SDPlus));
    dirs.push_back(std::make_pair("Single-diffractive (pp #rightarrow Xp)",fileMC_SDMinus));
    dirs.push_back(std::make_pair("Double-diffractive",fileMC_DD));
+   dirs.push_back(std::make_pair("Inel. non-diffractive",fileMC_QCD));
    /*dirs.push_back(std::make_pair("MinBias PHOJET - SD",fileMC_SD));
    dirs.push_back(std::make_pair("MinBias PHOJET - DD",fileMC_DD)); 
    dirs.push_back(std::make_pair("MinBias PHOJET - Inel. non-diffractive",fileMC_QCD));*/
 
    normFactors.push_back(1.);
    normFactors.push_back(nEventsFullSel_Data/nEventsFullSel_All); 
-   normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_SD));
+   //normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_SD));
+   normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_SDPlus));
+   normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_SDMinus));
    normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_DD));
    normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_QCD));
 }

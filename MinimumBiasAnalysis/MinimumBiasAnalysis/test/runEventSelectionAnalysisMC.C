@@ -32,8 +32,8 @@ void runEventSelectionAnalysisMC(){
 
    std::string outDir;
    //outDir = "root/7TeV/Pythia8/eventSelection-v6";
-   //outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMaxSelection_etaMax1";
-   outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMinSelection_etaMin-1";
+   outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMaxSelection_etaMax1";
+   //outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMinSelection_etaMin-1";
 
    std::vector<std::string> fileNames;
    setFileNamesPythia8(fileNames);
