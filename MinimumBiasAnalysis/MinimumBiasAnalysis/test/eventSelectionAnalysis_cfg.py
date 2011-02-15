@@ -22,8 +22,10 @@ config.trackTagName = 'analysisTracks'
 config.triggerResultsProcessNameMC = inputOptions.hltProcessNameMC
 config.instLumiROOTFile = 'lumibylsXing_132440-137028_June14thReReco_Collisions10_JSON_v2_sub_132440.root'
 
-if config.runOnMC: config.fileNames = ['file:/storage2/antoniov/data1/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
-else: config.fileNames = ['file:/storage1/antoniov/data1/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root']
+if config.runOnMC:
+    if config.generator == 'Pythia8': config.fileNames = ['file:/storage2/antoniov/data1/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
+    elif config.generator == 'Pythia6': config.fileNames = ['file:/storage2/antoniov/data1/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F63DF090-6879-DF11-9E7D-0030487CDA68.root']
+else: config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root']
 
 process = cms.Process("Analysis")
 

@@ -6,7 +6,7 @@
 
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/RootTools.h"
 
-#include "fileNames_data.C"
+#include "fileNames_MinimumBias_Commissioning10-Jun14thReReco_v1_Run132605_minimumBiasAnalysisTTree-v4.C"
 
 void setFileNamesZeroBiasRun132605(std::vector<std::string>& fileNames){
    fileNames.push_back("/data1/antoniov/AnalysisResults/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO/analysisMinBias_ZeroBias_Commissioning10-Jun14thReReco_v1_Run132605_minimumBiasAnalysisTTree-v5.root");
@@ -23,27 +23,21 @@ void runMinimumBiasTTreeAnalysis(){
    //std::string rootDir = "/tmp/antoniov/root/7TeV";
    std::vector<std::string> fileNames(0);
    //setFileNamesRun132440(fileNames);
-   //setFileNamesRun132605(fileNames);
+   setFileNamesRun132605(fileNames);
    //setFileNamesRun132605V2(fileNames);
-   setFileNamesZeroBiasRun132605(fileNames);
+   //setFileNamesZeroBiasRun132605(fileNames);
  
-   //std::string outDir = "root/900GeV/NoSel";
-   //std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0";
-   //std::string outDir = "root/900GeV/SumEnergyMaxHFMinus_8_0";
-   //std::string outDir = "root/900GeV/SumEnergyMaxHFPlus_8_0_HFMinus_8_0";
-   //std::string outDir = "root/2360GeV/NoSel";
-   //std::string outDir = "root/2360GeV/SumEnergyMaxHFPlus_8_0";
-   //std::string outDir = "root/2360GeV/SumEnergyMaxHFMinus_8_0";
-   //std::string outDir = "root/7TeV/Data/Run132440/SumEnergyMaxHFPlus_8_0";
-   //std::string outDir = "root/7TeV/Data/Run132605";
-   std::string outDir = "root/7TeV/ZeroBias/Run132605";
+   std::string outDir = "root/7TeV/Data/Run132605/minimumBiasAnalysisTTree-v4";
+   //std::string outDir = "root/7TeV/ZeroBias/Run132605";
    bool verbose = false;
 
    /*std::string fileName = rootDir + "/";
    fileName += getTTreeFileName(runRange);*/
 
    std::vector<std::string> selections;
-   //selections.push_back("eventSelectionBscMinBiasOR");
+   selections.push_back("eventSelectionBscMinBiasOR");
+   selections.push_back("eventSelectionBscMinBiasOREtaMaxFilter");
+   selections.push_back("eventSelectionBscMinBiasOREtaMinFilter");
    /*selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale090_EnergyScaleFactorHCAL_0_9");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale092_EnergyScaleFactorHCAL_0_92");
    selections.push_back("eventSelectionBscMinBiasOR_ApplyEnergyScaleHCAL_True_HCALTowerSummaryTag_hcalActivitySummaryScale095_EnergyScaleFactorHCAL_0_95");
@@ -57,10 +51,10 @@ void runMinimumBiasTTreeAnalysis(){
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHF_8_0");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_1_6_EnergyThresholdHB_1_2");
    selections.push_back("eventSelectionBscMinBiasOR_EnergyThresholdHE_2_4_EnergyThresholdHB_1_8");*/
-   //selections.push_back("eventSelection");
-   //selections.push_back("eventSelectionL1Tech4");
+   /*selections.push_back("eventSelection");
+   selections.push_back("eventSelectionL1Tech4");
    selections.push_back("eventSelectionBPTX");
-   /*selections.push_back("eventSelectionBscMinBiasORNoColl");
+   selections.push_back("eventSelectionBscMinBiasORNoColl");
    selections.push_back("eventSelectionBscMinBiasORBPTXOR");*/
    /*selections.push_back("eventSelectionBscMinBiasORHFVetoPlus");
    selections.push_back("eventSelectionBscMinBiasORHFVetoMinus");

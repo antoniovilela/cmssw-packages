@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 class config: pass
 config.verbose = True
 config.writeEdmOutput = False
-config.runOnMC = True
+config.runOnMC = False
 config.globalTagNameData = 'GR_R_36X_V12A::All'
 config.globalTagNameMC = 'START36_V10::All'
 config.outputEdmFile = '/tmp/antoniov/minimumBias.root'
@@ -15,11 +15,15 @@ config.trackAnalyzerName = 'trackHistoAnalyzer'
 #config.trackTagName = 'selectGoodTracks'
 config.trackTagName = 'analysisTracks'
 config.generator = 'Pythia6'
-config.varyAttributes = True
-config.runOfflineOnly = True
-config.runNoColl = False
+config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
+config.varyAttributes = False
+config.runOfflineOnly = False
+config.runNoColl = True
 config.runBPTX = False
-config.runHCALFilter = True
+config.runHCALFilter = False
+config.runEtaMaxFilter = True
+
+config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root']
 
 process = cms.Process("Analysis")
 
@@ -31,12 +35,10 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-        #'file:/data1/antoniov/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root'
-        #'file:/data1/antoniov/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO_6AF419E4-E17B-DF11-AEB6-0026189437FC.root'
-        'file:/data1/antoniov/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F63DF090-6879-DF11-9E7D-0030487CDA68.root'
-    )
+    fileNames = cms.untracked.vstring()
 )
+process.source.fileNames = config.fileNames
+
 # Import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
@@ -62,6 +64,7 @@ process.TFileService = cms.Service("TFileService",
 ###################################################################################
 # HCAL reflagging
 # HF RecHit reflagger -- specify type of HF cleaning to use
+"""
 from Utilities.AnalysisTools.addHcalReflagging import addHFReflagging,addHBHEReflagging
 # Adds hfrecoReflagged
 reflagVersion = None
@@ -80,7 +83,7 @@ if config.verbose:
     print "These are the severity levels for the various rechit flags:"
     print "(Severity > 10 causes rechit to be ignored by CaloTower maker)"
     for i in process.hcalRecAlgos.SeverityLevels: print i
-
+"""
 ###################################################################################
 
 if not config.runOnMC:
@@ -95,39 +98,51 @@ from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
 process.recoSequence = cms.Sequence(process.tracks*process.pfCandidates*process.edmDump)
 if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
+"""
 process.reflagging_step = cms.Path(process.hfrecoReflagged+process.hbherecoReflagged)
 process.rereco_step = cms.Path(process.caloTowersRec
                                *(process.recoJets*process.recoJetIds+process.recoTrackJets)
                                *process.recoJetAssociations
                                *process.metreco
                                ) # re-reco jets and met
-
+"""
 process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
 if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
-process.reco_step = cms.Path(process.eventSelection+process.recoSequence)
+process.reco_step = cms.Path(process.recoSequence)
 if config.runOnMC:
-    process.gen_step = cms.Path(process.genChargedParticles+process.genStableParticles*
+    process.gen_step = cms.Path(process.genChargedParticles+
+                                process.genProtonDissociative*process.edmNtupleMxGen+
+                                process.genStableParticles*
                                 process.etaMaxGen+process.etaMinGen*
                                 process.edmNtupleEtaMaxGen+process.edmNtupleEtaMinGen)
 
-# Path for event counting  
+# Path for event counting
 process.countsAll = countsAnalyzer.clone()
-process.countsL1CollBscOr = countsAnalyzer.clone()
 process.countshltBscMinBiasORBptxPlusORMinus = countsAnalyzer.clone()
+process.countsBPTX = countsAnalyzer.clone()
+process.countsBscOr = countsAnalyzer.clone()
 process.countsVertexFilter = countsAnalyzer.clone()
+process.countsBeamHaloVeto = countsAnalyzer.clone()
 process.countsFilterScraping = countsAnalyzer.clone()
-process.countsHBHENoiseFilter = countsAnalyzer.clone()
+process.countsHcalNoiseFilter = countsAnalyzer.clone()
+process.countsEtaMaxFilter = countsAnalyzer.clone()  
 process.countEvents_step = cms.Path(process.countsAll +
-                                    process.l1CollBscOr +
-                                    process.countsL1CollBscOr +
                                     process.hltBscMinBiasORBptxPlusORMinusFilter +
                                     process.countshltBscMinBiasORBptxPlusORMinus +
+                                    process.bptx +
+                                    process.countsBPTX + 
+                                    process.bscOr +
+                                    process.countsBscOr +
                                     process.primaryVertexFilter +
-                                    process.countsVertexFilter +  
+                                    process.countsVertexFilter +
+                                    process.beamHaloVeto +
+                                    process.countsBeamHaloVeto +
                                     process.filterScraping +
-                                    process.countsFilterScraping + 
-                                    process.HBHENoiseFilter +
-                                    process.countsHBHENoiseFilter)  
+                                    process.countsFilterScraping +
+                                    process.HBHENoiseFilter+process.hcalNoiseFilter +
+                                    process.countsHcalNoiseFilter +
+                                    process.etaMaxFilter +
+                                    process.countsEtaMaxFilter)
 
 if config.writeEdmOutput: process.out_step = cms.EndPath(process.output)
 
@@ -137,9 +152,11 @@ if config.writeEdmOutput: process.out_step = cms.EndPath(process.output)
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
 process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2.
 process.minimumBiasTTreeAnalysis.TrackTag = config.trackTagName
+"""
 process.minimumBiasTTreeAnalysisNoCleaning = process.minimumBiasTTreeAnalysis.clone(
     CaloTowerTag = cms.InputTag("towerMaker::RECO")
 )
+"""
 
 process.load('Utilities.AnalysisTools.trackHistos_cfi')
 process.trackHistos.src = config.trackTagName
@@ -174,7 +191,7 @@ if config.runOnMC:
 from Utilities.PyConfigTools.analysisTools import *
 
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR')
-makeAnalysis(process,'minimumBiasTTreeAnalysisNoCleaning','eventSelectionBscMinBiasOR')
+#makeAnalysis(process,'minimumBiasTTreeAnalysisNoCleaning','eventSelectionBscMinBiasOR')
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR')
 
 if config.varyAttributes:
@@ -189,7 +206,11 @@ if config.runBPTX:
 
 if config.runNoColl:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORNoColl')
-    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORBPTXOR')
+    #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORBPTXOR')
+
+if config.runEtaMaxFilter:
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMaxFilter')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMinFilter')
 
 if config.runHCALFilter:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORHFVetoPlus')
@@ -220,6 +241,9 @@ if config.runHCALFilter:
 
 # Add MC-specific paths
 # ...
+if config.switchPVFilter:
+    from Utilities.PyConfigTools.replaceInPaths import replaceInPaths
+    replaceInPaths(process,'primaryVertexFilter','primaryVertexFilterLooseNDOF0')
 
 if config.runOnMC:
     from Utilities.PyConfigTools.removeFromPaths import removeFromPaths

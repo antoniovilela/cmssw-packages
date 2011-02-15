@@ -57,6 +57,11 @@ eventSelectionBscMinBiasORNoVertex = cms.Sequence(hltBscMinBiasOR+offlineSelecti
 eventSelectionBscMinBiasORNoCollLooseNDOF0 = cms.Sequence(hltBscMinBiasORNoColl+offlineSelectionLooseNDOF0)
 eventSelectionBscMinBiasORNoCollNoVertex = cms.Sequence(hltBscMinBiasORNoColl+offlineSelectionNoVertex)
 
+eventSelectionBscMinBiasOREtaMaxFilter = cms.Sequence(eventSelectionBscMinBiasOR+etaMaxFilter)
+eventSelectionBscMinBiasORLooseNDOF0EtaMaxFilter = cms.Sequence(eventSelectionBscMinBiasORLooseNDOF0+etaMaxFilter)
+eventSelectionBscMinBiasOREtaMinFilter = cms.Sequence(eventSelectionBscMinBiasOR+etaMinFilter)
+eventSelectionBscMinBiasORLooseNDOF0EtaMinFilter = cms.Sequence(eventSelectionBscMinBiasORLooseNDOF0+etaMinFilter)
+
 tracks = cms.Sequence(analysisTracks)
 pfCandidates = cms.Sequence(pfCandidateNoiseThresholds*etaMaxPFCands+etaMinPFCands)
 edmDump = cms.Sequence(hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+

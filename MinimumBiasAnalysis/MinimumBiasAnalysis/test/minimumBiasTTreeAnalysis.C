@@ -323,9 +323,11 @@ void minimumBiasTTreeAnalysis(TTree* data,
       histosTH1F["MxFromPFCands"]->Fill(MxFromPFCands);
       if(accessMCInfo){
          double MxGen = eventData.MxGen_;
-         histosTH1F["MxGen"]->Fill(MxGen);
-         histosTH1F["ResMxFromTowers"]->Fill((MxFromTowers - MxGen)/MxGen);
-         histosTH1F["ResMxFromPFCands"]->Fill((MxFromPFCands - MxGen)/MxGen);
+         double MxGenRange = eventData.MxGenRange_; 
+         //histosTH1F["MxGen"]->Fill(MxGen);
+         histosTH1F["MxGen"]->Fill(MxGenRange); 
+         histosTH1F["ResMxFromTowers"]->Fill((MxFromTowers - MxGenRange)/MxGenRange);
+         histosTH1F["ResMxFromPFCands"]->Fill((MxFromPFCands - MxGenRange)/MxGenRange);
       }
 
       // Jets
@@ -381,10 +383,26 @@ void minimumBiasTTreeAnalysis(TTree* data,
       histosTH1F["EMinusPzFromPFCands"]->Fill(EMinusPzFromPFCands);
 
       if(accessMCInfo){
-         // xi <= 0.1
+         /*// xi <= 0.1
          double xigen_plus = eventData.xiGenPlus_;
-         double xigen_minus = eventData.xiGenMinus_;
-         if(xigen_plus > 0. && xigen_plus <= 0.1){
+         double xigen_minus = eventData.xiGenMinus_;*/
+         double xigen_plus = -1.;
+         double xigen_minus = -1.;  
+         double xi_gen = (eventData.MxGenNew_*eventData.MxGenNew_);
+         xi_gen /= 7000.*7000.;
+         std::vector<int> procIdsSDPlus,procIdsSDMinus;
+         if(genType == PYTHIA){
+            getSelectedProcIdsPYTHIA(SDPlus,procIdsSDPlus);
+            getSelectedProcIdsPYTHIA(SDMinus,procIdsSDMinus);
+         } else if(genType == PYTHIA8){
+            getSelectedProcIdsPYTHIA8(SDPlus,procIdsSDPlus);
+            getSelectedProcIdsPYTHIA8(SDMinus,procIdsSDMinus);
+         }
+         // SDPlus   
+         if( eventData.processId_ == *(procIdsSDPlus.begin()) )  xigen_plus = xi_gen;
+         if( eventData.processId_ == *(procIdsSDMinus.begin()) ) xigen_minus = xi_gen;
+         //if(xigen_plus > 0. && xigen_plus <= 0.1){
+         if(xigen_plus > 0.){ 
             histosTH1F["xiGenPlus"]->Fill(xigen_plus);
             histosTH1F["logXiGenPlus"]->Fill( log10(xigen_plus) );
             histosTH1F["logXiGenPlusVarBin"]->Fill( log10(xigen_plus) ); 
@@ -403,7 +421,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
                if(sameBinVarBin) histosTH1F["logXiFromPFCandsANDXiGenPlusVarBin"]->Fill(log10(xigen_plus));  
             }
          }
-         if(xigen_minus > 0. && xigen_minus <= 0.1){
+         //if(xigen_minus > 0. && xigen_minus <= 0.1){
+         if(xigen_minus > 0.){ 
             histosTH1F["xiGenMinus"]->Fill(xigen_minus);
             histosTH1F["logXiGenMinus"]->Fill( log10(xigen_minus) );
             histosTH1F["logXiGenMinusVarBin"]->Fill( log10(xigen_minus) );

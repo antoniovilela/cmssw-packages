@@ -44,11 +44,11 @@ void runEventSelectionAnalysisMC(){
    //selections.push_back("minimumBiasTTreeAnalysisAll");
    selections.push_back("minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus");
    //selections.push_back("minimumBiasTTreeAnalysisBPTX");
-   //selections.push_back("minimumBiasTTreeAnalysisBscOr");
-   //selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
+   selections.push_back("minimumBiasTTreeAnalysisBscOr");
+   selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
    //selections.push_back("minimumBiasTTreeAnalysisBeamHaloVeto");
    //selections.push_back("minimumBiasTTreeAnalysisFilterScraping");
-   //selections.push_back("minimumBiasTTreeAnalysisHcalNoiseFilter");
+   selections.push_back("minimumBiasTTreeAnalysisHcalNoiseFilter");
    selections.push_back("minimumBiasTTreeAnalysisEtaMaxFilter");
  
    std::vector<int> processTypes;
