@@ -51,6 +51,10 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    variables.push_back("sumEnergyHFMinusVarBin_dist");
    variables.push_back("xiPlusFromPFCands_dist");
    variables.push_back("xiMinusFromPFCands_dist");
+   variables.push_back("logXiPlusFromPFCands_dist");
+   variables.push_back("logXiMinusFromPFCands_dist");
+   variables.push_back("logXiPlusFromPFCandsVarBin_dist");
+   variables.push_back("logXiMinusFromPFCandsVarBin_dist");
    variables.push_back("EPlusPzFromPFCands_dist");
    variables.push_back("EMinusPzFromPFCands_dist");
    variables.push_back("MxFromPFCands_dist");
@@ -150,10 +154,10 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
       /*int colors[] = {kBlue,kOrange,kRed};
       int linestyles[] = {1,9,10};
       int markerstyles[] = {1,1,1};*/
-      int colors[] = {kBlack,kBlack,kBlue,kOrange,kRed};
-      int linestyles[] = {1,1,2,9,10};
-      int markerstyles[] = {20,1,1,1,1};
-      int fillcolors[] = {0,0,kBlue,kOrange,kRed};
+      int colors[] = {kBlack,kBlack,kBlue,kMagenta,kOrange,kRed};
+      int linestyles[] = {1,1,2,9,10,12};
+      int markerstyles[] = {20,1,1,1,1,1};
+      int fillcolors[] = {0,0,kBlue,kMagenta,kOrange,kRed};
       int fillstyles[] = {0,0,3004,3006,3005,3007,3013};
       std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
       std::vector<int> histLineStyles(linestyles,linestyles + sizeof(linestyles)/sizeof(int));

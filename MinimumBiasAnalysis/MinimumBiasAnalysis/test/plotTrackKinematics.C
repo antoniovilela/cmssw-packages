@@ -11,6 +11,8 @@
 #include "Utilities/PlottingTools/interface/Plotter.h"
 
 #include <iostream>
+#include <algorithm>
+#include <functional>
 #include <vector>
 #include <string>
 
@@ -20,7 +22,7 @@ void setDirsDataMCTunes(std::string const&, std::vector<std::pair<std::string,TD
 void setDirsDataMCMatBudget(std::string const&, std::vector<std::pair<std::string,TDirectory*> >&, std::vector<double>&);
 void setDirsDataVsSumEHF(std::vector<std::pair<std::string,TDirectory*> >&, std::vector<double>&);
 
-void plot(std::string const& eventSelection = "", std::string const& mode = "setDirsDataMC", const char* drawOption = ""){
+void plot(std::string const& eventSelection = "", std::string const& mode = "setDirsDataMC", const char* drawOption = "", int rebin = 1){
 
    std::vector<std::string> variables;
    variables.push_back("TrackEta_dist");
@@ -69,7 +71,14 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
    plotter.SetVerbose(true);
    plotter.SetRefHisto(true);
    plotter.SetStats(false);
-   //plotter.SetRebin(rebin);
+   plotter.SetRebin(rebin);
+   // Assume distributions normalized by bin width
+   std::vector<double> normFactorsRebin;
+   normFactorsRebin.resize(normFactors.size());
+   std::transform(normFactors.begin(),normFactors.end(),normFactorsRebin.begin(),
+                  std::bind1st(std::multiplies<double>(),(1./rebin)));
+   for(size_t k = 0 ; k < normFactors.size(); ++k)
+      std::cout << k << ": " << normFactors[k] << "  " << normFactorsRebin[k] << std::endl;
 
    /*plotter.AddLabel("CMS Preliminary 2010");
    plotter.AddLabel("#int#font[12]{L}dt = 20 #mub^{-1}");
@@ -98,8 +107,12 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
    TLatex* latexCMSPrel = static_cast<TLatex*>(latexLumiEnergy->Clone()); 
    latexCMSPrel->SetTextAlign(11); // align left
    latexCMSPrel->SetText(0.15,0.96,"CMS Preliminary 2010");
+   TLatex* latexSel = static_cast<TLatex*>(latexLumiEnergy->Clone());
+   latexSel->SetTextAlign(11);
+   latexSel->SetText(0.25,0.65,"E_{HF+} < 8 GeV");
    plotter.AddObject(latexLumiEnergy);
    plotter.AddObject(latexCMSPrel);
+   plotter.AddObject(latexSel);
    plotter.AddLabel("SD");
 
    //plotter.SetHeader("#sqrt{s} = 7 TeV (p_{T} > 0.5 GeV, |#eta| < 2.4)");
@@ -121,10 +134,9 @@ void plot(std::string const& eventSelection = "", std::string const& mode = "set
    plotter.SetMarkerStyles(histMarkerStyles);
    plotter.SetMarkerSizes(std::vector<float>(1,1.4));
 
-   plotter.plot(variables,dirs,normFactors,drawOption);
+   //plotter.plot(variables,dirs,normFactors,drawOption);
+   plotter.plot(variables,dirs,normFactorsRebin,drawOption);
    //plotter.plot(variables,dirs,drawOption);
-   //plotter.plotComponents(variables,dirs,normFactors,"NOSTACK");
-   //plotter.plotComponents(variables,dirs,normFactors,drawOption);
 }
 
 void setDirsDataMC(std::string const& eventSelection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
