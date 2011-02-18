@@ -175,7 +175,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doXiMinusSelection = false;
    double xiMax = 0.01;
    // EtaMax
-   bool doEtaMaxSelection = true;
+   bool doEtaMaxSelection = false;
    bool doEtaMinSelection = false;
    double etaMaxMax = 1.0;
    double etaMinMin = -1.0;
