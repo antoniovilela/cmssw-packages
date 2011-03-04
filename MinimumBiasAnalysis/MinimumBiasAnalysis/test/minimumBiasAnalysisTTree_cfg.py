@@ -5,14 +5,13 @@ class config: pass
 config.verbose = True
 config.writeEdmOutput = False
 config.runOnMC = False
-config.globalTagNameData = 'GR_R_36X_V12A::All'
-config.globalTagNameMC = 'START36_V10::All'
-config.outputEdmFile = '/tmp/antoniov/minimumBias.root'
+config.globalTagNameData = 'GR_R_38X_V13A::All'
+config.globalTagNameMC = 'START38_V12::All'
+config.outputEdmFile = 'minimumBias.root'
 config.outputTTreeFile = 'analysisMinBias_TTree_MinimumBias.root'
-config.instLumiROOTFile = 'lumibylsXing_132440-137028_June14thReReco_Collisions10_JSON_v2_sub_132440.root'
+config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collisions10_JSON_v2_sub_132440.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
-#config.trackTagName = 'selectGoodTracks'
 config.trackTagName = 'analysisTracks'
 config.generator = 'Pythia6'
 config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
@@ -23,7 +22,7 @@ config.runBPTX = False
 config.runHCALFilter = False
 config.runEtaMaxFilter = True
 
-config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO/MinimumBias_Commissioning10_GOODCOLL-Jun14thSkim_v1_RECO_EC45524A-E682-DF11-B8A7-001A92810AAA.root']
+config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10-Sep17ReReco_v2_RECO/Run132599/MinimumBias_Commissioning10-Sep17ReReco_v2_RECO_80A3A8E6-46CA-DF11-AE95-00215E21D61E.root']
 
 process = cms.Process("Analysis")
 

@@ -19,9 +19,10 @@
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
-#include "FWCore/Common/interface/TriggerNames.h" 
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "FWCore/Utilities/interface/RegexMatch.h"
 
 #include "Utilities/AnalysisTools/interface/FWLiteTools.h"
 
@@ -195,11 +196,20 @@ void MinimumBiasAnalysis::fillTriggerInfo(EventData& eventData, const edm::Event
      bool wasrun = triggerResults->wasrun(trigIdx);
      bool accept = triggerResults->accept(trigIdx);
   }*/
-  /*int idx_HLT_MinBiasBSCOR = triggerNames.triggerIndex("HLT_MinBiasBSC_OR");
-  int idx_HLT_MinBiasPixel = triggerNames.triggerIndex("HLT_MinBiasPixel_SingleTrack"); 
-  eventData.HLT_MinBiasBSCOR_ = (triggerResults->wasrun(idx_HLT_MinBiasBSCOR) && triggerResults->accept(idx_HLT_MinBiasBSCOR)) ? 1 : 0;
-  eventData.HLT_MinBiasPixel_ = (triggerResults->wasrun(idx_HLT_MinBiasPixel) && triggerResults->accept(idx_HLT_MinBiasPixel)) ? 1 : 0;*/
-  unsigned int idxHLT = triggerNames.triggerIndex(hltPathName_);
+
+  // In case hltPathName_ is a pattern (e.g. HLT_Jet30U*)
+  std::string hltPath;
+  if( edm::is_glob(hltPathName_) ){
+     std::vector< std::vector<std::string>::const_iterator > matches = edm::regexMatch(triggerNames.triggerNames(), hltPathName_);  
+
+     if( matches.empty() ) throw cms::Exception("Configuration") << "Could not find any HLT path of type " << hltPathName_ << "\n";
+     else if( matches.size() > 1) throw cms::Exception("Configuration") << "HLT path type " << hltPathName_ << " not unique\n";
+     else hltPath = *(matches[0]);
+  } else{
+     hltPath = hltPathName_; 
+  } 
+
+  unsigned int idxHLT = triggerNames.triggerIndex(hltPath);
   eventData.HLTPath_ = (triggerResults->wasrun(idxHLT) && triggerResults->accept(idxHLT)) ? 1 : 0; 
 }
 

@@ -29,7 +29,7 @@ void hltFWLiteAnalysis(std::vector<std::string>& fileNames,
                                    std::string const& outFileName = "analysisHLTFWLite_histos.root",
                                    int maxEvents = -1, bool verbose = false) {
  
-   std::string hltProcessName = "REDIGI36";
+   std::string hltProcessName = "REDIGI38X";
 
    bool selectEventsInRuns = false;
    std::vector<int> selectedRuns;

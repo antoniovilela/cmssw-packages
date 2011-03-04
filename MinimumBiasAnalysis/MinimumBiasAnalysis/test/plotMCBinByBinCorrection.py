@@ -99,7 +99,7 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = 
 
     canvases.append(ROOT.TCanvas("c_logXiFromPFCandsVarBin_data_corr","logXiFromPFCandsVarBin_data_corr"))
     h_logXiFromPFCandsVarBin_data_corr.GetXaxis().SetTitle("log(#xi)")
-    h_logXiFromPFCandsVarBin_data_corr.GetYaxis().SetTitle("#sigma/dlog(#xi) (mb)")
+    h_logXiFromPFCandsVarBin_data_corr.GetYaxis().SetTitle("d#sigma/dlog(#xi) (mb)")
     scaleByWidth(h_logXiFromPFCandsVarBin_data_corr)
     h_logXiFromPFCandsVarBin_data_corr.SetStats(0)
     h_logXiFromPFCandsVarBin_data_corr.Draw()
