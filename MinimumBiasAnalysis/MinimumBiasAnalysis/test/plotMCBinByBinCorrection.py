@@ -1,7 +1,7 @@
 import ROOT
 from scaleByWidth import scaleByWidth
 
-def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = "plus"):
+def plotMCBinByBinCorrection(fileNameData, fileNamesMCRef, fileNamesMCEff, side = "plus"):
     ROOT.TH1.AddDirectory(False)
 
     intLumi = 20.322 # /mub
@@ -21,94 +21,134 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = 
     file_data = ROOT.TFile(fileNameData,'read')
     h_logXiFromPFCandsVarBin_data = file_data.Get(histoNames["logXiFromPFCandsVarBin"])
 
-    file_mc_ref = ROOT.TFile(fileNameMCRef,'read')
-    h_logXiGenVarBin_ref = file_mc_ref.Get(histoNames["logXiGenVarBin"])
-    h_EventSelection_ref = file_mc_ref.Get("EventSelection")
+    files_mc_ref = []
+    files_mc_eff = []
+    histos_logXiGenVarBin_ref = []
+    histos_EventSelection_ref = []
+    histos_logXiFromPFCandsVarBin = []
+    histos_logXiGenVarBin = []
+    histos_logXiFromPFCandsANDXiGenVarBin = []
+    histos_logXiPurityVarBin = []
+    histos_logXiStabilityVarBin = []
+    histos_logXiCorrVarBin = []
+    histos_effLogXiGenVarBin = []
+    histos_logXiCorrFullVarBin = []
+    histos_logXiFromPFCandsVarBin_data_corr = []
+    histos_logXiGenVarBin_ref_scaled = []
+    for idx in range(len(fileNamesMCRef)):
+        files_mc_ref.append( ROOT.TFile(fileNamesMCRef[idx],'read') )
+        histos_logXiGenVarBin_ref.append( files_mc_ref[-1].Get(histoNames["logXiGenVarBin"]) )
+        histos_EventSelection_ref.append( files_mc_ref[-1].Get("EventSelection") )
 
-    file_mc_eff = ROOT.TFile(fileNameMCEff,'read')
-    h_logXiFromPFCandsVarBin = file_mc_eff.Get(histoNames["logXiFromPFCandsVarBin"])
-    h_logXiGenVarBin = file_mc_eff.Get(histoNames["logXiGenVarBin"])
-    h_logXiFromPFCandsANDXiGenVarBin = file_mc_eff.Get(histoNames["logXiFromPFCandsANDXiGenVarBin"])
+        files_mc_eff.append( ROOT.TFile(fileNamesMCEff[idx],'read') )
+        histos_logXiFromPFCandsVarBin.append( files_mc_eff[-1].Get(histoNames["logXiFromPFCandsVarBin"]) )
+        histos_logXiGenVarBin.append( files_mc_eff[-1].Get(histoNames["logXiGenVarBin"]) )
+        histos_logXiFromPFCandsANDXiGenVarBin.append( files_mc_eff[-1].Get(histoNames["logXiFromPFCandsANDXiGenVarBin"]) )
 
-    ###############################
-    # Purity & stability
-    h_logXiPurityVarBin = h_logXiFromPFCandsANDXiGenVarBin.Clone('logXiPurityVarBin')
-    h_logXiPurityVarBin.Divide(h_logXiFromPFCandsVarBin)
-    h_logXiStabilityVarBin = h_logXiFromPFCandsANDXiGenVarBin.Clone('logXiStabilityVarBin')
-    h_logXiStabilityVarBin.Divide(h_logXiGenVarBin)
+        ###############################
+        # Purity & stability
+        histos_logXiPurityVarBin.append( histos_logXiFromPFCandsANDXiGenVarBin[-1].Clone('logXiPurityVarBin_%d' % idx) )
+        histos_logXiPurityVarBin[-1].Divide( histos_logXiFromPFCandsVarBin[-1] )
+        histos_logXiStabilityVarBin.append( histos_logXiFromPFCandsANDXiGenVarBin[-1].Clone('logXiStabilityVarBin_%d' % idx) )
+        histos_logXiStabilityVarBin[-1].Divide(histos_logXiGenVarBin[-1])
  
-    # Correction factor
-    h_logXiCorrVarBin = h_logXiGenVarBin.Clone('logXiCorrVarBin')
-    h_logXiCorrVarBin.Divide(h_logXiFromPFCandsVarBin)
+        # Correction factor
+        histos_logXiCorrVarBin.append( histos_logXiGenVarBin[-1].Clone('logXiCorrVarBin_%d' % idx) )
+        histos_logXiCorrVarBin[-1].Divide( histos_logXiFromPFCandsVarBin[-1] )
 
-    # Efficiency
-    # FIXME: use graph and compute proper errors 
-    h_effLogXiGenVarBin = h_logXiGenVarBin.Clone('effLogXiGenVarBin')
-    h_effLogXiGenVarBin.Divide(h_logXiGenVarBin_ref)
+        # Efficiency
+        # FIXME: use graph and compute proper errors 
+        histos_effLogXiGenVarBin.append( histos_logXiGenVarBin[-1].Clone('effLogXiGenVarBin_%d' % idx) )
+        histos_effLogXiGenVarBin[-1].Divide( histos_logXiGenVarBin_ref[-1] )
 
-    # Full bin by bin correction
-    h_logXiCorrFullVarBin = h_logXiCorrVarBin.Clone('logXiCorrFullVarBin')
-    h_logXiCorrFullVarBin.Divide(h_effLogXiGenVarBin)
+        # Full bin by bin correction
+        histos_logXiCorrFullVarBin.append( histos_logXiCorrVarBin[-1].Clone('logXiCorrFullVarBin_%d' % idx) )
+        histos_logXiCorrFullVarBin[-1].Divide( histos_effLogXiGenVarBin[-1] )
 
-    # Correct data
-    h_logXiFromPFCandsVarBin_data_corr = h_logXiFromPFCandsVarBin_data.Clone('logXiFromPFCandsVarBin_data_corr')
-    h_logXiFromPFCandsVarBin_data_corr.Multiply(h_logXiCorrFullVarBin)
-    h_logXiFromPFCandsVarBin_data_corr.Scale(0.001/intLumi) # mb
+        # Correct data
+        histos_logXiFromPFCandsVarBin_data_corr.append( h_logXiFromPFCandsVarBin_data.Clone('logXiFromPFCandsVarBin_data_corr_%d' % idx) )
+        histos_logXiFromPFCandsVarBin_data_corr[-1].Multiply( histos_logXiCorrFullVarBin[-1] )
+        histos_logXiFromPFCandsVarBin_data_corr[-1].Scale(0.001/intLumi) # mb
 
-    # MC before selection
-    h_logXiGenVarBin_ref_scaled = h_logXiGenVarBin_ref.Clone('logXiGenVarBin_ref_scaled')
-    nEventsAll_ref = h_EventSelection_ref.GetBinContent(1)
-    h_logXiGenVarBin_ref_scaled.Scale(sigmaMC/nEventsAll_ref)    
-
+        # MC before selection
+        histos_logXiGenVarBin_ref_scaled.append( histos_logXiGenVarBin_ref[-1].Clone('logXiGenVarBin_ref_scaled_%d' % idx) )
+        nEventsAll_ref = histos_EventSelection_ref[-1].GetBinContent(1)
+        histos_logXiGenVarBin_ref_scaled[-1].Scale(sigmaMC/nEventsAll_ref)    
+    
+    # Plotting
     canvases = []
     histos = []
+    lineStyles = (1,2,3)
+    markerStylesData = (21,24,25)
     canvases.append(ROOT.TCanvas("c_logXiPurityVarBin","logXiPurityVarBin"))
-    h_logXiPurityVarBin.GetXaxis().SetTitle("log(#xi)") 
-    h_logXiPurityVarBin.GetYaxis().SetTitle("p(#xi^{PF},#xi^{Gen} #epsilon bin i | #xi^{PF} #epsilon bin i)")
-    h_logXiPurityVarBin.SetStats(0)
-    h_logXiPurityVarBin.Draw()
-    histos.append(h_logXiPurityVarBin)
+    for idx in range(len(histos_logXiPurityVarBin)):
+        histos_logXiPurityVarBin[idx].GetXaxis().SetTitle("log(#xi)") 
+        histos_logXiPurityVarBin[idx].GetYaxis().SetTitle("p(#xi^{PF},#xi^{Gen} #epsilon bin i | #xi^{PF} #epsilon bin i)")
+        histos_logXiPurityVarBin[idx].SetLineStyle( lineStyles[idx] )
+        histos_logXiPurityVarBin[idx].SetStats(0)
+        if idx == 0: histos_logXiPurityVarBin[idx].Draw()
+        else:        histos_logXiPurityVarBin[idx].Draw("SAME")
+    histos.append(histos_logXiPurityVarBin)
 
     canvases.append(ROOT.TCanvas("c_logXiStabilityVarBin","logXiStabilityVarBin"))
-    h_logXiStabilityVarBin.GetXaxis().SetTitle("log(#xi)")
-    h_logXiStabilityVarBin.GetYaxis().SetTitle("p(#xi^{PF},#xi^{Gen} #epsilon bin i | #xi^{Gen} #epsilon bin i)")
-    h_logXiStabilityVarBin.SetStats(0)
-    h_logXiStabilityVarBin.Draw()
-    histos.append(h_logXiStabilityVarBin)
+    for idx in range(len(histos_logXiStabilityVarBin)):
+        histos_logXiStabilityVarBin[idx].GetXaxis().SetTitle("log(#xi)")
+        histos_logXiStabilityVarBin[idx].GetYaxis().SetTitle("p(#xi^{PF},#xi^{Gen} #epsilon bin i | #xi^{Gen} #epsilon bin i)")
+        histos_logXiStabilityVarBin[idx].SetLineStyle( lineStyles[idx] )
+        histos_logXiStabilityVarBin[idx].SetStats(0)
+        if idx == 0: histos_logXiStabilityVarBin[idx].Draw()
+        else:        histos_logXiStabilityVarBin[idx].Draw("SAME")
+    histos.append(histos_logXiStabilityVarBin)
 
     canvases.append(ROOT.TCanvas("c_effLogXiGenVarBin","effLogXiGenVarBin"))
-    h_effLogXiGenVarBin.GetXaxis().SetTitle("log(#xi)")
-    h_effLogXiGenVarBin.GetYaxis().SetTitle("#varepsilon^{MC}(#xi)")
-    h_effLogXiGenVarBin.SetStats(0)
-    h_effLogXiGenVarBin.Draw()
-    histos.append(h_effLogXiGenVarBin) 
+    for idx in range(len(histos_effLogXiGenVarBin)):
+        histos_effLogXiGenVarBin[idx].GetXaxis().SetTitle("log(#xi)")
+        histos_effLogXiGenVarBin[idx].GetYaxis().SetTitle("#varepsilon^{MC}(#xi)")
+        histos_effLogXiGenVarBin[idx].SetLineStyle( lineStyles[idx] )
+        histos_effLogXiGenVarBin[idx].SetStats(0)
+        if idx == 0: histos_effLogXiGenVarBin[idx].Draw()
+        else:        histos_effLogXiGenVarBin[idx].Draw("SAME")
+    histos.append(histos_effLogXiGenVarBin) 
 
     canvases.append(ROOT.TCanvas("c_logXiCorrVarBin","logXiCorrVarBin"))
-    h_logXiCorrVarBin.GetXaxis().SetTitle("log(#xi)")
-    h_logXiCorrVarBin.GetYaxis().SetTitle("N(#xi^{Gen} #epsilon bin i)/N(#xi^{PF} #epsilon bin i)")
-    h_logXiCorrVarBin.SetStats(0)
-    h_logXiCorrVarBin.Draw()
-    histos.append(h_logXiCorrVarBin)
+    for idx in range(len(histos_logXiCorrVarBin)):
+        histos_logXiCorrVarBin[idx].GetXaxis().SetTitle("log(#xi)")
+        histos_logXiCorrVarBin[idx].GetYaxis().SetTitle("N(#xi^{Gen} #epsilon bin i)/N(#xi^{PF} #epsilon bin i)")
+        histos_logXiCorrVarBin[idx].SetLineStyle( lineStyles[idx] )
+        histos_logXiCorrVarBin[idx].SetStats(0)
+        if idx == 0: histos_logXiCorrVarBin[idx].Draw()
+        else:        histos_logXiCorrVarBin[idx].Draw("SAME")
+    histos.append(histos_logXiCorrVarBin)
   
     canvases.append(ROOT.TCanvas("c_logXiCorrFullVarBin","logXiCorrFullVarBin"))
-    h_logXiCorrFullVarBin.GetXaxis().SetTitle("log(#xi)")
-    h_logXiCorrFullVarBin.GetYaxis().SetTitle("#frac{1}{#varepsilon(#xi)}#frac{N(#xi^{Gen} #epsilon bin i)}{N(#xi^{PF} #epsilon bin i)}")
-    h_logXiCorrFullVarBin.SetStats(0)
-    h_logXiCorrFullVarBin.Draw()
-    histos.append(h_logXiCorrFullVarBin)
+    for idx in range(len(histos_logXiCorrFullVarBin)):
+        histos_logXiCorrFullVarBin[idx].GetXaxis().SetTitle("log(#xi)")
+        histos_logXiCorrFullVarBin[idx].GetYaxis().SetTitle("#frac{1}{#varepsilon(#xi)}#frac{N(#xi^{Gen} #epsilon bin i)}{N(#xi^{PF} #epsilon bin i)}")
+        histos_logXiCorrFullVarBin[idx].SetLineStyle( lineStyles[idx] )
+        histos_logXiCorrFullVarBin[idx].SetStats(0)
+        if idx == 0: histos_logXiCorrFullVarBin[idx].Draw()
+        else:        histos_logXiCorrFullVarBin[idx].Draw("SAME")
+    histos.append(histos_logXiCorrFullVarBin)
 
     canvases.append(ROOT.TCanvas("c_logXiFromPFCandsVarBin_data_corr","logXiFromPFCandsVarBin_data_corr"))
-    h_logXiFromPFCandsVarBin_data_corr.GetXaxis().SetTitle("log(#xi)")
-    h_logXiFromPFCandsVarBin_data_corr.GetYaxis().SetTitle("d#sigma/dlog(#xi) (mb)")
-    scaleByWidth(h_logXiFromPFCandsVarBin_data_corr)
-    h_logXiFromPFCandsVarBin_data_corr.SetStats(0)
-    h_logXiFromPFCandsVarBin_data_corr.Draw()
-    scaleByWidth(h_logXiGenVarBin_ref_scaled)
-    h_logXiGenVarBin_ref_scaled.SetLineColor(2)
-    h_logXiGenVarBin_ref_scaled.SetStats(0)
-    h_logXiGenVarBin_ref_scaled.Draw("HISTOSAME")
-    histos.append(h_logXiFromPFCandsVarBin_data_corr)
-    histos.append(h_logXiGenVarBin_ref_scaled)
+    for idx in range(len(histos_logXiFromPFCandsVarBin_data_corr)):
+        histos_logXiFromPFCandsVarBin_data_corr[idx].GetXaxis().SetTitle("log(#xi)")
+        histos_logXiFromPFCandsVarBin_data_corr[idx].GetYaxis().SetTitle("d#sigma/dlog(#xi) (mb)")
+        histos_logXiFromPFCandsVarBin_data_corr[idx].SetMarkerStyle( markerStylesData[idx] )
+        histos_logXiFromPFCandsVarBin_data_corr[idx].SetMarkerSize(1.6)
+        histos_logXiFromPFCandsVarBin_data_corr[idx].SetStats(0)
+
+        scaleByWidth(histos_logXiFromPFCandsVarBin_data_corr[idx])
+        if idx == 0: histos_logXiFromPFCandsVarBin_data_corr[idx].Draw()
+        else:        histos_logXiFromPFCandsVarBin_data_corr[idx].Draw("SAME")
+
+        histos_logXiGenVarBin_ref_scaled[idx].SetLineStyle( lineStyles[idx] )
+        histos_logXiGenVarBin_ref_scaled[idx].SetLineColor(2)
+        histos_logXiGenVarBin_ref_scaled[idx].SetStats(0)
+        scaleByWidth(histos_logXiGenVarBin_ref_scaled[idx])
+        histos_logXiGenVarBin_ref_scaled[idx].Draw("HISTOSAME")
+    histos.append(histos_logXiFromPFCandsVarBin_data_corr)
+    histos.append(histos_logXiGenVarBin_ref_scaled)
 
     return (canvases,histos)
 

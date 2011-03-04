@@ -82,6 +82,10 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    plotter.SetTitleX("EMinusPzFromPFCands_dist","#sum(E-pz) (GeV)");
    plotter.SetTitleX("xiPlusFromPFCands_dist","#xi^{+}");
    plotter.SetTitleX("xiMinusFromPFCands_dist","#xi^{-}");
+   plotter.SetTitleX("logXiPlusFromPFCands_dist","log#xi^{+}");
+   plotter.SetTitleX("logXiMinusFromPFCands_dist","log#xi^{-}");
+   plotter.SetTitleX("logXiPlusFromPFCandsVarBin_dist","log#xi^{+}");
+   plotter.SetTitleX("logXiMinusFromPFCandsVarBin_dist","log#xi^{-}");
    plotter.SetTitleX("MxFromPFCands_dist","M_{X} (GeV)");
    plotter.SetTitleX("etaMaxFromPFCandsVarBin_dist","#eta^{max}");
    plotter.SetTitleX("etaMinFromPFCandsVarBin_dist","#eta^{min}"); 
@@ -94,6 +98,10 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    plotter.SetTitleY("EMinusPzFromPFCands_dist","dN/d(#sumE-pz) (GeV^{-1})");
    plotter.SetTitleY("xiPlusFromPFCands_dist","dN/d#xi^{+}");
    plotter.SetTitleY("xiMinusFromPFCands_dist","dN/d#xi^{-}");
+   plotter.SetTitleY("logXiPlusFromPFCands_dist","dN/dlog#xi^{+}");
+   plotter.SetTitleY("logXiMinusFromPFCands_dist","dN/dlog#xi^{-}");
+   plotter.SetTitleY("logXiPlusFromPFCandsVarBin_dist","dN/dlog#xi^{+}");
+   plotter.SetTitleY("logXiMinusFromPFCandsVarBin_dist","dN/dlog#xi^{-}");
    plotter.SetTitleY("MxFromPFCands_dist","dN/dM_{X} (GeV^{-1})");
    plotter.SetTitleY("etaMaxFromPFCandsVarBin_dist","dN/d#eta^{max}");
    plotter.SetTitleY("etaMinFromPFCandsVarBin_dist","dN/d#eta^{min}");
@@ -291,13 +299,13 @@ void setDirsDataMC(std::string const& selection, std::vector<std::pair<std::stri
 
 void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
    run_range_t runRange = Data7TeV;
-   generator_t genType = PYTHIA8;
-   //generator_t genType = PYTHIAD6T;
+   //generator_t genType = PYTHIA8;
+   generator_t genType = PYTHIAZ1;
    //generator_t genType = PHOJET;
    std::string eventSelection = selection;
    std::string dirData = "root/7TeV/Data/Run132605/minimumBiasAnalysisTTree-v4";
-   std::string dirMC = "root/7TeV/Pythia8/eventSelection-v6";
-   //std::string dirMC = "root/7TeV/Pythia6D6T/eventSelection";
+   //std::string dirMC = "root/7TeV/Pythia8/eventSelection-v6";
+   std::string dirMC = "root/7TeV/Pythia6Z1/eventSelection-v2";
    //std::string dirMC = "root/7TeV/Phojet/eventSelection";
 
    TFile* file_Data = TFile::Open((dirData + "/" + getHistosFileName(runRange,eventSelection)).c_str());
@@ -331,7 +339,8 @@ void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair
    double nEvents_QCD = h_EventSelection_QCD->GetBinContent(1);
 
    dirs.push_back(std::make_pair("p+p (7 TeV)",file_Data));
-   dirs.push_back(std::make_pair("PYTHIA8",fileMC_All));
+   //dirs.push_back(std::make_pair("PYTHIA8",fileMC_All));
+   dirs.push_back(std::make_pair("PYTHIA6 Z1",fileMC_All));
    /*dirs.push_back(std::make_pair("PYTHIA8 - SD",fileMC_SD));
    dirs.push_back(std::make_pair("PYTHIA8 - DD",fileMC_DD)); 
    dirs.push_back(std::make_pair("PYTHIA8 - Inel. non-diffractive",fileMC_QCD));*/

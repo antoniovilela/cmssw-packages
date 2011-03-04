@@ -45,23 +45,23 @@ void runEventSelectionAnalysisMC(){
 
    std::vector<std::string> selections;
    //selections.push_back("minimumBiasTTreeAnalysisAll");
-   selections.push_back("minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus");
+   //selections.push_back("minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus");
    //selections.push_back("minimumBiasTTreeAnalysisBPTX");
-   selections.push_back("minimumBiasTTreeAnalysisBscOr");
-   selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
+   //selections.push_back("minimumBiasTTreeAnalysisBscOr");
+   //selections.push_back("minimumBiasTTreeAnalysisVertexFilter");
    //selections.push_back("minimumBiasTTreeAnalysisBeamHaloVeto");
    //selections.push_back("minimumBiasTTreeAnalysisFilterScraping");
    selections.push_back("minimumBiasTTreeAnalysisHcalNoiseFilter");
    selections.push_back("minimumBiasTTreeAnalysisEtaMaxFilter");
  
    std::vector<int> processTypes;
-   //processTypes.push_back(All);
+   processTypes.push_back(All);
    //processTypes.push_back(SD);
-   processTypes.push_back(DD);
+   //processTypes.push_back(DD);
    //processTypes.push_back(Diff);
-   //processTypes.push_back(Inelastic);
-   processTypes.push_back(SDPlus);
-   processTypes.push_back(SDMinus);
+   processTypes.push_back(Inelastic);
+   //processTypes.push_back(SDPlus);
+   //processTypes.push_back(SDMinus);
 
    for(size_t isel = 0; isel < selections.size(); ++isel){
       std::string treeName = selections[isel] + "/data";

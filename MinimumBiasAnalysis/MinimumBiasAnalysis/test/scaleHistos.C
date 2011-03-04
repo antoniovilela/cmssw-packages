@@ -11,7 +11,18 @@
 void scaleByWidthHistos(std::string const& fileName, std::string const& dirName, std::vector<std::string> variables, bool saveHistos);
 void scaleByWidth(TH1F*);
 
-void scaleByWidthPFHistos(std::string const& fileName, std::string const& dirName, bool saveHistos = false){
+void scaleByWidthPFHistos(std::string const& , std::string const& , bool);
+void scaleByWidthExtraPFHistos(std::string const& , std::string const& , bool);
+void scaleByWidthTrackHistos(std::string const& , std::string const& , bool);
+void scaleByWidthCaloTowerHistos(std::string const& , std::string const& , bool);
+
+void scaleByWidthEventHistos(std::string const& fileName, std::string const& dirName, bool saveHistos){
+  scaleByWidthCaloTowerHistos(fileName,dirName,saveHistos);
+  scaleByWidthPFHistos(fileName,dirName,saveHistos);
+  scaleByWidthExtraPFHistos(fileName,dirName,saveHistos);
+}
+
+void scaleByWidthPFHistos(std::string const& fileName, std::string const& dirName, bool saveHistos){
 
   std::vector<std::string> variables;
   variables.push_back("xiPlusFromPFCands");
@@ -25,7 +36,7 @@ void scaleByWidthPFHistos(std::string const& fileName, std::string const& dirNam
   scaleByWidthHistos(fileName,dirName,variables,saveHistos);
 }
 
-void scaleByWidthExtraPFHistos(std::string const& fileName, std::string const& dirName, bool saveHistos = false){
+void scaleByWidthExtraPFHistos(std::string const& fileName, std::string const& dirName, bool saveHistos){
 
   std::vector<std::string> variables;
   variables.push_back("logXiPlusFromPFCands");
@@ -36,7 +47,7 @@ void scaleByWidthExtraPFHistos(std::string const& fileName, std::string const& d
   scaleByWidthHistos(fileName,dirName,variables,saveHistos);
 }
 
-void scaleByWidthTrackHistos(std::string const& fileName, std::string const& dirName, bool saveHistos = false){
+void scaleByWidthTrackHistos(std::string const& fileName, std::string const& dirName, bool saveHistos){
 
   std::vector<std::string> variables;
   variables.push_back("TrackEta");
@@ -50,7 +61,7 @@ void scaleByWidthTrackHistos(std::string const& fileName, std::string const& dir
   scaleByWidthHistos(fileName,dirName,variables,saveHistos);
 }
 
-void scaleByWidthCaloTowerHistos(std::string const& fileName, std::string const& dirName, bool saveHistos = false){
+void scaleByWidthCaloTowerHistos(std::string const& fileName, std::string const& dirName, bool saveHistos){
 
   std::vector<std::string> variables;
   variables.push_back("EPlusPzFromTowersVarBin");
