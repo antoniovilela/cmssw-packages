@@ -44,7 +44,7 @@ namespace minimumBiasAnalysis {
      float binningESumHF[]={minEVarBin,5.,10.,15.,20.,25.,30.,40.,50.,60.,70.,80.,90.,
                                100.,120.,140.,160.,180.,200.}; // 18 bins
      int nBinsLogXi = 7;
-     float binningLogXi[] = {-5.,-4.5,-4.,-3.5,-3.,-2.5,-2.0,0.}; // 5 bins 
+     float binningLogXi[] = {-5.,-4.5,-4.,-3.5,-3.,-2.5,-2.0,0.}; // 7 bins 
 
      histos["nVertex"] = adaptor.template make<TH1F>("nVertex","Nr. of offline primary vertexes",10,0,10);
      histos["posXPrimVtx"] = adaptor.template make<TH1F>("posXPrimVtx","x position of primary vertexes",100,-1.,1.);
