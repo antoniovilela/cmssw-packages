@@ -19,20 +19,12 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    // Create output file
    TFile* hfile = new TFile("analysisOpenHLT_histos.root","recreate","data histograms");
 
+   // Reference trigger
+   std::string refTriggerName = "HLT_ZeroBias_v1";
+
    std::vector<std::string> triggerBits;
-   triggerBits.push_back("L1_SingleJet15");
-   triggerBits.push_back("L1_SingleJet30");
-   triggerBits.push_back("HLT_DiJetAve30");
-   triggerBits.push_back("L1_SingleEG2");
-   triggerBits.push_back("L1_SingleEG5");
-   triggerBits.push_back("L1_SingleEG8");
-   triggerBits.push_back("L1_SingleIsoEG5");
-   triggerBits.push_back("L1_SingleIsoEG8");
-   triggerBits.push_back("L1_DoubleEG1");
-   triggerBits.push_back("L1_DoubleEG5");
-   triggerBits.push_back("L1_DoubleMuOpen");
-   triggerBits.push_back("L1_DoubleMu3");
-   triggerBits.push_back("HLT_DoubleMu3");
+   triggerBits.push_back("HLT_ZeroBias_v1");
+   triggerBits.push_back("L1_SingleJet36");
 
    std::vector<std::pair<std::string,TH1F*> > histosTriggerBits(triggerBits.size());
    std::vector<std::pair<std::string,TH1F*> > histosEffVsThreshold(triggerBits.size());
@@ -60,6 +52,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       }
    }
 
+   // Reference trigger
+   int refTrigger;
+   if(refTriggerName != "") chain.SetBranchAddress(refTriggerName.c_str(),&refTrigger);
+
    int vars[triggerBits.size() + varNames.size()];
    int index = 0;
    std::map<std::string,int> mapNameToIndex;
@@ -80,7 +76,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       if((maxEvents > 0)&&(entry == maxEvents)) break;
       if(entry%2000 == 0) std::cout << ">>> Analysing " << entry << "th event" << std::endl;
       chain.GetEntry(entry);
-      //size_t index = 0;
+
+      // Reference trigger
+      if(refTriggerName != "" && refTrigger == 0) continue; 
+
       ++countEvts;
 
       for(std::vector<std::pair<std::string,TH1F*> >::const_iterator it = histosTriggerBits.begin(); it != histosTriggerBits.end(); ++it){
@@ -142,7 +141,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       it->second->Scale(1./countEvts);
       std::string hname = it->first + "_Rate";
       histosRateVsThreshold.push_back(static_cast<TH1F*>(it->second->Clone(hname.c_str())));
-      histosRateVsThreshold.back()->Scale(Lum*crossSection*10000.);
+      histosRateVsThreshold.back()->Scale(Lum*crossSection);
    }
 
    hfile->Write();

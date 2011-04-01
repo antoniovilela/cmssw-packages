@@ -2,7 +2,7 @@
 #define ExclusiveDijetsAnalysis_ExclusiveDijetsAnalysisImpl_h
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Utilities/interface/InputTag.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 
 #include <string>
