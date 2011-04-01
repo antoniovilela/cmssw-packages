@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 
-void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., int maxEvents = -1){
+void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxEvents = -1){
    TChain chain("HltTree");
    std::cout << ">>> Reading files: " << std::endl;
    for(std::vector<std::string>::const_iterator file = fileNames.begin(); file != fileNames.end(); ++file){
@@ -23,9 +23,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    std::string refTriggerName = "HLT_ZeroBias_v1";
 
    std::vector<std::string> triggerBits;
-   triggerBits.push_back("HLT_ZeroBias_v1");
+   //triggerBits.push_back("HLT_ZeroBias_v1");
    triggerBits.push_back("L1_SingleJet36");
-
+   triggerBits.push_back("L1_SingleEG12");
+   
    std::vector<std::pair<std::string,TH1F*> > histosTriggerBits(triggerBits.size());
    std::vector<std::pair<std::string,TH1F*> > histosEffVsThreshold(triggerBits.size());
    TH1F* h_countAll = new TH1F("countAll","countAll",triggerBits.size(),0,triggerBits.size());
@@ -54,8 +55,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
 
    // Reference trigger
    int refTrigger;
-   if(refTriggerName != "") chain.SetBranchAddress(refTriggerName.c_str(),&refTrigger);
-
+   if(refTriggerName != ""){
+      std::cout << ">>> Setting reference trigger " << refTriggerName << std::endl; 
+      chain.SetBranchAddress(refTriggerName.c_str(),&refTrigger);
+   }
    int vars[triggerBits.size() + varNames.size()];
    int index = 0;
    std::map<std::string,int> mapNameToIndex;
@@ -78,7 +81,12 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       chain.GetEntry(entry);
 
       // Reference trigger
-      if(refTriggerName != "" && refTrigger == 0) continue; 
+      //if(refTriggerName != "" && refTrigger == 0) continue;
+      if(refTriggerName != ""){
+         bool refTrigAccept = (refTrigger == 1);
+         //std::cout << refTriggerName << ": " << refTrigAccept << std::endl;
+         if(!refTrigAccept) continue;
+      }
 
       ++countEvts;
 
@@ -135,13 +143,14 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
   
    std::vector<TH1F*> histosRateVsThreshold;
    //double crossSection = 80.;//mb
-   double Lum = 1.;//10^31cms-2s-2
+   //double Lum = 1.;//10^31cms-2s-2
    for(std::vector<std::pair<std::string,TH1F*> >::const_iterator it = histosEffVsThreshold.begin();
                                                                   it != histosEffVsThreshold.end(); ++it){
-      it->second->Scale(1./countEvts);
+      //it->second->Scale(1./countEvts);
       std::string hname = it->first + "_Rate";
       histosRateVsThreshold.push_back(static_cast<TH1F*>(it->second->Clone(hname.c_str())));
-      histosRateVsThreshold.back()->Scale(Lum*crossSection);
+      histosRateVsThreshold.back()->Scale(norm);
+      it->second->Scale(1./countEvts);
    }
 
    hfile->Write();
