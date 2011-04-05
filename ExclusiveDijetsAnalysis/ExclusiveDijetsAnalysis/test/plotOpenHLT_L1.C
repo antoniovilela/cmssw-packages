@@ -24,9 +24,23 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
 
    std::vector<std::string> triggerBits;
    //triggerBits.push_back("HLT_ZeroBias_v1");
+   triggerBits.push_back("L1_SingleJet16");
    triggerBits.push_back("L1_SingleJet36");
    triggerBits.push_back("L1_SingleEG12");
+   triggerBits.push_back("L1_DoubleEG3");
    
+   std::vector<std::string> varNames;
+   /*varNames.push_back("L1HfRing1EtSumNegativeEta");
+   varNames.push_back("L1HfRing2EtSumNegativeEta");
+   varNames.push_back("L1HfRing1EtSumPositiveEta");
+   varNames.push_back("L1HfRing2EtSumPositiveEta");*/
+   varNames.push_back("L1HfTowerCountPositiveEtaRing1");
+   varNames.push_back("L1HfTowerCountNegativeEtaRing1");
+   varNames.push_back("L1HfTowerCountPositiveEtaRing2");
+   varNames.push_back("L1HfTowerCountNegativeEtaRing2"); 
+
+   TH1::SetDefaultSumw2(true);
+
    std::vector<std::pair<std::string,TH1F*> > histosTriggerBits(triggerBits.size());
    std::vector<std::pair<std::string,TH1F*> > histosEffVsThreshold(triggerBits.size());
    TH1F* h_countAll = new TH1F("countAll","countAll",triggerBits.size(),0,triggerBits.size());
@@ -37,12 +51,6 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
       histosEffVsThreshold[trigBit] = std::make_pair(*it,new TH1F((*it + "_VsThreshold").c_str(),it->c_str(),nThresholds,0,nThresholds));
       h_countAll->GetXaxis()->SetBinLabel((trigBit + 1),it->c_str());
    }
-
-   std::vector<std::string> varNames;
-   varNames.push_back("L1HfRing1EtSumNegativeEta");
-   varNames.push_back("L1HfRing2EtSumNegativeEta");
-   varNames.push_back("L1HfRing1EtSumPositiveEta");
-   varNames.push_back("L1HfRing2EtSumPositiveEta");
 
    std::vector<std::pair<std::string,TH1F*> > histos;
    std::vector<std::pair<std::pair<std::string,std::string>,TH1F*> > histosWithCut;
@@ -59,13 +67,22 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
       std::cout << ">>> Setting reference trigger " << refTriggerName << std::endl; 
       chain.SetBranchAddress(refTriggerName.c_str(),&refTrigger);
    }
-   int vars[triggerBits.size() + varNames.size()];
+   // Trigger bits, prescales, variables
+   int vars[triggerBits.size() + triggerBits.size() + varNames.size()];
    int index = 0;
    std::map<std::string,int> mapNameToIndex;
    for(std::vector<std::string>::const_iterator it = triggerBits.begin(); it != triggerBits.end(); ++it,++index){
       if(mapNameToIndex.find(it->c_str()) != mapNameToIndex.end()) {--index;continue;}
       chain.SetBranchAddress(it->c_str(),vars + index);
       mapNameToIndex.insert(std::make_pair(it->c_str(),index));
+   }
+   // Prescales
+   for(std::vector<std::string>::const_iterator it = triggerBits.begin(); it != triggerBits.end(); ++it,++index){
+      std::string name(*it);
+      name += "_Prescl";
+      if(mapNameToIndex.find(name) != mapNameToIndex.end()) {--index;continue;}
+      chain.SetBranchAddress(name.c_str(),vars + index);
+      mapNameToIndex.insert(std::make_pair(name,index));
    }
    for(std::vector<std::string>::const_iterator it = varNames.begin(); it != varNames.end(); ++it,++index){
       if(mapNameToIndex.find(it->c_str()) != mapNameToIndex.end()) {--index;continue;}
@@ -123,7 +140,9 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
       size_t trigBit = 0;
       for(std::vector<std::string>::const_iterator itBit = triggerBits.begin(); itBit != triggerBits.end(); ++itBit,++trigBit){
          int iBit = mapNameToIndex[*itBit];
+         int iBitPrescl = mapNameToIndex[(*itBit + "_Prescl")];
          bool trigAccept = (vars[iBit] == 1);
+         int prescale = vars[iBitPrescl];
          if(!trigAccept) continue;
 
          std::vector<int> accept(nThresholds,1);
@@ -135,7 +154,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
          } 
          if(accept[0] == 1) h_countAll->Fill(trigBit);
          for(int iThreshold = 0; iThreshold < nThresholds; ++iThreshold){
-            if(accept[iThreshold] == 1) histosEffVsThreshold[trigBit].second->Fill(iThreshold);
+            if(accept[iThreshold] == 1) histosEffVsThreshold[trigBit].second->Fill(iThreshold,prescale);
          }
       }       
    }

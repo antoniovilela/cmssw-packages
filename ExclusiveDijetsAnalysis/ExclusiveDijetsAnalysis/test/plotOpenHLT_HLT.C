@@ -28,6 +28,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    TH1F* h_L1HfRing1EtSumPositiveEta = new TH1F("L1HfRing1EtSumPositiveEta","L1HfRing1EtSumPositiveEta",10,0,10);
    TH1F* h_L1HfRing2EtSumPositiveEta = new TH1F("L1HfRing2EtSumPositiveEta","L1HfRing2EtSumPositiveEta",10,0,10);
 
+   TH1F* h_L1HfTowerCountPositiveEtaRing1 = new TH1F("L1HfTowerCountPositiveEtaRing1","L1HfTowerCountPositiveEtaRing1",10,0,10);
+   TH1F* h_L1HfTowerCountNegativeEtaRing1 = new TH1F("L1HfTowerCountNegativeEtaRing1","L1HfTowerCountNegativeEtaRing1",10,0,10);
+   TH1F* h_L1HfTowerCountPositiveEtaRing2 = new TH1F("L1HfTowerCountPositiveEtaRing2","L1HfTowerCountPositiveEtaRing2",10,0,10);
+   TH1F* h_L1HfTowerCountNegativeEtaRing2 = new TH1F("L1HfTowerCountNegativeEtaRing2","L1HfTowerCountNegativeEtaRing2",10,0,10);
+
    TH1F* h_trigBitL1 = new TH1F("trigBitL1","trigBitL1",2,0,2);
    TH1F* h_trigBitHLT = new TH1F("trigBitHLT","trigBitHLT",2,0,2);
    TH1F* h_L1CenJetEt = new TH1F("L1CenJetEt","L1CenJetEt",100,0.,100.);
@@ -72,8 +77,8 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    TF1* func_effTrigHLT = new TF1("effTrigHLT","[0]",sumEMin,sumEMax);   
 
    //std::string trigName = "HLT_Jet30U";
-   std::string trigNameL1 = "L1_SingleJet20";
-   std::string trigNameHLT = "HLT_Jet30U"; 
+   std::string trigNameL1 = "L1_SingleJet36";
+   std::string trigNameHLT = "HLT_Jet60_v1"; 
 
    int runNumber,lumiBlock,bunchCrossing;
    int trigBitL1;
@@ -94,6 +99,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    int L1HfRing2EtSumNegativeEta;
    int L1HfRing1EtSumPositiveEta;
    int L1HfRing2EtSumPositiveEta;
+
+   int L1HfTowerCountPositiveEtaRing1;
+   int L1HfTowerCountNegativeEtaRing1;
+   int L1HfTowerCountPositiveEtaRing2;
+   int L1HfTowerCountNegativeEtaRing2;
 
    int nHFtowers;
    float hfTwrEnergy[1000];
@@ -125,6 +135,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    chain.SetBranchAddress("L1HfRing2EtSumNegativeEta",&L1HfRing2EtSumNegativeEta);
    chain.SetBranchAddress("L1HfRing1EtSumPositiveEta",&L1HfRing1EtSumPositiveEta);
    chain.SetBranchAddress("L1HfRing2EtSumPositiveEta",&L1HfRing2EtSumPositiveEta);
+   chain.SetBranchAddress("L1HfTowerCountPositiveEtaRing1",&L1HfTowerCountPositiveEtaRing1);
+   chain.SetBranchAddress("L1HfTowerCountNegativeEtaRing1",&L1HfTowerCountNegativeEtaRing1);
+   chain.SetBranchAddress("L1HfTowerCountPositiveEtaRing2",&L1HfTowerCountPositiveEtaRing2);
+   chain.SetBranchAddress("L1HfTowerCountNegativeEtaRing2",&L1HfTowerCountNegativeEtaRing2);
    chain.SetBranchAddress("NrecoTowCal",&nHFtowers);
    chain.SetBranchAddress("recoTowE",hfTwrEnergy);
    chain.SetBranchAddress("recoTowEt",hfTwrEt);
@@ -137,7 +151,8 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    int nEvents = chain.GetEntries();
    double etaMin = 3.0;
    double towerThreshold = 4.0; //energy
-   int L1EtSumThreshold = 1;
+   int L1EtSumThreshold = 999;
+   int L1TowerCountThreshold = 1;
    double sumEHFThreshold = 200.; 
  
    int nPassedTrigBitL1 = 0;
@@ -195,10 +210,20 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       h_L1HfRing1EtSumPositiveEta->Fill(L1HfRing1EtSumPositiveEta);
       h_L1HfRing2EtSumPositiveEta->Fill(L1HfRing2EtSumPositiveEta);
 
+      h_L1HfTowerCountPositiveEtaRing1->Fill(L1HfTowerCountPositiveEtaRing1);
+      h_L1HfTowerCountNegativeEtaRing1->Fill(L1HfTowerCountNegativeEtaRing1);
+      h_L1HfTowerCountPositiveEtaRing2->Fill(L1HfTowerCountPositiveEtaRing2);
+      h_L1HfTowerCountNegativeEtaRing2->Fill(L1HfTowerCountNegativeEtaRing2);
+
       if((L1HfRing1EtSumNegativeEta > L1EtSumThreshold)||
          (L1HfRing2EtSumNegativeEta > L1EtSumThreshold)||
          (L1HfRing1EtSumPositiveEta > L1EtSumThreshold)||
          (L1HfRing2EtSumPositiveEta > L1EtSumThreshold)) continue;
+
+      if( (L1HfTowerCountPositiveEtaRing1 > L1TowerCountThreshold) || 
+          (L1HfTowerCountNegativeEtaRing1 > L1TowerCountThreshold) ||
+          (L1HfTowerCountPositiveEtaRing2 > L1TowerCountThreshold) ||
+          (L1HfTowerCountPositiveEtaRing2 > L1TowerCountThreshold) ) continue;     
 
       ++nPassedTrigBitL1AndL1EtSum;
       h_NevtsL1VsLumi->Fill(lumiBlock);
