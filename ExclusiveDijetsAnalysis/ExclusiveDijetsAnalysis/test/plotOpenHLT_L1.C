@@ -20,10 +20,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
    TFile* hfile = new TFile("analysisOpenHLT_histos.root","recreate","data histograms");
 
    // Reference trigger
-   std::string refTriggerName = "HLT_ZeroBias_v1";
+   //std::string refTriggerName = "HLT_ZeroBias_v1";
+   std::string refTriggerName = "HLT_ExclDiJet60_HFAND_v1";
 
    std::vector<std::string> triggerBits;
-   //triggerBits.push_back("HLT_ZeroBias_v1");
    triggerBits.push_back("L1_SingleJet16");
    triggerBits.push_back("L1_SingleJet36");
    triggerBits.push_back("L1_SingleEG12");

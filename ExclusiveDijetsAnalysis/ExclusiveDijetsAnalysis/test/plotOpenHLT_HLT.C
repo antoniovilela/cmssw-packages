@@ -50,6 +50,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    TH1F* h_L1ResHT = new TH1F("L1ResHT","L1ResHT",100,-5.0,5.0);
    TH1F* h_L1ResEtTot = new TH1F("L1ResEtTot","L1ResEtTot",100,-5.0,5.0);
 
+   TH1F* h_nJetsCor = new TH1F("nJetsCor","nJetsCor",20,0,20);
+   TH1F* h_leadingJetCorPt = new TH1F("leadingJetCorPt","leadingJetCorPt",200,0.,200.);
+   TH1F* h_leadingJetCorEta = new TH1F("leadingJetCorEta","leadingJetCorEta",100,-5.,5.);
+   TH1F* h_secondJetCorPt = new TH1F("secondJetCorPt","secondJetCorPt",200,0.,200.);
+   TH1F* h_secondJetCorEta = new TH1F("secondJetCorEta","secondJetCorEta",100,-5.,5.);
    TH1F* h_nHFtowers = new TH1F("nHFtowers","nHFtowers",100,0.,600.);
    TH1F* h_hfTwrEnergy = new TH1F("hfTwrEnergy","hfTwrEnergy",500,0.,500.);
    TH1F* h_hfTwrEt = new TH1F("hfTwrEt","hfTwrEt",100,0.,10.);
@@ -76,9 +81,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    TF1* func_effTrigBitHLT = new TF1("effTrigBitHLT","[0]",sumEMin,sumEMax);
    TF1* func_effTrigHLT = new TF1("effTrigHLT","[0]",sumEMin,sumEMax);   
 
-   //std::string trigName = "HLT_Jet30U";
-   std::string trigNameL1 = "L1_SingleJet36";
-   std::string trigNameHLT = "HLT_Jet60_v1"; 
+   //std::string trigNameL1 = "L1_SingleJet36";
+   std::string trigNameL1 = "L1_SingleJet16";
+   //std::string trigNameHLT = "HLT_Jet60_v1"; 
+   std::string trigNameHLT = "HLT_Jet30_v1"; 
 
    int runNumber,lumiBlock,bunchCrossing;
    int trigBitL1;
@@ -113,14 +119,22 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    float hfTwrEta[1000];
    float hfTwrPhi[1000];
     
-   int nJetsCal;
-   float jetCalPt[100];
-   float jetCalEta[100];
+   int nJetsCor;
+   float jetCorPt[100];
+   float jetCorEta[100];
 
-   chain.SetBranchAddress(trigNameL1.c_str(),&trigBitL1);
-   chain.SetBranchAddress(trigNameHLT.c_str(),&trigBitHLT);
-   chain.SetBranchAddress((trigNameL1 + "_Prescl").c_str(),&trigBitL1Prescl);
-   chain.SetBranchAddress((trigNameHLT + "_Prescl").c_str(),&trigBitHLTPrescl);
+   if(trigNameL1 != ""){
+      chain.SetBranchAddress(trigNameL1.c_str(),&trigBitL1);
+      chain.SetBranchAddress((trigNameL1 + "_Prescl").c_str(),&trigBitL1Prescl);
+   } else{
+      trigBitL1Prescl = 1;  
+   }
+   if(trigNameHLT != ""){
+      chain.SetBranchAddress(trigNameHLT.c_str(),&trigBitHLT);
+      chain.SetBranchAddress((trigNameHLT + "_Prescl").c_str(),&trigBitHLTPrescl);
+   } else{
+      trigBitHLTPrescl = 1;
+   }
    chain.SetBranchAddress("Run",&runNumber);
    chain.SetBranchAddress("LumiBlock",&lumiBlock);
    chain.SetBranchAddress("Bx",&bunchCrossing);
@@ -148,15 +162,16 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    chain.SetBranchAddress("recoTowEt",hfTwrEt);
    chain.SetBranchAddress("recoTowEta",hfTwrEta);
    chain.SetBranchAddress("recoTowPhi",hfTwrPhi);
-   chain.SetBranchAddress("NrecoJetCal",&nJetsCal);
-   chain.SetBranchAddress("recoJetCalPt",jetCalPt); 
-   chain.SetBranchAddress("recoJetCalEta",jetCalEta);
+   chain.SetBranchAddress("NrecoJetCorCal",&nJetsCor);
+   chain.SetBranchAddress("recoJetCorCalPt",jetCorPt); 
+   chain.SetBranchAddress("recoJetCorCalEta",jetCorEta);
    
    int nEvents = chain.GetEntries();
    double etaMin = 3.0;
    double towerThreshold = 4.0; //energy
    int L1EtSumThreshold = 999;
-   int L1TowerCountThreshold = 1;
+   int L1TowerCountThreshold = 5;
+   double hltJetPtMin = 50.; 
    double sumEHFThreshold = 200.; 
  
    int nPassedTrigBitL1 = 0;
@@ -178,9 +193,11 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
 
       if(lumiMax < 0) lumiMax = lumiBlock;
       if(lumiMax >= 0 && lumiBlock > lumiMax) lumiMax = lumiBlock;
-
-      h_trigBitL1->Fill(trigBitL1);
-      if(trigBitL1 == 0) continue;
+      
+      if(trigNameL1 != ""){
+         h_trigBitL1->Fill(trigBitL1);
+         if(trigBitL1 == 0) continue;
+      }
       ++nPassedTrigBitL1;
       h_NevtsL1BitVsLumi->Fill(lumiBlock);
 
@@ -232,8 +249,24 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       ++nPassedTrigBitL1AndL1EtSum;
       h_NevtsL1VsLumi->Fill(lumiBlock);
 
-      h_trigBitHLT->Fill(trigBitHLT);
-      if(trigBitHLT == 0) continue;
+      if(trigNameHLT != ""){
+         h_trigBitHLT->Fill(trigBitHLT);
+         if(trigBitHLT == 0) continue; 
+      }
+      h_nJetsCor->Fill(nJetsCor);
+      bool acceptJetPt = true;
+      if(nJetsCor >= 1){
+         h_leadingJetCorPt->Fill(jetCorPt[0]);
+         h_leadingJetCorEta->Fill(jetCorEta[0]); 
+         if(jetCorPt[0] < hltJetPtMin) acceptJetPt = false;
+      }
+      if(nJetsCor >= 2){
+         h_secondJetCorPt->Fill(jetCorPt[1]);
+         h_secondJetCorEta->Fill(jetCorEta[1]);
+         if(jetCorPt[1] < hltJetPtMin) acceptJetPt = false;
+      }
+      if(!acceptJetPt) continue;
+ 
       ++nPassedTrigBitHLT;
       h_NevtsHLTBitVsLumi->Fill(lumiBlock);
 
@@ -260,8 +293,8 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       h_sumEHF_plus->Fill(sumEHF_plus);
       h_sumEHF_minus->Fill(sumEHF_minus);
 
-      double fracEt = (nJetsCal)?jetCalPt[0]:-1;
-      if(nJetsCal >=2 ) fracEt += jetCalPt[1];
+      double fracEt = (nJetsCor)?jetCorPt[0]:-1;
+      if(nJetsCor >=2 ) fracEt += jetCorPt[1];
       if(sumEt) fracEt /= sumEt;
       else fracEt = -1;
 
@@ -272,7 +305,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
          float threshold = h_NevtsVsThreshold->GetXaxis()->GetBinLowEdge(i_bin + 1);
          float bin_center = h_NevtsVsThreshold->GetXaxis()->GetBinCenter(i_bin + 1);
          // Apply veto
-         if((sumEHF_plus < threshold)&&(sumEHF_minus < threshold)) h_NevtsVsThreshold->Fill(bin_center);
+         if((sumEHF_plus < threshold)&&(sumEHF_minus < threshold)) h_NevtsVsThreshold->Fill(bin_center,(trigBitL1Prescl*trigBitHLTPrescl));
       }
 
       if((sumEHF_plus < sumEHFThreshold)&&(sumEHF_minus < sumEHFThreshold)){
@@ -305,7 +338,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    double lumiLength = 23.3; //s
    double deltaLumi = lumiMax - lumiMin;
    TH1F* h_RateVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("RateVsThreshold"));
-   h_RateVsThreshold->Scale((trigBitL1Prescl*trigBitHLTPrescl)/(deltaLumi*lumiLength));
+   h_RateVsThreshold->Scale(1./(deltaLumi*lumiLength));
 
    TH1F* h_RateXSectionVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("RateXSectionVsThreshold"));
    double Lum = 1.;//10^31cms-2s-1
