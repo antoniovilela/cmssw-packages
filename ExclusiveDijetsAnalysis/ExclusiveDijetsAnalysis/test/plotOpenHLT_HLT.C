@@ -83,6 +83,8 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    int runNumber,lumiBlock,bunchCrossing;
    int trigBitL1;
    int trigBitHLT;
+   int trigBitL1Prescl;
+   int trigBitHLTPrescl; 
    int nL1CenJet;
    float l1CenJetEt[4];
    int nL1ForJet;
@@ -117,6 +119,8 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
 
    chain.SetBranchAddress(trigNameL1.c_str(),&trigBitL1);
    chain.SetBranchAddress(trigNameHLT.c_str(),&trigBitHLT);
+   chain.SetBranchAddress((trigNameL1 + "_Prescl").c_str(),&trigBitL1Prescl);
+   chain.SetBranchAddress((trigNameHLT + "_Prescl").c_str(),&trigBitHLTPrescl);
    chain.SetBranchAddress("Run",&runNumber);
    chain.SetBranchAddress("LumiBlock",&lumiBlock);
    chain.SetBranchAddress("Bx",&bunchCrossing);
@@ -301,7 +305,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    double lumiLength = 23.3; //s
    double deltaLumi = lumiMax - lumiMin;
    TH1F* h_RateVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("RateVsThreshold"));
-   h_RateVsThreshold->Scale(1./(deltaLumi*lumiLength));
+   h_RateVsThreshold->Scale((trigBitL1Prescl*trigBitHLTPrescl)/(deltaLumi*lumiLength));
 
    TH1F* h_RateXSectionVsThreshold = static_cast<TH1F*>(h_NevtsVsThreshold->Clone("RateXSectionVsThreshold"));
    double Lum = 1.;//10^31cms-2s-1

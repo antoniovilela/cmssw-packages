@@ -60,6 +60,7 @@ void plot(std::string const& fileName){
    plotter.SetLineStyles(histLineStyles);
    plotter.SetFillColors(std::vector<int>(1,0));
    plotter.SetFillStyles(std::vector<int>(1,0));
+   plotter.SetStats(false);
 
    plotter.plot(varMap,file,"HISTOE1");
 
@@ -70,6 +71,7 @@ void plot(std::string const& fileName){
    plotterRates.SetLineStyles(histLineStyles);
    plotterRates.SetFillColors(std::vector<int>(1,0));
    plotterRates.SetFillStyles(std::vector<int>(1,0));
-  
+   plotterRates.SetStats(false);  
+
    plotterRates.plot(varMapRates,file,"HISTOE1");
 }
