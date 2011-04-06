@@ -5,42 +5,34 @@
 #include "TDirectory.h"
 #include "TH1F.h"
 
-#include "plotTools.h"
+#include "Utilities/PlottingTools/interface/Plotter.h"
+#include "Utilities/PlottingTools/interface/PlottingTools.h"
 
 #include <iostream>
 #include <vector>
 #include <map>
 
-/*TH1F* getHisto(TFile*, const string&);
-TH1F* getHisto(TDirectory*, const string&);
-void scaleHisto(TH1F* histo, double scale, int line, int color, int rebin);
-
-void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm);
-void plot(std::vector<std::string>& variables, std::vector<TDirectory*>& directories, bool Norm);*/
-
-//void plot(std::map<std::string,std::vector<std::string> >& variablesMap, TDirectory* dir, bool Norm);
-
-void plot(bool Norm = false){
-   TFile* file = TFile::Open("root/analysisOpenHLT_MinBias_histos_L1.root");
+void plot(std::string const& fileName){
+   TFile* file = TFile::Open( fileName.c_str() );
 
    std::map<std::string,std::vector<std::string> > varMap;
+   std::map<std::string,std::vector<std::string> > varMapRates;
 
    std::vector<std::string> varNames;
-   varNames.push_back("L1HfRing1EtSumNegativeEta");
+   /*varNames.push_back("L1HfRing1EtSumNegativeEta");
    varNames.push_back("L1HfRing2EtSumNegativeEta");
    varNames.push_back("L1HfRing1EtSumPositiveEta");
-   varNames.push_back("L1HfRing2EtSumPositiveEta");
+   varNames.push_back("L1HfRing2EtSumPositiveEta");*/
+   varNames.push_back("L1HfTowerCountPositiveEtaRing1");
+   varNames.push_back("L1HfTowerCountNegativeEtaRing1");
+   varNames.push_back("L1HfTowerCountPositiveEtaRing2");
+   varNames.push_back("L1HfTowerCountNegativeEtaRing2");
 
    std::vector<std::string> triggerBits;
-   //triggerBits.push_back("L1_SingleJet15");
-   triggerBits.push_back("L1_SingleJet30");
-   triggerBits.push_back("HLT_DiJetAve30");
-   //triggerBits.push_back("L1_SingleEG5");
-   //triggerBits.push_back("L1_SingleEG8");
-   //triggerBits.push_back("L1_DoubleEG5");
-   //triggerBits.push_back("L1_DoubleMuOpen");
-   //triggerBits.push_back("L1_DoubleMu3");
-   //triggerBits.push_back("HLT_DoubleMu3");
+   //triggerBits.push_back("L1_SingleJet16");
+   triggerBits.push_back("L1_SingleJet36");
+   triggerBits.push_back("L1_SingleEG12");
+   triggerBits.push_back("L1_DoubleEG3");
 
    std::vector<std::string> def;
    for(std::vector<std::string>::const_iterator var = varNames.begin(); var != varNames.end(); ++var){
@@ -52,12 +44,32 @@ void plot(bool Norm = false){
       }
    }
 
-   varMap["Rates"] = def;
-   varMap["TrigBitVsThreshold"] = def;
+   varMapRates["Rates"] = def;
+   varMapRates["TrigBitVsThreshold"] = def;
    for(std::vector<std::string>::const_iterator trigBit = triggerBits.begin(); trigBit != triggerBits.end(); ++trigBit){
-      varMap["Rates"].push_back(*trigBit + "_Rate");
-      varMap["TrigBitVsThreshold"].push_back(*trigBit + "_VsThreshold");
+      varMapRates["Rates"].push_back(*trigBit + "_Rate");
+      varMapRates["TrigBitVsThreshold"].push_back(*trigBit + "_VsThreshold");
    }
 
-   plot(varMap,file,Norm);
+   Plotter<NumberEntriesNorm> plotter;
+   int colors[] = {kBlack,kRed,kBlue,kMagenta,kOrange};
+   int linestyles[] = {1,2,3,9,10,12};
+   std::vector<int> histColors(colors,colors + sizeof(colors)/sizeof(int));
+   std::vector<int> histLineStyles(linestyles,linestyles+sizeof(linestyles)/sizeof(int));
+   plotter.SetLineColors(histColors);
+   plotter.SetLineStyles(histLineStyles);
+   plotter.SetFillColors(std::vector<int>(1,0));
+   plotter.SetFillStyles(std::vector<int>(1,0));
+
+   plotter.plot(varMap,file,"HISTOE1");
+
+   Plotter<DefaultNorm> plotterRates;
+   histColors.erase(histColors.begin());
+   histLineStyles.erase(histLineStyles.begin());
+   plotterRates.SetLineColors(histColors);
+   plotterRates.SetLineStyles(histLineStyles);
+   plotterRates.SetFillColors(std::vector<int>(1,0));
+   plotterRates.SetFillStyles(std::vector<int>(1,0));
+  
+   plotterRates.plot(varMapRates,file,"HISTOE1");
 }
