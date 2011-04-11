@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE Telescope SYSTEM "telecfg.dtd">
+<Telescope Comment="Telescope Configuration Version" Version="1.0.0">
+  <Plane ChipType="PSI" Dut="No" Id="0" Include="Yes" MeasureX="No" PlaqId="3" StationId="2">
+    <ParaFiles Comment="Para P0" GainFile="gain_0_Y_100406.dat" MiscFile="misc_0_Y_100419.dat"/>
+    <GeomSetting Alpha="-0.41504" Beta="0.04195" Comment="Geom P0" Phi="-0.00725" Xcenter="3.37857" Ycenter="0.00000" Zcenter="-41.40000"/>
+    <Chip Id="0" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" 16.20" Y00="-8.10"></Chip>
+    <Chip Id="1" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="-8.10"></Chip>
+    <Chip Id="2" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="  0.00" Y00="-8.10"></Chip>
+    <Chip Id="3" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00="-8.10"></Chip>
+    <Chip Id="4" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="-16.20" Y00=" 8.10"></Chip>
+    <Chip Id="5" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" 8.10"></Chip>
+    <Chip Id="6" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  0.00" Y00=" 8.10"></Chip>
+    <Chip Id="7" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" 8.10"></Chip>
+  </Plane>
+  <Plane ChipType="PSI" Dut="No" Id="1" Include="Yes" MeasureX="No" PlaqId="2" StationId="2">
+    <ParaFiles Comment="Para P1" GainFile="gain_1_Y_100406.dat" MiscFile="misc_1_Y_100419.dat"/>
+    <GeomSetting Alpha="-0.43964" Beta="0.02701" Comment="Geom P1" Phi="0.00220" Xcenter="2.92564" Ycenter="4.26860" Zcenter="-40.60000"/>
+    <Chip Id="0" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00=" 16.20" Y00=" 8.10"></Chip>
+    <Chip Id="1" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" 8.10"></Chip>
+    <Chip Id="2" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  0.00" Y00=" 8.10"></Chip>
+    <Chip Id="3" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" 8.10"></Chip>
+    <Chip Id="4" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="-16.20" Y00="-8.10"></Chip>
+    <Chip Id="5" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00="-8.10"></Chip>
+    <Chip Id="6" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="  0.00" Y00="-8.10"></Chip>
+    <Chip Id="7" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="-8.10"></Chip>
+  </Plane>
+  <Plane ChipType="PSI" Dut="No" Id="2" Include="Yes" MeasureX="Yes" PlaqId="1" StationId="2">
+    <ParaFiles Comment="Para P2" GainFile="gain_2_X_100406.dat" MiscFile="misc_2_X_100419.dat"/>
+    <GeomSetting Alpha="-0.03123" Beta="0.40167" Comment="Geom P2" Phi="0.00278" Xcenter="0.00000" Ycenter="0.62879" Zcenter="-25.40000"/>
+    <Chip Id="0" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" 12.15"></Chip>
+    <Chip Id="1" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="  4.05"></Chip>
+    <Chip Id="2" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" -4.05"></Chip>
+    <Chip Id="3" IncCol="Yes" IncRow="Yes" Include="No"  NumCol="52" NumRow="80" X00=" -8.10" Y00="-12.15"></Chip>
+    <Chip Id="4" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" -4.05"></Chip>
+    <Chip Id="5" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00="  4.05"></Chip>
+  </Plane>
+  <Plane ChipType="PSI" Dut="No" Id="3" Include="Yes" MeasureX="Yes" PlaqId="0" StationId="2">
+    <ParaFiles Comment="Para P3" GainFile="gain_3_X_100406.dat" MiscFile="misc_3_X_100419.dat"/>
+    <GeomSetting Alpha="-0.03064" Beta="0.40092" Comment="Geom P3" Phi="0.01437" Xcenter="4.40574" Ycenter="0.10727" Zcenter="-24.60000"/>
+    <Chip Id="0" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" 12.15"></Chip>
+    <Chip Id="1" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00="  4.05"></Chip>
+    <Chip Id="2" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" -4.05"></Chip>
+    <Chip Id="3" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="-12.15"></Chip>
+    <Chip Id="4" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" -4.05"></Chip>
+    <Chip Id="5" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="  4.05"></Chip>
+  </Plane>
+  <Plane ChipType="PSI" Dut="Yes" Id="4" Include="Yes" MeasureX="Yes" PlaqId="1" StationId="4">
+    <ParaFiles Comment="Para P4" GainFile="gain_4_cvd_fake.dat" MiscFile="misc_4_cvd_100419.dat"/>
+    <GeomSetting Alpha="-0.01230" Beta="-0.00421" Comment="Geom P4" Phi="0.01391" Xcenter="3.62418" Ycenter="3.63838" Zcenter="-6.00000"/>
+    <Chip Id="0" IncCol="No" IncRow="Yes"  Include="Yes" NumCol="52" NumRow="80" X00="  -4.05" Y00="4.05"></Chip>
+  </Plane>
+  <Plane ChipType="PSI" Dut="Yes" Id="5" Include="Yes" MeasureX="Yes" PlaqId="0" StationId="4">
+    <ParaFiles Comment="Para P5" GainFile="gain_4_cvd_fake.dat" MiscFile="misc_4_cvd_100419.dat"/>
+    <GeomSetting Alpha="-0.00191" Beta="0.00097" Comment="Geom P5" Phi="0.08402" Xcenter="1.99089" Ycenter="3.75312" Zcenter="6.00000"/>
+    <Chip Id="0" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  4.05" Y00="-4.05"></Chip>
+  </Plane>
+  <Plane ChipType="PSI" Dut="No" Id="6" Include="Yes" MeasureX="Yes" PlaqId="3" StationId="0">
+    <ParaFiles Comment="Para P6" GainFile="gain_5_X_100406.dat" MiscFile="misc_5_X_100419.dat"/>
+    <GeomSetting Alpha="0.04506" Beta="0.44148" Comment="Geom P6" Phi="0.04457" Xcenter="1.39577" Ycenter="-2.94125" Zcenter="24.60000"/>
+    <Chip Id="0" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" 12.15"></Chip>
+    <Chip Id="1" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="  4.05"></Chip>
+    <Chip Id="2" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" -4.05"></Chip>
+    <Chip Id="3" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00="-12.15"></Chip>
+    <Chip Id="4" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" -4.05"></Chip>
+    <Chip Id="5" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00="  4.05"></Chip>
+  </Plane>
+  <Plane ChipType="PSI" Dut="No" Id="7" Include="Yes" MeasureX="Yes" PlaqId="2" StationId="0">
+    <ParaFiles Comment="Para P7" GainFile="gain_6_X_100406.dat" MiscFile="misc_6_X_100419.dat"/>
+    <GeomSetting Alpha="0.01841" Beta="0.42749" Comment="Geom P7" Phi="0.01313" Xcenter="5.80420" Ycenter="-2.86388" Zcenter="25.40000"/>
+    <Chip Id="0" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" 12.15"></Chip>
+    <Chip Id="1" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00="  4.05"></Chip>
+    <Chip Id="2" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" -4.05"></Chip>
+    <Chip Id="3" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="-12.15"></Chip>
+    <Chip Id="4" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" -4.05"></Chip>
+    <Chip Id="5" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="  4.05"></Chip>
+  </Plane>
+  <Plane ChipType="PSI" Dut="No" Id="8" Include="Yes" MeasureX="No" PlaqId="1" StationId="0">
+    <ParaFiles Comment="Para P8" GainFile="gain_7_Y_100406.dat" MiscFile="misc_7_Y_100419.dat"/>
+    <GeomSetting Alpha="-0.43490" Beta="-0.00954" Comment="Geom P8" Phi="-0.00132" Xcenter="1.65632" Ycenter="0.67288" Zcenter="40.60000"/>
+    <Chip Id="0" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" 16.20" Y00="-8.10"></Chip>
+    <Chip Id="1" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="-8.10"></Chip>
+    <Chip Id="2" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="  0.00" Y00="-8.10"></Chip>
+    <Chip Id="3" IncCol="No"  IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00="-8.10"></Chip>
+    <Chip Id="4" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="-16.20" Y00=" 8.10"></Chip>
+    <Chip Id="5" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" 8.10"></Chip>
+    <Chip Id="6" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  0.00" Y00=" 8.10"></Chip>
+    <Chip Id="7" IncCol="Yes" IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" 8.10"></Chip>
+  </Plane>
+  <Plane ChipType="PSI" Dut="No" Id="9" Include="Yes" MeasureX="No" PlaqId="0" StationId="0">
+    <ParaFiles Comment="Para P9" GainFile="gain_8_Y_100406.dat" MiscFile="misc_8_Y_100419.dat"/>
+    <GeomSetting Alpha="-0.42867" Beta="-0.02089" Comment="Geom P9" Phi="-0.00367" Xcenter="3.35019" Ycenter="5.06366" Zcenter="41.40000"/>
+    <Chip Id="0" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00=" 16.20" Y00=" 8.10"></Chip>
+    <Chip Id="1" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00=" 8.10"></Chip>
+    <Chip Id="2" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00="  0.00" Y00=" 8.10"></Chip>
+    <Chip Id="3" IncCol="No"  IncRow="No"  Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00=" 8.10"></Chip>
+    <Chip Id="4" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="-16.20" Y00="-8.10"></Chip>
+    <Chip Id="5" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00=" -8.10" Y00="-8.10"></Chip>
+    <Chip Id="6" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="  0.00" Y00="-8.10"></Chip>
+    <Chip Id="7" IncCol="Yes" IncRow="Yes" Include="Yes" NumCol="52" NumRow="80" X00="  8.10" Y00="-8.10"></Chip>
+  </Plane>
+</Telescope>
