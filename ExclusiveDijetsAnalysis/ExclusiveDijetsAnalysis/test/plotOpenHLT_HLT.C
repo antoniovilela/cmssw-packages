@@ -61,6 +61,10 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    TH1F* h_hfTwrEta = new TH1F("hfTwrEta","hfTwrEta",100,-5.5,5.5);
    TH1F* h_hfTwrPhi = new TH1F("hfTwrPhi","hfTwrPhi",100,-1.1*M_PI,1.1*M_PI);
 
+   TH1F* h_nVtx = new TH1F("nVtx","nVtx",15,0,15);
+   TH1F* h_vtxZ = new TH1F("vtxZ","vtxZ",15,0,15);
+   TH1F* h_vtxNdof = new TH1F("vtxNdof","vtxNdof",15,0,15);
+
    TH1F* h_sumEHF_plus = new TH1F("sumEHF_plus","sumEHF_plus",500,0.,1000.);
    TH1F* h_sumEHF_minus = new TH1F("sumEHF_minus","sumEHF_minus",500,0.,1000.);
 
@@ -123,6 +127,12 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    float jetCorPt[100];
    float jetCorEta[100];
 
+   int nVtx;
+   float vtxZ[50];
+   float vtxNdof[50];
+   float vtxChi2[50];
+   float vtxNtrk[50];
+
    if(trigNameL1 != ""){
       chain.SetBranchAddress(trigNameL1.c_str(),&trigBitL1);
       chain.SetBranchAddress((trigNameL1 + "_Prescl").c_str(),&trigBitL1Prescl);
@@ -165,13 +175,18 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
    chain.SetBranchAddress("NrecoJetCorCal",&nJetsCor);
    chain.SetBranchAddress("recoJetCorCalPt",jetCorPt); 
    chain.SetBranchAddress("recoJetCorCalEta",jetCorEta);
+   chain.SetBranchAddress("recoNVrt",&nVtx);
+   chain.SetBranchAddress("recoVrtZ",vtxZ);
+   chain.SetBranchAddress("recoVrtNdof",vtxNdof);
+   chain.SetBranchAddress("recoVrtChi2",vtxChi2);
+   chain.SetBranchAddress("recoVrtNtrk",vtxNtrk); 
    
    int nEvents = chain.GetEntries();
    double etaMin = 3.0;
    double towerThreshold = 4.0; //energy
    int L1EtSumThreshold = 999;
-   int L1TowerCountThreshold = 5;
-   double hltJetPtMin = 50.; 
+   int L1TowerCountThreshold = 1;
+   double hltJetPtMin = 0.; 
    double sumEHFThreshold = 200.; 
  
    int nPassedTrigBitL1 = 0;
@@ -270,6 +285,12 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double crossSection = 1., 
       ++nPassedTrigBitHLT;
       h_NevtsHLTBitVsLumi->Fill(lumiBlock);
 
+      h_nVtx->Fill(nVtx);
+      if(nVtx){
+         h_vtxZ->Fill(vtxZ[0]);
+         h_vtxNdof->Fill(vtxNdof[0]);
+      }
+  
       h_nHFtowers->Fill(nHFtowers);
       double sumEHF_plus = 0.;
       double sumEHF_minus = 0.;

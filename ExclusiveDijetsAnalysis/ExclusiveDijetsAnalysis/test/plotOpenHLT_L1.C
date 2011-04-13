@@ -20,14 +20,18 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
    TFile* hfile = new TFile("analysisOpenHLT_histos.root","recreate","data histograms");
 
    // Reference trigger
+   //std::string refTriggerName = "HLT_Physics_v1";
    //std::string refTriggerName = "HLT_ZeroBias_v1";
-   std::string refTriggerName = "HLT_ExclDiJet60_HFAND_v1";
+   std::string refTriggerName = "HLT_L1SingleJet36_v1";
+   //std::string refTriggerName = "HLT_ExclDiJet60_HFAND_v1";
 
    std::vector<std::string> triggerBits;
-   triggerBits.push_back("L1_SingleJet16");
+   //triggerBits.push_back("L1_BptxPlus_NotBptxMinus");
+   //triggerBits.push_back("L1_BptxMinus_NotBptxPlus"); 
+   //triggerBits.push_back("L1_SingleJet16");
    triggerBits.push_back("L1_SingleJet36");
-   triggerBits.push_back("L1_SingleEG12");
-   triggerBits.push_back("L1_DoubleEG3");
+   //triggerBits.push_back("L1_SingleEG12");
+   //triggerBits.push_back("L1_DoubleEG3");
    
    std::vector<std::string> varNames;
    /*varNames.push_back("L1HfRing1EtSumNegativeEta");
@@ -92,6 +96,7 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
 
    int nEvents = chain.GetEntries();
    int countEvts = 0;
+   std::vector<double> sumWeights(triggerBits.size(),0.);
    for(int entry = 0; entry < nEvents; ++entry){
       if((maxEvents > 0)&&(entry == maxEvents)) break;
       if(entry%2000 == 0) std::cout << ">>> Analysing " << entry << "th event" << std::endl;
@@ -145,6 +150,9 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
          int prescale = vars[iBitPrescl];
          if(!trigAccept) continue;
 
+         double weight = prescale;
+         sumWeights[trigBit] += weight;
+
          std::vector<int> accept(nThresholds,1);
          for(std::vector<std::string>::const_iterator itVar = varNames.begin(); itVar != varNames.end(); ++itVar){
             int iVar = mapNameToIndex[*itVar]; 
@@ -163,13 +171,16 @@ void plotOpenHLT(std::vector<std::string>& fileNames, double norm = 1., int maxE
    std::vector<TH1F*> histosRateVsThreshold;
    //double crossSection = 80.;//mb
    //double Lum = 1.;//10^31cms-2s-2
+   size_t idx_bit = 0;
    for(std::vector<std::pair<std::string,TH1F*> >::const_iterator it = histosEffVsThreshold.begin();
-                                                                  it != histosEffVsThreshold.end(); ++it){
+                                                                  it != histosEffVsThreshold.end();
+                                                                  ++it,++idx_bit){
       //it->second->Scale(1./countEvts);
       std::string hname = it->first + "_Rate";
       histosRateVsThreshold.push_back(static_cast<TH1F*>(it->second->Clone(hname.c_str())));
       histosRateVsThreshold.back()->Scale(norm);
-      it->second->Scale(1./countEvts);
+      double sum_weights = sumWeights[idx_bit];
+      it->second->Scale(1./sum_weights);
    }
 
    hfile->Write();
