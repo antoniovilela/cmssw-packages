@@ -1,0 +1,422 @@
+17:54:37 on Wednesday, March 23, 2011
+User Note: FBK DUT Calibrations 2nd Set of DUTs
+---------------------- 1 Register ---------------------------------
+CC_ALIAS: dut
+CID: 0
+REG: 25. Vcal
+START: 20
+STEP: 3
+ITERATIONS: 37
+TIME_TO_READ: 5
+NUM_OF_PIX: 4
+INJECT_NUM: 10
+INJECT_PER: 400
+MAX_ADC: 1024
+----------------------------------------------------------------------
+Iteration 1 --- reg = 20
+r 1 c 40 h 1 a 266
+r 2 c 26 h 8 a 277
+r 2 c 27 h 1 a 280
+r 3 c 26 h 1 a 273
+r 3 c 27 h 1 a 289
+r 3 c 40 h 2 a 280
+r 4 c 13 h 9 a 304
+r 4 c 14 h 2 a 280
+r 4 c 27 h 9 a 285
+r 4 c 40 h 3 a 279
+r 5 c 26 h 1 a 279
+r 5 c 27 h 5 a 278
+r 6 c 27 h 1 a 293
+r 6 c 40 h 8 a 286
+r 7 c 13 h 8 a 296
+r 7 c 14 h 3 a 273
+r 7 c 27 h 2 a 282
+r 7 c 39 h 2 a 276
+r 8 c 14 h 1 a 262
+r 8 c 26 h 5 a 286
+r 8 c 27 h 10 a 290
+r 9 c 13 h 2 a 301
+r 9 c 14 h 2 a 276
+r 9 c 27 h 1 a 287
+r 9 c 39 h 1 a 292
+r 9 c 40 h 7 a 294
+r 10 c 13 h 2 a 285
+r 10 c 26 h 6 a 282
+r 10 c 27 h 10 a 297
+r 10 c 39 h 1 a 278
+r 10 c 40 h 1 a 280
+r 11 c 13 h 2 a 286
+r 11 c 14 h 2 a 268
+r 11 c 26 h 1 a 281
+r 11 c 27 h 2 a 279
+r 11 c 39 h 9 a 281
+r 11 c 40 h 8 a 286
+r 12 c 26 h 2 a 278
+r 12 c 27 h 1 a 274
+r 12 c 40 h 2 a 284
+r 13 c 14 h 4 a 276
+r 13 c 26 h 7 a 292
+r 13 c 27 h 2 a 282
+r 13 c 39 h 9 a 277
+r 13 c 40 h 7 a 270
+r 14 c 0 h 1 a 250
+r 14 c 1 h 1 a 265
+r 14 c 13 h 2 a 280
+r 14 c 14 h 7 a 274
+r 14 c 26 h 10 a 283
+r 14 c 27 h 1 a 275
+r 14 c 39 h 6 a 276
+r 14 c 40 h 10 a 281
+r 15 c 26 h 6 a 284
+r 15 c 27 h 6 a 296
+r 15 c 39 h 10 a 288
+r 15 c 40 h 7 a 279
+r 16 c 14 h 5 a 271
+r 16 c 26 h 7 a 285
+r 16 c 27 h 2 a 283
+r 16 c 40 h 10 a 293
+r 17 c 13 h 1 a 284
+r 17 c 14 h 3 a 269
+r 17 c 26 h 1 a 275
+r 17 c 27 h 4 a 281
+r 17 c 39 h 1 a 277
+r 17 c 40 h 7 a 273
+r 18 c 1 h 1 a 291
+r 18 c 14 h 1 a 279
+r 18 c 26 h 9 a 287
+r 18 c 27 h 1 a 290
+r 18 c 39 h 10 a 285
+r 18 c 40 h 8 a 296
+r 19 c 26 h 10 a 299
+r 19 c 27 h 10 a 286
+r 19 c 39 h 6 a 285
+r 19 c 40 h 1 a 274
+r 20 c 1 h 1 a 270
+r 20 c 14 h 6 a 268
+r 20 c 26 h 6 a 278
+r 20 c 27 h 5 a 285
+r 20 c 39 h 6 a 281
+r 21 c 14 h 3 a 281
+r 21 c 26 h 5 a 283
+r 21 c 27 h 10 a 294
+r 21 c 40 h 10 a 300
+r 22 c 1 h 1 a 274
+r 22 c 13 h 1 a 280
+r 22 c 14 h 2 a 273
+r 22 c 26 h 1 a 288
+r 22 c 27 h 9 a 286
+r 22 c 39 h 8 a 278
+r 22 c 40 h 3 a 287
+r 23 c 13 h 1 a 280
+r 23 c 14 h 6 a 272
+r 23 c 26 h 1 a 275
+r 23 c 27 h 8 a 270
+r 23 c 40 h 4 a 270
+r 24 c 1 h 1 a 293
+r 24 c 13 h 2 a 296
+r 24 c 14 h 1 a 282
+r 24 c 26 h 4 a 286
+r 24 c 27 h 6 a 295
+r 24 c 39 h 1 a 279
+r 24 c 40 h 8 a 290
+r 25 c 1 h 1 a 268
+r 25 c 14 h 6 a 265
+r 25 c 26 h 6 a 281
+r 25 c 27 h 7 a 271
+r 25 c 39 h 10 a 279
+r 25 c 40 h 10 a 283
+r 26 c 14 h 1 a 249
+r 26 c 26 h 1 a 277
+r 26 c 27 h 8 a 283
+r 26 c 39 h 9 a 285
+r 26 c 40 h 8 a 269
+r 27 c 26 h 9 a 287
+r 27 c 27 h 7 a 296
+r 27 c 39 h 10 a 301
+r 27 c 40 h 2 a 281
+r 28 c 13 h 1 a 277
+r 28 c 14 h 8 a 276
+r 28 c 26 h 10 a 278
+r 28 c 27 h 10 a 292
+r 28 c 39 h 6 a 286
+r 28 c 40 h 6 a 274
+r 29 c 13 h 9 a 289
+r 29 c 26 h 10 a 284
+r 29 c 27 h 6 a 274
+r 29 c 39 h 4 a 270
+r 29 c 40 h 1 a 278
+r 30 c 14 h 2 a 277
+r 30 c 26 h 10 a 295
+r 30 c 27 h 7 a 288
+r 30 c 39 h 10 a 286
+r 30 c 40 h 8 a 280
+r 31 c 13 h 9 a 298
+r 31 c 14 h 10 a 275
+r 31 c 26 h 10 a 295
+r 31 c 27 h 10 a 286
+r 31 c 39 h 1 a 268
+r 31 c 40 h 1 a 268
+r 32 c 13 h 4 a 291
+r 32 c 14 h 7 a 261
+r 32 c 26 h 3 a 269
+r 32 c 27 h 10 a 284
+r 32 c 39 h 8 a 273
+r 32 c 40 h 7 a 261
+r 33 c 1 h 1 a 269
+r 33 c 13 h 6 a 303
+r 33 c 14 h 6 a 272
+r 33 c 26 h 10 a 289
+r 33 c 27 h 10 a 290
+r 33 c 39 h 1 a 274
+r 33 c 40 h 6 a 278
+r 34 c 13 h 1 a 289
+r 34 c 14 h 2 a 264
+r 34 c 26 h 10 a 300
+r 34 c 27 h 8 a 285
+r 34 c 39 h 7 a 275
+r 34 c 40 h 9 a 279
+r 35 c 1 h 1 a 263
+r 35 c 13 h 10 a 292
+r 35 c 14 h 10 a 279
+r 35 c 26 h 10 a 275
+r 35 c 27 h 7 a 275
+r 35 c 39 h 10 a 275
+r 35 c 40 h 10 a 270
+r 36 c 13 h 10 a 308
+r 36 c 14 h 7 a 264
+r 36 c 26 h 8 a 279
+r 36 c 27 h 8 a 287
+r 36 c 39 h 10 a 292
+r 36 c 40 h 10 a 298
+r 37 c 13 h 9 a 286
+r 37 c 14 h 1 a 266
+r 37 c 26 h 6 a 280
+r 37 c 27 h 6 a 276
+r 37 c 39 h 10 a 280
+r 37 c 40 h 10 a 288
+r 38 c 13 h 9 a 288
+r 38 c 14 h 2 a 263
+r 38 c 26 h 10 a 283
+r 38 c 27 h 10 a 295
+r 38 c 39 h 3 a 273
+r 38 c 40 h 9 a 263
+r 39 c 1 h 6 a 286
+r 39 c 13 h 4 a 289
+r 39 c 26 h 10 a 283
+r 39 c 27 h 10 a 300
+r 39 c 39 h 10 a 291
+r 40 c 13 h 1 a 270
+r 40 c 14 h 1 a 275
+r 40 c 26 h 10 a 281
+r 40 c 27 h 10 a 281
+r 40 c 39 h 8 a 278
+r 40 c 40 h 10 a 283
+r 41 c 1 h 3 a 272
+r 41 c 13 h 9 a 279
+r 41 c 14 h 10 a 269
+r 41 c 26 h 10 a 278
+r 41 c 27 h 9 a 274
+r 41 c 39 h 10 a 271
+r 41 c 40 h 10 a 277
+r 42 c 13 h 9 a 291
+r 42 c 14 h 6 a 283
+r 42 c 26 h 10 a 292
+r 42 c 27 h 3 a 300
+r 42 c 39 h 9 a 288
+r 42 c 40 h 6 a 286
+r 43 c 13 h 2 a 287
+r 43 c 14 h 6 a 281
+r 43 c 26 h 10 a 284
+r 43 c 27 h 10 a 282
+r 43 c 39 h 9 a 276
+r 43 c 40 h 10 a 280
+r 44 c 1 h 2 a 281
+r 44 c 13 h 9 a 285
+r 44 c 14 h 10 a 276
+r 44 c 26 h 10 a 276
+r 44 c 40 h 10 a 288
+r 45 c 13 h 10 a 312
+r 45 c 14 h 7 a 273
+r 45 c 27 h 10 a 291
+r 45 c 39 h 9 a 288
+r 45 c 40 h 5 a 272
+r 46 c 1 h 1 a 270
+r 46 c 13 h 10 a 297
+r 46 c 14 h 6 a 279
+r 46 c 26 h 2 a 271
+r 46 c 27 h 3 a 273
+r 46 c 39 h 9 a 277
+r 46 c 40 h 10 a 278
+r 47 c 13 h 9 a 288
+r 47 c 14 h 3 a 260
+r 47 c 26 h 7 a 268
+r 47 c 27 h 8 a 274
+r 47 c 39 h 10 a 284
+r 47 c 40 h 10 a 269
+r 48 c 13 h 3 a 287
+r 48 c 14 h 10 a 284
+r 48 c 26 h 10 a 284
+r 48 c 27 h 10 a 297
+r 48 c 39 h 10 a 296
+r 48 c 40 h 9 a 279
+r 49 c 13 h 5 a 273
+r 49 c 14 h 8 a 269
+r 49 c 26 h 10 a 288
+r 49 c 27 h 9 a 269
+r 49 c 39 h 1 a 276
+r 49 c 40 h 10 a 283
+r 50 c 13 h 10 a 280
+r 50 c 14 h 8 a 276
+r 50 c 26 h 10 a 280
+r 50 c 27 h 10 a 282
+r 50 c 39 h 8 a 262
+r 50 c 40 h 10 a 272
+r 51 c 13 h 8 a 302
+r 51 c 14 h 9 a 275
+r 51 c 26 h 8 a 277
+r 51 c 27 h 9 a 295
+r 51 c 39 h 8 a 286
+r 51 c 40 h 7 a 278
+r 52 c 0 h 1 a 277
+r 52 c 13 h 8 a 275
+r 52 c 14 h 7 a 278
+r 52 c 26 h 10 a 286
+r 52 c 39 h 1 a 262
+r 52 c 40 h 10 a 284
+r 53 c 13 h 8 a 289
+r 53 c 14 h 2 a 264
+r 53 c 26 h 7 a 265
+r 53 c 27 h 3 a 272
+r 53 c 39 h 8 a 268
+r 54 c 13 h 10 a 290
+r 54 c 14 h 1 a 272
+r 54 c 26 h 9 a 278
+r 54 c 27 h 1 a 281
+r 54 c 39 h 10 a 286
+r 54 c 40 h 6 a 282
+r 55 c 14 h 2 a 274
+r 55 c 26 h 10 a 284
+r 55 c 39 h 1 a 279
+r 55 c 40 h 2 a 275
+r 56 c 14 h 7 a 265
+r 56 c 26 h 10 a 282
+r 56 c 27 h 10 a 271
+r 56 c 40 h 10 a 262
+r 57 c 13 h 9 a 311
+r 57 c 14 h 2 a 269
+r 57 c 27 h 7 a 298
+r 57 c 39 h 8 a 283
+r 57 c 40 h 2 a 266
+r 58 c 13 h 7 a 285
+r 58 c 14 h 2 a 270
+r 58 c 26 h 5 a 276
+r 58 c 27 h 7 a 281
+r 58 c 39 h 8 a 273
+r 58 c 40 h 4 a 267
+r 59 c 13 h 9 a 280
+r 59 c 14 h 9 a 270
+r 59 c 26 h 10 a 271
+r 59 c 27 h 5 a 267
+r 59 c 39 h 1 a 261
+r 59 c 40 h 8 a 262
+r 60 c 13 h 1 a 283
+r 60 c 26 h 3 a 279
+r 60 c 39 h 8 a 269
+r 60 c 40 h 10 a 289
+r 61 c 13 h 10 a 288
+r 61 c 14 h 1 a 270
+r 61 c 26 h 6 a 266
+r 61 c 39 h 3 a 269
+r 61 c 40 h 8 a 277
+r 62 c 13 h 7 a 293
+r 62 c 26 h 4 a 265
+r 62 c 40 h 6 a 270
+r 63 c 13 h 6 a 288
+r 63 c 14 h 10 a 284
+r 63 c 26 h 10 a 281
+r 63 c 27 h 3 a 272
+r 63 c 40 h 10 a 282
+r 64 c 13 h 8 a 288
+r 64 c 26 h 1 a 280
+r 64 c 39 h 7 a 272
+r 64 c 40 h 10 a 281
+r 65 c 13 h 10 a 281
+r 65 c 14 h 1 a 263
+r 65 c 26 h 10 a 267
+r 65 c 27 h 10 a 283
+r 65 c 39 h 2 a 269
+r 66 c 13 h 2 a 285
+r 66 c 26 h 5 a 271
+r 66 c 27 h 10 a 281
+r 66 c 39 h 8 a 272
+r 66 c 40 h 1 a 270
+r 67 c 13 h 5 a 279
+r 67 c 26 h 10 a 273
+r 67 c 27 h 7 a 278
+r 67 c 39 h 2 a 260
+r 68 c 13 h 9 a 291
+r 68 c 26 h 10 a 269
+r 68 c 27 h 7 a 273
+r 68 c 39 h 5 a 258
+r 68 c 40 h 9 a 263
+r 69 c 13 h 2 a 280
+r 69 c 26 h 4 a 281
+r 69 c 27 h 1 a 292
+r 69 c 39 h 7 a 276
+r 69 c 40 h 9 a 272
+r 70 c 13 h 2 a 274
+r 70 c 26 h 10 a 270
+r 70 c 39 h 2 a 271
+r 71 c 13 h 1 a 287
+r 71 c 26 h 9 a 278
+r 71 c 39 h 9 a 268
+r 72 c 26 h 2 a 280
+r 73 c 13 h 1 a 281
+r 73 c 26 h 6 a 270
+r 74 c 13 h 4 a 276
+r 74 c 26 h 1 a 266
+r 74 c 39 h 9 a 265
+r 75 c 26 h 6 a 276
+r 75 c 39 h 7 a 275
+r 76 c 39 h 1 a 279
+r 77 c 26 h 10 a 282
+r 77 c 39 h 4 a 267
+r 78 c 26 h 1 a 271
+r 78 c 39 h 1 a 279
+r 79 c 39 h 3 a 260
+Iteration 2 --- reg = 23
+Iteration 3 --- reg = 26
+Iteration 4 --- reg = 29
+Iteration 5 --- reg = 32
+Iteration 6 --- reg = 35
+Iteration 7 --- reg = 38
+Iteration 8 --- reg = 41
+Iteration 9 --- reg = 44
+Iteration 10 --- reg = 47
+Iteration 11 --- reg = 50
+Iteration 12 --- reg = 53
+Iteration 13 --- reg = 56
+Iteration 14 --- reg = 59
+Iteration 15 --- reg = 62
+Iteration 16 --- reg = 65
+Iteration 17 --- reg = 68
+Iteration 18 --- reg = 71
+Iteration 19 --- reg = 74
+Iteration 20 --- reg = 77
+Iteration 21 --- reg = 80
+Iteration 22 --- reg = 83
+Iteration 23 --- reg = 86
+Iteration 24 --- reg = 89
+Iteration 25 --- reg = 92
+Iteration 26 --- reg = 95
+Iteration 27 --- reg = 98
+Iteration 28 --- reg = 101
+Iteration 29 --- reg = 104
+Iteration 30 --- reg = 107
+Iteration 31 --- reg = 110
+Iteration 32 --- reg = 113
+Iteration 33 --- reg = 116
+Iteration 34 --- reg = 119
+Iteration 35 --- reg = 122
+Iteration 36 --- reg = 125
+Iteration 37 --- reg = 128
