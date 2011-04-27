@@ -6,7 +6,7 @@ def fitGains(rootFileName,outputFileName,stationId,plaqId,chipId,verbose=True):
     outFile = open(outputFileName,'w')
 
     option = ""
-    if not verbose: option = "Q"
+    if not verbose: option = "QN"
 
     #stationId = 0
     #plaqId = 0
