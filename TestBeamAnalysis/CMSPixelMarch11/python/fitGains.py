@@ -1,15 +1,18 @@
 import ROOT
 import os,sys
 
-def fitGains(rootFileName,outputFileName,stationId,plaqId,chipId):
+def fitGains(rootFileName,outputFileName,stationId,plaqId,chipId,verbose=True):
     file = ROOT.TFile(rootFileName,'READ')
     outFile = open(outputFileName,'w')
+
+    option = ""
+    if not verbose: option = "Q"
 
     #stationId = 0
     #plaqId = 0
     #chipId = 0
     def writeWord(word):
-        print word
+        if verbose: print word
         outFile.write(word)
 
     nRows = 80
@@ -50,7 +53,7 @@ def fitGains(rootFileName,outputFileName,stationId,plaqId,chipId):
             minFit = h_adc.GetBinLowEdge(iBinMin)
             maxFit = h_adc.GetBinLowEdge(iBinMax)
             fitFunc = ROOT.TF1("fit_adc_%d_%d" % (row,col),"pol1",minFit,maxFit)
-            h_adc.Fit(fitFunc,"R")
+            h_adc.Fit(fitFunc,"R" + option)
             fit_slope = fitFunc.GetParameter(1)
             fit_ped = fitFunc.GetParameter(0)
             if fit_slope <= 0:
