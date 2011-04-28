@@ -1,3 +1,4 @@
+== TELESCOPE
 st pl ch r c slope pedestal max
 2 3 0 0 0 0.000 0.000 0.000
 2 3 0 0 1 0.316 741.308 756.000
