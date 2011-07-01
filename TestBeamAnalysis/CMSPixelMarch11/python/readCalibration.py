@@ -2,10 +2,18 @@ import ROOT
 import os,sys
 import re
 
-def readCalibration(file,outFile):
-    rootFile = ROOT.TFile.Open(outFile, 'recreate')
+def readCalibration(fileName,outputFileName):
+    """
+    Convert values in input calibration file in ROOT histograms
+    """
+
+    file = open(fileName,'r')
+    if not file:
+        raise RuntimeError, "Could not open file '%s'" % fileName
+
+    rootFile = ROOT.TFile.Open(outputFileName, 'recreate')
     if not rootFile:
-        raise RuntimeError, "Could not open output file '%s'" % outFile
+        raise RuntimeError, "Could not open output file '%s'" % outputFileName
 
     histosHits = {}
     histosADC = {}
@@ -53,7 +61,6 @@ if __name__ == '__main__':
     else:
         outFile =  os.path.basename(inputFile).split('.')[0] + '.root'
 
-    file = open(inputFile,'r')
-    readCalibration(file,outFile)
+    readCalibration(inputFile,outFile)
 
     sys.exit(0)
