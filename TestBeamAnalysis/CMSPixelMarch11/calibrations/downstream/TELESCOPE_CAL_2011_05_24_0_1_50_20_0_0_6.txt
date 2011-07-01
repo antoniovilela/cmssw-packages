@@ -1,0 +1,82 @@
+18:50:48 on Tuesday, May 24, 2011
+User Note: UpstreamTelescope
+---------------------- 1 Register ---------------------------------
+CC_ALIAS: downstream
+CID: 6
+REG: 25. Vcal
+START: 0
+STEP: 1
+ITERATIONS: 50
+TIME_TO_READ: 8
+NUM_OF_PIX: 4
+INJECT_NUM: 20
+INJECT_PER: 200
+MAX_ADC: 1024
+----------------------------------------------------------------------
+Iteration 1 --- reg = 0
+Iteration 2 --- reg = 1
+Iteration 3 --- reg = 2
+Iteration 4 --- reg = 3
+Iteration 5 --- reg = 4
+Iteration 6 --- reg = 5
+Iteration 7 --- reg = 6
+Iteration 8 --- reg = 7
+Iteration 9 --- reg = 8
+Iteration 10 --- reg = 9
+Iteration 11 --- reg = 10
+Iteration 12 --- reg = 11
+Iteration 13 --- reg = 12
+Iteration 14 --- reg = 13
+Iteration 15 --- reg = 14
+Iteration 16 --- reg = 15
+Iteration 17 --- reg = 16
+Iteration 18 --- reg = 17
+Iteration 19 --- reg = 18
+Iteration 20 --- reg = 19
+Iteration 21 --- reg = 20
+Iteration 22 --- reg = 21
+Iteration 23 --- reg = 22
+Iteration 24 --- reg = 23
+Iteration 25 --- reg = 24
+Iteration 26 --- reg = 25
+Iteration 27 --- reg = 26
+Iteration 28 --- reg = 27
+Iteration 29 --- reg = 28
+Iteration 30 --- reg = 29
+Iteration 31 --- reg = 30
+Iteration 32 --- reg = 31
+Iteration 33 --- reg = 32
+Iteration 34 --- reg = 33
+Iteration 35 --- reg = 34
+r 9 c 7 h 1 a 573
+r 9 c 33 h 1 a 574
+r 9 c 47 h 2 a 634
+Iteration 36 --- reg = 35
+Iteration 37 --- reg = 36
+Iteration 38 --- reg = 37
+Iteration 39 --- reg = 38
+Iteration 40 --- reg = 39
+r 9 c 7 h 1 a 698
+r 9 c 49 h 1 a 697
+Iteration 41 --- reg = 40
+Iteration 42 --- reg = 41
+r 27 c 9 h 1 a 699
+r 27 c 35 h 1 a 698
+r 27 c 47 h 2 a 698
+Iteration 43 --- reg = 42
+r 9 c 5 h 1 a 697
+r 9 c 7 h 1 a 698
+r 9 c 31 h 2 a 697
+r 9 c 43 h 1 a 698
+r 9 c 45 h 1 a 697
+r 9 c 47 h 1 a 697
+Iteration 44 --- reg = 43
+r 9 c 37 h 1 a 697
+Iteration 45 --- reg = 44
+Iteration 46 --- reg = 45
+r 9 c 7 h 1 a 699
+r 9 c 31 h 1 a 699
+Iteration 47 --- reg = 46
+Iteration 48 --- reg = 47
+Iteration 49 --- reg = 48
+Iteration 50 --- reg = 49
