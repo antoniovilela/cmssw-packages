@@ -3,6 +3,8 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 
+#include "ForwardAnalysis/Utilities/interface/AcceptCaloTower.h"
+
 #include <vector>
 
 class CaloTower;
@@ -16,6 +18,7 @@ private:
   bool checkTowerFlagsHE( CaloTower const& );
   bool checkTowerFlagsHF( CaloTower const&, double );
 
+  forwardAnalysis::AcceptCaloTower acceptCaloTower_;
   edm::InputTag caloTowersTag_;
 
   double eThresholdHBMin_;
@@ -59,7 +62,8 @@ private:
 
 using namespace reco;
 
-HCALActivitySummary::HCALActivitySummary(edm::ParameterSet const& pset): 
+HCALActivitySummary::HCALActivitySummary(edm::ParameterSet const& pset):
+  acceptCaloTower_(pset), 
   caloTowersTag_(pset.getParameter<edm::InputTag>("CaloTowersTag")),
   eThresholdHBMin_(pset.getParameter<double>("TowerEnergyThresholdHBMin")),
   eThresholdHBMax_(pset.getParameter<double>("TowerEnergyThresholdHBMax")),
@@ -197,7 +201,10 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
   CaloTowerCollection::const_iterator calotower = towerCollection.begin();
   CaloTowerCollection::const_iterator calotowers_end = towerCollection.end(); 
   for(; calotower != calotowers_end; ++calotower) {	
-
+     
+     // General calo tower selector
+     if( !acceptCaloTower_(*calotower) ) continue;
+ 
      bool hasHCAL = false;		
      bool hasHF = false;
      bool hasHE = false;
@@ -223,7 +230,7 @@ void HCALActivitySummary::produce(edm::Event& event, edm::EventSetup const& setu
            else if(ecalSubDet == EcalEndcap) hasEE = true;
         }
      }
-				 	
+	
      //int zside = calotower->zside();
      //double eta = calotower->eta();
      int ieta = calotower->ieta();

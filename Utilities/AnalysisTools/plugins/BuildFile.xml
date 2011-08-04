@@ -10,5 +10,6 @@
   <use name="CommonTools/UtilAlgos"/>
   <use name="CommonTools/RecoAlgos"/> 
   <use name="Utilities/AnalysisTools"/>
+  <use name="ForwardAnalysis/Utilities"/>
   <use name="root"/>
 </library>
