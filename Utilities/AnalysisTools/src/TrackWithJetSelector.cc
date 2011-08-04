@@ -20,10 +20,12 @@ TrackWithJetSelector::~TrackWithJetSelector() {}
 bool TrackWithJetSelector::operator()(const Track& track, const edm::Event& event) const {
    edm::Handle<edm::View<Candidate> > jetCollectionH;
    event.getByLabel(jetTag_,jetCollectionH);
+   
+   // If no jet, accept track
+   if(jetCollectionH->size() == 0) return true;
    const Candidate& leadingJet = *(jetCollectionH->begin());
  
    double dphi = fabs(leadingJet.phi() - track.phi());
-
    bool accept = (dphi >= deltaPhiMin_)&&(dphi < deltaPhiMax_);
   
    return accept;
