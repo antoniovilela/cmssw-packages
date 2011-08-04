@@ -138,6 +138,11 @@ int pflowId(std::string const& name){
 
 bool pflowThreshold(reco::PFCandidate const& part, std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap){
 
+   //FIXME
+   // HF eta rings 29, 40, 41
+   if( ( (fabs(part.eta()) >= 2.866) && (fabs(part.eta()) < 2.976) ) || 
+         (fabs(part.eta()) >= 4.730) ) return false;
+
    bool accept = true;
 
    double eta = part.eta();

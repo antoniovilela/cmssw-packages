@@ -66,7 +66,9 @@ double MassColl(PartColl& partCollection, double ptThreshold = -1.,
          part_energy *= energyScale;
       }
 
-      if( fabs(part->eta()) >= 4.730 ) continue; // HF eta rings 40, 41
+      // HF eta rings 29, 40, 41
+      if( ( (fabs(part->eta()) >= 2.866) && (fabs(part->eta()) < 2.976) ) || 
+          (fabs(part->eta()) >= 4.730) ) continue;
  
       if(part_pt < ptThreshold) continue;
       if((fabs(part->eta()) < 1.3) && (part_energy < energyHBThreshold)) continue;
@@ -104,7 +106,9 @@ std::pair<double,double> xi(Coll& partCollection, double Ebeam, double ptThresho
          part_energy *= energyScale;
       }
 
-      if( fabs(part->eta()) >= 4.730 ) continue; // HF eta rings 40, 41
+      // HF eta rings 29, 40, 41
+      if( ( (fabs(part->eta()) >= 2.866) && (fabs(part->eta()) < 2.976) ) || 
+          (fabs(part->eta()) >= 4.730) ) continue;
 
       if(part_pt < ptThreshold) continue;
       if((fabs(part->eta()) < 1.3) && (part_energy < energyHBThreshold)) continue;
@@ -162,8 +166,10 @@ std::pair<double,double> EPlusPz(Coll& partCollection, double ptThreshold = -1.,
          part_pz *= energyScale;
       }
 
-      if( fabs(part->eta()) >= 4.730 ) continue; // HF eta rings 40, 41
- 
+      // HF eta rings 29, 40, 41
+      if( ( (fabs(part->eta()) >= 2.866) && (fabs(part->eta()) < 2.976) ) || 
+          (fabs(part->eta()) >= 4.730) ) continue;
+
       if(part_pt < ptThreshold) continue;
       if((fabs(part->eta()) < 1.3) && (part_energy < energyHBThreshold)) continue;
       if(((fabs(part->eta()) >= 1.3) && (fabs(part->eta()) < 3.0)) && (part_energy < energyHEThreshold)) continue; 

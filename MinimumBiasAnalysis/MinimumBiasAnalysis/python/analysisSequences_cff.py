@@ -3,12 +3,19 @@ import FWCore.ParameterSet.Config as cms
 from Utilities.AnalysisSequences.minimumBiasAnalysisSequences_cff import *
 
 # Add EtaMax
-from ForwardAnalysis.Utilities.pfCandidateSelector_cfi import pfCandidateSelector as pfCandidateNoiseThresholds
-from ForwardAnalysis.Utilities.PFCandidateNoiseStringCut import PFCandidateNoiseStringCut
 # Change thresholds here if needed
+from ForwardAnalysis.Utilities.pfCandidateSelector_cfi import pfCandidateSelector as pfCandidateNoiseThresholds
+from ForwardAnalysis.Utilities.ExcludeHFEdgesStringCut import ExcludeHFEdgesStringCut
+from ForwardAnalysis.Utilities.PFCandidateNoiseStringCut import PFCandidateNoiseStringCut
 #from ForwardAnalysis.Utilities.pfThresholds_cfi import pfThresholds
 from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_cfi import pfThresholds
-pfCandidateNoiseThresholds.cut = PFCandidateNoiseStringCut(pfThresholds).cut()
+
+#pfCandidateNoiseThresholds.cut = PFCandidateNoiseStringCut(pfThresholds).cut()
+pfStrCut1 = ExcludeHFEdgesStringCut().cut()
+pfStrCut2 = PFCandidateNoiseStringCut(pfThresholds).cut()
+pfStrCut = '%s & %s' % (pfStrCut1,pfStrCut2)
+pfCandidateNoiseThresholds.cut = pfStrCut
+ 
 from ForwardAnalysis.Utilities.etaMaxCandViewSelector_cfi import etaMaxCandViewSelector as etaMaxPFCands
 from ForwardAnalysis.Utilities.etaMinCandViewSelector_cfi import etaMinCandViewSelector as etaMinPFCands
 etaMaxPFCands.src = "pfCandidateNoiseThresholds"
