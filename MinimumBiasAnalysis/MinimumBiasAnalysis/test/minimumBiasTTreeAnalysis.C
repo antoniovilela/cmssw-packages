@@ -5,7 +5,8 @@
 #include "TCanvas.h"
 #include "TTree.h"
 
-#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
+//#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
+#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/MinimumBiasEventData.h"
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/Histos.h" 
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/RootTools.h"
 
@@ -103,10 +104,14 @@ void minimumBiasTTreeAnalysis(TTree* data,
       }
    }
 
-   EventData eventData;
-   setTTreeBranches(*data,eventData);
-   int nEntries = data->GetEntries(); 
-
+   // Access event data
+   //EventData eventData;
+   //setTTreeBranches(*data,eventData);
+   MinimumBiasEventData* eventData_ptr = new MinimumBiasEventData;
+   TBranch* eventsBranch = data->GetBranch("Events");
+   eventsBranch->SetAddress(&eventData_ptr);
+   MinimumBiasEventData const& eventData = *eventData_ptr;
+ 
    // Create output file
    TFile* hfile = new TFile(outFileName.c_str(),"recreate","data histograms");
 
@@ -226,6 +231,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    double eventWeight = 1.0;
    //std::vector<std::pair<int,int> > selectedEvents;
    // Loop over the events
+   int nEntries = data->GetEntries();
    for(int ientry = 0; ientry < nEntries; ++ientry){
       if((maxEvents > 0)&&(ientry == maxEvents)) break;
       //if(verbose && ientry%2000 == 0) std::cout << ">>> Analysing " << ientry << "th entry" << std::endl;

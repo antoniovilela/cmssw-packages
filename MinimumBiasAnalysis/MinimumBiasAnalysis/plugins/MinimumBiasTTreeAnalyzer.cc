@@ -2,8 +2,9 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
+//#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
 //#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/Histos.h"
+#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/MinimumBiasEventData.h"
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/MinimumBiasAnalysis.h"
 
 class TTree;
@@ -24,7 +25,8 @@ class MinimumBiasTTreeAnalyzer: public edm::EDAnalyzer
     bool saveTTree_;
 
     TTree* data_;
-    minimumBiasAnalysis::EventData eventData_;
+    MinimumBiasEventData* eventData_;
+    //minimumBiasAnalysis::EventData eventData_;
     //minimumBiasAnalysis::HistoMapTH1F histosTH1F_;
     //minimumBiasAnalysis::HistoMapTH2F histosTH2F_;
 };
@@ -49,14 +51,18 @@ MinimumBiasTTreeAnalyzer::MinimumBiasTTreeAnalyzer(const edm::ParameterSet& pset
   minimumBiasAnalysis_(pset),  
   saveTTree_(pset.getUntrackedParameter<bool>("SaveROOTTree",true)){}
 
-MinimumBiasTTreeAnalyzer::~MinimumBiasTTreeAnalyzer(){}
+MinimumBiasTTreeAnalyzer::~MinimumBiasTTreeAnalyzer(){
+  delete eventData_;
+}
 
 void MinimumBiasTTreeAnalyzer::beginJob(){
   edm::Service<TFileService> fs;
 
   if(saveTTree_){
     data_ = fs->make<TTree>("data","data");
-    addTTreeBranches(*data_,eventData_);
+    //addTTreeBranches(*data_,eventData_);
+    eventData_ = new MinimumBiasEventData;
+    data_->Branch("Events","MinimumBiasEventData",&eventData_);
   }
 
   //bookHistos(histosTH1F_,*fs);
@@ -69,7 +75,7 @@ void MinimumBiasTTreeAnalyzer::beginRun(const edm::Run& run, const edm::EventSet
 
 void MinimumBiasTTreeAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup){
 
-  minimumBiasAnalysis_.fillEventData(eventData_,event,setup);
+  minimumBiasAnalysis_.fillEventData(*eventData_,event,setup);
 
   // Fill TTree
   if(saveTTree_) data_->Fill();

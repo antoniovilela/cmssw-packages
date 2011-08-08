@@ -9,9 +9,9 @@
 #include <string>
 #include <map>
 
-namespace minimumBiasAnalysis {
+struct MinimumBiasEventData;
 
-struct EventData;
+namespace minimumBiasAnalysis {
 
 class MinimumBiasAnalysis {
   public:
@@ -19,18 +19,18 @@ class MinimumBiasAnalysis {
      ~MinimumBiasAnalysis();
 
      void servicesBeginRun(const edm::Run&, const edm::EventSetup&);
-     void fillEventData(EventData&, const edm::Event&, const edm::EventSetup&);
+     void fillEventData(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
   private:
-     void fillEventInfo(EventData&, const edm::Event&, const edm::EventSetup&);
-     void fillNoiseInfo(EventData&, const edm::Event&, const edm::EventSetup&);
-     void fillTriggerInfo(EventData&, const edm::Event&, const edm::EventSetup&);
-     //void fillSelectionInfo(EventData&, const edm::Event&, const edm::EventSetup&);
-     void fillVertexInfo(EventData&, const edm::Event&, const edm::EventSetup&);
-     void fillTrackInfo(EventData&, const edm::Event&, const edm::EventSetup&);
-     void fillMETInfo(EventData&, const edm::Event&, const edm::EventSetup&);
-     void fillJetInfo(EventData&, const edm::Event&, const edm::EventSetup&);
-     void fillMultiplicities(EventData&, const edm::Event&, const edm::EventSetup&);
-     void fillEventVariables(EventData&, const edm::Event&, const edm::EventSetup&);
+     void fillEventInfo(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
+     void fillNoiseInfo(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
+     void fillTriggerInfo(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
+     //void fillSelectionInfo(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
+     void fillVertexInfo(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
+     void fillTrackInfo(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
+     void fillMETInfo(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
+     void fillJetInfo(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
+     void fillMultiplicities(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
+     void fillEventVariables(MinimumBiasEventData&, const edm::Event&, const edm::EventSetup&);
 
      void resetPFThresholds(std::map<int,std::pair<double,double> >&);
      void setPFThresholds(std::map<int,std::pair<double,double> >&, edm::ParameterSet const&);

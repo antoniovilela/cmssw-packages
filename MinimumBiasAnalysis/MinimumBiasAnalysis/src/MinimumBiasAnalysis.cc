@@ -26,7 +26,7 @@
 
 #include "Utilities/AnalysisTools/interface/FWLiteTools.h"
 
-#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/EventData.h"
+#include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/MinimumBiasEventData.h"
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/FWLiteTools.h"
 
 #include <sstream>
@@ -110,7 +110,7 @@ MinimumBiasAnalysis::~MinimumBiasAnalysis(){}
 
 void MinimumBiasAnalysis::servicesBeginRun(const edm::Run& run, const edm::EventSetup& setup) {}
 
-void MinimumBiasAnalysis::fillEventData(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillEventData(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   fillEventInfo(eventData,event,setup);
   fillNoiseInfo(eventData,event,setup); 
   fillTriggerInfo(eventData,event,setup);
@@ -122,7 +122,7 @@ void MinimumBiasAnalysis::fillEventData(EventData& eventData, const edm::Event& 
   fillEventVariables(eventData,event,setup);
 }
 
-void MinimumBiasAnalysis::fillEventInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillEventInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   if(accessMCInfo_){
      edm::Handle<GenEventInfoProduct> genEventInfo;
      event.getByLabel("generator",genEventInfo);
@@ -160,7 +160,7 @@ void MinimumBiasAnalysis::fillEventInfo(EventData& eventData, const edm::Event& 
   eventData.bunchCrossing_ = bunchCrossing;
 }
 
-void MinimumBiasAnalysis::fillNoiseInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillNoiseInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   edm::Handle<HcalNoiseSummary> noiseSummaryH;
   event.getByLabel("hcalnoise",noiseSummaryH);   
 
@@ -180,7 +180,7 @@ void MinimumBiasAnalysis::fillNoiseInfo(EventData& eventData, const edm::Event& 
   eventData.BeamHaloTightId_ = beamHaloTightId ? 1 : 0;
 }
 
-void MinimumBiasAnalysis::fillTriggerInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillTriggerInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   //FIXME
   edm::Handle<edm::TriggerResults> triggerResults;
   event.getByLabel(triggerResultsTag_, triggerResults);
@@ -214,7 +214,7 @@ void MinimumBiasAnalysis::fillTriggerInfo(EventData& eventData, const edm::Event
 }
 
 /*
-void MinimumBiasAnalysis::fillSelectionInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillSelectionInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   edm::Handle<edm::TriggerResults> triggerResults;
   event.getByLabel("TriggerResults", triggerResults);
 
@@ -229,7 +229,7 @@ void MinimumBiasAnalysis::fillSelectionInfo(EventData& eventData, const edm::Eve
 }
 */
 
-void MinimumBiasAnalysis::fillVertexInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillVertexInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   // Access vertex collection
   edm::Handle<edm::View<reco::Vertex> > vertexCollectionH;
   event.getByLabel(vertexTag_,vertexCollectionH);
@@ -257,7 +257,7 @@ void MinimumBiasAnalysis::fillVertexInfo(EventData& eventData, const edm::Event&
 
 }
 
-void MinimumBiasAnalysis::fillTrackInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillTrackInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   // Access collection
   edm::Handle<edm::View<reco::Track> > trackCollectionH;
   event.getByLabel(trackTag_,trackCollectionH);
@@ -298,7 +298,7 @@ void MinimumBiasAnalysis::fillTrackInfo(EventData& eventData, const edm::Event& 
   }
 }
 
-void MinimumBiasAnalysis::fillMETInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillMETInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   edm::Handle<edm::View<reco::MET> > metCollectionH;
   event.getByLabel(metTag_,metCollectionH);
 
@@ -313,7 +313,7 @@ void MinimumBiasAnalysis::fillMETInfo(EventData& eventData, const edm::Event& ev
   eventData.MET_ = met_et;
 }
 
-void MinimumBiasAnalysis::fillJetInfo(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillJetInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   edm::Handle<edm::View<reco::Jet> > jetCollectionH;
   event.getByLabel(jetTag_,jetCollectionH);
 
@@ -330,7 +330,7 @@ void MinimumBiasAnalysis::fillJetInfo(EventData& eventData, const edm::Event& ev
   }  
 }
 
-void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillMultiplicities(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   // Access multiplicities
   /*edm::Handle<unsigned int> trackMultiplicity; 
   event.getByLabel("trackMultiplicity","trackMultiplicity",trackMultiplicity);
@@ -460,7 +460,7 @@ void MinimumBiasAnalysis::fillMultiplicities(EventData& eventData, const edm::Ev
   }
 }
 
-void MinimumBiasAnalysis::fillEventVariables(EventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
+void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   if(accessMCInfo_){
      // Gen particles
      edm::Handle<reco::GenParticleCollection> genParticlesCollectionH;
