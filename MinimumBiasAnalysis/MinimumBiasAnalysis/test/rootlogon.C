@@ -14,7 +14,6 @@
         AutoLibraryLoader::enable();
         gSystem->Load("libDataFormatsFWLite.so");
         gSystem->Load("libDataFormatsPatCandidates.so");
-        gSystem->Load("libDataFormatsMETReco.so");
         gSystem->Load("libMinimumBiasAnalysisMinimumBiasAnalysis");
         gSystem->Load("libUtilitiesPlottingTools");
 }

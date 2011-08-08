@@ -6,10 +6,14 @@
 
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/RootTools.h"
 
-#include "fileNames_MinimumBias_Commissioning10-Jun14thReReco_v1_Run132605_minimumBiasAnalysisTTree-v4.C"
+//#include "fileNames_MinimumBias_Commissioning10-Jun14thReReco_v1_Run132605_minimumBiasAnalysisTTree-v4.C"
 
 void setFileNamesZeroBiasRun132605(std::vector<std::string>& fileNames){
    fileNames.push_back("/data1/antoniov/AnalysisResults/ZeroBias_Commissioning10-Jun14thReReco_v1_RECO/analysisMinBias_ZeroBias_Commissioning10-Jun14thReReco_v1_Run132605_minimumBiasAnalysisTTree-v5.root");
+}
+
+void setFileNamesMinimumBias(std::vector<std::string>& fileNames){
+   fileNames.push_back("analysisMinBias_TTree_MinimumBias.root");
 }
 
 void runMinimumBiasTTreeAnalysis(){
@@ -22,13 +26,15 @@ void runMinimumBiasTTreeAnalysis(){
    //std::string rootDir = "/tmp/antoniov/root/2360GeV";
    //std::string rootDir = "/tmp/antoniov/root/7TeV";
    std::vector<std::string> fileNames(0);
+   setFileNamesMinimumBias(fileNames);
    //setFileNamesRun132440(fileNames);
-   setFileNamesRun132605(fileNames);
+   //setFileNamesRun132605(fileNames);
    //setFileNamesRun132605V2(fileNames);
    //setFileNamesZeroBiasRun132605(fileNames);
  
-   std::string outDir = "root/7TeV/Data/Run132605/minimumBiasAnalysisTTree-v4";
+   //std::string outDir = "root/7TeV/Data/Run132605/minimumBiasAnalysisTTree-v4";
    //std::string outDir = "root/7TeV/ZeroBias/Run132605";
+   std::string outDir = "root";
    bool verbose = false;
 
    /*std::string fileName = rootDir + "/";

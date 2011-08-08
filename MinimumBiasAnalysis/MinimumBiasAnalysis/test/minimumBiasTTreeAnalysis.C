@@ -219,7 +219,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doEtaMinSelection = false;
    double etaMaxMax = 1.0;
    double etaMinMin = -1.0;
-   // Xi correction factor
+   // Xi correction factora
+   double EBeam = 3500.;
    double xiCorrectionFactor = 2.0;
 
    double eventWeight = 1.0;
@@ -386,13 +387,17 @@ void minimumBiasTTreeAnalysis(TTree* data,
       histosTH1F["xiPlusFromJets"]->Fill();
       histosTH1F["xiMinusFromJets"]->Fill();*/
 
-      double xiPlusFromTowers = eventData.xiPlusFromTowers_;
-      double xiMinusFromTowers = eventData.xiMinusFromTowers_;
+      //double xiPlusFromTowers = eventData.xiPlusFromTowers_;
+      //double xiMinusFromTowers = eventData.xiMinusFromTowers_;
+      double xiPlusFromTowers = eventData.EPlusPzFromTowers_; xiPlusFromTowers /= 2*EBeam;
+      double xiMinusFromTowers = eventData.EMinusPzFromTowers_; xiMinusFromTowers /= 2*EBeam;
       histosTH1F["xiPlusFromTowers"]->Fill(xiPlusFromTowers);
       histosTH1F["xiMinusFromTowers"]->Fill(xiMinusFromTowers);
 
-      double xiPlusFromPFCands = eventData.xiPlusFromPFCands_;
-      double xiMinusFromPFCands = eventData.xiMinusFromPFCands_;
+      //double xiPlusFromPFCands = eventData.xiPlusFromPFCands_;
+      //double xiMinusFromPFCands = eventData.xiMinusFromPFCands_;
+      double xiPlusFromPFCands = eventData.EPlusPzFromPFCands_; xiPlusFromPFCands /= 2*EBeam;
+      double xiMinusFromPFCands = eventData.EMinusPzFromPFCands_; xiMinusFromPFCands /= 2*EBeam;
       // Apply correction factor
       xiPlusFromPFCands *= xiCorrectionFactor;
       xiMinusFromPFCands *= xiCorrectionFactor;

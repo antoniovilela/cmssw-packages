@@ -5,11 +5,11 @@ class config: pass
 config.verbose = True
 config.writeEdmOutput = False
 config.runOnMC = False
-config.globalTagNameData = 'GR_R_38X_V13A::All'
-config.globalTagNameMC = 'START38_V12::All'
+config.globalTagNameData = 'FT_R_42_V13A::All'
+config.globalTagNameMC = 'START42_V13::All'
 config.outputEdmFile = 'minimumBias.root'
 config.outputTTreeFile = 'analysisMinBias_TTree_MinimumBias.root'
-config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collisions10_JSON_v2_sub_132440.root'
+#config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collisions10_JSON_v2_sub_132440.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
@@ -22,7 +22,7 @@ config.runBPTX = False
 config.runHCALFilter = False
 config.runEtaMaxFilter = True
 
-config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10-Sep17ReReco_v2_RECO/Run132599/MinimumBias_Commissioning10-Sep17ReReco_v2_RECO_80A3A8E6-46CA-DF11-AE95-00215E21D61E.root']
+config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_May19ReReco-v1_RECO/MinimumBias_Commissioning10_May19ReReco-v1_RECO_0C0FA77A-0D83-E011-82D3-001A64787060.root']
 
 process = cms.Process("Analysis")
 
@@ -85,9 +85,9 @@ if config.verbose:
 """
 ###################################################################################
 
-if not config.runOnMC:
-    process.load('Utilities.AnalysisTools.lumiWeight_cfi')
-    process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
+#if not config.runOnMC:
+#    process.load('Utilities.AnalysisTools.lumiWeight_cfi')
+#    process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
 
 from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
 
@@ -95,7 +95,7 @@ from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
 #process.xiFromCaloTowers.comEnergy = config.comEnergy
 #process.xiFromJets.comEnergy = config.comEnergy
 process.recoSequence = cms.Sequence(process.tracks*process.pfCandidates*process.edmDump)
-if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
+#if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
 """
 process.reflagging_step = cms.Path(process.hfrecoReflagged+process.hbherecoReflagged)
@@ -106,7 +106,7 @@ process.rereco_step = cms.Path(process.caloTowersRec
                                ) # re-reco jets and met
 """
 process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
-if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
+#if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.recoSequence)
 if config.runOnMC:
     process.gen_step = cms.Path(process.genChargedParticles+
@@ -161,6 +161,9 @@ process.load('Utilities.AnalysisTools.trackHistos_cfi')
 process.trackHistos.src = config.trackTagName
 process.load('Utilities.AnalysisTools.trackHistoAnalyzer_cfi')
 process.trackHistoAnalyzer.TrackTag = config.trackTagName
+process.load('Utilities.AnalysisTools.pfHistos_cfi')
+process.pFlowHistos = process.pfHistos.clone( src = 'particleFlow' )
+process.pFlowWithThresholdsHistos = process.pfHistos.clone( src = 'pfCandidateNoiseThresholds' )
 
 attributesEnergyScale = [{'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.90,'HCALTowerSummaryTag':'hcalActivitySummaryScale090'},
                          {'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.92,'HCALTowerSummaryTag':'hcalActivitySummaryScale092'},
@@ -192,6 +195,8 @@ from Utilities.PyConfigTools.analysisTools import *
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR')
 #makeAnalysis(process,'minimumBiasTTreeAnalysisNoCleaning','eventSelectionBscMinBiasOR')
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR')
+makeAnalysis(process,'pFlowHistos','eventSelectionBscMinBiasOR')
+makeAnalysis(process,'pFlowWithThresholdsHistos','eventSelectionBscMinBiasOR')
 
 if config.varyAttributes:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR',attributes)
