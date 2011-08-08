@@ -67,8 +67,10 @@ class MinimumBiasEventData {
      double EPlusPzFromPFCands_;
      double EMinusPzFromPFCands_;
      double MxGen_;
-     double MxGenNew_; 
+     double MxGenDiss_; 
      double MxGenRange_;
+     double MxGenPlus_;
+     double MxGenMinus_;
      double MxFromTowers_;
      //double MxFromJets_;
      double MxFromPFCands_;

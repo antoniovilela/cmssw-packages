@@ -15,6 +15,66 @@ namespace minimumBiasAnalysis {
 
 enum calo_region_t {Barrel,Endcap,Transition,Forward};
 
+bool greaterEta( const math::XYZTLorentzVector& a, const math::XYZTLorentzVector& b){ 
+   return a.eta() > b.eta();
+}
+
+void genRapidityGap(reco::GenParticleCollection const& genParticles, math::XYZTLorentzVector& genGapLow,
+                                                                     math::XYZTLorentzVector& genGapHigh){
+   // Copy and sort gen particles in eta
+   std::vector<math::XYZTLorentzVector> genParticlesSort(0);
+   double etaEdgeLow = -999.0;
+   double etaEdgeHigh = 999.0;
+   reco::GenParticleCollection::const_iterator genpart = genParticles.begin();
+   reco::GenParticleCollection::const_iterator genpart_end = genParticles.end();  
+   for(; genpart != genpart_end; ++genpart){
+      if( genpart->status() != 1 ) continue;
+
+      if((genpart->eta() >= etaEdgeLow) && (genpart->eta() <= etaEdgeHigh))
+         genParticlesSort.push_back( genpart->p4() );
+   }
+   std::stable_sort(genParticlesSort.begin(), genParticlesSort.end(), greaterEta);
+
+   // Cases: 0, 1 or > 1 particles in selected range
+   math::XYZTLorentzVector def_vec(0.,0.,0.,0.);
+   if( genParticlesSort.size() == 0 ){
+      genGapLow = def_vec; genGapHigh = def_vec;
+      return;
+   } else if( genParticlesSort.size() == 1 ){
+      genGapLow = def_vec;
+      genGapHigh = genParticlesSort[0];
+      return;
+   } else{
+      //FIXME; There must be a STL algorithm for this
+      double deltaEtaMax = 0.;
+      std::vector<math::XYZTLorentzVector>::const_iterator genPartDeltaEtaMax = genParticlesSort.end();
+      std::vector<math::XYZTLorentzVector>::const_iterator genpart = genParticlesSort.begin();
+      std::vector<math::XYZTLorentzVector>::const_iterator genpart_end = genParticlesSort.end();
+      for(; genpart != genpart_end; ++genpart){
+         std::vector<math::XYZTLorentzVector>::const_iterator next = genpart + 1;
+         double deltaEta = ( next != genpart_end ) ? ( next->eta() - genpart->eta() ) : 0.;
+         if( deltaEta > deltaEtaMax ){
+            deltaEtaMax = deltaEta;
+            genPartDeltaEtaMax = genpart;
+         } 
+      }
+      if( genPartDeltaEtaMax != genpart_end ){
+         std::vector<math::XYZTLorentzVector>::const_iterator next = genPartDeltaEtaMax + 1;
+         if( next != genpart_end ){
+            genGapLow = (*genPartDeltaEtaMax);
+            genGapHigh = (*next);
+         } else{
+            genGapLow = def_vec;
+            genGapHigh = (*genPartDeltaEtaMax);
+         }
+      } else{
+         genGapLow = def_vec; genGapHigh = def_vec;
+         return;
+      }
+   } 
+   
+}
+
 void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                                  math::XYZTLorentzVector& genAllParticles,
                                                                  math::XYZTLorentzVector& genAllParticlesInRange,
@@ -26,9 +86,6 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
                                                                  math::XYZTLorentzVector& genEtaMin,
                                                                  math::XYZTLorentzVector& genProtonPlus,
                                                                  math::XYZTLorentzVector& genProtonMinus){
-   /*fwlite::Handle<std::vector<reco::GenParticle> > genParticlesCollection;
-   genParticlesCollection.getByLabel(ev,"genParticles");
-   const reco::GenParticleCollection& genParticles = *genParticlesCollection;*/
 
    math::XYZTLorentzVector allGenParticles(0.,0.,0.,0.);
    math::XYZTLorentzVector allGenParticlesInRange(0.,0.,0.,0.);
@@ -54,13 +111,6 @@ void setGenInfo(reco::GenParticleCollection const& genParticles, double Ebeam,
    reco::GenParticleCollection::const_iterator etaMinParticle = genParticles.end(); 
    for(reco::GenParticleCollection::const_iterator genpart = genParticles.begin(); genpart != genParticles.end(); ++genpart){
       if(genpart->status() != 1) continue;
-      //histosTH1F["EnergyVsEta"]->Fill(genpart->eta(),genpart->energy());      
-
-      /*double pz = genpart->pz();
-      if( (proton1 == genParticles.end()) &&
-          (genpart->pdgId() == 2212) && (pz > 0.50*Ebeam) ) proton1 = genpart;
-      if( (proton2 == genParticles.end()) &&
-          (genpart->pdgId() == 2212) && (pz < -0.50*Ebeam) ) proton2 = genpart;*/
 
       allGenParticles += genpart->p4();
       if(fabs(genpart->eta()) < 5.0) allGenParticlesInRange += genpart->p4();
@@ -178,6 +228,20 @@ bool pflowThreshold(reco::PFCandidate const& part, std::map<int, std::map<int,st
 
    return accept;
 }*/
+
+double MassDissGen(reco::GenParticleCollection const& genParticles, double rangeEtaMin = -999.,
+                                                                    double rangeEtaMax = 999.){
+                                                                    
+   math::XYZTLorentzVector allGenParticles(0.,0.,0.,0.);
+   reco::GenParticleCollection::const_iterator genpart = genParticles.begin();
+   reco::GenParticleCollection::const_iterator genpart_end = genParticles.end();
+   for(; genpart != genpart_end; ++genpart){
+      if( genpart->status() != 1 ) continue;
+
+      if( (genpart->eta() >= rangeEtaMin) && (genpart->eta() <= rangeEtaMax) ) allGenParticles += genpart->p4();
+   }
+   return allGenParticles.M();
+}
 
 // FIXME: Generalize for any collection with changeable threshold scheme
 double MassColl(reco::PFCandidateCollection const& pflowCollection, std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap){

@@ -488,6 +488,11 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
      xigen_plus = 1 - genProtonPlus.pz()/Ebeam_;
      xigen_minus = 1 + genProtonMinus.pz()/Ebeam_;
 
+     math::XYZTLorentzVector genGapLowEdge(0.,0.,0.,0.),genGapHighEdge(0.,0.,0.,0.);
+     genRapidityGap(genParticles,genGapLowEdge,genGapHighEdge);
+     double massDissGenPlus = MassDissGen(genParticles,genGapHighEdge.eta(),999.);
+     double massDissGenMinus = MassDissGen(genParticles,-999.,genGapLowEdge.eta());
+
      eventData.xiGenPlus_ = xigen_plus;
      eventData.xiGenMinus_ = xigen_minus;
      eventData.MxGen_ = genAllParticles.mass();
@@ -499,10 +504,14 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
      eventData.etaMaxGen_ = genEtaMax.eta();
      eventData.etaMinGen_ = genEtaMin.eta();
 
+     eventData.MxGenPlus_ = massDissGenPlus;
+     eventData.MxGenMinus_ = massDissGenMinus;
+ 
+     // Access variables from event 
      edm::Handle<std::vector<float> > edmNtupleMxGen;
      event.getByLabel(edm::InputTag("edmNtupleMxGen","Mx"),edmNtupleMxGen);
  
-     eventData.MxGenNew_ = (edmNtupleMxGen.isValid() && edmNtupleMxGen->size()) ? (*edmNtupleMxGen)[0] : -999.;
+     eventData.MxGenDiss_ = (edmNtupleMxGen.isValid() && edmNtupleMxGen->size()) ? (*edmNtupleMxGen)[0] : -999.;
 
      edm::Handle<std::vector<float> > edmNtupleEtaMaxGen;
      event.getByLabel(edm::InputTag("edmNtupleEtaMaxGen","etaMax"),edmNtupleEtaMaxGen);
@@ -516,8 +525,10 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
      eventData.xiGenPlus_ = -1.;
      eventData.xiGenMinus_ = -1.;
      eventData.MxGen_ = -1.;
-     eventData.MxGenNew_ = -1.;
+     eventData.MxGenDiss_ = -1.;
      eventData.MxGenRange_ = -1.;
+     eventData.MxGenPlus_ = -1.; 
+     eventData.MxGenMinus_ = -1.; 
      eventData.sumEnergyHEPlusGen_ = -1.;
      eventData.sumEnergyHEMinusGen_ = -1.;
      eventData.sumEnergyHFPlusGen_ = -1.;

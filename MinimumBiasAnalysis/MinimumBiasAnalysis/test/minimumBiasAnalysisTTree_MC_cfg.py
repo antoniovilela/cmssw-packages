@@ -1,25 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 
 from minimumBiasAnalysisTTree_cfg import process,config
-#process.source.fileNames = ['file:/tmp/antoniov/MinBias_TuneD6T_7TeV-pythia6_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F63DF090-6879-DF11-9E7D-0030487CDA68.root']
-#process.source.fileNames = ['file:/tmp/antoniov/MinBias_TuneCW_7TeV-pythia6_START36_V10-v1_GEN-SIM-RECODEBUG_F65EF1B2-4887-DF11-9A50-001EC9AAA38C.root']
-#process.source.fileNames = ['file:/tmp/antoniov/MinBias_7TeV-pythia8_START36_V10_SP10-v1_GEN-SIM-RECODEBUG_F2E56105-8E74-DF11-9C73-00237DA1CDBE.root']
-#process.source.fileNames = ['file:/tmp/antoniov/PHOJET_MinBias_7TeV_START36_V10_362-HLT-v1_PrivateProd-START36_V10_362_RECO-v1_step2_RAW2DIGI_L1Reco_RECO_VALIDATION_5_1_5XQ.root']
-process.source.fileNames = ['file:/tmp/antoniov/MinBias_7TeV-phojet_START36_V10_362-HLT-v1_PrivateProd-START36_V10_362_RECO-v1_step2_RAW2DIGI_L1Reco_RECO_VALIDATION_80_1_dtB.root']
+process.source.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root']
 process.MessageLogger.cerr.threshold = 'INFO'
-process.maxEvents.input = 5000
-process.GlobalTag.globaltag = 'START36_V10::All'
-
-analyzerPrefix = 'minimumBiasTTreeAnalysis'
-for analyzerName in process.analyzers:
-    if analyzerName.find(analyzerPrefix) != -1:
-        module = getattr(process,analyzerName)
-        module.AccessMCInfo = True
-        #module.HLTPath = 'HLT_MinBiasBSC_OR'
-        #module.TriggerResultsTag = cms.InputTag("TriggerResults::REDIGI36")
-for pathName in process.paths:
-    getattr(process,pathName).remove(getattr(process,'bptx'))
-    getattr(process,pathName).remove(getattr(process,'hltBscMinBiasORBptxPlusORMinusFilter'))
+process.maxEvents.input = 3000
+#process.GlobalTag.globaltag = 'START::All'
+process.TFileService.fileName = "analysisMinBias_TTree_MinBias.root"
 
 # Add paths for different process-Id selections
 from Utilities.AnalysisTools.processIdFilter_cfi import processIdFilter
@@ -46,12 +32,17 @@ filtersProcessIdsPythia8 = ['processIdPythia8_SD','processIdPythia8_DD',
 filtersProcessIdsPhojet = ['processIdPhojet_SD','processIdPhojet_DD',
                             'processIdPhojet_Diff','processIdPhojet_ND']
 #filtersProcessIds = filtersProcessIdsPythia6
-#filtersProcessIds = filtersProcessIdsPythia8
-filtersProcessIds = filtersProcessIdsPhojet
+filtersProcessIds = filtersProcessIdsPythia8
+#filtersProcessIds = filtersProcessIdsPhojet
 
 from Utilities.PyConfigTools.analysisTools import *
 makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR',filters=filtersProcessIds)
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMaxFilter',filters=filtersProcessIds)
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMinFilter',filters=filtersProcessIds)
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR',filters=filtersProcessIds)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREtaMaxFilter',filters=filtersProcessIds)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREtaMinFilter',filters=filtersProcessIds)
+"""
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoPlus',filters=filtersProcessIds)
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoMinus',filters=filtersProcessIds)
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoPlus',filters=filtersProcessIds)
@@ -64,5 +55,15 @@ makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMax
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus8',filters=filtersProcessIds)
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus12',filters=filtersProcessIds)
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus16',filters=filtersProcessIds)
+"""
 
-process.TFileService.fileName = "analysisMinBias_TTree_MinBias.root"
+analyzerPrefix = 'minimumBiasTTreeAnalysis'
+for analyzerName in process.analyzers:
+    if analyzerName.find(analyzerPrefix) != -1:
+        module = getattr(process,analyzerName)
+        module.AccessMCInfo = True
+        module.HLTPath = 'HLT_Jet30_v*'
+        #module.TriggerResultsTag = cms.InputTag("TriggerResults::REDIGI36")
+for pathName in process.paths:
+    getattr(process,pathName).remove(getattr(process,'bptx'))
+    getattr(process,pathName).remove(getattr(process,'hltBscMinBiasORBptxPlusORMinusFilter'))

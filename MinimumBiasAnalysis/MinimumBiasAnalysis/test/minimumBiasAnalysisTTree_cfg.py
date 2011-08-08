@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 class config: pass
 config.verbose = True
 config.writeEdmOutput = False
-config.runOnMC = False
+config.runOnMC = True
 config.globalTagNameData = 'FT_R_42_V13A::All'
 config.globalTagNameMC = 'START42_V13::All'
 config.outputEdmFile = 'minimumBias.root'
@@ -13,11 +13,11 @@ config.outputTTreeFile = 'analysisMinBias_TTree_MinimumBias.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
-config.generator = 'Pythia6'
+config.generator = 'Pythia8'
 config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
 config.varyAttributes = False
 config.runOfflineOnly = False
-config.runNoColl = True
+config.runNoColl = False
 config.runBPTX = False
 config.runHCALFilter = False
 config.runEtaMaxFilter = True
@@ -256,5 +256,5 @@ if config.runOnMC:
 
     from Utilities.PyConfigTools.setAnalyzerAttributes import setAnalyzerAttributes
     setAnalyzerAttributes(process,'minimumBiasTTreeAnalysis',
-                                  AccessMCInfo = True, 
-                                  TriggerResultsTag = cms.InputTag("TriggerResults::REDIGI36")) 
+                                  AccessMCInfo = True) 
+    #TriggerResultsTag = cms.InputTag("TriggerResults::HLT") 
