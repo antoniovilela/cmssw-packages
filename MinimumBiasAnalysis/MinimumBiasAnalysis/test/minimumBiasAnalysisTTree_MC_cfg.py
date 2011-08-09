@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from minimumBiasAnalysisTTree_cfg import process,config
+from minimumBiasAnalysisTTree_cfg import process,config,processIdFilters
 process.source.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root',
                             'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_1.root',
                             'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_10.root']
@@ -10,6 +10,7 @@ process.maxEvents.input = 3000
 process.TFileService.fileName = "analysisMinBias_TTree_MinBias.root"
 process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck') 
 
+"""
 # Add paths for different process-Id selections
 from Utilities.AnalysisTools.processIdFilter_cfi import processIdFilter
 # Pythia 6
@@ -28,45 +29,46 @@ process.processIdPhojet_DD = processIdFilter.clone(GeneratorTag = "source", Proc
 process.processIdPhojet_Diff = processIdFilter.clone(GeneratorTag = "source", ProcessIds = [4,5,6,7])
 process.processIdPhojet_ND = cms.Sequence(~process.processIdPhojet_Diff)
 
-filtersProcessIdsPythia6 = ['processIdPythia6_SD','processIdPythia6_DD',
+processIdFiltersPythia6 = ['processIdPythia6_SD','processIdPythia6_DD',
                             'processIdPythia6_Diff','processIdPythia6_ND']
-filtersProcessIdsPythia8 = ['processIdPythia8_SD','processIdPythia8_DD',
+processIdFiltersPythia8 = ['processIdPythia8_SD','processIdPythia8_DD',
                             'processIdPythia8_Diff','processIdPythia8_ND']
-filtersProcessIdsPhojet = ['processIdPhojet_SD','processIdPhojet_DD',
+processIdFiltersPhojet = ['processIdPhojet_SD','processIdPhojet_DD',
                             'processIdPhojet_Diff','processIdPhojet_ND']
-#filtersProcessIds = filtersProcessIdsPythia6
-filtersProcessIds = filtersProcessIdsPythia8
-#filtersProcessIds = filtersProcessIdsPhojet
+#processIdFilters = processIdFiltersPythia6
+processIdFilters = processIdFiltersPythia8
+#processIdFilters = processIdFiltersPhojet
+"""
 
 from Utilities.PyConfigTools.analysisTools import *
-makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR',filters=filtersProcessIds)
-makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMaxFilter',filters=filtersProcessIds)
-makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMinFilter',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREtaMaxFilter',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREtaMinFilter',filters=filtersProcessIds)
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR',filters=processIdFilters)
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMaxFilter',filters=processIdFilters)
+makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMinFilter',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREtaMaxFilter',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREtaMinFilter',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREtaMinFilterCastorVeto',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOREtaMinFilterCastorTag',filters=processIdFilters)
 """
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoPlus',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoMinus',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoPlus',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoMinus',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus4',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus8',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus12',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus16',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus4',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus8',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus12',filters=filtersProcessIds)
-makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus16',filters=filtersProcessIds)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoPlus',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHFVetoMinus',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoPlus',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORHEHFVetoMinus',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus4',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus8',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus12',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFPlus16',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus4',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus8',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus12',filters=processIdFilters)
+makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasORSumEMaxHFMinus16',filters=processIdFilters)
 """
 
-analyzerPrefix = 'minimumBiasTTreeAnalysis'
-for analyzerName in process.analyzers:
-    if analyzerName.find(analyzerPrefix) != -1:
-        module = getattr(process,analyzerName)
-        module.AccessMCInfo = True
-        module.HLTPath = 'HLT_Jet30_v*'
-        #module.TriggerResultsTag = cms.InputTag("TriggerResults::REDIGI36")
-for pathName in process.paths:
-    getattr(process,pathName).remove(getattr(process,'bptx'))
-    getattr(process,pathName).remove(getattr(process,'hltBscMinBiasORBptxPlusORMinusFilter'))
+from Utilities.PyConfigTools.removeFromPaths import removeFromPaths
+removeFromPaths(process,'bptx')
+removeFromPaths(process,'hltBscMinBiasORBptxPlusORMinusFilter')
+
+from Utilities.PyConfigTools.setAnalyzerAttributes import setAnalyzerAttributes
+setAnalyzerAttributes(process,'minimumBiasTTreeAnalysis',
+                               AccessMCInfo = True,
+                               HLTPath = 'HLT_L1Tech_BSC_minBias_OR')

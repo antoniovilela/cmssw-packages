@@ -51,6 +51,14 @@ etaMaxGenFilter = etaMaxFilter.clone(src = "etaMaxGen")
 etaMinGenFilter = etaMinFilter.clone(src = "etaMinGen")
 
 ############
+from ForwardAnalysis.Utilities.castorActivityFilter_cfi import castorActivityFilter
+castorActivityFilter.CastorRecHitTag = "castorRecHitCorrector"
+castorActivityFilter.SumEMaxCastor = 250.
+
+castorInvalidDataFilter = cms.EDFilter("CastorInvalidDataFilter")
+castorVeto = cms.Sequence(castorInvalidDataFilter + castorActivityFilter)
+castorTag = cms.Sequence(castorInvalidDataFilter + ~castorActivityFilter) 
+############
 primaryVertexFilterLooseNDOF2 = primaryVertexFilter.clone()
 primaryVertexFilterLooseNDOF2.cut = cms.string("!isFake && ndof > 2 && abs(z) <= 15 && position.Rho <= 2")
 primaryVertexFilterLooseNDOF0 = primaryVertexFilter.clone()
@@ -68,6 +76,15 @@ eventSelectionBscMinBiasOREtaMaxFilter = cms.Sequence(eventSelectionBscMinBiasOR
 eventSelectionBscMinBiasORLooseNDOF0EtaMaxFilter = cms.Sequence(eventSelectionBscMinBiasORLooseNDOF0+etaMaxFilter)
 eventSelectionBscMinBiasOREtaMinFilter = cms.Sequence(eventSelectionBscMinBiasOR+etaMinFilter)
 eventSelectionBscMinBiasORLooseNDOF0EtaMinFilter = cms.Sequence(eventSelectionBscMinBiasORLooseNDOF0+etaMinFilter)
+
+eventSelectionBscMinBiasOREtaMinFilterCastorVeto = cms.Sequence(eventSelectionBscMinBiasOR+
+                                                                etaMinFilter+castorVeto)
+eventSelectionBscMinBiasORLooseNDOF0EtaMinFilterCastorVeto = cms.Sequence(eventSelectionBscMinBiasORLooseNDOF0+
+                                                                          etaMinFilter+castorVeto)
+eventSelectionBscMinBiasOREtaMinFilterCastorTag = cms.Sequence(eventSelectionBscMinBiasOR+
+                                                               etaMinFilter+castorTag)
+eventSelectionBscMinBiasORLooseNDOF0EtaMinFilterCastorTag = cms.Sequence(eventSelectionBscMinBiasORLooseNDOF0+
+                                                                         etaMinFilter+castorTag)
 
 tracks = cms.Sequence(analysisTracks)
 pfCandidates = cms.Sequence(pfCandidateNoiseThresholds*etaMaxPFCands+etaMinPFCands)
