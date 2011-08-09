@@ -10,6 +10,7 @@ MinimumBiasAnalysis = cms.PSet(
     JetTag = cms.InputTag("ak5PFJets"),
     METTag = cms.InputTag("met"),
     CaloTowerTag = cms.InputTag("towerMaker"), 
+    CastorRecHitTag = cms.InputTag("castorRecHitCorrector"),
     ParticleFlowTag = cms.InputTag("particleFlow"),
     GenChargedParticlesTag = cms.InputTag("genChargedParticles"),
     TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),

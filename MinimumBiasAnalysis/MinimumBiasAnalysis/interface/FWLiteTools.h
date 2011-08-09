@@ -6,6 +6,7 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
+#include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
 
 #include <vector>
 #include <algorithm>
@@ -302,6 +303,43 @@ std::pair<double,double> etaMax(reco::PFCandidateCollection const& pflowCollecti
    double eta_min = etaCands.size() ? *( std::min_element(etaCands.begin(), etaCands.end()) ) : -999.;
 
    return std::make_pair(eta_max,eta_min);
+}
+
+double castorEnergy(CastorRecHitCollection const& castorRecHitCollection, bool isRealData = true){
+ 
+   double sumETotCastor = 0.,
+          sumETotCastorNMod5 = 0.,
+          sumETotCastorNMod4 = 0.,
+          sumETotCastorNMod3 = 0.,
+          sumETotCastorNMod2 = 0.;
+  
+   // Loop over rec hits
+   CastorRecHitCollection::const_iterator castorRecHit = castorRecHitCollection.begin();
+   CastorRecHitCollection::const_iterator castorRecHits_end = castorRecHitCollection.end();
+   for(; castorRecHit != castorRecHits_end; ++castorRecHit) {
+      const CastorRecHit& recHit = (*castorRecHit);
+
+      int sectorId  = recHit.id().sector();
+      int moduleId  = recHit.id().module();
+      double energy = recHit.energy();
+      double time   = recHit.time();
+
+      if( !isRealData ) energy *= 62.5;
+
+      if( moduleId > 5 ) continue;
+
+      if( moduleId == 1 && sectorId == 5 ) continue;
+      if( moduleId == 1 && sectorId == 6) continue;
+
+      sumETotCastor += energy;
+
+      if( moduleId <= 5 ) sumETotCastorNMod5 += energy;
+      if( moduleId <= 4 ) sumETotCastorNMod4 += energy;
+      if( moduleId <= 3 ) sumETotCastorNMod3 += energy;
+      if( moduleId <= 2 ) sumETotCastorNMod2 += energy;
+   }
+
+   return sumETotCastor;
 }
 
 } // namespace

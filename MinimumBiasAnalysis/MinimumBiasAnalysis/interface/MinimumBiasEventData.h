@@ -49,6 +49,7 @@ class MinimumBiasEventData {
      double sumEnergyHEMinusGen_;
      double sumEnergyHFPlusGen_;
      double sumEnergyHFMinusGen_; 
+     double sumETotCastor_;
      double xiGenPlus_;
      double xiGenMinus_;
      double xiPlusFromTowers_;

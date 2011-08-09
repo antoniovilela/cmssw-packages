@@ -39,6 +39,7 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   metTag_(pset.getParameter<edm::InputTag>("METTag")),
   jetTag_(pset.getParameter<edm::InputTag>("JetTag")),
   caloTowerTag_(pset.getParameter<edm::InputTag>("CaloTowerTag")),
+  castorRecHitTag_(pset.getParameter<edm::InputTag>("CastorRecHitTag")),
   particleFlowTag_(pset.getParameter<edm::InputTag>("ParticleFlowTag")),
   genChargedTag_(pset.getParameter<edm::InputTag>("GenChargedParticlesTag")),
   triggerResultsTag_(pset.getParameter<edm::InputTag>("TriggerResultsTag")),
@@ -614,6 +615,13 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
   float etaMin_pfCands = edmNtupleEtaMin->size() ? (*edmNtupleEtaMin)[0] : -999.; 
   eventData.etaMaxFromPFCandsNew_ = etaMax_pfCands;
   eventData.etaMinFromPFCandsNew_ = etaMin_pfCands;
+
+  // Castor RecHit collection
+  edm::Handle<CastorRecHitCollection> castorRecHitCollectionH;
+  event.getByLabel(castorRecHitTag_,castorRecHitCollectionH);
+  double sumETotCastor = castorEnergy(*castorRecHitCollectionH, event.isRealData());
+ 
+  eventData.sumETotCastor_ = sumETotCastor;
 
   fillMultiplicities(eventData,event,setup);
 }

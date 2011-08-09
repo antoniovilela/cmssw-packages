@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
-config.runOnMC = True
+config.runOnMC = False
 config.maxEvents = 3000
 config.verbose = True
 config.writeEdmOutput = False
@@ -24,10 +24,10 @@ config.runHCALFilter = False
 config.runEtaMaxFilter = True
 config.runCastorFilter = True
 
-#config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_May19ReReco-v1_RECO/MinimumBias_Commissioning10_May19ReReco-v1_RECO_0C0FA77A-0D83-E011-82D3-001A64787060.root']
-config.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root',
-                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_1.root',
-                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_10.root']
+config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_May19ReReco-v1_RECO/MinimumBias_Commissioning10_May19ReReco-v1_RECO_0C0FA77A-0D83-E011-82D3-001A64787060.root']
+#config.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root',
+#                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_1.root',
+#                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_10.root']
 
 if config.runOnMC: config.outputTTreeFile = 'analysisMinBias_TTree_MinBias.root'
 

@@ -4,6 +4,7 @@
 <use   name="DataFormats/VertexReco"/>
 <use   name="DataFormats/JetReco"/>
 <use   name="DataFormats/METReco"/>
+<use   name="DataFormats/HcalRecHit"/>
 <use   name="root"/>
 <use   name="rootrflx"/>
 <export>
