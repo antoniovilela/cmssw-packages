@@ -151,14 +151,18 @@ void setFileNamesPythia6Z1(std::vector<std::string>& fileNames){
    fileNames.push_back("rfio://castorcms//castor/cern.ch//user/a/antoniov/crab_output/AnalysisResults/MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1/minimumBiasAnalysisTTree-v1/analysisMinBias_TTree_MinBias_9_1_nEc.root");
 }
 
+void setFileNamesMinBias(std::vector<std::string>& fileNames){
+   fileNames.push_back("analysisMinBias_TTree_MinBias.root");
+}
+
 void runMinimumBiasTTreeAnalysisMC(){
    gROOT->ProcessLine(".L minimumBiasTTreeAnalysis.C+");
 
    //run_range_t runRange = Data900GeV;
    //run_range_t runRange = Data2360GeV;
    run_range_t runRange = Data7TeV;
-   generator_t genType = PYTHIA;
-   generator_t genTune = PYTHIAZ1;
+   generator_t genType = PYTHIA8;
+   generator_t genTune = PYTHIA8;
    //generator_t genType = PHOJET;
    //generator_t genTune = PHOJET;
 
@@ -168,16 +172,18 @@ void runMinimumBiasTTreeAnalysisMC(){
    //std::string outDir = "root/7TeV/Pythia6DW/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/7TeV/Pythia6CW/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/7TeV/Pythia6P0/SumEnergyMaxHFPlus_8_0";
-   std::string outDir = "root/7TeV/Pythia6Z1";
+   //std::string outDir = "root/7TeV/Pythia6Z1";
+   std::string outDir = "root";
 
    std::vector<std::string> fileNames(0);
+   setFileNamesMinBias(fileNames);
    //setFileNamesPythia8(fileNames);
    //setFileNamesPhojet(fileNames);
    //setFileNamesPythia6D6T(fileNames);
    //setFileNamesPythia6DW(fileNames);
    //setFileNamesPythia6CW(fileNames);
    //setFileNamesPythia6P0(fileNames);
-   setFileNamesPythia6Z1(fileNames);
+   //setFileNamesPythia6Z1(fileNames);
 
    bool verbose = false;
 
@@ -187,21 +193,11 @@ void runMinimumBiasTTreeAnalysisMC(){
 
    std::vector<std::string> selections;
    selections.push_back("eventSelectionBscMinBiasOR");
+   selections.push_back("eventSelectionBscMinBiasOREtaMaxFilter");
+   selections.push_back("eventSelectionBscMinBiasOREtaMinFilter");
    /*selections.push_back("processIdPythia6_SD_eventSelectionBscMinBiasOR");
    selections.push_back("processIdPythia6_DD_eventSelectionBscMinBiasOR");
    selections.push_back("processIdPythia6_Diff_eventSelectionBscMinBiasOR");*/
-   /*selections.push_back("eventSelectionBscMinBiasORHFVetoPlus");
-   selections.push_back("eventSelectionBscMinBiasORHFVetoMinus");
-   selections.push_back("eventSelectionBscMinBiasORHEHFVetoPlus");
-   selections.push_back("eventSelectionBscMinBiasORHEHFVetoMinus");*/
-   /*selections.push_back("eventSelectionBscMinBiasORSumEMaxHFPlus4");
-   selections.push_back("eventSelectionBscMinBiasORSumEMaxHFPlus8");
-   selections.push_back("eventSelectionBscMinBiasORSumEMaxHFPlus12");
-   selections.push_back("eventSelectionBscMinBiasORSumEMaxHFPlus16");
-   selections.push_back("eventSelectionBscMinBiasORSumEMaxHFMinus4");
-   selections.push_back("eventSelectionBscMinBiasORSumEMaxHFMinus8");
-   selections.push_back("eventSelectionBscMinBiasORSumEMaxHFMinus12");
-   selections.push_back("eventSelectionBscMinBiasORSumEMaxHFMinus16");*/   
 
    std::vector<int> processTypes;
    processTypes.push_back(All);

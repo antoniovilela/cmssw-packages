@@ -15,8 +15,8 @@ namespace minimumBiasAnalysis {
 
 enum calo_region_t {Barrel,Endcap,Transition,Forward};
 
-bool greaterEta( const math::XYZTLorentzVector& a, const math::XYZTLorentzVector& b){ 
-   return a.eta() > b.eta();
+bool sortByEta( const math::XYZTLorentzVector& a, const math::XYZTLorentzVector& b){ 
+   return a.eta() < b.eta();
 }
 
 void genRapidityGap(reco::GenParticleCollection const& genParticles, math::XYZTLorentzVector& genGapLow,
@@ -33,7 +33,7 @@ void genRapidityGap(reco::GenParticleCollection const& genParticles, math::XYZTL
       if((genpart->eta() >= etaEdgeLow) && (genpart->eta() <= etaEdgeHigh))
          genParticlesSort.push_back( genpart->p4() );
    }
-   std::stable_sort(genParticlesSort.begin(), genParticlesSort.end(), greaterEta);
+   std::stable_sort(genParticlesSort.begin(), genParticlesSort.end(), sortByEta);
 
    // Cases: 0, 1 or > 1 particles in selected range
    math::XYZTLorentzVector def_vec(0.,0.,0.,0.);
@@ -53,7 +53,7 @@ void genRapidityGap(reco::GenParticleCollection const& genParticles, math::XYZTL
       for(; genpart != genpart_end; ++genpart){
          std::vector<math::XYZTLorentzVector>::const_iterator next = genpart + 1;
          double deltaEta = ( next != genpart_end ) ? ( next->eta() - genpart->eta() ) : 0.;
-         if( deltaEta > deltaEtaMax ){
+         if( deltaEta > (deltaEtaMax - 0.0001) ){
             deltaEtaMax = deltaEta;
             genPartDeltaEtaMax = genpart;
          } 
@@ -238,7 +238,8 @@ double MassDissGen(reco::GenParticleCollection const& genParticles, double range
    for(; genpart != genpart_end; ++genpart){
       if( genpart->status() != 1 ) continue;
 
-      if( (genpart->eta() >= rangeEtaMin) && (genpart->eta() <= rangeEtaMax) ) allGenParticles += genpart->p4();
+      if( ( genpart->eta() >= (rangeEtaMin - 0.0001) ) && 
+          ( genpart->eta() <= (rangeEtaMax + 0.0001) ) ) allGenParticles += genpart->p4();
    }
    return allGenParticles.M();
 }

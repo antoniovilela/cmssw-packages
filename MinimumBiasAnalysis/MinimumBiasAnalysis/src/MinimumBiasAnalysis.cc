@@ -490,9 +490,17 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
 
      math::XYZTLorentzVector genGapLowEdge(0.,0.,0.,0.),genGapHighEdge(0.,0.,0.,0.);
      genRapidityGap(genParticles,genGapLowEdge,genGapHighEdge);
-     double massDissGenPlus = MassDissGen(genParticles,genGapHighEdge.eta(),999.);
-     double massDissGenMinus = MassDissGen(genParticles,-999.,genGapLowEdge.eta());
+     double massDissGenPlus = (genGapHighEdge == math::XYZTLorentzVector(0.,0.,0.,0.)) ? -999. : MassDissGen(genParticles,genGapHighEdge.eta(),999.);
+     double massDissGenMinus = (genGapLowEdge == math::XYZTLorentzVector(0.,0.,0.,0.)) ? -999. : MassDissGen(genParticles,-999.,genGapLowEdge.eta());
 
+     double deltaEtaGen = 0.;
+     if(genGapHighEdge == math::XYZTLorentzVector(0.,0.,0.,0.) || genGapLowEdge == math::XYZTLorentzVector(0.,0.,0.,0.)) deltaEtaGen = -999.;
+     else deltaEtaGen = genGapHighEdge.eta() - genGapLowEdge.eta(); 
+     double etaGapLow = (genGapLowEdge == math::XYZTLorentzVector(0.,0.,0.,0.)) ? -999. : genGapLowEdge.eta();
+     double etaGapHigh = (genGapHighEdge == math::XYZTLorentzVector(0.,0.,0.,0.)) ? -999. : genGapHighEdge.eta();
+
+     LogDebug("Analysis") << "Gap low,high = " << genGapLowEdge << " , " << genGapHighEdge;
+ 
      eventData.xiGenPlus_ = xigen_plus;
      eventData.xiGenMinus_ = xigen_minus;
      eventData.MxGen_ = genAllParticles.mass();
@@ -504,6 +512,9 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
      eventData.etaMaxGen_ = genEtaMax.eta();
      eventData.etaMinGen_ = genEtaMin.eta();
 
+     eventData.deltaEtaGen_ = deltaEtaGen;
+     eventData.etaGapLow_ = etaGapLow;
+     eventData.etaGapHigh_ = etaGapHigh;
      eventData.MxGenPlus_ = massDissGenPlus;
      eventData.MxGenMinus_ = massDissGenMinus;
  
@@ -528,7 +539,10 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
      eventData.MxGenDiss_ = -1.;
      eventData.MxGenRange_ = -1.;
      eventData.MxGenPlus_ = -1.; 
-     eventData.MxGenMinus_ = -1.; 
+     eventData.MxGenMinus_ = -1.;
+     eventData.deltaEtaGen_ = -1.; 
+     eventData.etaGapLow_ = -999.;
+     eventData.etaGapHigh_ = -999.;
      eventData.sumEnergyHEPlusGen_ = -1.;
      eventData.sumEnergyHEMinusGen_ = -1.;
      eventData.sumEnergyHFPlusGen_ = -1.;

@@ -226,7 +226,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    double etaMinMin = -1.0;
    // Xi correction factora
    double EBeam = 3500.;
-   double xiCorrectionFactor = 2.0;
+   double xiCorrectionFactor = 1.0;
 
    double eventWeight = 1.0;
    //std::vector<std::pair<int,int> > selectedEvents;
@@ -610,9 +610,9 @@ void minimumBiasTTreeAnalysis(TTree* data,
          /*// xi <= 0.1
          double xigen_plus = eventData.xiGenPlus_;
          double xigen_minus = eventData.xiGenMinus_;*/
-         double xigen_plus = -1.;
+         /*double xigen_plus = -1.;
          double xigen_minus = -1.;
-         double xi_gen = (eventData.MxGenNew_*eventData.MxGenNew_);
+         double xi_gen = (eventData.MxGenDiss_*eventData.MxGenDiss_);
          xi_gen /= 7000.*7000.;
          std::vector<int> procIdsSDPlus,procIdsSDMinus;
          if(genType == PYTHIA){
@@ -624,7 +624,10 @@ void minimumBiasTTreeAnalysis(TTree* data,
          }
          // SDPlus   
          if( eventData.processId_ == *(procIdsSDPlus.begin()) )  xigen_plus = xi_gen;
-         if( eventData.processId_ == *(procIdsSDMinus.begin()) ) xigen_minus = xi_gen;
+         if( eventData.processId_ == *(procIdsSDMinus.begin()) ) xigen_minus = xi_gen;*/
+         // Xi hadron level definition
+         double xigen_plus = (eventData.MxGenMinus_*eventData.MxGenMinus_)/(4*EBeam*EBeam);
+         double xigen_minus = (eventData.MxGenPlus_*eventData.MxGenPlus_)/(4*EBeam*EBeam);;
          if(xigen_plus > 0.){ 
             histosTH1F["xiGenPlus"]->Fill(xigen_plus);
             histosTH1F["logXiGenPlus"]->Fill( log10(xigen_plus) );

@@ -1,11 +1,14 @@
 import FWCore.ParameterSet.Config as cms
 
 from minimumBiasAnalysisTTree_cfg import process,config
-process.source.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root']
+process.source.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root',
+                            'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_1.root',
+                            'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_10.root']
 process.MessageLogger.cerr.threshold = 'INFO'
 process.maxEvents.input = 3000
 #process.GlobalTag.globaltag = 'START::All'
 process.TFileService.fileName = "analysisMinBias_TTree_MinBias.root"
+process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck') 
 
 # Add paths for different process-Id selections
 from Utilities.AnalysisTools.processIdFilter_cfi import processIdFilter

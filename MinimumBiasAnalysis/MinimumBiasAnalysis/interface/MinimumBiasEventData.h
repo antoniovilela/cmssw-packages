@@ -74,6 +74,9 @@ class MinimumBiasEventData {
      double MxFromTowers_;
      //double MxFromJets_;
      double MxFromPFCands_;
+     double deltaEtaGen_;
+     double etaGapLow_;
+     double etaGapHigh_;
      double etaMaxGen_;
      double etaMinGen_;
      double etaMaxFromPFCands_;
