@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
-config.runOnMC = False
+config.runOnMC = False 
 config.maxEvents = 3000
 config.verbose = True
 config.writeEdmOutput = False
@@ -24,10 +24,10 @@ config.runHCALFilter = False
 config.runEtaMaxFilter = True
 config.runCastorFilter = True
 
-config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_May19ReReco-v1_RECO/MinimumBias_Commissioning10_May19ReReco-v1_RECO_0C0FA77A-0D83-E011-82D3-001A64787060.root']
-#config.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root',
-#                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_1.root',
-#                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_10.root']
+#config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_May19ReReco-v1_RECO/MinimumBias_Commissioning10_May19ReReco-v1_RECO_0C0FA77A-0D83-E011-82D3-001A64787060.root']
+config.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root',
+                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_1.root',
+                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_10.root']
 
 if config.runOnMC: config.outputTTreeFile = 'analysisMinBias_TTree_MinBias.root'
 
@@ -101,32 +101,32 @@ if config.verbose:
 
 ###################################################################################
 # CASTOR RecHit Corrector
-process.castorRecHitCorrector = cms.EDProducer("RecHitCorrector",
-    rechitLabel = cms.InputTag("castorreco","","RECO"),
-    revertFactor = cms.double(1),
-    doInterCalib = cms.bool(False)
+if not config.runOnMC:
+    process.castorRecHitCorrector = cms.EDProducer("RecHitCorrector",
+        rechitLabel = cms.InputTag("castorreco","","RECO"),
+        revertFactor = cms.double(1),
+        doInterCalib = cms.bool(False)
     )
-if config.runOnMC: process.castorRecHitCorrector.rechitLabel = cms.InputTag("castorreco","","HLT")
 
-process.load("CondCore.DBCommon.CondDBSetup_cfi")
-process.CastorDbProducer = cms.ESProducer("CastorDbProducer")
-process.es_castor_pool = cms.ESSource("PoolDBESSource",
-    process.CondDBSetup,
-    timetype = cms.string('runnumber'),
-    connect = cms.string('frontier://cmsfrontier.cern.ch:8000/FrontierProd/CMS_COND_31X_HCAL'),
-    authenticationMethod = cms.untracked.uint32(0),
-    toGet = cms.VPSet(
-        cms.PSet(
-            record = cms.string('CastorChannelQualityRcd'),  
-            tag = cms.string('CastorChannelQuality_v2.2_offline')
+    process.load("CondCore.DBCommon.CondDBSetup_cfi")
+    process.CastorDbProducer = cms.ESProducer("CastorDbProducer")
+    process.es_castor_pool = cms.ESSource("PoolDBESSource",
+        process.CondDBSetup,
+        timetype = cms.string('runnumber'),
+        connect = cms.string('frontier://cmsfrontier.cern.ch:8000/FrontierProd/CMS_COND_31X_HCAL'),
+        authenticationMethod = cms.untracked.uint32(0),
+        toGet = cms.VPSet(
+            cms.PSet(
+                record = cms.string('CastorChannelQualityRcd'),  
+                tag = cms.string('CastorChannelQuality_v2.2_offline')
+            )
         )
     )
-)
-process.es_prefer_castor = cms.ESPrefer('PoolDBESSource','es_castor_pool')
+    process.es_prefer_castor = cms.ESPrefer('PoolDBESSource','es_castor_pool')
 
-#process.castorInvalidDataFilter = cms.EDFilter("CastorInvalidDataFilter")
+    #process.castorInvalidDataFilter = cms.EDFilter("CastorInvalidDataFilter")
+    process.castorSequence = cms.Sequence(process.castorInvalidDataFilter+process.castorRecHitCorrector)
 
-process.castorSequence = cms.Sequence(process.castorInvalidDataFilter+process.castorRecHitCorrector)
 ###################################################################################
 
 #if not config.runOnMC:
@@ -149,7 +149,7 @@ process.rereco_step = cms.Path(process.caloTowersRec
                                *process.metreco
                                ) # re-reco jets and met
 """
-process.castor_step = cms.Path(process.castorSequence)
+if not config.runOnMC: process.castor_step = cms.Path(process.castorSequence)
 process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
 #if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.recoSequence)
@@ -196,6 +196,8 @@ if config.writeEdmOutput: process.out_step = cms.EndPath(process.output)
 ###################################################################################
 
 # Analysis modules
+if config.runOnMC: process.castorActivityFilter.CastorRecHitTag = 'castorreco'
+
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
 process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2.
 process.minimumBiasTTreeAnalysis.TrackTag = config.trackTagName
@@ -316,10 +318,11 @@ if config.runOnMC:
     from Utilities.PyConfigTools.removeFromPaths import removeFromPaths
     removeFromPaths(process,'bptx')
     removeFromPaths(process,'hltBscMinBiasORBptxPlusORMinusFilter')
-    #removeFromPaths(process,'castorInvalidDataFilter')
+    removeFromPaths(process,'castorInvalidDataFilter')
 
     from Utilities.PyConfigTools.setAnalyzerAttributes import setAnalyzerAttributes
     setAnalyzerAttributes(process,'minimumBiasTTreeAnalysis',
                                   AccessMCInfo = True,
-                                  HLTPath = 'HLT_Jet30_v*') 
+                                  HLTPath = 'HLT_Jet30_v*',
+                                  CastorRecHitTag = 'castorreco') 
     #TriggerResultsTag = cms.InputTag("TriggerResults::HLT") 
