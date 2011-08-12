@@ -554,6 +554,9 @@ void minimumBiasTTreeAnalysis(TTree* data,
       histosTH1F["sumEnergyHFPlusVarBin"]->Fill(sumEHF_plus);
       histosTH1F["sumEnergyHFMinusVarBin"]->Fill(sumEHF_minus);
 
+      double sumECASTOR = eventData.sumETotCastor_;
+      histosTH1F["sumEnergyCASTOR"]->Fill(sumECASTOR);
+
       double etaMaxFromPFCands = eventData.etaMaxFromPFCands_;
       double etaMinFromPFCands = eventData.etaMinFromPFCands_;
       histosTH1F["etaMaxFromPFCands"]->Fill(etaMaxFromPFCands);

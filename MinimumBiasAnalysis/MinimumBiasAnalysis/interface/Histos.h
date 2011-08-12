@@ -71,6 +71,7 @@ namespace minimumBiasAnalysis {
      histos["sumEnergyHFMinusVarBin"] = adaptor.template make<TH1F>("sumEnergyHFMinusVarBin","sumEnergyHFMinusVarBin",18,binningESumHF);
      histos["multiplicityHFPlusVarBin"] = adaptor.template make<TH1F>("multiplicityHFPlusVarBin","multiplicityHFPlusVarBin",20,-0.5,19.5);
      histos["multiplicityHFMinusVarBin"] = adaptor.template make<TH1F>("multiplicityHFMinusVarBin","multiplicityHFMinusVarBin",20,-0.5,19.5);
+     histos["sumEnergyCASTOR"] = adaptor.template make<TH1F>("sumEnergyCASTOR","sumEnergyHFPlus",800,0.,4000.);
 
      histos["xiTowerPlus"] = adaptor.template make<TH1F>("xiTowerPlus","xiTowerPlus",200,0.,1.);
      histos["xiTowerMinus"] = adaptor.template make<TH1F>("xiTowerMinus","xiTowerMinus",200,0.,1.);

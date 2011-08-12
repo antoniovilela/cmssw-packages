@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
-config.runOnMC = False 
+config.runOnMC = True 
 config.maxEvents = 3000
 config.verbose = True
 config.writeEdmOutput = False
