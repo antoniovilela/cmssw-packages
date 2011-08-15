@@ -4,7 +4,8 @@ from scaleByWidth import scaleByWidth
 def plotMCBinByBinCorrection(fileNameData, fileNamesMCRef, fileNamesMCEff, side = "plus"):
     ROOT.TH1.AddDirectory(False)
 
-    intLumi = 20.322 # /mub
+    #intLumi = 20.322 # /mub
+    intLumi = 500000./71260.;
     sigmaMC = 71.26 # mb
     ###############################
     histoNames = {}

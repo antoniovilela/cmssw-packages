@@ -4,17 +4,18 @@ from scaleByWidth import scaleByWidth
 def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = "plus"):
     ROOT.TH1.AddDirectory(False)
 
-    intLumi = 20.322 # /mub
+    #intLumi = 20.322 # /mub
+    intLumi = 500000./71260.;
     sigmaMC = 71.26 # mb
     nLogXiBins = 2
     ###############################
     histoNames = {}
-    #histoNames["VarLogXi"] = "multiplicityTracks_LogXiPlus"
-    #histoNames["VarLogXiGen"] = "multiplicityTracks_LogXiGenPlus"
-    histoNames["VarLogXi"] = "multiplicityTracksGen_LogXiPlus"
-    histoNames["VarLogXiGen"] = "multiplicityTracksGen_LogXiGenPlus"
-    #histoNames["VarGenLogXi"] = "multiplicityTracksGen_LogXiPlus"
-    #histoNames["VarGenLogXiGen"] = "multiplicityTracksGen_LogXiGenPlus"
+    if side == "plus":
+        histoNames["VarLogXi"] = "multiplicityTracksGen_LogXiPlus"
+        histoNames["VarLogXiGen"] = "multiplicityTracksGen_LogXiGenPlus"
+    elif side == "minus":
+        histoNames["VarLogXi"] = "multiplicityTracksGen_LogXiMinus"
+        histoNames["VarLogXiGen"] = "multiplicityTracksGen_LogXiGenMinus"
 
     ###############################
     file_data = ROOT.TFile(fileNameData,'read')

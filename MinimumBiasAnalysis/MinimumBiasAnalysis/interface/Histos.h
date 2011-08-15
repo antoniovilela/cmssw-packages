@@ -113,10 +113,14 @@ namespace minimumBiasAnalysis {
      histos["etaMaxGen"] = adaptor.template make<TH1F>("etaMaxGen","etaMaxGen",200,-10.,10.);
      histos["etaMinGen"] = adaptor.template make<TH1F>("etaMinGen","etaMinGen",200,-10.,10.);
 
+     histos["deltaEtaGen"] = adaptor.template make<TH1F>("deltaEtaGen","deltaEtaGen",100,0.,15.);
+     histos["etaGapLow"] = adaptor.template make<TH1F>("etaGapLow","etaGapLow",200,-10.,10.);
+     histos["etaGapHigh"] = adaptor.template make<TH1F>("etaGapHigh","etaGapHigh",200,-10.,10.);
+
      histos["logXiPlusFromPFCands"] = adaptor.template make<TH1F>("logXiPlusFromPFCands","logXiPlusFromPFCands",200,-5.,0.);
      histos["logXiMinusFromPFCands"] = adaptor.template make<TH1F>("logXiMinusFromPFCands","logXiMinusFromPFCands",200,-5.,0.);
-     histos["logXiGenPlus"] = adaptor.template make<TH1F>("logXiGenPlus","logXiGenPlus",200,-5.,0.);
-     histos["logXiGenMinus"] = adaptor.template make<TH1F>("logXiGenMinus","logXiGenMinus",200,-5.,0.);
+     histos["logXiGenPlus"] = adaptor.template make<TH1F>("logXiGenPlus","logXiGenPlus",200,-10.,0.);
+     histos["logXiGenMinus"] = adaptor.template make<TH1F>("logXiGenMinus","logXiGenMinus",200,-10.,0.);
      histos["logXiFromPFCandsANDXiGenPlus"] = adaptor.template make<TH1F>("logXiFromPFCandsANDXiGenPlus","logXiFromPFCandsANDXiGenPlus",200,-5.,0.);
      histos["logXiFromPFCandsANDXiGenMinus"] = adaptor.template make<TH1F>("logXiFromPFCandsANDXiGenMinus","logXiFromPFCandsANDXiGenMinus",200,-5.,0.); 
      histos["logXiPlusFromPFCandsVarBin"] = adaptor.template make<TH1F>("logXiPlusFromPFCandsVarBin","logXiPlusFromPFCandsVarBin",nBinsLogXi,binningLogXi);
@@ -143,6 +147,8 @@ namespace minimumBiasAnalysis {
      histos["ResXiMinusFromTowers"] = adaptor.template make<TH1F>("ResXiMinusFromTowers","ResXiMinusFromTowers",200,-2.0,2.0);
      histos["ResXiPlusFromPFCands"] = adaptor.template make<TH1F>("ResXiPlusFromPFCands","ResXiPlusFromPFCands",200,-2.0,2.0);
      histos["ResXiMinusFromPFCands"] = adaptor.template make<TH1F>("ResXiMinusFromPFCands","ResXiMinusFromPFCands",200,-2.0,2.0);
+     histos["ResLogXiPlusFromPFCands"] = adaptor.template make<TH1F>("ResLogXiPlusFromPFCands","ResLogXiPlusFromPFCands",200,-5.0,5.0);
+     histos["ResLogXiMinusFromPFCands"] = adaptor.template make<TH1F>("ResLogXiMinusFromPFCands","ResLogXiMinusFromPFCands",200,-5.0,5.0);
 
      histos["BeamHaloId"] = adaptor.template make<TH1F>("BeamHaloId","BeamHaloId",2,0,2);
      histos["BeamHaloId"]->GetXaxis()->SetBinLabel(1,"BeamHaloLooseId");

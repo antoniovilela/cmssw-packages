@@ -187,11 +187,21 @@ void minimumBiasTTreeAnalysis(TTree* data,
       for(size_t iprocess = 0; iprocess < processIDs.size(); ++iprocess) histosTH1F["ProcessId"] ->GetXaxis()->SetBinLabel(iprocess + 1,processNames[iprocess].c_str());
    }
 
-   bool doEtaMaxGenSelection= false;
-   bool doEtaMinGenSelection= false;
+   //==========================
+   bool doEtaMaxGenSelection = false;
+   bool doEtaMinGenSelection = false;
    double etaMaxGenMax = 0.;
    double etaMinGenMin = 0.; 
+   
+   bool doDeltaEtaGenSelection = false;
+   double deltaEtaGenMin = 3.0;
 
+   bool doLogXiGenPlusSelection  = false;
+   bool doLogXiGenMinusSelection = false;
+   double logXiGenPlusMax  = -5.0;
+   double logXiGenMinusMax = -5.0;
+
+   //==========================
    // Event selection
    bool doTriggerSelection = false;
    bool doHcalNoiseSelection = false;
@@ -224,9 +234,11 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doEtaMinSelection = false;
    double etaMaxMax = 1.0;
    double etaMinMin = -1.0;
-   // Xi correction factora
+   //==========================
+
+   // Xi correction factor
    double EBeam = 3500.;
-   double xiCorrectionFactor = 1.0;
+   double xiCorrectionFactor = 2.0;
 
    double eventWeight = 1.0;
    //std::vector<std::pair<int,int> > selectedEvents;
@@ -256,9 +268,21 @@ void minimumBiasTTreeAnalysis(TTree* data,
       if(accessMCInfo){
          int processId = eventData.processId_;
          if(selectProcessIds && std::find(selectedProcIds.begin(),selectedProcIds.end(),processId) == selectedProcIds.end()) continue;
+         
+         // Gen level selection
          if(doEtaMaxGenSelection && eventData.etaMaxGen_ > etaMaxGenMax) continue;
          if(doEtaMinGenSelection && eventData.etaMinGen_ < etaMinGenMin) continue;
 
+         if(doDeltaEtaGenSelection && eventData.deltaEtaGen_ < deltaEtaGenMin) continue;
+
+         double logXiGenPlus = (eventData.MxGenMinus_*eventData.MxGenMinus_)/(4*EBeam*EBeam);
+         double logXiGenMinus = (eventData.MxGenPlus_*eventData.MxGenPlus_)/(4*EBeam*EBeam);
+         logXiGenPlus = (logXiGenPlus > 0.) ? log10(logXiGenPlus) : -999.;
+         logXiGenMinus = (logXiGenMinus > 0.) ? log10(logXiGenMinus) : -999.; 
+         if(doLogXiGenPlusSelection && logXiGenPlus > logXiGenPlusMax) continue;
+         if(doLogXiGenMinusSelection && logXiGenMinus > logXiGenMinusMax) continue;
+          
+         // Fill histo with process Id's
          std::vector<int>::const_iterator it_processId = std::find(processIDs.begin(),processIDs.end(),processId);
          if(it_processId != processIDs.end()){
            int idx_processId = it_processId - processIDs.begin();
@@ -587,6 +611,10 @@ void minimumBiasTTreeAnalysis(TTree* data,
          double etaMaxGen = eventData.etaMaxGen_;
          double etaMinGen = eventData.etaMinGen_;
 
+         double deltaEtaGen = eventData.deltaEtaGen_; 
+         double etaGapLow   = eventData.etaGapLow_;
+         double etaGapHigh  = eventData.etaGapHigh_;
+ 
          int multiplicityTracksGen = eventData.multiplicityTracksGen_;
          double sumPtTracksGen = eventData.sumPtTracksGen_;
  
@@ -599,6 +627,10 @@ void minimumBiasTTreeAnalysis(TTree* data,
          histosTH1F["etaMinGen"]->Fill(etaMinGen);
          histosTH2F["etaMaxFromPFCandsVsetaMaxGen"]->Fill(etaMaxGen,etaMaxFromPFCands);
          histosTH2F["etaMinFromPFCandsVsetaMinGen"]->Fill(etaMinGen,etaMinFromPFCands);
+
+         histosTH1F["deltaEtaGen"]->Fill(deltaEtaGen);
+         histosTH1F["etaGapLow"]->Fill(etaGapLow);
+         histosTH1F["etaGapHigh"]->Fill(etaGapHigh);
 
          histosTH1F["multiplicityTracksGen"]->Fill(multiplicityTracksGen);
          histosTH1F["sumPtTracksGen"]->Fill(sumPtTracksGen);
@@ -630,7 +662,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
          if( eventData.processId_ == *(procIdsSDMinus.begin()) ) xigen_minus = xi_gen;*/
          // Xi hadron level definition
          double xigen_plus = (eventData.MxGenMinus_*eventData.MxGenMinus_)/(4*EBeam*EBeam);
-         double xigen_minus = (eventData.MxGenPlus_*eventData.MxGenPlus_)/(4*EBeam*EBeam);;
+         double xigen_minus = (eventData.MxGenPlus_*eventData.MxGenPlus_)/(4*EBeam*EBeam);
          if(xigen_plus > 0.){ 
             histosTH1F["xiGenPlus"]->Fill(xigen_plus);
             histosTH1F["logXiGenPlus"]->Fill( log10(xigen_plus) );
@@ -642,6 +674,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
             histosTH2F["xiFromTowersVslogXiGenPlus"]->Fill( log10(xigen_plus),xiPlusFromTowers );
             histosTH2F["xiFromPFCandsVslogXiGenPlus"]->Fill( log10(xigen_plus),xiPlusFromPFCands );
             if(xiPlusFromPFCands > 0.){
+               histosTH1F["ResLogXiPlusFromPFCands"]->Fill( log10(xiPlusFromPFCands) - log10(xigen_plus) );
+ 
                histosTH2F["logXiFromPFCandsVslogXiGenPlus"]->Fill( log10(xigen_plus),log10(xiPlusFromPFCands) );
                bool sameBin = ( histosTH1F["logXiPlusFromPFCands"]->FindBin(log10(xiPlusFromPFCands)) == histosTH1F["logXiGenPlus"]->FindBin(log10(xigen_plus)) );
                if(sameBin) histosTH1F["logXiFromPFCandsANDXiGenPlus"]->Fill(log10(xigen_plus));
@@ -659,6 +693,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
             histosTH2F["xiFromTowersVslogXiGenMinus"]->Fill( log10(xigen_minus),xiMinusFromTowers );
             histosTH2F["xiFromPFCandsVslogXiGenMinus"]->Fill( log10(xigen_minus),xiMinusFromPFCands );
             if(xiMinusFromPFCands > 0.){
+               histosTH1F["ResLogXiMinusFromPFCands"]->Fill( log10(xiMinusFromPFCands) - log10(xigen_minus) ); 
                histosTH2F["logXiFromPFCandsVslogXiGenMinus"]->Fill( log10(xigen_minus),log10(xiMinusFromPFCands) );
                bool sameBin = ( histosTH1F["logXiMinusFromPFCands"]->FindBin(log10(xiMinusFromPFCands)) == histosTH1F["logXiGenMinus"]->FindBin(log10(xigen_minus)) );
                if(sameBin) histosTH1F["logXiFromPFCandsANDXiGenMinus"]->Fill(log10(xigen_minus));

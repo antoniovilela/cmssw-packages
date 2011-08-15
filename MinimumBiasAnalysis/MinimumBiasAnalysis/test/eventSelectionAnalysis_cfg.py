@@ -13,19 +13,19 @@ config.runOnMC = inputOptions.runOnMC
 config.generator = inputOptions.generator
 
 config.verbose = True
-config.globalTagNameData = 'GR_R_38X_V13A::All'
-config.globalTagNameMC = 'START38_V12::All'
-config.outputTTreeFile = 'eventSelectionAnalysis_TTree_MinimumBias.root'
+config.globalTagNameData = 'GR_R_42_V19::All'
+config.globalTagNameMC = 'START42_V13::All'
+config.outputTTreeFile = '/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/eventSelection-v1/eventSelectionAnalysis_TTree_MinimumBias_Pythia8MBR-reco423patch3.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
 config.triggerResultsProcessNameMC = inputOptions.hltProcessNameMC
-config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collisions10_JSON_v2_sub_132440.root'
+#config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collisions10_JSON_v2_sub_132440.root'
 
 if config.runOnMC:
-    if config.generator == 'Pythia8': config.fileNames = ['file:/storage2/antoniov/data1/MinBias_7TeV-pythia8_Fall10-START38_V12-v1_GEN-SIM-RECO/MinBias_7TeV-pythia8_Fall10-START38_V12-v1_GEN-SIM-RECO_A08BF063-13CC-DF11-8C8A-0030487D7EB1.root']
-    elif config.generator == 'Pythia6': config.fileNames = ['file:/storage2/antoniov/data1/']
-else: config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10-Sep17ReReco_v2_RECO/Run132599/MinimumBias_Commissioning10-Sep17ReReco_v2_RECO_80A3A8E6-46CA-DF11-AE95-00215E21D61E.root']
+    if config.generator == 'Pythia8':
+        from fileNames_Pythia8MBR_reco423patch3 import fileNames
+        config.fileNames = fileNames
 
 process = cms.Process("Analysis")
 
@@ -38,12 +38,13 @@ process.MessageLogger.cerr.Analysis = cms.untracked.PSet(limit = cms.untracked.i
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring()
 )
 process.source.fileNames = config.fileNames
+if config.runOnMC: process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 # Import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -85,9 +86,9 @@ if config.verbose:
 """
 ###################################################################################
 
-if not config.runOnMC:
-    process.load('Utilities.AnalysisTools.lumiWeight_cfi')
-    process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
+#if not config.runOnMC:
+#    process.load('Utilities.AnalysisTools.lumiWeight_cfi')
+#    process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
 
 #process.xiTower.comEnergy = config.comEnergy
 #process.xiFromCaloTowers.comEnergy = config.comEnergy
@@ -103,7 +104,7 @@ process.rereco_step = cms.Path(process.caloTowersRec
                                *process.metreco
                                ) # re-reco jets and met
 """
-if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
+#if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.recoSequence)
 if config.runOnMC:
     process.gen_step = cms.Path(process.genChargedParticles+
@@ -124,8 +125,10 @@ process.minimumBiasTTreeAnalysisVertexFilter = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisBeamHaloVeto = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisFilterScraping = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisHcalNoiseFilter = minimumBiasTTreeAnalysis.clone()
-process.minimumBiasTTreeAnalysisEtaMaxFilter = minimumBiasTTreeAnalysis.clone()
+process.minimumBiasTTreeAnalysisEtaMinFilter = minimumBiasTTreeAnalysis.clone()
+process.minimumBiasTTreeAnalysisCastorVeto = minimumBiasTTreeAnalysis.clone()
 
+if config.runOnMC: process.castorActivityFilter.CastorRecHitTag = 'castorreco'
 process.load('Utilities.AnalysisTools.trackHistos_cfi')
 process.trackHistos.src = config.trackTagName
 process.load('Utilities.AnalysisTools.trackHistoAnalyzer_cfi')
@@ -150,7 +153,8 @@ process.countsVertexFilter = countsAnalyzer.clone()
 process.countsBeamHaloVeto = countsAnalyzer.clone()
 process.countsFilterScraping = countsAnalyzer.clone()
 process.countsHcalNoiseFilter = countsAnalyzer.clone()
-process.countsEtaMaxFilter = countsAnalyzer.clone()
+process.countsEtaMinFilter = countsAnalyzer.clone()
+process.countsCastorVeto = countsAnalyzer.clone()
 
 process.countEvents_step = cms.Path(    process.countsAll +
                                         #process.minimumBiasTTreeAnalysisAll +
@@ -175,9 +179,12 @@ process.countEvents_step = cms.Path(    process.countsAll +
                                     process.HBHENoiseFilter+process.hcalNoiseFilter +
                                         process.countsHcalNoiseFilter +
                                         process.minimumBiasTTreeAnalysisHcalNoiseFilter +
-                                    process.etaMaxFilter +
-                                        process.countsEtaMaxFilter +
-                                        process.minimumBiasTTreeAnalysisEtaMaxFilter)  
+                                    process.etaMinFilter +
+                                        process.countsEtaMinFilter +
+                                        process.minimumBiasTTreeAnalysisEtaMinFilter +
+                                    process.castorVeto +
+                                        process.countsCastorVeto +
+                                        process.minimumBiasTTreeAnalysisCastorVeto)  
 
 process.countEvents_step.replace(process.primaryVertexFilter,process.primaryVertexFilterLooseNDOF0)
 
@@ -190,9 +197,11 @@ if config.runOnMC:
     from Utilities.PyConfigTools.removeFromPaths import removeFromPaths
     removeFromPaths(process,'bptx')
     removeFromPaths(process,'hltBscMinBiasORBptxPlusORMinusFilter')
+    removeFromPaths(process,'castorInvalidDataFilter')
 
     from Utilities.PyConfigTools.setAnalyzerAttributes import setAnalyzerAttributes
     setAnalyzerAttributes(process,'minimumBiasTTreeAnalysis',
                                   AccessMCInfo = True, 
-                                  HLTPath = "HLT_L1Tech_BSC_minBias_OR",
+                                  HLTPath = "HLT_Jet30_v*",
+                                  CastorRecHitTag = 'castorreco', 
                                   TriggerResultsTag = cms.InputTag("TriggerResults","",config.triggerResultsProcessNameMC)) 

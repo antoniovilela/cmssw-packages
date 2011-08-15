@@ -7,11 +7,9 @@
 #include <string>
 #include <map>
 
-//#include "fileNames_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_eventSelection-v4.C"
-//#include "fileNames_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_eventSelection-v5.C"
-#include "fileNames_MinBias_7TeV-pythia8_Summer10-START36_V10_SP10-v1_eventSelection-v6.C"
-
-//#include "fileNames_MinBias_TuneZ1_7TeV-pythia6_Summer10-START36_V10_TP-v1-eventSelection-v2.C"
+void setFileNamesMinBias(std::vector<std::string>& fileNames){
+   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/eventSelection-v1/eventSelectionAnalysis_TTree_MinimumBias_Pythia8MBR-reco423patch3.root");
+}
 
 void runEventSelectionAnalysisMC(){
    gROOT->ProcessLine(".L minimumBiasTTreeAnalysis.C+");
@@ -25,13 +23,12 @@ void runEventSelectionAnalysisMC(){
    //generator_t genTune = PHOJET;
 
    std::string outDir;
-   outDir = "root/7TeV/Pythia8/eventSelection-v6";
-   //outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMaxSelection_etaMax1";
-   //outDir = "root/7TeV/Pythia8/eventSelection-v6/doEtaMinSelection_etaMin-1";
-   //outDir = "root/7TeV/Pythia6Z1/eventSelection-v2";
+   outDir = "root/7TeV/Pythia8MBR/eventSelection-v1";
+   //outDir = "root/7TeV/Pythia8MBR/eventSelection-v1/doLogXiGenPlusSelection"; 
 
    std::vector<std::string> fileNames;
-   setFileNamesPythia8(fileNames);
+   setFileNamesMinBias(fileNames);
+   //setFileNamesPythia8(fileNames);
    //setFileNamesPythia6(fileNames);
  
    bool verbose = false;
@@ -45,14 +42,15 @@ void runEventSelectionAnalysisMC(){
    //selections.push_back("minimumBiasTTreeAnalysisBeamHaloVeto");
    //selections.push_back("minimumBiasTTreeAnalysisFilterScraping");
    selections.push_back("minimumBiasTTreeAnalysisHcalNoiseFilter");
-   selections.push_back("minimumBiasTTreeAnalysisEtaMaxFilter");
+   selections.push_back("minimumBiasTTreeAnalysisEtaMinFilter");
+   selections.push_back("minimumBiasTTreeAnalysisCastorVeto");
  
    std::vector<int> processTypes;
-   //processTypes.push_back(All);
+   processTypes.push_back(All);
    //processTypes.push_back(SD);
    processTypes.push_back(DD);
    //processTypes.push_back(Diff);
-   //processTypes.push_back(Inelastic);
+   processTypes.push_back(Inelastic);
    processTypes.push_back(SDPlus);
    processTypes.push_back(SDMinus);
 
