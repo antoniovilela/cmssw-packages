@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
-config.runOnMC = True 
+config.runOnMC = False 
 config.maxEvents = 3000
 config.verbose = True
 config.writeEdmOutput = False
@@ -18,7 +18,7 @@ config.generator = 'Pythia8'
 config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
 config.varyAttributes = False
 config.runOfflineOnly = False
-config.runNoColl = False
+config.runNoColl = True
 config.runBPTX = False
 config.runHCALFilter = False
 config.runEtaMaxFilter = True

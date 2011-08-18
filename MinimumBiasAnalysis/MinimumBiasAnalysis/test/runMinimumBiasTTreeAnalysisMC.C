@@ -69,14 +69,11 @@ void runMinimumBiasTTreeAnalysisMC(){
    //fileName += getTTreeFileName(genTune,runRange);
 
    std::vector<std::string> selections;
-   //selections.push_back("eventSelectionBscMinBiasOR");
-   //selections.push_back("eventSelectionBscMinBiasOREtaMaxFilter");
-   selections.push_back("eventSelectionBscMinBiasOREtaMinFilter");
-   selections.push_back("eventSelectionBscMinBiasOREtaMinFilterCastorVeto");
-   selections.push_back("eventSelectionBscMinBiasOREtaMinFilterCastorTag");
-   /*selections.push_back("processIdPythia6_SD_eventSelectionBscMinBiasOR");
-   selections.push_back("processIdPythia6_DD_eventSelectionBscMinBiasOR");
-   selections.push_back("processIdPythia6_Diff_eventSelectionBscMinBiasOR");*/
+   selections.push_back("eventSelectionBscMinBiasOR");
+   selections.push_back("eventSelectionBscMinBiasOREtaMaxFilter");
+   //selections.push_back("eventSelectionBscMinBiasOREtaMinFilter");
+   //selections.push_back("eventSelectionBscMinBiasOREtaMinFilterCastorVeto");
+   //selections.push_back("eventSelectionBscMinBiasOREtaMinFilterCastorTag");
 
    std::vector<int> processTypes;
    processTypes.push_back(All);

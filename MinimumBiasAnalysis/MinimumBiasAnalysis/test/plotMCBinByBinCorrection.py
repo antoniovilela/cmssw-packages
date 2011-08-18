@@ -5,7 +5,8 @@ def plotMCBinByBinCorrection(fileNameData, fileNamesMCRef, fileNamesMCEff, side 
     ROOT.TH1.AddDirectory(False)
 
     #intLumi = 20.322 # /mub
-    intLumi = 500000./71260.;
+    intLumi = 49.156 # /mub
+    #intLumi = 500000./71260.;
     sigmaMC = 71.26 # mb
     ###############################
     histoNames = {}

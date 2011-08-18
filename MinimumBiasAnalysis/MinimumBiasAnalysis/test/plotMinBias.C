@@ -6,8 +6,6 @@
 #include "TH2F.h"
 #include "TTree.h"
 
-//#include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/test/PlottingTools.h"
-//#include "ExclusiveDijetsAnalysis/ExclusiveDijetsAnalysis/test/Plotter.h"
 #include "Utilities/PlottingTools/interface/PlottingTools.h"
 #include "Utilities/PlottingTools/interface/Plotter.h"
 
@@ -28,10 +26,10 @@ void setDirsDataMCGenSel(std::string const& selection,std::vector<std::pair<std:
 
 void plot(std::string const& selection, std::string const& mode = "setDirsDataMC", const char* drawOption = "", int rebin = 1){
    std::vector<std::string> variables;
-   /*variables.push_back("nVertex");
+   variables.push_back("nVertex");
    variables.push_back("posXPrimVtx");
    variables.push_back("posYPrimVtx");
-   variables.push_back("posZPrimVtx");*/
+   variables.push_back("posZPrimVtx");
    /*variables.push_back("multiplicityTracks");
    variables.push_back("multiplicityHFPlus");
    variables.push_back("multiplicityHFMinus");
@@ -44,7 +42,7 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    variables.push_back("MxFromPFCands");
    variables.push_back("etaMaxFromPFCandsVarBin");
    variables.push_back("etaMinFromPFCandsVarBin");*/
-   variables.push_back("multiplicityTracks");
+   /*variables.push_back("multiplicityTracks");
    variables.push_back("multiplicityHFPlusVarBin_dist");
    variables.push_back("multiplicityHFMinusVarBin_dist");
    variables.push_back("sumEnergyHFPlusVarBin_dist");
@@ -59,7 +57,18 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    variables.push_back("EMinusPzFromPFCands_dist");
    variables.push_back("MxFromPFCands_dist");
    variables.push_back("etaMaxFromPFCandsVarBin_dist");
-   variables.push_back("etaMinFromPFCandsVarBin_dist");
+   variables.push_back("etaMinFromPFCandsVarBin_dist");*/
+   variables.push_back("multiplicityTracks");
+   variables.push_back("sumEnergyHFPlusVarBin");
+   variables.push_back("sumEnergyHFMinusVarBin");
+   variables.push_back("sumEnergyCASTOR"); 
+   variables.push_back("logXiPlusFromPFCands");
+   variables.push_back("logXiMinusFromPFCands");
+   variables.push_back("logXiPlusFromPFCandsVarBin");
+   variables.push_back("logXiMinusFromPFCandsVarBin");
+   variables.push_back("MxFromPFCands");
+   variables.push_back("etaMaxFromPFCandsVarBin");
+   variables.push_back("etaMinFromPFCandsVarBin");
    /*variables.push_back("xiGenPlus");
    variables.push_back("xiGenMinus");
    variables.push_back("etaMaxGen");
@@ -299,14 +308,14 @@ void setDirsDataMC(std::string const& selection, std::vector<std::pair<std::stri
 
 void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
    run_range_t runRange = Data7TeV;
-   //generator_t genType = PYTHIA8;
-   generator_t genType = PYTHIAZ1;
+   generator_t genType = PYTHIA8;
+   //generator_t genType = PYTHIAZ1;
    //generator_t genType = PHOJET;
    std::string eventSelection = selection;
-   std::string dirData = "root/7TeV/Data/Run132605/minimumBiasAnalysisTTree-v4";
-   //std::string dirMC = "root/7TeV/Pythia8/eventSelection-v6";
-   std::string dirMC = "root/7TeV/Pythia6Z1/eventSelection-v2";
-   //std::string dirMC = "root/7TeV/Phojet/eventSelection";
+   std::string dirData = "root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v2";
+   std::string dirMC = "root/7TeV/Pythia8MBR/minimumBiasTTreeAnalysis-v1";
+
+   double normMC = 71260.*49.156/499596;
 
    TFile* file_Data = TFile::Open((dirData + "/" + getHistosFileName(runRange,eventSelection)).c_str());
    TH1F* h_EventSelection_Data = static_cast<TH1F*>(file_Data->Get("EventSelection"));
@@ -339,8 +348,8 @@ void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair
    double nEvents_QCD = h_EventSelection_QCD->GetBinContent(1);
 
    dirs.push_back(std::make_pair("p+p (7 TeV)",file_Data));
-   //dirs.push_back(std::make_pair("PYTHIA8",fileMC_All));
-   dirs.push_back(std::make_pair("PYTHIA6 Z1",fileMC_All));
+   dirs.push_back(std::make_pair("PYTHIA8",fileMC_All));
+   //dirs.push_back(std::make_pair("PYTHIA6 Z1",fileMC_All));
    /*dirs.push_back(std::make_pair("PYTHIA8 - SD",fileMC_SD));
    dirs.push_back(std::make_pair("PYTHIA8 - DD",fileMC_DD)); 
    dirs.push_back(std::make_pair("PYTHIA8 - Inel. non-diffractive",fileMC_QCD));*/
@@ -352,13 +361,20 @@ void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair
    dirs.push_back(std::make_pair("MinBias PHOJET - DD",fileMC_DD)); 
    dirs.push_back(std::make_pair("MinBias PHOJET - Inel. non-diffractive",fileMC_QCD));*/
 
-   normFactors.push_back(1.);
+   /*normFactors.push_back(1.);
    normFactors.push_back(nEventsFullSel_Data/nEventsFullSel_All); 
    //normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_SD));
    normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_SDPlus));
    normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_SDMinus));
    normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_DD));
-   normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_QCD));
+   normFactors.push_back((nEventsFullSel_Data/nEventsFullSel_All)*(nEvents_All/nEvents_QCD));*/
+
+   normFactors.push_back(1.);
+   normFactors.push_back(normMC);
+   normFactors.push_back(normMC);
+   normFactors.push_back(normMC);
+   normFactors.push_back(normMC);
+   normFactors.push_back(normMC);
 }
 
 void setDirsCompareData(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
