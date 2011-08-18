@@ -1,8 +1,0 @@
-===== 3D Torino 1E-3, Purdue 1E-7 WBC=84, THR=, HV=
---- Angle = 0
-  1 t4d2v1 run1410 Run1410.dat
-  1 t4d2v1AlignAllRun1411 run1411 Run1411.dat
-  1 t4d2v1AlignAllRun1411 run1425 Run1425.dat
-  1 t4d2v1AlignAllRun1411 run1426 Run1426.dat 
-  1 t4d2v1AlignAllRun1411 run1428 Run1428.dat
-  1 t4d2v1AlignAllRun1411 run1448 Run1448.dat
