@@ -9,6 +9,7 @@
 #include "DataFormats/Math/interface/deltaR.h"
 
 using namespace reco;
+using analysisTools::TrackOutsideJetsSelector;
 
 TrackOutsideJetsSelector::TrackOutsideJetsSelector(const edm::ParameterSet& pset):
    jetTag_(pset.getParameter<edm::InputTag>("JetTag")),

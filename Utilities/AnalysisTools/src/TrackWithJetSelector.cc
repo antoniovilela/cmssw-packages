@@ -9,6 +9,7 @@
 #include "DataFormats/Math/interface/deltaPhi.h"
 
 using namespace reco;
+using analysisTools::TrackWithJetSelector;
 
 TrackWithJetSelector::TrackWithJetSelector(const edm::ParameterSet& pset):
    jetTag_(pset.getParameter<edm::InputTag>("JetTag")),

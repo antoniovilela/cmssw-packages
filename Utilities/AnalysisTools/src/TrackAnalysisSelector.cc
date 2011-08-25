@@ -9,9 +9,8 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
-namespace analysisTools {
-
 using namespace reco;
+using analysisTools::TrackAnalysisSelector;
 
 TrackAnalysisSelector::TrackAnalysisSelector(const edm::ParameterSet& pset):
    vertexTag_(pset.getParameter<edm::InputTag>("vertexTag")),
@@ -45,5 +44,3 @@ bool TrackAnalysisSelector::operator()(const Track& track, const edm::Event& eve
 
    return accept;
 }
-
-} // namespace

@@ -56,4 +56,4 @@ bool ProcessIdFilter::filter(edm::Event& event, edm::EventSetup const& setup){
   return accept;
 }
 
-DEFINE_FWK_MODULE(ProcessIdFilter);
+//DEFINE_FWK_MODULE(ProcessIdFilter);

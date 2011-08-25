@@ -5,6 +5,8 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+namespace analysisTools {
+
 class TrackOutsideJetsSelector {
    public:
       explicit TrackOutsideJetsSelector(const edm::ParameterSet&);
@@ -15,4 +17,5 @@ class TrackOutsideJetsSelector {
       double coneSize_; 
 };
 
+} // namespace
 #endif

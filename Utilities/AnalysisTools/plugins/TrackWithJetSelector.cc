@@ -6,8 +6,8 @@
 namespace reco { 
   namespace modules {
 
-    typedef TrackFullCloneSelectorBase< ::TrackWithJetSelector > TrackWithJetSelector;
+    typedef TrackFullCloneSelectorBase< analysisTools::TrackWithJetSelector > TrackWithJetSelector;
 
-    DEFINE_FWK_MODULE(TrackWithJetSelector);
+    //DEFINE_FWK_MODULE(TrackWithJetSelector);
   }
 }

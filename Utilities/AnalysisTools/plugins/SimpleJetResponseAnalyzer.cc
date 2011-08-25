@@ -100,4 +100,4 @@ void SimpleJetResponseAnalyzer::analyze(const edm::Event& event, const edm::Even
    }  
 }
 
-DEFINE_FWK_MODULE(SimpleJetResponseAnalyzer);
+//DEFINE_FWK_MODULE(SimpleJetResponseAnalyzer);

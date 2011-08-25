@@ -8,6 +8,6 @@ namespace reco {
 
     typedef TrackFullCloneSelectorBase< analysisTools::TrackAnalysisSelector > TrackAnalysisSelector;
 
-    DEFINE_FWK_MODULE(TrackAnalysisSelector);
+    //DEFINE_FWK_MODULE(TrackAnalysisSelector);
   }
 }

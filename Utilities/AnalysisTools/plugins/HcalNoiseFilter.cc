@@ -48,4 +48,4 @@ bool HcalNoiseFilter::filter(edm::Event& event, edm::EventSetup const& setup){
 } // namespace
 
 using analysisTools::HcalNoiseFilter;
-DEFINE_FWK_MODULE(HcalNoiseFilter);
+//DEFINE_FWK_MODULE(HcalNoiseFilter);

@@ -43,4 +43,4 @@ bool PileUpInfoFilter::filter(edm::Event& event, const edm::EventSetup& setup){
   return accept;
 }
 
-DEFINE_FWK_MODULE(PileUpInfoFilter);
+//DEFINE_FWK_MODULE(PileUpInfoFilter);

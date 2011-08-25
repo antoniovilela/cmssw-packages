@@ -167,4 +167,4 @@ void SimpleTrackAnalyzer::bookHistos(HistoMapTH1F& histos, edm::Service<TFileSer
   }
 }
 
-DEFINE_FWK_MODULE(SimpleTrackAnalyzer);
+//DEFINE_FWK_MODULE(SimpleTrackAnalyzer);

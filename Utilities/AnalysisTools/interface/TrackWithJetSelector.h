@@ -5,6 +5,8 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+namespace analysisTools {
+
 class TrackWithJetSelector {
    public:
       explicit TrackWithJetSelector(const edm::ParameterSet&);
@@ -16,4 +18,5 @@ class TrackWithJetSelector {
       double deltaPhiMax_; 
 };
 
+} // namespace
 #endif

@@ -5,4 +5,4 @@
 
 typedef HistoAnalyzer<reco::PFCandidateCollection> PFCandidateHistoAnalyzer;
 
-DEFINE_FWK_MODULE( PFCandidateHistoAnalyzer );
+//DEFINE_FWK_MODULE( PFCandidateHistoAnalyzer );

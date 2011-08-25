@@ -75,4 +75,4 @@ void LuminosityWeightProducer::produce(edm::Event& event, edm::EventSetup const&
   event.put( luminosityWeight ); 
 }
 
-DEFINE_FWK_MODULE(LuminosityWeightProducer);
+//DEFINE_FWK_MODULE(LuminosityWeightProducer);

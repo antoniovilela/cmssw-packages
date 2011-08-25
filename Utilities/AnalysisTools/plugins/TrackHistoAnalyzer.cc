@@ -5,4 +5,4 @@
 
 typedef HistoAnalyzer<reco::TrackCollection> TrackHistoAnalyzer;
 
-DEFINE_FWK_MODULE( TrackHistoAnalyzer );
+//DEFINE_FWK_MODULE( TrackHistoAnalyzer );

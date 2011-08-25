@@ -74,4 +74,4 @@ void NCountsAnalyzer::bookHistos(HistoMapTH1F& histos, edm::Service<TFileService
   histos["SumWeights"] = fs->make<TH1F>("SumWeights","SumWeights",1,0,1);
 }
 
-DEFINE_FWK_MODULE(NCountsAnalyzer);
+//DEFINE_FWK_MODULE(NCountsAnalyzer);
