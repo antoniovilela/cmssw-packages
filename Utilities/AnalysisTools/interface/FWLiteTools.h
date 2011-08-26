@@ -1,14 +1,16 @@
 #ifndef UtilitiesAnalysisTools_FWLiteTools_h
 #define UtilitiesAnalysisTools_FWLiteTools_h
 
-#include <map>
-#include <algorithm>
-
 #if !defined(__CINT__) && !defined(__MAKECINT__)
 //Headers for the data items
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #endif
+
+#include "TMath.h"
+
+#include <map>
+#include <algorithm>
 
 namespace analysisTools {
 
