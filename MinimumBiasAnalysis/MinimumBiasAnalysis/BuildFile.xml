@@ -5,6 +5,7 @@
 <use   name="DataFormats/JetReco"/>
 <use   name="DataFormats/METReco"/>
 <use   name="DataFormats/HcalRecHit"/>
+<use   name="DataFormats/L1GlobalTrigger"/>
 <use   name="root"/>
 <use   name="rootrflx"/>
 <export>

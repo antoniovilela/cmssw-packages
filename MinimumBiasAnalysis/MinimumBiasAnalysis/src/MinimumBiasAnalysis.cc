@@ -18,6 +18,9 @@
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -52,18 +55,9 @@ MinimumBiasAnalysis::MinimumBiasAnalysis(const edm::ParameterSet& pset):
   energyScaleHCAL_(-1.),
   accessMCInfo_(pset.getUntrackedParameter<bool>("AccessMCInfo",false)),
   //hltPathNames_(pset.getParameter<std::vector<std::string> >("HLTPathNames")),
-  hltPathName_(pset.getParameter<std::string>("HLTPath"))
-  //selectionPathName_(pset.getParameter<std::string>("SelectionPath"))
+  hltPathName_(pset.getParameter<std::string>("HLTPath")),
+  ttBit_(pset.getParameter<int>("TTBit")) 
 {
-  //FIXME
-  /*thresholdsPFlow_[reco::PFCandidate::X] = std::make_pair(-1.,1.0);
-  thresholdsPFlow_[reco::PFCandidate::h] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::e] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::mu] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::gamma] = std::make_pair(0.5,-1.);
-  thresholdsPFlow_[reco::PFCandidate::h0] = std::make_pair(-1.,std::max(energyThresholdHB_,energyThresholdHE_));
-  thresholdsPFlow_[reco::PFCandidate::h_HF] = std::make_pair(-1.,energyThresholdHF_);
-  thresholdsPFlow_[reco::PFCandidate::egamma_HF] = std::make_pair(-1.,energyThresholdHF_);*/
   resetPFThresholds(thresholdsPFlowBarrel_);
   resetPFThresholds(thresholdsPFlowEndcap_);
   resetPFThresholds(thresholdsPFlowTransition_);
@@ -115,7 +109,6 @@ void MinimumBiasAnalysis::fillEventData(MinimumBiasEventData& eventData, const e
   fillEventInfo(eventData,event,setup);
   fillNoiseInfo(eventData,event,setup); 
   fillTriggerInfo(eventData,event,setup);
-  //fillSelectionInfo(eventData,event,setup);
   fillVertexInfo(eventData,event,setup);
   fillTrackInfo(eventData,event,setup);
   fillJetInfo(eventData,event,setup);
@@ -182,21 +175,10 @@ void MinimumBiasAnalysis::fillNoiseInfo(MinimumBiasEventData& eventData, const e
 }
 
 void MinimumBiasAnalysis::fillTriggerInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
-  //FIXME
   edm::Handle<edm::TriggerResults> triggerResults;
   event.getByLabel(triggerResultsTag_, triggerResults);
 
-  //edm::TriggerNames triggerNames;
-  //triggerNames.init(*triggerResults);
   const edm::TriggerNames& triggerNames = event.triggerNames(*triggerResults);
-
-  /*std::vector<std::string>::const_iterator pathName = triggerResultsPaths_.begin();
-  std::vector<std::string>::const_iterator pathNames_end = triggerResultsPaths_.end();
-  for(; pathName != pathNames_end; ++pathName){
-     int trigIdx = triggerNames.triggerIndex(*pathName);
-     bool wasrun = triggerResults->wasrun(trigIdx);
-     bool accept = triggerResults->accept(trigIdx);
-  }*/
 
   // In case hltPathName_ is a pattern (e.g. HLT_Jet30U*)
   std::string hltPath;
@@ -212,23 +194,22 @@ void MinimumBiasAnalysis::fillTriggerInfo(MinimumBiasEventData& eventData, const
 
   unsigned int idxHLT = triggerNames.triggerIndex(hltPath);
   eventData.HLTPath_ = (triggerResults->wasrun(idxHLT) && triggerResults->accept(idxHLT)) ? 1 : 0; 
-}
 
-/*
-void MinimumBiasAnalysis::fillSelectionInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
-  edm::Handle<edm::TriggerResults> triggerResults;
-  event.getByLabel("TriggerResults", triggerResults);
+  edm::Handle<L1GlobalTriggerReadoutRecord> gtReadoutRecordH;
+  event.getByLabel("gtDigis", gtReadoutRecordH);
+  
+  if( gtReadoutRecordH.isValid() ){
+     const L1GlobalTriggerReadoutRecord* gtReadoutRecord = gtReadoutRecordH.product();
+     const TechnicalTriggerWord&  technicalTriggerWordBeforeMask = gtReadoutRecord->technicalTriggerWord();
+     //const unsigned int numberTechnicalTriggerBits( technicalTriggerWordBeforeMask.size() );
+     
+     bool passL1TT = technicalTriggerWordBeforeMask.at(ttBit_);
+     eventData.TTBit_ = (int)passL1TT;
+  } else{
+     eventData.TTBit_ = -1;
+  }
 
-  const edm::TriggerNames& triggerNames = event.triggerNames(*triggerResults);
-  unsigned int idxPath = triggerNames.triggerIndex(selectionPathName_);
-  if(idxPath >= triggerNames.size()) throw cms::Exception("Configuration") << "Could not find path with name "
-                                                    << selectionPathName_ << " from "
-                                                    << triggerResults.provenance()->moduleLabel() << "::"
-                                                    << triggerResults.provenance()->processName() << "\n"; 
-  //eventData.SelectionPath_ = (triggerResults->wasrun(idxPath) && triggerResults->accept(idxPath)) ? 1 : 0;
-  eventData.SelectionPath_ = -1.; 
 }
-*/
 
 void MinimumBiasAnalysis::fillVertexInfo(MinimumBiasEventData& eventData, const edm::Event& event, const edm::EventSetup& setup){
   // Access vertex collection

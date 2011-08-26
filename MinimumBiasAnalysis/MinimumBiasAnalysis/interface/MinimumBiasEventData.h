@@ -9,10 +9,8 @@ class MinimumBiasEventData {
      int lumiSection_;
      int bunchCrossing_;
      double lumiWeight_;
-     //int HLT_MinBiasBSCOR_;
-     //int HLT_MinBiasPixel_;
      int HLTPath_;
-     //int SelectionPath_;
+     int TTBit_;
      int nVertex_;
      double posXPrimVtx_;
      double posYPrimVtx_;
@@ -24,8 +22,6 @@ class MinimumBiasEventData {
      double leadingJetPt_;
      double leadingJetEta_;
      double leadingJetPhi_;
-     /*int trackMultiplicity_;
-     int trackMultiplicityAssociatedToPV_;*/
      int multiplicityHEPlus_;
      int multiplicityHEMinus_;
      double sumEnergyHEPlus_;
@@ -54,17 +50,12 @@ class MinimumBiasEventData {
      double xiGenMinus_;
      double xiPlusFromTowers_;
      double xiMinusFromTowers_;
-     //double xiPlusFromJets_;
-     //double xiMinusFromJets_;
      double xiPlusFromPFCands_;
      double xiMinusFromPFCands_;
      double missingMassFromXiFromTowers_;
-     //double missingMassFromXiFromJets_;
      double missingMassFromXiFromPFCands_;
      double EPlusPzFromTowers_;
      double EMinusPzFromTowers_;
-     //double EPlusPzFromJets_;
-     //double EMinusPzFromJets_;
      double EPlusPzFromPFCands_;
      double EMinusPzFromPFCands_;
      double MxGen_;
@@ -73,7 +64,6 @@ class MinimumBiasEventData {
      double MxGenPlus_;
      double MxGenMinus_;
      double MxFromTowers_;
-     //double MxFromJets_;
      double MxFromPFCands_;
      double deltaEtaGen_;
      double etaGapLow_;

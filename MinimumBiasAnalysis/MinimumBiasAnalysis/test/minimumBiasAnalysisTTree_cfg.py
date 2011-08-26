@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
-config.runOnMC = False 
+config.runOnMC = True
 config.maxEvents = 3000
 config.verbose = True
 config.writeEdmOutput = False
@@ -10,24 +10,26 @@ config.globalTagNameData = 'GR_R_42_V19::All'
 config.globalTagNameMC = 'START42_V13::All'
 config.outputEdmFile = 'minimumBias.root'
 config.outputTTreeFile = 'analysisMinBias_TTree_MinimumBias.root'
-#config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collisions10_JSON_v2_sub_132440.root'
+config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collisions10_JSON_v2_sub_132440.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
 config.generator = 'Pythia8'
 config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
 config.varyAttributes = False
-config.runOfflineOnly = False
+config.runOfflineOnly = True
 config.runNoColl = False
-config.runBPTX = True
+config.runBPTX = False
 config.runHCALFilter = False
-config.runEtaMaxFilter = False
-config.runCastorFilter = False
+config.runEtaMaxFilter = True
+config.runCastorFilter = True
 
-#config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_May19ReReco-v1_RECO/MinimumBias_Commissioning10_May19ReReco-v1_RECO_0C0FA77A-0D83-E011-82D3-001A64787060.root']
-config.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root',
-                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_1.root',
-                    'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_10.root']
+if not config.runOnMC:
+    config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_May19ReReco-v1_RECO/MinimumBias_Commissioning10_May19ReReco-v1_RECO_0C0FA77A-0D83-E011-82D3-001A64787060.root']
+else:
+    config.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root',
+                        'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_1.root',
+                        'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_10.root']
 
 if config.runOnMC: config.outputTTreeFile = 'analysisMinBias_TTree_MinBias.root'
 
@@ -129,9 +131,9 @@ if not config.runOnMC:
 
 ###################################################################################
 
-#if not config.runOnMC:
-#    process.load('Utilities.AnalysisTools.lumiWeight_cfi')
-#    process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
+if not config.runOnMC:
+    process.load('Utilities.AnalysisTools.lumiWeight_cfi')
+    process.lumiWeight.rootFileName = cms.string(config.instLumiROOTFile)
 
 from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
 
@@ -139,7 +141,7 @@ from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
 #process.xiFromCaloTowers.comEnergy = config.comEnergy
 #process.xiFromJets.comEnergy = config.comEnergy
 process.recoSequence = cms.Sequence(process.tracks*process.pfCandidates*process.edmDump)
-#if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
+if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
 """
 process.reflagging_step = cms.Path(process.hfrecoReflagged+process.hbherecoReflagged)
@@ -151,7 +153,7 @@ process.rereco_step = cms.Path(process.caloTowersRec
 """
 if not config.runOnMC: process.castor_step = cms.Path(process.castorSequence)
 process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
-#if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
+if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.recoSequence)
 if config.runOnMC:
     process.gen_step = cms.Path(process.genChargedParticles+

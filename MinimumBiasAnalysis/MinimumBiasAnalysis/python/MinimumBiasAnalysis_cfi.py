@@ -26,5 +26,6 @@ MinimumBiasAnalysis = cms.PSet(
     ApplyEnergyScaleHCAL = cms.bool(False),
     EnergyScaleFactorHCAL = cms.double(1.0),
     HLTPath = cms.string("HLT_L1_BscMinBiasOR_BptxPlusORMinus"), 
+    TTBit = cms.int32(34),
     AccessMCInfo = cms.untracked.bool(False)
 )
