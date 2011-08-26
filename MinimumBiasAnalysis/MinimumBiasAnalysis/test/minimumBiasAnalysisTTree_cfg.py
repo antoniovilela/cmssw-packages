@@ -18,11 +18,11 @@ config.generator = 'Pythia8'
 config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
 config.varyAttributes = False
 config.runOfflineOnly = False
-config.runNoColl = True
-config.runBPTX = False
+config.runNoColl = False
+config.runBPTX = True
 config.runHCALFilter = False
-config.runEtaMaxFilter = True
-config.runCastorFilter = True
+config.runEtaMaxFilter = False
+config.runCastorFilter = False
 
 #config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_May19ReReco-v1_RECO/MinimumBias_Commissioning10_May19ReReco-v1_RECO_0C0FA77A-0D83-E011-82D3-001A64787060.root']
 config.fileNames = ['file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_0.root',
