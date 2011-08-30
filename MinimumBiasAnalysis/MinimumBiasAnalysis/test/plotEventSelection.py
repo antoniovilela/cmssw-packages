@@ -5,20 +5,16 @@ def plotTTreeHistos():
     return -1
 
 def plotEventSelection(dir,selectionRef,selectionEff,
-                       prefix='analysisMinBiasTTree_MinimumBias_7TeV',rebin=1):
-
-    #selectionRef = 'minimumBiasTTreeAnalysisBscOr'
-    #selectionEff = 'minimumBiasTTreeAnalysisVertexFilter'
+                       prefix='analysisMinBiasTTree_MinimumBias_7TeV',rebin=1,outputFileName=""):
 
     variables = [
-        'posRPrimVtx',
-        'multiplicityTracks',  
-        'sumEnergyHFPlus',
-        'sumEnergyHFMinus',
-        'etaMaxFromPFCands',
-        'etaMinFromPFCands',
-        'xiPlusFromPFCands',
-        'xiMinusFromPFCands'
+        'multiplicityTracks',
+        'sumEnergyHFPlusVarBin',
+        'sumEnergyHFMinusVarBin',
+        'etaMaxFromPFCandsVarBin',
+        'etaMinFromPFCandsVarBin',
+        'logXiPlusFromPFCandsVarBin',
+        'logXiMinusFromPFCandsVarBin'  
     ]
 
     steps = [selectionRef,selectionEff]
@@ -35,21 +31,15 @@ def plotEventSelection(dir,selectionRef,selectionEff,
                             types=("",),
                             selectionRef=selectionRef,
                             selectionEff=selectionEff,
-                            rebin=rebin)
+                            rebin=rebin,
+                            outputFileName=outputFileName)
 
-def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1):
+def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1,outputFileName=""):
 
     #dir = 'root/7TeV/Pythia8/eventSelection'
     #prefix = 'analysisMinBiasTTree_PYTHIA8_MinBias_7TeV'
-
     #selectionRef = 'minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus'
     #selectionEff = 'minimumBiasTTreeAnalysisBscOr'
-
-    #selectionRef = 'minimumBiasTTreeAnalysisBscOr'
-    #selectionEff = 'minimumBiasTTreeAnalysisVertexFilter'
-
-    #selectionRef = 'minimumBiasTTreeAnalysisVertexFilter'
-    #selectionEff = 'minimumBiasTTreeAnalysisHBHENoiseFilterHcalNoiseSelection'
 
     variables = [
         'multiplicityTracks',
@@ -58,8 +48,6 @@ def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1):
         'sumEnergyHFMinusVarBin',
         'etaMaxFromPFCandsVarBin',
         'etaMinFromPFCandsVarBin',
-        'xiPlusFromPFCands',
-        'xiMinusFromPFCands',
         'logXiPlusFromPFCands',
         'logXiMinusFromPFCands', 
         'logXiPlusFromPFCandsVarBin',
@@ -69,8 +57,6 @@ def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1):
         'deltaEtaGen',
         'etaGapLow',
         'etaGapHigh',
-        'xiGenPlus',
-        'xiGenMinus',
         'logXiGenPlus',
         'logXiGenMinus',
         'logXiGenPlusVarBin',
@@ -88,10 +74,6 @@ def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1):
     steps = [selectionRef,selectionEff]
 
     files = {}
-    #processIds = ['All','SD','DD','Inelastic'] 
-    #processIds = ['SD','DD','Inelastic']
-    #processIds = ['All_EtaMaxGen']
-    #processIds =['SD']
     for selection in steps:
         for type in types:
             fileName = "%s/%s_%s_histos_%s.root" % (dir, prefix, selection, type)
@@ -107,16 +89,18 @@ def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1):
                             types=types,
                             selectionRef=selectionRef,
                             selectionEff=selectionEff,
-                            rebin=rebin)
+                            rebin=rebin,
+                            outputFileName=outputFileName)
 
-def plotEfficiencies(variables, files, types, selectionRef, selectionEff, rebin=1):
+def plotEfficiencies(variables, files, types, selectionRef, selectionEff, rebin=1, 
+                                                            outputFileName=""):
 
     ROOT.TH1.AddDirectory(False)
 
     #colors = (1,2,4,12,6,43,38,57)
     colors = (2,4,12,6,43,38,57)
     #markers = (20,21,25,22,26,20,24,27)
-    markers = (24,25,26) 
+    markers = (24,25,26,27,28) 
     canvases = []
     legends = []
     graphsEff = {}
@@ -138,10 +122,10 @@ def plotEfficiencies(variables, files, types, selectionRef, selectionEff, rebin=
 
             graphsEff[variable].append(ROOT.TGraphAsymmErrors(h_Eff,h_Ref))
             graphsEff[variable][-1].SetName( h_Eff.GetName() + "_" + type + "_graph" )
-            graphsEff[variable][-1].SetLineColor(colors[idx_type])
+            graphsEff[variable][-1].SetLineColor( colors[idx_type % len(colors)] )
             graphsEff[variable][-1].SetLineWidth(3)
-            graphsEff[variable][-1].SetMarkerColor(colors[idx_type])
-            graphsEff[variable][-1].SetMarkerStyle(markers[idx_type])
+            graphsEff[variable][-1].SetMarkerColor( colors[idx_type % len(colors)] )
+            graphsEff[variable][-1].SetMarkerStyle( markers[idx_type % len(markers)] )
             graphsEff[variable][-1].SetMarkerSize(1.4)
             graphsEff[variable][-1].GetYaxis().SetRangeUser(0.,1.05)
             graphsEff[variable][-1].GetYaxis().SetTitle("Efficiency")
@@ -160,7 +144,15 @@ def plotEfficiencies(variables, files, types, selectionRef, selectionEff, rebin=
         #legends[-1].SetHeader( variable ) 
         legends[-1].Draw("SAME")
 
-    return (canvases,legends,graphsEff)
+    if outputFileName:
+        outputFile = ROOT.TFile(outputFileName,'recreate')
+        outputFile.cd()
+        for key in graphsEff:
+            graphs = graphsEff[key]
+            for gr in graphs: gr.Write() 
+        return 0
+    else:       
+        return (canvases,legends,graphsEff)
 
 if __name__ == '__main__':
     

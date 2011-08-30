@@ -7,10 +7,10 @@ from fileNames_Pythia8MBR_reco423patch3 import fileNames
 #                            'file:/storage2/antoniov/data1/Pythia8MBR-reco423patch3/step2_10.root']
 process.source.fileNames = fileNames
 process.MessageLogger.cerr.threshold = 'INFO'
-process.maxEvents.input = -1
+process.maxEvents.input = 5000
 #process.GlobalTag.globaltag = 'START::All'
 #process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck') 
-process.TFileService.fileName = "/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/minimumBiasTTreeAnalysis-v1/analysisMinBias_TTree_MinBias_Pythia8MBR-reco423patch3.root"
+process.TFileService.fileName = "/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/minimumBiasTTreeAnalysis-v2/analysisMinBias_TTree_MinBias_Pythia8MBR-reco423patch3.root"
 
 """
 from Utilities.PyConfigTools.analysisTools import *

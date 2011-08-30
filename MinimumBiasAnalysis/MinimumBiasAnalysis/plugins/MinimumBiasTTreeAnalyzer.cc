@@ -52,7 +52,7 @@ MinimumBiasTTreeAnalyzer::MinimumBiasTTreeAnalyzer(const edm::ParameterSet& pset
   saveTTree_(pset.getUntrackedParameter<bool>("SaveROOTTree",true)){}
 
 MinimumBiasTTreeAnalyzer::~MinimumBiasTTreeAnalyzer(){
-  delete eventData_;
+  if(eventData_) delete eventData_;
 }
 
 void MinimumBiasTTreeAnalyzer::beginJob(){

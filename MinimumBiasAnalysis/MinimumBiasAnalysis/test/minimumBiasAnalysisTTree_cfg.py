@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Settings
 class config: pass
-config.runOnMC = True
+config.runOnMC = False
 config.maxEvents = 3000
 config.verbose = True
 config.writeEdmOutput = False
@@ -17,12 +17,12 @@ config.trackTagName = 'analysisTracks'
 config.generator = 'Pythia8'
 config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
 config.varyAttributes = False
-config.runOfflineOnly = True
+config.runOfflineOnly = False
 config.runNoColl = False
-config.runBPTX = False
+config.runBPTX = True
 config.runHCALFilter = False
-config.runEtaMaxFilter = True
-config.runCastorFilter = True
+config.runEtaMaxFilter = False
+config.runCastorFilter = False
 
 if not config.runOnMC:
     config.fileNames = ['file:/storage2/antoniov/data1/MinimumBias_Commissioning10_May19ReReco-v1_RECO/MinimumBias_Commissioning10_May19ReReco-v1_RECO_0C0FA77A-0D83-E011-82D3-001A64787060.root']
@@ -255,14 +255,18 @@ if config.varyAttributes:
 
 if config.runOfflineOnly:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBeamHaloVeto')
 
 if config.runBPTX:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBPTX')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionL1Tech4')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionL1Tech4BeamHaloVeto') 
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionL1Tech4BscOr')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionL1Tech4HLTBscMinBiasOR')
 
 if config.runNoColl:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORNoColl')
-    #makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORBPTXOR')
+    makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORBPTXOR')
 
 if config.runEtaMaxFilter:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMaxFilter')
@@ -325,6 +329,6 @@ if config.runOnMC:
     from Utilities.PyConfigTools.setAnalyzerAttributes import setAnalyzerAttributes
     setAnalyzerAttributes(process,'minimumBiasTTreeAnalysis',
                                   AccessMCInfo = True,
-                                  HLTPath = 'HLT_Jet30_v*',
+                                  HLTPath = 'HLT_Physics_v*',
                                   CastorRecHitTag = 'castorreco') 
     #TriggerResultsTag = cms.InputTag("TriggerResults::HLT") 

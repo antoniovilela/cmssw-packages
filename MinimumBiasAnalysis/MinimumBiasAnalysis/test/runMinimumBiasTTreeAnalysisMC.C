@@ -29,7 +29,7 @@ void setFileNamesPythia6Z1(std::vector<std::string>& fileNames){
 }
 
 void setFileNamesMinBias(std::vector<std::string>& fileNames){
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/minimumBiasTTreeAnalysis-v1/analysisMinBias_TTree_MinBias_Pythia8MBR-reco423patch3.root");
+   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/minimumBiasTTreeAnalysis-v2/analysisMinBias_TTree_MinBias_Pythia8MBR-reco423patch3.root");
 }
 
 void runMinimumBiasTTreeAnalysisMC(){
@@ -50,7 +50,7 @@ void runMinimumBiasTTreeAnalysisMC(){
    //std::string outDir = "root/7TeV/Pythia6CW/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/7TeV/Pythia6P0/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/7TeV/Pythia6Z1";
-   std::string outDir = "root/7TeV/Pythia8MBR/minimumBiasTTreeAnalysis-v1";
+   std::string outDir = "root/7TeV/Pythia8MBR/minimumBiasTTreeAnalysis-v2";
 
    std::vector<std::string> fileNames(0);
    setFileNamesMinBias(fileNames);
@@ -69,11 +69,13 @@ void runMinimumBiasTTreeAnalysisMC(){
    //fileName += getTTreeFileName(genTune,runRange);
 
    std::vector<std::string> selections;
+   selections.push_back("eventSelection");
+   selections.push_back("eventSelectionBeamHaloVeto");
    selections.push_back("eventSelectionBscMinBiasOR");
    selections.push_back("eventSelectionBscMinBiasOREtaMaxFilter");
-   //selections.push_back("eventSelectionBscMinBiasOREtaMinFilter");
-   //selections.push_back("eventSelectionBscMinBiasOREtaMinFilterCastorVeto");
-   //selections.push_back("eventSelectionBscMinBiasOREtaMinFilterCastorTag");
+   selections.push_back("eventSelectionBscMinBiasOREtaMinFilter");
+   selections.push_back("eventSelectionBscMinBiasOREtaMinFilterCastorVeto");
+   selections.push_back("eventSelectionBscMinBiasOREtaMinFilterCastorTag");
 
    std::vector<int> processTypes;
    processTypes.push_back(All);
