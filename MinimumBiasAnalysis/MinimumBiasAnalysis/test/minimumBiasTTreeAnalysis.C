@@ -198,7 +198,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
    bool doLogXiGenPlusSelection  = false;
    bool doLogXiGenMinusSelection = false;
-   double logXiGenPlusMax  = -5.0;
+   double logXiGenPlusMax  = -5.5;
+   //double logXiGenPlusMax  = -6.5;
    double logXiGenMinusMax = -5.0;
 
    //==========================
