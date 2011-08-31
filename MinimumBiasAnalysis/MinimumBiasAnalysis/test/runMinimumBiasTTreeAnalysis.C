@@ -6,14 +6,12 @@
 
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/RootTools.h"
 
-//#include "fileNames_MinimumBias_Commissioning10-Jun14thReReco_v1_Run132605_minimumBiasAnalysisTTree-v4.C"
-
 void setFileNamesZeroBiasRun132605(std::vector<std::string>& fileNames){
    fileNames.push_back();
 }
 
 void setFileNamesZeroBiasRun135528(std::vector<std::string>& fileNames){
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/ZeroBias_Commissioning10-May19ReReco-v1/Run135528/minimumBiasAnalysisTTree-v3/mergedTTree/analysisMinBias_TTree_MinimumBias_merged_0.root");
+   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/ZeroBias_Commissioning10-May19ReReco-v1/Run135528/minimumBiasAnalysisTTree-v4/mergedTTree/analysisMinBias_TTree_MinimumBias_merged_0.root");
 }
 
 void setFileNamesMinimumBiasRun135528(std::vector<std::string>& fileNames){
@@ -40,7 +38,7 @@ void runMinimumBiasTTreeAnalysis(){
  
    //std::string outDir = "root";
    //std::string outDir = "root/7TeV/Data/Run135528/minimumBiasAnalysisTTree-v2";
-   std::string outDir = "root/7TeV/ZeroBias/Run135528/minimumBiasTTreeAnalysis-v3";
+   std::string outDir = "root/7TeV/ZeroBias/Run135528/minimumBiasAnalysisTTree-v4";
    bool verbose = false;
 
    /*std::string fileName = rootDir + "/";
@@ -49,8 +47,9 @@ void runMinimumBiasTTreeAnalysis(){
    std::vector<std::string> selections;
    selections.push_back("eventSelectionBPTX");
    selections.push_back("eventSelectionL1Tech4");
-   selections.push_back("eventSelectionL1Tech4BscOr");
    selections.push_back("eventSelectionL1Tech4BeamHaloVeto");
+   selections.push_back("eventSelectionL1Tech4BscOr");
+   selections.push_back("eventSelectionL1Tech4HLTBscMinBiasOR");
    /*selections.push_back("eventSelectionBscMinBiasOR");
    selections.push_back("eventSelectionBscMinBiasOREtaMaxFilter");
    selections.push_back("eventSelectionBscMinBiasOREtaMinFilter");

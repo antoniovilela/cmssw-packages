@@ -95,6 +95,7 @@ def plotEventSelectionMC(types,dir,selectionRef,selectionEff,prefix,rebin=1,outp
 def plotEfficiencies(variables, files, types, selectionRef, selectionEff, rebin=1, 
                                                             outputFileName=""):
 
+    AddDirectoryStatus_ = ROOT.TH1.AddDirectoryStatus()
     ROOT.TH1.AddDirectory(False)
 
     #colors = (1,2,4,12,6,43,38,57)
@@ -143,6 +144,8 @@ def plotEfficiencies(variables, files, types, selectionRef, selectionEff, rebin=
         legends[-1].SetFillColor( canvases[-1].GetFillColor() ) 
         #legends[-1].SetHeader( variable ) 
         legends[-1].Draw("SAME")
+
+    ROOT.TH1.AddDirectory(AddDirectoryStatus_)
 
     if outputFileName:
         outputFile = ROOT.TFile(outputFileName,'recreate')
