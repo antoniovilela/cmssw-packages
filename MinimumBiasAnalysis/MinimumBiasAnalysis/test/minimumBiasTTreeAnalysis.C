@@ -104,6 +104,13 @@ void minimumBiasTTreeAnalysis(TTree* data,
       }
    }
 
+   if(accessMCInfo){
+      TFile reweightVtxFile("reweightPosZVertex.root","read"); 
+      TH1F* h_reweightPosZVertex_tmp = static_cast<TH1F*>( reweightVtxFile.Get("posZPrimVtx_ratio") );
+      TH1F h_reweightPosZVertex(*h_reweightPosZVertex_tmp);
+      reweightVtxFile.Close();
+   }
+
    // Access event data
    //EventData eventData;
    //setTTreeBranches(*data,eventData);
@@ -263,6 +270,19 @@ void minimumBiasTTreeAnalysis(TTree* data,
       }
       if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with event...skipping" << std::endl;continue;}
 
+      // Re-weight
+      if(accessMCInfo){
+         double weight_vtx = 1.;
+         int ibin_vtx = h_reweightPosZVertex.FindBin( eventData.posZPrimVtx_ );
+         if( ibin_vtx >= 1 && ibin_vtx <= h_reweightPosZVertex.GetNbinsX() ){
+            weight_vtx = h_reweightPosZVertex.GetBinContent(ibin_vtx);
+         }else{
+            weight_vtx = 0.;
+         }
+         // Apply weight
+         eventWeight *= weight_vtx;   
+      }      
+
       histosTH1F["EventsPerBunchCrossing"]->Fill(bunchCrossing,eventWeight);
       histosTH1F["EventSelection"]->Fill("All",eventWeight);
 
@@ -287,7 +307,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
          std::vector<int>::const_iterator it_processId = std::find(processIDs.begin(),processIDs.end(),processId);
          if(it_processId != processIDs.end()){
            int idx_processId = it_processId - processIDs.begin();
-           histosTH1F["ProcessId"]->Fill(idx_processId);
+           histosTH1F["ProcessId"]->Fill(idx_processId,eventWeight);
          }  
       }
 
@@ -325,8 +345,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
       bool beamHaloLooseId = (eventData.BeamHaloLooseId_ == 1) ? true : false;
       bool beamHaloTightId = (eventData.BeamHaloTightId_ == 1) ? true : false;
      
-      if(beamHaloLooseId) histosTH1F["BeamHaloId"]->Fill(0);
-      if(beamHaloTightId) histosTH1F["BeamHaloId"]->Fill(1);
+      if(beamHaloLooseId) histosTH1F["BeamHaloId"]->Fill(0,eventWeight);
+      if(beamHaloTightId) histosTH1F["BeamHaloId"]->Fill(1,eventWeight);
 
       if(verbose){
          std::cout << " =============== Beam Halo Id =============== " << std::endl
@@ -348,10 +368,10 @@ void minimumBiasTTreeAnalysis(TTree* data,
       double posXPrimVtx = eventData.posXPrimVtx_;
       double posYPrimVtx = eventData.posYPrimVtx_;
       double posZPrimVtx = eventData.posZPrimVtx_;
-      histosTH1F["posXPrimVtx"]->Fill(posXPrimVtx);
-      histosTH1F["posYPrimVtx"]->Fill(posYPrimVtx);
-      histosTH1F["posZPrimVtx"]->Fill(posZPrimVtx);
-      histosTH1F["posRPrimVtx"]->Fill(sqrt(posXPrimVtx*posXPrimVtx + posYPrimVtx*posYPrimVtx));
+      histosTH1F["posXPrimVtx"]->Fill(posXPrimVtx,eventWeight);
+      histosTH1F["posYPrimVtx"]->Fill(posYPrimVtx,eventWeight);
+      histosTH1F["posZPrimVtx"]->Fill(posZPrimVtx,eventWeight);
+      histosTH1F["posRPrimVtx"]->Fill(sqrt(posXPrimVtx*posXPrimVtx + posYPrimVtx*posYPrimVtx),eventWeight);
       //histosTH1F["numberDOF"]->Fill();
 
       if(doVertexSelection && (fabs(posZPrimVtx) > primVtxZMax)) continue;
@@ -384,7 +404,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
       // Fill Histos
       // SumET
       double sumET = eventData.sumET_;
-      histosTH1F["sumET"]->Fill(sumET);
+      histosTH1F["sumET"]->Fill(sumET,eventWeight);
 
       // Mx
       double MxFromTowers = eventData.MxFromTowers_;

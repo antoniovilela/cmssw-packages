@@ -1,5 +1,7 @@
 import ROOT
 from scaleByWidth import scaleByWidth
+from convertTGraph import convert as convertTGraphToTH1F
+from divideByTGraph import divide as divideHistoByTGraph
 
 def plotMCBinByBinCorrection(fileNameData, fileNamesMCRef, fileNamesMCEff, side = "plus"):
     ROOT.TH1.AddDirectory(False)
@@ -34,6 +36,7 @@ def plotMCBinByBinCorrection(fileNameData, fileNamesMCRef, fileNamesMCEff, side 
     histos_logXiStabilityVarBin = []
     histos_logXiCorrVarBin = []
     histos_effLogXiGenVarBin = []
+    graphs_effLogXiGenVarBin = []
     histos_logXiCorrFullVarBin = []
     histos_logXiFromPFCandsVarBin_data_corr = []
     histos_logXiGenVarBin_ref_scaled = []
@@ -60,12 +63,17 @@ def plotMCBinByBinCorrection(fileNameData, fileNamesMCRef, fileNamesMCEff, side 
 
         # Efficiency
         # FIXME: use graph and compute proper errors 
-        histos_effLogXiGenVarBin.append( histos_logXiGenVarBin[-1].Clone('effLogXiGenVarBin_%d' % idx) )
-        histos_effLogXiGenVarBin[-1].Divide( histos_logXiGenVarBin_ref[-1] )
+        #histos_effLogXiGenVarBin.append( histos_logXiGenVarBin[-1].Clone('effLogXiGenVarBin_%d' % idx) )
+        #histos_effLogXiGenVarBin[-1].Divide( histos_logXiGenVarBin_ref[-1] )
 
+        graphs_effLogXiGenVarBin.append( ROOT.TGraphAsymmErrors(histos_logXiGenVarBin[-1],histos_logXiGenVarBin_ref[-1]) )
+        graphs_effLogXiGenVarBin[-1].SetName('effLogXiGenVarBin_graph_%d' % idx)
+        histos_effLogXiGenVarBin.append( convertTGraphToTH1F(graphs_effLogXiGenVarBin[-1],'effLogXiGenVarBin_%d' % idx) )
+        
         # Full bin by bin correction
         histos_logXiCorrFullVarBin.append( histos_logXiCorrVarBin[-1].Clone('logXiCorrFullVarBin_%d' % idx) )
-        histos_logXiCorrFullVarBin[-1].Divide( histos_effLogXiGenVarBin[-1] )
+        #histos_logXiCorrFullVarBin[-1].Divide( histos_effLogXiGenVarBin[-1] )
+        divideHistoByTGraph(histos_logXiCorrFullVarBin[-1],graphs_effLogXiGenVarBin[-1])
 
         # Correct data
         histos_logXiFromPFCandsVarBin_data_corr.append( h_logXiFromPFCandsVarBin_data.Clone('logXiFromPFCandsVarBin_data_corr_%d' % idx) )
