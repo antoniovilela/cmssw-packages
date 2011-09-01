@@ -1,34 +1,56 @@
 import ROOT
 from scaleByWidth import scaleByWidth
 
+def unfoldData(h_VarData,h_VarRecoMC,h_VarGenMC,h_VarRecoVsGenMC,iterations=4):
+
+    from swapAxisTH2 import swapAxisTH2
+    h_VarGenVsReco = swapAxisTH2(h_VarRecoVsGenMC)
+
+    response = ROOT.RooUnfoldResponse(h_VarRecoMC,h_VarGenMC,h_VarRecoVsGenMC)
+    unfold = ROOT.RooUnfoldBayes(response, h_VarData, iterations)
+
+    h_VarData_unfold = unfold.Hreco()
+    return h_VarData_unfold
+
 def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = "plus"):
     ROOT.TH1.AddDirectory(False)
 
     #intLumi = 20.322 # /mub
-    intLumi = 500000./71260.;
+    intLumi = 49.156 # /mub
+    #intLumi = 500000./71260.;
     sigmaMC = 71.26 # mb
     nLogXiBins = 2
     ###############################
     histoNames = {}
     if side == "plus":
-        histoNames["VarLogXi"] = "multiplicityTracksGen_LogXiPlus"
-        histoNames["VarLogXiGen"] = "multiplicityTracksGen_LogXiGenPlus"
+        histoNames["VarRecoLogXi"]   = "multiplicityTracks_LogXiPlus"
+        histoNames["VarGenLogXi"]    = "multiplicityTracksGen_LogXiPlus"
+        histoNames["VarGenLogXiGen"] = "multiplicityTracksGen_LogXiGenPlus"
     elif side == "minus":
-        histoNames["VarLogXi"] = "multiplicityTracksGen_LogXiMinus"
-        histoNames["VarLogXiGen"] = "multiplicityTracksGen_LogXiGenMinus"
+        histoNames["VarRecoLogXi"]   = "multiplicityTracks_LogXiMinus"
+        histoNames["VarGenLogXi"]    = "multiplicityTracksGen_LogXiMinus"
+        histoNames["VarGenLogXiGen"] = "multiplicityTracksGen_LogXiGenMinus"
 
+    histoNames["VarReco"]      = "multiplicityTracks"
+    histoNames["VarGen"]       = "multiplicityTracksGen"        
+    histoNames["VarRecoVsGen"] = "multiplicityTracksVsGen"
     ###############################
     file_data = ROOT.TFile(fileNameData,'read')
-    histos_VarLogXi_data = []
-    for idx in range(nLogXiBins):
-        histos_VarLogXi_data.append( file_data.Get("%s_%d" % (histoNames["VarLogXi"],idx) ) )
+    #histos_VarLogXi_data = []
+    #for idx in range(nLogXiBins):
+    #    histos_VarLogXi_data.append( file_data.Get("%s_%d" % (histoNames["VarLogXi"],idx) ) )
 
     #files_mc_ref = []
     #files_mc_eff = [] 
     file_mc_ref = ROOT.TFile(fileNameMCRef,'read')
     file_mc_eff = ROOT.TFile(fileNameMCEff,'read')
-    h_EventSelection_ref = file_mc_ref.Get("EventSelection") 
- 
+    h_EventSelection_mc_ref = file_mc_ref.Get("EventSelection")
+    h_VarReco_mc_eff        = file_mc_eff.Get( histoNames["VarReco"] )
+    h_VarGen_mc_eff         = file_mc_eff.Get( histoNames["VarGen"] )
+    h_VarRecoVsGen_mc_eff   = file_mc_eff.Get( histoNames["VarRecoVsGen"] )
+
+    histos_VarLogXi_data = []
+    histos_VarLogXi_data_unfold = []
     histos_VarLogXiGen_ref = []
     histos_VarLogXiGen = []
     histos_VarLogXi = []
@@ -38,10 +60,18 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = 
     histos_VarLogXi_data_corr = []
     histos_VarLogXiGen_ref_scaled = []
     for idx in range(nLogXiBins):
-        histos_VarLogXiGen_ref.append( file_mc_ref.Get("%s_%d" % (histoNames["VarLogXiGen"],idx) ) )
-        histos_VarLogXiGen.append( file_mc_eff.Get("%s_%d" % (histoNames["VarLogXiGen"],idx) ) )
-        histos_VarLogXi.append( file_mc_eff.Get("%s_%d" % (histoNames["VarLogXi"],idx) ) )
-        
+        histos_VarLogXi_data.append( file_data.Get("%s_%d" % (histoNames["VarRecoLogXi"],idx)) )  
+
+        histos_VarLogXiGen_ref.append( file_mc_ref.Get("%s_%d" % (histoNames["VarGenLogXiGen"],idx)) )
+        histos_VarLogXiGen.append( file_mc_eff.Get("%s_%d" % (histoNames["VarGenLogXiGen"],idx)) )
+        histos_VarLogXi.append( file_mc_eff.Get("%s_%d" % (histoNames["VarGenLogXi"],idx)) )
+
+        ###############################
+        # Unfolding
+        histos_VarLogXi_data_unfold.append( unfoldData(histos_VarLogXi_data[-1],
+                                                       h_VarReco_mc_eff,
+                                                       h_VarGen_mc_eff,
+                                                       h_VarRecoVsGen_mc_eff, 8) )  
         ###############################
         # Correction factor
         histos_corrVarLogXi.append( histos_VarLogXiGen[-1].Clone('corrVarLogXi_%d' % idx) )
@@ -57,13 +87,14 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = 
         histos_corrFullVarLogXi[-1].Divide( histos_effVarLogXi[-1] )
 
         # Correct data
-        histos_VarLogXi_data_corr.append( histos_VarLogXi_data[idx].Clone('VarLogXi_data_%d' % idx) )
+        #histos_VarLogXi_data_corr.append( histos_VarLogXi_data[idx].Clone('VarLogXi_data_%d' % idx) )
+        histos_VarLogXi_data_corr.append( histos_VarLogXi_data_unfold[idx].Clone('VarLogXi_data_%d' % idx) ) 
         histos_VarLogXi_data_corr[-1].Multiply( histos_corrFullVarLogXi[-1] ) 
         histos_VarLogXi_data_corr[-1].Scale(0.001/intLumi) # mb
 
         # MC before selection
         histos_VarLogXiGen_ref_scaled.append( histos_VarLogXiGen_ref[-1].Clone('VarLogXiGen_ref_scaled_%d' % idx) )
-        nEventsAll_ref = h_EventSelection_ref.GetBinContent(1)
+        nEventsAll_ref = h_EventSelection_mc_ref.GetBinContent(1)
         histos_VarLogXiGen_ref_scaled[-1].Scale(sigmaMC/nEventsAll_ref)    
     
     # Plotting
