@@ -34,7 +34,7 @@ PFlowNoiseAnalyzer::~PFlowNoiseAnalyzer()
 void PFlowNoiseAnalyzer::beginJob(){
 
   edm::Service<TFileService> fs;
-  //TH1::SetDefaultSumw2(true);
+  TH1::SetDefaultSumw2(true);
 
   histosTH1F_["NEvents"] = fs->make<TH1F>("NEvents","NEvents",1,0,1);
 
