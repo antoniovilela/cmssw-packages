@@ -98,8 +98,15 @@ hltBscMinBiasORBPTXOR = cms.Sequence(l1NoBPTXBscOr + hltBscMinBiasORBptxPlusORMi
 #preSelection = cms.Sequence()
 offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping+HBHENoiseFilter+hcalNoiseFilter)
 eventSelection = cms.Sequence(offlineSelection)
+eventSelectionBeamHaloVeto = cms.Sequence(beamHaloVeto+offlineSelection)
+
 eventSelectionBPTX = cms.Sequence(bptx+offlineSelection)
 eventSelectionL1Tech4 = cms.Sequence(l1Tech4+offlineSelection)
+eventSelectionL1Tech4BeamHaloVeto = cms.Sequence(l1Tech4+beamHaloVeto+offlineSelection)
+eventSelectionL1Tech4BscOr = cms.Sequence(l1Tech4+bscOr+beamHaloVeto+offlineSelection)
+eventSelectionL1Tech4HLTBscMinBiasOR = cms.Sequence(l1Tech4+hltBscMinBiasORBptxPlusORMinusFilter+
+                                                            bscOr+beamHaloVeto+offlineSelection)
+
 eventSelectionBscMinBiasOR = cms.Sequence(hltBscMinBiasOR+offlineSelection)
 eventSelectionBscMinBiasORNoColl = cms.Sequence(hltBscMinBiasORNoColl+offlineSelection)
 eventSelectionBscMinBiasORBPTXOR = cms.Sequence(hltBscMinBiasORBPTXOR+offlineSelection) 
