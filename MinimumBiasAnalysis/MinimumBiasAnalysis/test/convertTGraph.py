@@ -11,6 +11,7 @@ def convert(graph,hname=''):
     histo = ROOT.TH1F(hname,graph.GetTitle(),nBins,
                                              graph.GetX()[0] - graph.GetErrorXlow(0),
                                              graph.GetX()[nBins-1] + graph.GetErrorXhigh(nBins-1) )
+    print "  Created", histo.GetName()
 
     for ix in range(graph.GetN()):
         print ix,graph.GetX()[ix],graph.GetY()[ix]

@@ -3,18 +3,22 @@ import FWCore.ParameterSet.Config as cms
 # Settings
 class config: pass
 config.runOnMC = True
+config.generator = 'Pythia8'
+config.comEnergy = 7000.0
 config.maxEvents = 3000
 config.verbose = True
+#---
 config.writeEdmOutput = False
-config.globalTagNameData = 'GR_R_42_V19::All'
-config.globalTagNameMC = 'START42_V13::All'
 config.outputEdmFile = 'minimumBias.root'
 config.outputTTreeFile = 'analysisMinBias_TTree_MinimumBias.root'
+#---
+config.globalTagNameData = 'GR_R_42_V19::All'
+config.globalTagNameMC = 'START42_V13::All'
 config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collisions10_JSON_v2_sub_132440.root'
-config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
-config.generator = 'Pythia8'
+config.vertexTagName = 'analysisVertices'
+#---
 config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
 config.varyAttributes = False
 config.runOfflineOnly = True
@@ -137,10 +141,8 @@ if not config.runOnMC:
 
 from Utilities.AnalysisTools.countsAnalyzer_cfi import countsAnalyzer
 
-#process.xiTower.comEnergy = config.comEnergy
-#process.xiFromCaloTowers.comEnergy = config.comEnergy
-#process.xiFromJets.comEnergy = config.comEnergy
-process.recoSequence = cms.Sequence(process.tracks*process.pfCandidates*process.edmDump)
+#process.recoSequence = cms.Sequence(process.tracks*process.pfCandidates*process.edmDump)
+process.recoSequence = cms.Sequence(process.vertices*process.tracks*process.pfCandidates*process.edmDump)
 if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
 """
@@ -203,6 +205,7 @@ if config.runOnMC: process.castorActivityFilter.CastorRecHitTag = 'castorreco'
 process.load('MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi')
 process.minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2.
 process.minimumBiasTTreeAnalysis.TrackTag = config.trackTagName
+process.minimumBiasTTreeAnalysis.VertexTag = config.vertexTagName
 """
 process.minimumBiasTTreeAnalysisNoCleaning = process.minimumBiasTTreeAnalysis.clone(
     CaloTowerTag = cms.InputTag("towerMaker::RECO")

@@ -51,6 +51,12 @@ etaMaxGenFilter = etaMaxFilter.clone(src = "etaMaxGen")
 etaMinGenFilter = etaMinFilter.clone(src = "etaMinGen")
 
 ############
+analysisVertices = cms.EDFilter("VertexSelector",
+   src = cms.InputTag("offlinePrimaryVertices"),
+   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"),
+   filter = cms.bool(False),
+)
+############
 from ForwardAnalysis.Utilities.castorActivityFilter_cfi import castorActivityFilter
 castorActivityFilter.CastorRecHitTag = "castorRecHitCorrector"
 castorActivityFilter.SumEMaxCastor = 250.
@@ -86,6 +92,7 @@ eventSelectionBscMinBiasOREtaMinFilterCastorTag = cms.Sequence(eventSelectionBsc
 eventSelectionBscMinBiasORLooseNDOF0EtaMinFilterCastorTag = cms.Sequence(eventSelectionBscMinBiasORLooseNDOF0+
                                                                          etaMinFilter+castorTag)
 
+vertices = cms.Sequence(analysisVertices)
 tracks = cms.Sequence(analysisTracks)
 pfCandidates = cms.Sequence(pfCandidateNoiseThresholds*etaMaxPFCands+etaMinPFCands)
 edmDump = cms.Sequence(hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
