@@ -9,6 +9,126 @@ def getThreshold(pset,region,type,var):
     return value
 """
 
+def fitHisto(histo):
+    nSigmas = 4
+    fitOption = "R"
+    iBinMax = histo.GetMaximumBin()
+    iBinLow = -1
+    for ibin in range(1,iBinMax + 1):
+	if histo.GetBinContent(ibin) >= 0.15*histo.GetMaximum():
+	    iBinLow = ibin
+	    break
+    rangeFitLow = histo.GetBinCenter(iBinLow)
+    print "Histogram maximum",histo.GetBinCenter(iBinMax),histo.GetMaximum()
+    print "Fit low range",rangeFitLow
+
+    minFit = histo.GetBinCenter(iBinMax) - histo.GetRMS()
+    if minFit < rangeFitLow: minFit = rangeFitLow
+    maxFit = histo.GetBinCenter(iBinMax) + histo.GetRMS()
+
+    funcName = histo.GetName() + "_gaus"
+    fitFunc = ROOT.TF1(funcName,"gaus",minFit,maxFit)
+    histo.Fit(fitFunc,fitOption)
+
+    minFit = fitFunc.GetParameter(1) - nSigmas*fitFunc.GetParameter(2)
+    if minFit < rangeFitLow: minFit = rangeFitLow 
+    maxFit = fitFunc.GetParameter(1) + nSigmas*fitFunc.GetParameter(2)
+    fitFunc.SetRange(minFit,maxFit)
+    histo.Fit(fitFunc,fitOption)
+
+    return (fitFunc.GetParameter(1),fitFunc.GetParameter(2))
+
+def fitHistoDoubleGaus(histo):
+    fitOption = "R"
+    iBinMax = histo.GetMaximumBin()
+    iBinLow = -1
+    for ibin in range(1,iBinMax + 1):
+	if histo.GetBinContent(ibin) >= 0.15*histo.GetMaximum():
+	    iBinLow = ibin
+	    break
+    rangeFitLow = histo.GetBinCenter(iBinLow)
+    maximumHisto = histo.GetMaximum()
+    print "Histogram maximum",histo.GetBinCenter(iBinMax),maximumHisto
+    print "Fit low range",rangeFitLow
+
+    minFit = histo.GetBinCenter(iBinMax) - histo.GetRMS()
+    if minFit < rangeFitLow: minFit = rangeFitLow
+    maxFit = histo.GetBinCenter(iBinMax) + histo.GetRMS()
+
+    funcName = histo.GetName() + "_gaus"
+    fitFunc = ROOT.TF1(funcName,"gaus",minFit,maxFit)
+    histo.Fit(fitFunc,fitOption)
+
+    minFit = fitFunc.GetParameter(1) - 3*fitFunc.GetParameter(2)
+    if minFit < rangeFitLow: minFit = rangeFitLow 
+    maxFit = fitFunc.GetParameter(1) + 10*fitFunc.GetParameter(2)
+
+    funcName = histo.GetName() + "_doubleGaus"
+    fitFuncDoubleGaus = ROOT.TF1(funcName,"gaus(0) + gaus(3)",minFit,maxFit)
+    fitFuncDoubleGaus.SetParameters(fitFunc.GetParameter(0),fitFunc.GetParameter(1),fitFunc.GetParameter(2),
+                                    0.1*fitFunc.GetParameter(0),
+                                    fitFunc.GetParameter(1),5*fitFunc.GetParameter(2))
+    fitFuncDoubleGaus.FixParameter(4,fitFunc.GetParameter(1))
+    histo.Fit(fitFuncDoubleGaus,fitOption)
+
+    return (fitFunc.GetParameter(1),fitFuncDoubleGaus.GetParameter(5))
+
+def fitHistoRooFit(histo, plot=False):
+
+    iBinMax = histo.GetMaximumBin()
+    iBinLow = -1
+    for ibin in range(1,iBinMax + 1):
+	if histo.GetBinContent(ibin) >= 0.15*histo.GetMaximum():
+	    iBinLow = ibin
+	    break
+
+    minHisto = histo.GetBinCenter(1)
+    maxHisto = histo.GetBinCenter( histo.GetNbinsX() )
+    rangeFitLow = histo.GetBinCenter(iBinLow)
+    rangeFitHigh = histo.GetBinCenter( histo.GetNbinsX() )  
+    print "Histogram range, maximum",minHisto,maxHisto,histo.GetBinCenter(iBinMax),histo.GetMaximum()
+    print "Fit range",rangeFitLow,rangeFitHigh
+    
+    x = ROOT.RooRealVar(histo.GetName() + "_var","energy",minHisto,maxHisto)
+    sigma1 = ROOT.RooRealVar("sigma1","sigma1",0.,0.7)
+    sigma2 = ROOT.RooRealVar("sigma2","sigma2",0.,0.7)
+    mean = ROOT.RooRealVar("mean","mean",histo.GetBinCenter(iBinMax),rangeFitLow,rangeFitHigh)
+    frac = ROOT.RooRealVar("frac","frac",0.,1.)
+   
+    gaus1 = ROOT.RooGaussian(histo.GetName() + "_gaus1","Gaussian distribution",x,mean,sigma1)
+    gaus2 = ROOT.RooGaussian(histo.GetName() + "_gaus2","Gaussian distribution",x,mean,sigma2)
+    model = ROOT.RooAddPdf(histo.GetName() + "_model","Model",ROOT.RooArgList(gaus1,gaus2),ROOT.RooArgList(frac))
+
+    hdata = ROOT.RooDataHist(histo.GetName() + "_hdata","Binned data",ROOT.RooArgList(x),histo)
+    #model.fitTo( hdata,ROOT.RooFit.Minos(0) )
+    #model.fitTo(hdata,ROOT.RooFit.Minos(0),ROOT.RooFit.Range(rangeFitLow,rangeFitHigh))
+    #model.fitTo(hdata,ROOT.RooFit.Range(rangeFitLow,rangeFitHigh))
+    model.fitTo(hdata)
+
+    objects = []
+    if plot:
+        frame = x.frame()
+	hdata.plotOn(frame)
+        model.plotOn(frame)
+	#gaus1.plotOn(frame,ROOT.RooFit.LineStyle(3),ROOT.RooFit.LineColor(2))
+	#gaus2.plotOn(frame,ROOT.RooFit.LineStyle(2),ROOT.RooFit.LineColor(3))
+        
+	canvas = ROOT.TCanvas("c_" + histo.GetName() + "_fit")
+	canvas.SetGridy()
+	canvas.SetLogy()
+	canvas.cd()
+        frame.Draw()
+
+        objects.append(frame)
+        objects.append(x)
+        objects.append(hdata)
+        objects.append(model)
+        objects.append(gaus1)
+        objects.append(gaus2)
+        objects.append(canvas) 
+
+    return (mean,sigma1,sigma2,frac,objects)
+
 def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""):
 
     AddDirectoryStatus_ = ROOT.TH1.AddDirectoryStatus() 
@@ -57,11 +177,12 @@ def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""
     canvases = []
     histos = []
     objects = []
-    thresholdsNew = {}
+    thresholdsPlus = {}
+    thresholdsMinus = {}
     for type in particleTypes:
         histo = file.Get("%s/%s" % (selection,histoNames[type]))
         canvas = ROOT.TCanvas("c_" + histo.GetName())
-        #canvas.SetGridy()
+        canvas.SetGridy()
         canvas.cd() 
         
         histo.SetMarkerSize(0.1)
@@ -75,7 +196,9 @@ def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""
         canvasesProj = []         
         projections = []
         linesProj = []
-        thresholdsNew[type] = {}
+        fitObjects = []
+        thresholdsPlus[type] = {}
+        thresholdsMinus[type] = {}
         for region in thresholds[type]:
             xrange = regions[region]
             ythreshold = thresholds[type][region]
@@ -98,8 +221,8 @@ def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""
             canvasesProj.append(canvasProj)
             canvasesProj[-1].SetGridy()
             canvasesProj[-1].SetLogy()
-            canvasesProj[-1].cd()
-
+            canvasesProj[-1].cd() 
+            
             iBinLow = histo.GetXaxis().FindBin(xrange[0])
             iBinUpp = histo.GetXaxis().FindBin(xrange[1]) - 1
             print "Bin range for %s, %s region, eta=[%.1f,%.1f): [%d,%d]" % (type,region,xrange[0],xrange[1],iBinLow,iBinUpp)
@@ -110,27 +233,19 @@ def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""
             projections[-1].Rebin(rebin)
             projections[-1].Scale( 1./projections[-1].GetSumOfWeights() )
             ###
-            nSigmas = 4
-            fitOption = "R"
-            iBinMax = projections[-1].GetMaximumBin()
-            minFit = projections[-1].GetBinCenter(iBinMax) - projections[-1].GetRMS()
-            maxFit = projections[-1].GetBinCenter(iBinMax) + projections[-1].GetRMS()
-
-	    funcName = projections[-1].GetName() + "_gaus"
-	    fitFunc = ROOT.TF1(funcName,"gaus",minFit,maxFit)
-	    projections[-1].Fit(fitFunc,fitOption)
-
-	    minFit = fitFunc.GetParameter(1) - nSigmas*fitFunc.GetParameter(2)
-	    maxFit = fitFunc.GetParameter(1) + nSigmas*fitFunc.GetParameter(2)
-	    fitFunc.SetRange(minFit,maxFit)
-	    projections[-1].Fit(fitFunc,fitOption)
-            thresholdsNew[type][region] = fitFunc.GetParameter(1) + 5*fitFunc.GetParameter(2)  
-            ###
+            #returnFit = fitHisto(projections[-1],True) 
+            #fitObjects.append( returnFit[-1] )
+            #fitMean,fitSigma = returnFit[0].getVal(),returnFit[1].getVal()
+            fitMean,fitSigma = fitHistoDoubleGaus(projections[-1])
+            thresholdsPlus[type][region] = fitMean + 3*fitSigma  
+            ythresholdNew = thresholdsPlus[type][region]
+            ### 
             #projections[-1].DrawNormalized() 
+            #if len(fitObjects[-1]): fitObjects[-1][0].Draw()
             projections[-1].Draw()
    
-            linesProj.append(ROOT.TLine(ythreshold,0.,
-                                        ythreshold,0.15))
+            linesProj.append(ROOT.TLine(ythresholdNew,0.,
+                                        ythresholdNew,0.15))
             linesProj[-1].SetLineColor(2)
             linesProj[-1].SetLineStyle(2)
             linesProj[-1].SetLineWidth(4)
@@ -150,10 +265,17 @@ def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""
             projections[-1].SetMarkerStyle(20)
             projections[-1].SetMarkerSize(1.2)
             projections[-1].Rebin(rebin)
-            projections[-1].DrawNormalized()
+            projections[-1].Scale( 1./projections[-1].GetSumOfWeights() )
+            ###
+            fitMean,fitSigma = fitHistoDoubleGaus(projections[-1])
+            thresholdsMinus[type][region] = fitMean + 3*fitSigma  
+            ythresholdNew = thresholdsMinus[type][region]
+            ###
+            #projections[-1].DrawNormalized()
+            projections[-1].Draw()
 
-            linesProj.append(ROOT.TLine(ythreshold,0.,
-                                        ythreshold,0.15))
+            linesProj.append(ROOT.TLine(ythresholdNew,0.,
+                                        ythresholdNew,0.15))
             linesProj[-1].SetLineColor(2)
             linesProj[-1].SetLineStyle(2)
             linesProj[-1].SetLineWidth(4)
@@ -162,18 +284,28 @@ def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""
         canvases.append(canvas)
         canvases.append(canvasesProj)
         histos.append(histo)
-        histos.append(projections)
+        for proj in projections: histos.append(proj)
+        objects.append(fitObjects)
         objects.append(lines)
         objects.append(linesProj)
 
     ROOT.TH1.AddDirectory(AddDirectoryStatus_)
 
     for type in particleTypes:
-        for region in thresholds[type]:
+        if not thresholdsPlus.has_key(type): continue
+        for region in thresholdsPlus[type]:
             xrange = regions[region]
             ythreshold = thresholds[type][region]
-            ythresholdNew = thresholdsNew[type][region]
+            ythresholdNew = thresholdsPlus[type][region]
             print "New threshold for %s, %s region, eta=[%.1f,%.1f): %.2f --> %.2f" % (type,region,xrange[0],xrange[1],ythreshold,ythresholdNew)
+
+    for type in particleTypes:
+        if not thresholdsMinus.has_key(type): continue
+        for region in thresholdsMinus[type]:
+            xrange = regions[region]
+            ythreshold = thresholds[type][region]
+            ythresholdNew = thresholdsMinus[type][region]
+            print "New threshold for %s, %s region, eta=(%.1f,%.1f]: %.2f --> %.2f" % (type,region,-xrange[1],xrange[0],ythreshold,ythresholdNew)
 
     if outputFileName:
         outputFile = ROOT.TFile(outputFileName,'recreate')
