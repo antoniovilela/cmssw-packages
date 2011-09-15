@@ -17,19 +17,19 @@
 //std::string getDataFile(int runRange);
 //std::string getMCFile(int genType,int runRange);
 
-void setDirsMCComponents(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
+void setDirsMCComponents(std::string const& selection, std::string const& rootDir, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsPYTHIAPHOJET(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsDataMC(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsDataMCComponents(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsCompareData(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsDataMCGenSel(std::string const& selection,std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 
-void plot(std::string const& selection, std::string const& mode = "setDirsDataMC", const char* drawOption = "", int rebin = 1){
+void plot(std::string const& selection, std::string const& mode = "setDirsDataMC", std::string const& rootDir = "", const char* drawOption = "", int rebin = 1){
    std::vector<std::string> variables;
-   variables.push_back("nVertex");
+   /*variables.push_back("nVertex");
    variables.push_back("posXPrimVtx");
    variables.push_back("posYPrimVtx");
-   variables.push_back("posZPrimVtx");
+   variables.push_back("posZPrimVtx");*/
    /*variables.push_back("multiplicityTracks");
    variables.push_back("multiplicityHFPlus");
    variables.push_back("multiplicityHFMinus");
@@ -59,16 +59,18 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    variables.push_back("etaMaxFromPFCandsVarBin_dist");
    variables.push_back("etaMinFromPFCandsVarBin_dist");*/
    variables.push_back("multiplicityTracks");
-   variables.push_back("sumEnergyHFPlusVarBin");
-   variables.push_back("sumEnergyHFMinusVarBin");
-   variables.push_back("sumEnergyCASTOR"); 
+   //variables.push_back("sumEnergyHFPlusVarBin");
+   //variables.push_back("sumEnergyHFMinusVarBin");
+   //variables.push_back("sumEnergyCASTOR"); 
    variables.push_back("logXiPlusFromPFCands");
    variables.push_back("logXiMinusFromPFCands");
    variables.push_back("logXiPlusFromPFCandsVarBin");
    variables.push_back("logXiMinusFromPFCandsVarBin");
-   variables.push_back("MxFromPFCands");
+   //variables.push_back("MxFromPFCands");
    variables.push_back("etaMaxFromPFCandsVarBin");
    variables.push_back("etaMinFromPFCandsVarBin");
+   variables.push_back("logXiGenPlus");
+   variables.push_back("logXiGenMinus");
    /*variables.push_back("xiGenPlus");
    variables.push_back("xiGenMinus");
    variables.push_back("etaMaxGen");
@@ -81,7 +83,8 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    plotter.SetStats(false);
    plotter.SetRebin(rebin);
    plotter.SetMarkerSizes(std::vector<float>(1,1.4));
-   plotter.SetHeader("BSC OR and Vertex");
+   plotter.SetHeader("#eta_{min} > -1 (BSC OR and Vertex and CASTOR tag)");
+
    plotter.SetTitleX("multiplicityTracks","N_{trk}");
    plotter.SetTitleX("sumEnergyHFPlusVarBin_dist","#sum E (HF+) (GeV)");
    plotter.SetTitleX("sumEnergyHFMinusVarBin_dist","#sum E (HF-) (GeV)");
@@ -91,13 +94,20 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    plotter.SetTitleX("EMinusPzFromPFCands_dist","#sum(E-pz) (GeV)");
    plotter.SetTitleX("xiPlusFromPFCands_dist","#xi^{+}");
    plotter.SetTitleX("xiMinusFromPFCands_dist","#xi^{-}");
+   plotter.SetTitleX("logXiPlusFromPFCands","log#xi^{+}");
+   plotter.SetTitleX("logXiMinusFromPFCands","log#xi^{-}");
    plotter.SetTitleX("logXiPlusFromPFCands_dist","log#xi^{+}");
    plotter.SetTitleX("logXiMinusFromPFCands_dist","log#xi^{-}");
    plotter.SetTitleX("logXiPlusFromPFCandsVarBin_dist","log#xi^{+}");
    plotter.SetTitleX("logXiMinusFromPFCandsVarBin_dist","log#xi^{-}");
    plotter.SetTitleX("MxFromPFCands_dist","M_{X} (GeV)");
+   plotter.SetTitleX("etaMaxFromPFCandsVarBin","#eta^{max}");
+   plotter.SetTitleX("etaMinFromPFCandsVarBin","#eta^{min}"); 
    plotter.SetTitleX("etaMaxFromPFCandsVarBin_dist","#eta^{max}");
    plotter.SetTitleX("etaMinFromPFCandsVarBin_dist","#eta^{min}"); 
+   plotter.SetTitleX("logXiGenPlus","log#xi^{+}");
+   plotter.SetTitleX("logXiGenMinus","log#xi^{-}");
+   
    plotter.SetTitleY("multiplicityTracks","dN/dN_{trk}");
    plotter.SetTitleY("sumEnergyHFPlusVarBin_dist","dN/dE_{HF} (GeV^{-1})");
    plotter.SetTitleY("sumEnergyHFMinusVarBin_dist","dN/dE_{HF} (GeV^{-1})");
@@ -128,7 +138,7 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
       setDirsPYTHIAPHOJET(dirs,normFactors);
       plotter.plot(variables,dirs,normFactors,drawOption);
    } else if(mode == "setDirsMCComponents"){
-      setDirsMCComponents(selection,dirs,normFactors);
+      setDirsMCComponents(selection,rootDir,dirs,normFactors);
       int colors[] = {kBlack,kBlue,kMagenta,kOrange,kRed};
       int linestyles[] = {1,2,3,9,10};
       int markerstyles[] = {1,1,1,1,1};
@@ -199,12 +209,13 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    }
 }
 
-void setDirsMCComponents(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
+void setDirsMCComponents(std::string const& selection, std::string const& dir, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
    run_range_t runRange = Data7TeV;
    generator_t genType = PYTHIA8;
    std::string eventSelection = selection;
    //std::string dir = "root/7TeV/Pythia6D6T/eventSelection";   
-   std::string dir = "root/7TeV/Pythia8/eventSelection-v6";
+   //std::string dir = "root/7TeV/Pythia8/eventSelection-v6";
+   //std::string dir = "root/7TeV/Pythia8MBR/eventSelection-v1";
 
    TFile* fileMC_All = TFile::Open((dir + "/" + getHistosFileName(genType,runRange,All,eventSelection)).c_str());
    TH1F* h_EventSelection_All = static_cast<TH1F*>(fileMC_All->Get("EventSelection"));
@@ -230,7 +241,7 @@ void setDirsMCComponents(std::string const& selection, std::vector<std::pair<std
    TH1F* h_EventSelection_QCD = static_cast<TH1F*>(fileMC_QCD->Get("EventSelection"));
    double nEvents_QCD = h_EventSelection_QCD->GetBinContent(1);
 
-   dirs.push_back(std::make_pair("PYTHIA-6 D6T",fileMC_All));
+   dirs.push_back(std::make_pair("PYTHIA8 MBR",fileMC_All));
    //dirs.push_back(std::make_pair("Single-diffractive",fileMC_SD));
    dirs.push_back(std::make_pair("Single-diffractive (pp #rightarrow pX)",fileMC_SDPlus));
    dirs.push_back(std::make_pair("Single-diffractive (pp #rightarrow Xp)",fileMC_SDMinus));

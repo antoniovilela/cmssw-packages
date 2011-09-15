@@ -59,19 +59,30 @@ def fitHistoDoubleGaus(histo):
     fitFunc = ROOT.TF1(funcName,"gaus",minFit,maxFit)
     histo.Fit(fitFunc,fitOption)
 
-    minFit = fitFunc.GetParameter(1) - 3*fitFunc.GetParameter(2)
+    mean = fitFunc.GetParameter(1)
+    sigma = fitFunc.GetParameter(2)
+    if mean < rangeFitLow:
+        mean = histo.GetBinCenter(iBinMax)
+
+    minFit = mean - 3*sigma
     if minFit < rangeFitLow: minFit = rangeFitLow 
-    maxFit = fitFunc.GetParameter(1) + 10*fitFunc.GetParameter(2)
+    maxFit = mean + 10*sigma
 
     funcName = histo.GetName() + "_doubleGaus"
     fitFuncDoubleGaus = ROOT.TF1(funcName,"gaus(0) + gaus(3)",minFit,maxFit)
-    fitFuncDoubleGaus.SetParameters(fitFunc.GetParameter(0),fitFunc.GetParameter(1),fitFunc.GetParameter(2),
-                                    0.1*fitFunc.GetParameter(0),
-                                    fitFunc.GetParameter(1),5*fitFunc.GetParameter(2))
-    fitFuncDoubleGaus.FixParameter(4,fitFunc.GetParameter(1))
+    fitFuncDoubleGaus.SetParameters(fitFunc.GetParameter(0),mean,sigma,
+                                    0.05*fitFunc.GetParameter(0),mean,10*sigma)
+ 
+    fixMean = True
+    if fixMean:
+        fitFuncDoubleGaus.FixParameter(1,mean)
+        fitFuncDoubleGaus.FixParameter(4,mean)
+
     histo.Fit(fitFuncDoubleGaus,fitOption)
 
-    return (fitFunc.GetParameter(1),fitFuncDoubleGaus.GetParameter(5))
+    meanFinal = fitFuncDoubleGaus.GetParameter(4)
+    sigmaFinal = fitFuncDoubleGaus.GetParameter(5)
+    return (meanFinal,sigmaFinal)
 
 def fitHistoRooFit(histo, plot=False):
 

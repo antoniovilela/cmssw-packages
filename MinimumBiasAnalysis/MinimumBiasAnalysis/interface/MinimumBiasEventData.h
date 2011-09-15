@@ -59,7 +59,8 @@ class MinimumBiasEventData {
      double EPlusPzFromPFCands_;
      double EMinusPzFromPFCands_;
      double MxGen_;
-     double MxGenDiss_; 
+     double MxGenDiss_;
+     double MyGenDiss_;
      double MxGenRange_;
      double MxGenPlus_;
      double MxGenMinus_;

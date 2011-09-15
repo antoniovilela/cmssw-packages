@@ -226,8 +226,10 @@ void MinimumBiasAnalysis::fillVertexInfo(MinimumBiasEventData& eventData, const 
   } 
   eventData.nVertex_ = nGoodVertices;
 
-  const reco::Vertex& primVertex = (*vertexCollectionH)[0];
-  if(primVertex.isValid() && !primVertex.isFake()){
+  //const reco::Vertex& primVertex = (*vertexCollectionH)[0];
+  //if(primVertex.isValid() && !primVertex.isFake()){
+  if( nGoodVertices ){
+     const reco::Vertex& primVertex = vtxColl[0];
      eventData.posXPrimVtx_ = primVertex.x();
      eventData.posYPrimVtx_ = primVertex.y();
      eventData.posZPrimVtx_ = primVertex.z();
@@ -505,7 +507,8 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
      event.getByLabel(edm::InputTag("edmNtupleMxGen","Mx"),edmNtupleMxGen);
  
      eventData.MxGenDiss_ = (edmNtupleMxGen.isValid() && edmNtupleMxGen->size()) ? (*edmNtupleMxGen)[0] : -999.;
-
+     eventData.MyGenDiss_ = (edmNtupleMxGen.isValid() && edmNtupleMxGen->size() > 1) ? (*edmNtupleMxGen)[1] : -999.;
+     
      edm::Handle<std::vector<float> > edmNtupleEtaMaxGen;
      event.getByLabel(edm::InputTag("edmNtupleEtaMaxGen","etaMax"),edmNtupleEtaMaxGen);
 
@@ -519,6 +522,7 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
      eventData.xiGenMinus_ = -1.;
      eventData.MxGen_ = -1.;
      eventData.MxGenDiss_ = -1.;
+     eventData.MyGenDiss_ = -1.;
      eventData.MxGenRange_ = -1.;
      eventData.MxGenPlus_ = -1.; 
      eventData.MxGenMinus_ = -1.;
