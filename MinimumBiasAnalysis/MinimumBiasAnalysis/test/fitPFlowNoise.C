@@ -25,6 +25,24 @@ void fitPFlowNoise(std::string const& fileName){
    std::vector<std::string> variables;
    variables.push_back("energyVsEtaGamma_proj_Barrel_zplus");
    variables.push_back("energyVsEtaGamma_proj_Barrel_zminus");
+   variables.push_back("energyVsEtaGamma_proj_Transition_zplus");
+   variables.push_back("energyVsEtaGamma_proj_Transition_zminus");
+   variables.push_back("energyVsEtaGamma_proj_Endcap_zplus");
+   variables.push_back("energyVsEtaGamma_proj_Endcap_zminus");
+   variables.push_back("energyVsEtaNeutralHadron_proj_Barrel_zplus");
+   variables.push_back("energyVsEtaNeutralHadron_proj_Barrel_zminus");
+   variables.push_back("energyVsEtaNeutralHadron_proj_Transition_zplus");
+   variables.push_back("energyVsEtaNeutralHadron_proj_Transition_zminus");
+   variables.push_back("energyVsEtaNeutralHadron_proj_Endcap_zplus");
+   variables.push_back("energyVsEtaNeutralHadron_proj_Endcap_zminus");
+   variables.push_back("energyVsEtaHadronHF_proj_Forward_zplus");
+   variables.push_back("energyVsEtaHadronHF_proj_Forward_zminus");
+   variables.push_back("energyVsEtaHadronHF_proj_Transition_zplus");
+   variables.push_back("energyVsEtaHadronHF_proj_Transition_zminus");
+   variables.push_back("energyVsEtaEGammaHF_proj_Forward_zplus");
+   variables.push_back("energyVsEtaEGammaHF_proj_Forward_zminus");
+   variables.push_back("energyVsEtaEGammaHF_proj_Transition_zplus");
+   variables.push_back("energyVsEtaEGammaHF_proj_Transition_zminus");
 
    std::map<std::string,double> thresholds;
    std::vector<TCanvas*> canvases;
