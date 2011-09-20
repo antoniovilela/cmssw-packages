@@ -1,6 +1,7 @@
 #if !defined(__CINT__) || defined(__MAKECINT__)
 #include <TFile.h>
 #include <TCanvas.h>
+#include <TH1.h>
 
 #include "RooRealVar.h"
 #include "RooDataSet.h"

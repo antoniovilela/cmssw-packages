@@ -17,4 +17,6 @@
         gSystem->Load("libMinimumBiasAnalysisMinimumBiasAnalysis");
         gSystem->Load("libUtilitiesPlottingTools");
         gSystem->Load("RooUnfold-1.0.3/libRooUnfold.so");
+        gSystem->Load("libRooFit");
+        gSystem->Load("libRooFitCore");
 }
