@@ -43,10 +43,10 @@ void fitPFlowNoise(std::string const& fileName){
       double rangeFitLow = histo->GetBinCenter(iBinLow);
       double rangeFitHigh = histo->GetBinCenter( histo->GetNbinsX() );
       std::cout << "Histogram range, maximum" << minHisto << ", " << maxHisto << ", " 
-                                              << histo.GetBinCenter(iBinMax) << ", " << histo.GetMaximum() << std::endl;
+                                              << histo->GetBinCenter(iBinMax) << ", " << histo->GetMaximum() << std::endl;
       std::cout << "Fit range"  << rangeFitLow << ", " << rangeFitHigh << std::endl;
   
-      RooRealVar x(histo->GetName() + "_var","energy",minHisto,maxHisto);
+      RooRealVar x((std::string(histo->GetName()) + "_var").c_str(),"energy",minHisto,maxHisto);
       RooRealVar sigma1("sigma1","sigma1",0.,0.7);
       RooRealVar sigma2("sigma2","sigma2",0.,0.7);
       RooRealVar mean1("mean1","mean1",histo->GetBinCenter(iBinMax),rangeFitLow,rangeFitHigh);
@@ -54,11 +54,11 @@ void fitPFlowNoise(std::string const& fileName){
 
       RooRealVar frac("frac","frac",0.,1.);
 
-      RooGaussian gaus1(histo->GetName() + "_gaus1","Gaussian distribution",x,mean1,sigma1);
-      RooGaussian gaus2(histo->GetName() + "_gaus2","Gaussian distribution",x,mean2,sigma2);
-      RooAddPdf model(histo->GetName() + "_model","Model",RooArgList(gaus1,gaus2),RooArgList(frac));
+      RooGaussian gaus1((std::string(histo->GetName()) + "_gaus1").c_str(),"Gaussian distribution",x,mean1,sigma1);
+      RooGaussian gaus2((std::string(histo->GetName()) + "_gaus2").c_str(),"Gaussian distribution",x,mean2,sigma2);
+      RooAddPdf model((std::string(histo->GetName()) + "_model").c_str(),"Model",RooArgList(gaus1,gaus2),RooArgList(frac));
 
-      RooDataHist hdata(histo->GetName() + "_hdata","Binned data",RooArgList(x),histo);
+      RooDataHist hdata((std::string(histo->GetName()) + "_hdata").c_str(),"Binned data",RooArgList(x),histo);
       //model.fitTo( hdata,ROOT.RooFit.Minos(0) )
       //model.fitTo(hdata,ROOT.RooFit.Minos(0),ROOT.RooFit.Range(rangeFitLow,rangeFitHigh))
       //model.fitTo(hdata,ROOT.RooFit.Range(rangeFitLow,rangeFitHigh))
