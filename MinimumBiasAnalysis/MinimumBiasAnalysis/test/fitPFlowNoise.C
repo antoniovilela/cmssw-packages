@@ -32,16 +32,16 @@ void fitPFlowNoise(std::string const& fileName){
    std::vector<std::string>::const_iterator vars_end = variables.end();
    for(;var != vars_end; ++var){
       TH1* histo = static_cast<TH1*>( file->Get( (*var).c_str() ) );
-      int iBinMax = histo->GetMaximumBin()
-      int iBinLow = -1
+      int iBinMax = histo->GetMaximumBin();
+      int iBinLow = -1;
       for(int ibin = 1; ibin <= iBinMax; ++ibin){
          if( histo->GetBinContent(ibin) >= 0.15*histo->GetMaximum() ) {iBinLow = ibin; break;}
       }
     
-      double minHisto = histo->GetBinCenter(1)
-      double maxHisto = histo->GetBinCenter( histo->GetNbinsX() )
-      double rangeFitLow = histo->GetBinCenter(iBinLow)
-      double rangeFitHigh = histo->GetBinCenter( histo->GetNbinsX() )
+      double minHisto = histo->GetBinCenter(1);
+      double maxHisto = histo->GetBinCenter( histo->GetNbinsX() );
+      double rangeFitLow = histo->GetBinCenter(iBinLow);
+      double rangeFitHigh = histo->GetBinCenter( histo->GetNbinsX() );
       std::cout << "Histogram range, maximum" << minHisto << ", " << maxHisto << ", " 
                                               << histo.GetBinCenter(iBinMax) << ", " << histo.GetMaximum() << std::endl;
       std::cout << "Fit range"  << rangeFitLow << ", " << rangeFitHigh << std::endl;
@@ -69,9 +69,9 @@ void fitPFlowNoise(std::string const& fileName){
       double thresholdNew = fitMean + 3*fitSigma;      
       thresholds[*var] = thresholdNew;
 
-      RooPlot* frame = x.frame()
-      hdata.plotOn(frame)
-      model.plotOn(frame)
+      RooPlot* frame = x.frame();
+      hdata.plotOn(frame);
+      model.plotOn(frame);
       model.plotOn(frame,Components(gaus2),LineColor(2),LineStyle(2));
 
       canvases.push_back( new TCanvas( (std::string(histo->GetName()) + "_canvas").c_str() ) );
