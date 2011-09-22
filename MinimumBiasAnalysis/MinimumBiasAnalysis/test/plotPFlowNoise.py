@@ -1,5 +1,5 @@
 import ROOT
-from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_cfi import pfThresholds
+from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_new_cfi import pfThresholds
 
 """
 def getThreshold(pset,region,type,var):
@@ -145,7 +145,7 @@ def fitHistoRooFit(histo, plot=False):
 
     return (mean1,mean2,sigma1,sigma2,frac,objects)
 
-def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""):
+def plot(fileName, selection="pFlowAnalysisNoCollNoVtx", runFit=True, rebin=1, outputFileName=""):
 
     AddDirectoryStatus_ = ROOT.TH1.AddDirectoryStatus() 
     ROOT.TH1.AddDirectory(False)
@@ -250,9 +250,12 @@ def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""
             projections[-1].Rebin(rebin)
             projections[-1].Scale( 1./projections[-1].GetSumOfWeights() )
             ###
-            fitMean,fitSigma = fitHistoDoubleGaus(projections[-1])
-            thresholdsPlus[type][region] = fitMean + 3*fitSigma  
-            ythresholdNew = thresholdsPlus[type][region]
+            if runFit:
+		fitMean,fitSigma = fitHistoDoubleGaus(projections[-1])
+		thresholdsPlus[type][region] = fitMean + 3*fitSigma  
+
+            ythresholdNew = ythreshold 
+            if hasattr(thresholdsPlus[type],region): ythresholdNew = thresholdsPlus[type][region]
             ### 
             #projections[-1].DrawNormalized() 
             #if len(fitObjects[-1]): fitObjects[-1][0].Draw()
@@ -281,9 +284,12 @@ def plot(fileName,selection="pFlowAnalysisNoCollNoVtx",rebin=1,outputFileName=""
             projections[-1].Rebin(rebin)
             projections[-1].Scale( 1./projections[-1].GetSumOfWeights() )
             ###
-            fitMean,fitSigma = fitHistoDoubleGaus(projections[-1])
-            thresholdsMinus[type][region] = fitMean + 3*fitSigma  
-            ythresholdNew = thresholdsMinus[type][region]
+            if runFit:
+		fitMean,fitSigma = fitHistoDoubleGaus(projections[-1])
+		thresholdsMinus[type][region] = fitMean + 3*fitSigma  
+
+            ythresholdNew = ythreshold 
+            if hasattr(thresholdsMinus[type],region): ythresholdNew = thresholdsMinus[type][region]
             ###
             #projections[-1].DrawNormalized()
             projections[-1].Draw()
