@@ -1,8 +1,13 @@
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include <DataFormats/L1GlobalCaloTrigger/interface/L1GctHFRingEtSums.h>
-#include <DataFormats/L1GlobalCaloTrigger/interface/L1GctJetCounts.h>
+
+#include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
+
+#include "DataFormats/L1GlobalCaloTrigger/interface/L1GctHFRingEtSums.h"
+#include "DataFormats/L1GlobalCaloTrigger/interface/L1GctHFBitCounts.h"
+#include "DataFormats/L1GlobalCaloTrigger/interface/L1GctJetCounts.h"
+#include "DataFormats/L1GlobalCaloTrigger/interface/L1GctCollections.h"
 
 #include <vector>
 #include <string>
@@ -15,16 +20,15 @@ class TH2F;
 class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 {
   public: 
-    typedef std::vector<L1GctHFRingEtSums> L1GctHFRingEtSumsCollection;
-
     explicit DijetsTriggerAnalyzer(const edm::ParameterSet&);
     ~DijetsTriggerAnalyzer();
 
-    virtual void beginJob(const edm::EventSetup&);
+    virtual void beginJob();
     virtual void endJob();
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
   private:
     bool acceptHFRingEtSum(std::vector<TH1F*>&, const L1GctHFRingEtSumsCollection*);
+    bool acceptHFRingEtSum(std::vector<TH1F*>&, const L1GctHFBitCountsCollection*);
     bool acceptHFRingEtSum(std::vector<TH1F*>&, const std::vector<L1GctJetCounts>*);
 
     class Correlation{
@@ -36,7 +40,7 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
              double sigx = sqrt(fabs(sumX2_/sumEvt_ - (sumX_/sumEvt_)*(sumX_/sumEvt_)));
              double sigy = sqrt(fabs(sumY2_/sumEvt_ - (sumY_/sumEvt_)*(sumY_/sumEvt_)));
              
-             return ((sigx == 0.)||(sigy == 0.))?0.:covxy/(sigx*sigy);
+             return ((sigx == 0.)||(sigy == 0.)) ? 0. : covxy/(sigx*sigy);
           }
        private:
           double sumEvt_;
@@ -51,7 +55,11 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
     edm::InputTag gctDigisTag_;
     edm::InputTag l1GtObjectMapTag_; 
 
-    unsigned int thresholdHFRingEtSum_;
+    L1GtUtils l1GtUtils_;
+
+    //unsigned int thresholdHFRingEtSum_;
+    unsigned int thresholdHFRingSum_;
+    std::string hfRingSumType_;
     bool accessL1GctHFRingEtSums_;
 
     std::vector<std::string> ringNames_;
@@ -74,11 +82,13 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/Utilities/interface/Exception.h"
 
-//#include <DataFormats/L1GlobalCaloTrigger/interface/L1GctHFRingEtSums.h>
-#include <DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h>
-#include <DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h>
-//#include <DataFormats/L1GlobalCaloTrigger/interface/L1GctJetCounts.h>
+//#include "DataFormats/L1GlobalCaloTrigger/interface/L1GctHFRingEtSums.h"
+//#include "DataFormats/L1GlobalCaloTrigger/interface/L1GctHFBitCounts.h"
+//#include "DataFormats/L1GlobalCaloTrigger/interface/L1GctJetCounts.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -86,42 +96,44 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 #include "TH1F.h"
 #include "TH2F.h"
 
-//typedef std::vector<L1GctHFRingEtSums> L1GctHFRingEtSumsCollection;
-
 DijetsTriggerAnalyzer::DijetsTriggerAnalyzer(const edm::ParameterSet& pset):
-     gtDigisTag_(pset.getParameter<edm::InputTag>("GTDigisTag")),
-     gctDigisTag_(pset.getParameter<edm::InputTag>("GCTDigisTag")),
-     l1GtObjectMapTag_(pset.getParameter<edm::InputTag>("L1GTObjectMapTag")),
-     thresholdHFRingEtSum_(pset.getParameter<unsigned int>("HFRingETSumThreshold")),
-     accessL1GctHFRingEtSums_(pset.getUntrackedParameter<bool>("AccessL1GctHFRingEtSums",true)),
-     l1TriggerNames_(pset.getParameter<std::vector<std::string> >("L1TriggerNames")){}
+     gtDigisTag_(pset.getParameter<edm::InputTag>("gtDigisTag")),
+     gctDigisTag_(pset.getParameter<edm::InputTag>("gctDigisTag")),
+     l1GtObjectMapTag_(pset.getParameter<edm::InputTag>("l1GTObjectMapTag")),
+     thresholdHFRingSum_(pset.getParameter<unsigned int>("hfRingThreshold")),
+     hfRingSumType_(pset.getParameter<std::string>("hfRingSumType")),
+     accessL1GctHFRingEtSums_(false),
+     l1TriggerNames_(pset.getParameter<std::vector<std::string> >("l1TriggerNames")) {
+
+     //FIXME
+     if      (hfRingSumType_ == "HFRingEtSums") accessL1GctHFRingEtSums_ = true;
+     else if (hfRingSumType_ == "HFBitCounts")  accessL1GctHFRingEtSums_ = false;
+     else throw cms::Exception("Configuration") << "Option " << hfRingSumType_ << " not valid (available: HFRingEtSums, HFBitCounts)\n";
+}
 
 DijetsTriggerAnalyzer::~DijetsTriggerAnalyzer() {}
 
-void DijetsTriggerAnalyzer::beginJob(const edm::EventSetup& setup){
+void DijetsTriggerAnalyzer::beginJob(){
   edm::Service<TFileService> fs;
 
-  /*h_countAll_ = fs->make<TH1F>("countAll","countAll",3,0,3);
-  h_countAll_->GetXaxis()->SetBinLabel(1,"All");
-  h_countAll_->GetXaxis()->SetBinLabel(2,"L1Jets");
-  h_countAll_->GetXaxis()->SetBinLabel(3,"L1HFRingEtSum");*/
- 
   ringNames_.push_back("Ring 1 HF-plus");
   ringNames_.push_back("Ring 1 HF-minus");
   ringNames_.push_back("Ring 2 HF-plus");
   ringNames_.push_back("Ring 2 HF-minus");
-
+  
   h_summaryL1_ = fs->make<TH1F>("summaryL1","summaryL1",l1TriggerNames_.size()+1,0,l1TriggerNames_.size()+1);  
   h_summaryL1_->GetXaxis()->SetBinLabel(1,"All");
   histosCountAll_.resize(l1TriggerNames_.size());
   histosRingSum_.resize(l1TriggerNames_.size());
   for(size_t k = 0; k < histosCountAll_.size(); ++k){
+     edm::LogVerbatim("Analysis") << "Creating histograms for L1 reference trigger " << l1TriggerNames_[k];
+
      h_summaryL1_->GetXaxis()->SetBinLabel(k+2,l1TriggerNames_[k].c_str());
    
      histosCountAll_[k] = fs->make<TH1F>((l1TriggerNames_[k] + "_count").c_str(),(l1TriggerNames_[k] + "_count").c_str(),3,0,3);
      histosCountAll_[k]->GetXaxis()->SetBinLabel(1,"All");
      histosCountAll_[k]->GetXaxis()->SetBinLabel(2,l1TriggerNames_[k].c_str());
-     histosCountAll_[k]->GetXaxis()->SetBinLabel(3,"L1HFRingEtSum"); 
+     histosCountAll_[k]->GetXaxis()->SetBinLabel(3, accessL1GctHFRingEtSums_ ? "L1HFRingEtSum" : "L1HFBitCount");
 
      histosRingSum_[k].resize(ringNames_.size());
      for(size_t ihisto = 0; ihisto < histosRingSum_[k].size(); ++ihisto){
@@ -145,11 +157,12 @@ void DijetsTriggerAnalyzer::endJob(){
    for(size_t k = 0; k < histosCountAll_.size(); ++k){
      float nall = histosCountAll_[k]->GetBinContent(1);
      float ntrig = histosCountAll_[k]->GetBinContent(2); 
-     float nHFRingETSum = histosCountAll_[k]->GetBinContent(3);
+     float nHFRingSum = histosCountAll_[k]->GetBinContent(3);
 
-     edm::LogInfo("") << "Efficiency " << l1TriggerNames_[k] << " = " << ((nall)?(ntrig/nall):-1) << "\n"
-                      << "Efficiency L1 HF Rings ET sum = " << ((nall)?(nHFRingETSum/nall):-1)
-                                                            << " relative = " << ((ntrig)?(nHFRingETSum/ntrig):-1);
+     edm::LogVerbatim("Analysis") << "Efficiency L1 trigger " << l1TriggerNames_[k] << " = " 
+                                                          << ( (nall) ? (ntrig/nall) : -1 ) << "\n"
+                              << "Efficiency L1 HF Rings = " << ( (nall) ? (nHFRingSum/nall) : -1 )
+                              << "              relative = " << ( (ntrig) ? (nHFRingSum/ntrig) : -1 );
    }
 
    for(size_t i = 0; i < l1TriggerNames_.size(); ++i){
@@ -168,11 +181,17 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
 
   edm::Handle<L1GlobalTriggerObjectMapRecord> l1GTObjMapRcdH;
   event.getByLabel(l1GtObjectMapTag_,l1GTObjMapRcdH);
-  if(!l1GTReadoutRcdH.isValid() || !l1GTObjMapRcdH.isValid()) return;  
+  if( !l1GTReadoutRcdH.isValid() ) { edm::LogWarning("L1 GT Readout record not found, skipping.");return;}
+  if( !l1GTObjMapRcdH.isValid() )  { edm::LogWarning("L1 GT Object Map not found, skipping.");return;}  
 
-  DecisionWord gtDecisionWord = l1GTReadoutRcdH->decisionWord();
+  const L1GlobalTriggerReadoutRecord* gtReadoutRecord = l1GTReadoutRcdH.product();
+  const L1GlobalTriggerObjectMapRecord* gtObjectMapRecord = l1GTObjMapRcdH.product();
 
-  const std::vector<L1GlobalTriggerObjectMap>& objMapVec = l1GTObjMapRcdH->gtObjectMap();
+  if( gtReadoutRecord == 0 || gtObjectMapRecord == 0) return;
+
+  DecisionWord const& gtDecisionWord = gtReadoutRecord->decisionWord();
+  const std::vector<L1GlobalTriggerObjectMap>& objMapVec = gtObjectMapRecord->gtObjectMap();
+
   std::vector<std::string> passedL1;
   for(std::vector<L1GlobalTriggerObjectMap>::const_iterator itMap = objMapVec.begin();
                                                             itMap != objMapVec.end(); ++itMap) {
@@ -181,19 +200,15 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
     // Get trigger names
     //std::string trigName = (*itMap).algoName();
 
-    if(gtDecisionWord[itrig]) passedL1.push_back((*itMap).algoName());
+    if(gtDecisionWord[itrig]) passedL1.push_back( (*itMap).algoName() );
   }
  
-  for(std::vector<std::string>::const_iterator itPassedL1 = passedL1.begin(); itPassedL1 != passedL1.end(); ++itPassedL1)
-             LogTrace("") << "Passed L1 trigger " << *itPassedL1;
+  for(std::vector<std::string>::const_iterator itPassedL1 = passedL1.begin();
+                                               itPassedL1 != passedL1.end();
+                                               ++itPassedL1) LogTrace("Analysis") << "Passed L1 trigger " << *itPassedL1;
 
   
-  // Check if event satisfied pre-defined triggers
-  //bool acceptL1Jets = false;
-  /*for(std::vector<std::string>::const_iterator itTrigL1 = l1TriggerNames_.begin();
-                                               itTrigL1 != l1TriggerNames_.end(); ++itTrigL1,++itrig){
-    if(find(passedL1.begin(),passedL1.end(),*itTrigL1) != passedL1.end()) {acceptL1Jets = true;break;}*/
-
+  // Check if event satisfied pre-defined triggers and get correlations
   for(size_t i = 0; i < l1TriggerNames_.size(); ++i){
      for(size_t j = 0; j < l1TriggerNames_.size(); ++j){
         std::pair<int,int> index(i,j);
@@ -207,27 +222,38 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
      }
   }
 
-  const L1GctHFRingEtSumsCollection* ringSumCollection = 0;
-  const std::vector<L1GctJetCounts>* jetCounts = 0;
+  const L1GctHFRingEtSumsCollection* gctHFRingEtSumsCollection = 0;
+  const L1GctHFBitCountsCollection* gctHFBitCountsCollection = 0;
+  //const std::vector<L1GctJetCounts>* jetCounts = 0;
   if(accessL1GctHFRingEtSums_){
-     edm::Handle<L1GctHFRingEtSumsCollection> ringSumsH;
-     event.getByLabel(gctDigisTag_, ringSumsH);
-     ringSumCollection = &*ringSumsH;
+     edm::Handle<L1GctHFRingEtSumsCollection> gctHFRingEtSumsH;
+     event.getByLabel(gctDigisTag_, gctHFRingEtSumsH);
+     if( !gctHFRingEtSumsH.isValid() ){
+        edm::LogWarning("L1 GCT HF Ring Et sums collection not found, skipping.");
+        return;
+     }
+     gctHFRingEtSumsCollection = gctHFRingEtSumsH.product();
   } else{
-     edm::Handle<std::vector<L1GctJetCounts> > jetCountsH;
-     event.getByLabel(gctDigisTag_, jetCountsH);
-     jetCounts = &*jetCountsH;
+     edm::Handle<L1GctHFBitCountsCollection> gctHFBitCountsH;
+     event.getByLabel(gctDigisTag_, gctHFBitCountsH);
+     if( !gctHFBitCountsH.isValid() ){
+        edm::LogWarning("L1 GCT HF bit counts collection not found, skipping.");
+        return;
+     }
+     gctHFBitCountsCollection = gctHFBitCountsH.product();  
   }
+
   h_summaryL1_->Fill(0); 
   for(size_t k = 0; k < l1TriggerNames_.size(); ++k){
     histosCountAll_[k]->Fill(0);
-    if(find(passedL1.begin(),passedL1.end(),l1TriggerNames_[k]) != passedL1.end()){ //Found trigger
+    if( find(passedL1.begin(),passedL1.end(),l1TriggerNames_[k]) != passedL1.end() ){ //Found trigger
        h_summaryL1_->Fill(k+1);
  
        histosCountAll_[k]->Fill(1);
 
        std::vector<TH1F*>& histos = histosRingSum_[k];
-       bool acceptRingSum = (accessL1GctHFRingEtSums_)?acceptHFRingEtSum(histos,ringSumCollection):acceptHFRingEtSum(histos,jetCounts);
+       bool acceptRingSum = (accessL1GctHFRingEtSums_) ? acceptHFRingEtSum(histos,gctHFRingEtSumsCollection) : 
+                                                         acceptHFRingEtSum(histos,gctHFBitCountsCollection);
        if(!acceptRingSum) continue;
 
        histosCountAll_[k]->Fill(2); 
@@ -238,15 +264,32 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
 
 bool DijetsTriggerAnalyzer::acceptHFRingEtSum(std::vector<TH1F*>& histosRingSum, const L1GctHFRingEtSumsCollection* ringSumCollection){
    bool accept = true;
+
    L1GctHFRingEtSumsCollection::const_iterator ringSumItr = ringSumCollection->begin();
-  
    // Require sum(ET) threshold for all rings
    for(; ringSumItr->bx()==0 && ringSumItr != ringSumCollection->end(); ++ringSumItr){
-      LogTrace("") << "Is empty: " << ringSumItr->empty();  
+      LogTrace("Analysis") << "Is empty: " << ringSumItr->empty();  
       for(size_t k = 0; k < 4; ++k){ 
-         LogTrace("") << "ET Sum for " << ringNames_[k] << ": " << ringSumItr->etSum(k);
+         LogTrace("Analysis") << "ET Sum for " << ringNames_[k] << ": " << ringSumItr->etSum(k);
          histosRingSum[k]->Fill(ringSumItr->etSum(k));
-         if(ringSumItr->etSum(k) > thresholdHFRingEtSum_) accept = false;
+         if(ringSumItr->etSum(k) > thresholdHFRingSum_) accept = false;
+      }
+   }
+
+   return accept;
+}
+
+bool DijetsTriggerAnalyzer::acceptHFRingEtSum(std::vector<TH1F*>& histosRingSum, const L1GctHFBitCountsCollection* ringSumCollection){
+   bool accept = true;
+
+   L1GctHFBitCountsCollection::const_iterator ringSumItr = ringSumCollection->begin();
+   // Require bit count threshold for all rings
+   for(; ringSumItr->bx()==0 && ringSumItr != ringSumCollection->end(); ++ringSumItr){
+      LogTrace("Analysis") << "Is empty: " << ringSumItr->empty();  
+      for(size_t k = 0; k < 4; ++k){ 
+         LogTrace("Analysis") << "Bit count for " << ringNames_[k] << ": " << ringSumItr->bitCount(k);
+         histosRingSum[k]->Fill(ringSumItr->bitCount(k));
+         if(ringSumItr->bitCount(k) > thresholdHFRingSum_) accept = false;
       }
    }
 
@@ -259,9 +302,9 @@ bool DijetsTriggerAnalyzer::acceptHFRingEtSum(std::vector<TH1F*>& histosRingSum,
                                                    jetCountItr != jetCounts->end(); ++jetCountItr){
       int iring = 0;
       for(int icount = 8; icount <= 11; ++icount,++iring){
-         LogTrace("") << "ET Sum index " << icount << ": " << jetCountItr->count(icount);
+         LogTrace("Analysis") << "ET Sum index " << icount << ": " << jetCountItr->count(icount);
          histosRingSum[iring]->Fill(jetCountItr->count(icount));
-         if(jetCountItr->count(icount) > thresholdHFRingEtSum_) accept = false; 
+         if(jetCountItr->count(icount) > thresholdHFRingSum_) accept = false; 
       }
    }
 
