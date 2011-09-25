@@ -10,10 +10,12 @@ config.outputTTreeFile = 'exclusiveDijetsTriggerAnalysis.root'
 process = cms.Process("Analysis")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.MessageLogger.cerr.threshold = 'INFO' 
-#process.MessageLogger.debugModules = cms.untracked.vstring('dijetsTriggerAnalysisHFRingEtSums')
+process.MessageLogger.cerr.threshold = 'DEBUG' 
+process.MessageLogger.debugModules = cms.untracked.vstring('dijetsTriggerAnalysisHFRingEtSums')
 #process.MessageLogger.destinations = cms.untracked.vstring('cerr')
 process.MessageLogger.categories.append('Analysis')
+process.MessageLogger.cerr.DEBUG = cms.untracked.PSet(limit = cms.untracked.int32(0))
+process.MessageLogger.cerr.Analysis = cms.untracked.PSet(limit = cms.untracked.int32(-1))
 #process.MessageLogger.debugs = cms.untracked.PSet(
 #    threshold = cms.untracked.string('DEBUG'),
 #    noLineBreaks = cms.untracked.bool(False),

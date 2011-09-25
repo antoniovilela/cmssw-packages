@@ -1,9 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
 dijetsTriggerAnalysis = cms.EDAnalyzer("DijetsTriggerAnalyzer",
-  gtDigisTag = cms.InputTag("gtDigis"),
+  #gtDigisTag = cms.InputTag("gtDigis"),
+  #l1GTObjectMapTag = cms.InputTag("hltL1GtObjectMap"),
   gctDigisTag = cms.InputTag("gctDigis"), 
-  l1GTObjectMapTag = cms.InputTag("hltL1GtObjectMap"),
   # ET sum/tower count per HF ring (HFRingEtSums, HFBitCounts)
   hfRingSumType = cms.string("HFBitCounts"),
   hfRingThreshold = cms.uint32(5),

@@ -25,6 +25,7 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 
     virtual void beginJob();
     virtual void endJob();
+    virtual void beginRun(const edm::Run&, const edm::EventSetup&);
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
   private:
     bool acceptHFRingEtSum(std::vector<TH1F*>&, const L1GctHFRingEtSumsCollection*);
@@ -52,8 +53,8 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
     };
 
     edm::InputTag gtDigisTag_;
-    edm::InputTag gctDigisTag_;
     edm::InputTag l1GtObjectMapTag_; 
+    edm::InputTag gctDigisTag_;
 
     L1GtUtils l1GtUtils_;
 
@@ -96,10 +97,12 @@ class DijetsTriggerAnalyzer: public edm::EDAnalyzer
 #include "TH1F.h"
 #include "TH2F.h"
 
+#include <sstream>
+
 DijetsTriggerAnalyzer::DijetsTriggerAnalyzer(const edm::ParameterSet& pset):
-     gtDigisTag_(pset.getParameter<edm::InputTag>("gtDigisTag")),
+     //gtDigisTag_(pset.getParameter<edm::InputTag>("gtDigisTag")),
+     //l1GtObjectMapTag_(pset.getParameter<edm::InputTag>("l1GTObjectMapTag")),
      gctDigisTag_(pset.getParameter<edm::InputTag>("gctDigisTag")),
-     l1GtObjectMapTag_(pset.getParameter<edm::InputTag>("l1GTObjectMapTag")),
      thresholdHFRingSum_(pset.getParameter<unsigned int>("hfRingThreshold")),
      hfRingSumType_(pset.getParameter<std::string>("hfRingSumType")),
      accessL1GctHFRingEtSums_(false),
@@ -121,12 +124,13 @@ void DijetsTriggerAnalyzer::beginJob(){
   ringNames_.push_back("Ring 2 HF-plus");
   ringNames_.push_back("Ring 2 HF-minus");
   
+  std::ostringstream oss;
   h_summaryL1_ = fs->make<TH1F>("summaryL1","summaryL1",l1TriggerNames_.size()+1,0,l1TriggerNames_.size()+1);  
   h_summaryL1_->GetXaxis()->SetBinLabel(1,"All");
   histosCountAll_.resize(l1TriggerNames_.size());
   histosRingSum_.resize(l1TriggerNames_.size());
   for(size_t k = 0; k < histosCountAll_.size(); ++k){
-     edm::LogVerbatim("Analysis") << "Creating histograms for L1 reference trigger " << l1TriggerNames_[k];
+     oss << "Creating histograms for L1 reference trigger " << l1TriggerNames_[k] << std::endl;
 
      h_summaryL1_->GetXaxis()->SetBinLabel(k+2,l1TriggerNames_[k].c_str());
    
@@ -151,19 +155,22 @@ void DijetsTriggerAnalyzer::beginJob(){
         correlations_.insert(std::make_pair(std::make_pair(i,j),Correlation()));
      }
   }
+  edm::LogInfo("Analysis") << oss.str();
 }
 
 void DijetsTriggerAnalyzer::endJob(){
+   std::ostringstream oss;
    for(size_t k = 0; k < histosCountAll_.size(); ++k){
      float nall = histosCountAll_[k]->GetBinContent(1);
      float ntrig = histosCountAll_[k]->GetBinContent(2); 
      float nHFRingSum = histosCountAll_[k]->GetBinContent(3);
 
-     edm::LogVerbatim("Analysis") << "Efficiency L1 trigger " << l1TriggerNames_[k] << " = " 
-                                                          << ( (nall) ? (ntrig/nall) : -1 ) << "\n"
-                              << "Efficiency L1 HF Rings = " << ( (nall) ? (nHFRingSum/nall) : -1 )
-                              << "              relative = " << ( (ntrig) ? (nHFRingSum/ntrig) : -1 );
+     oss << "Efficiency L1 trigger " << l1TriggerNames_[k] << " = " 
+                                     << ( (nall) ? (ntrig/nall) : -1 ) << std::endl
+         << "Efficiency L1 HF Rings = " << ( (nall) ? (nHFRingSum/nall) : -1 ) << std::endl
+         << "              relative = " << ( (ntrig) ? (nHFRingSum/ntrig) : -1 ) << std::endl;
    }
+   edm::LogInfo("Analysis") << oss.str();
 
    for(size_t i = 0; i < l1TriggerNames_.size(); ++i){
       for(size_t j = 0; j < l1TriggerNames_.size(); ++j){
@@ -173,10 +180,14 @@ void DijetsTriggerAnalyzer::endJob(){
    }
 }
 
+void DijetsTriggerAnalyzer::beginRun(const edm::Run& run, const edm::EventSetup& setup){
+  //l1GtUtils_.getL1GtRunCache(run, setup, true, false);
+}
+
 void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup){
 
   // Access L1 bits
-  edm::Handle<L1GlobalTriggerReadoutRecord> l1GTReadoutRcdH;
+  /*edm::Handle<L1GlobalTriggerReadoutRecord> l1GTReadoutRcdH;
   event.getByLabel(gtDigisTag_, l1GTReadoutRcdH);
 
   edm::Handle<L1GlobalTriggerObjectMapRecord> l1GTObjMapRcdH;
@@ -187,9 +198,9 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
   const L1GlobalTriggerReadoutRecord* gtReadoutRecord = l1GTReadoutRcdH.product();
   const L1GlobalTriggerObjectMapRecord* gtObjectMapRecord = l1GTObjMapRcdH.product();
 
-  if( gtReadoutRecord == 0 || gtObjectMapRecord == 0) return;
+  DecisionWord gtDecisionWord = gtReadoutRecord->decisionWord();
+  const unsigned int numberTriggerBits(gtDecisionWord.size());
 
-  DecisionWord const& gtDecisionWord = gtReadoutRecord->decisionWord();
   const std::vector<L1GlobalTriggerObjectMap>& objMapVec = gtObjectMapRecord->gtObjectMap();
 
   std::vector<std::string> passedL1;
@@ -201,13 +212,33 @@ void DijetsTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
     //std::string trigName = (*itMap).algoName();
 
     if(gtDecisionWord[itrig]) passedL1.push_back( (*itMap).algoName() );
-  }
+  }*/
  
-  for(std::vector<std::string>::const_iterator itPassedL1 = passedL1.begin();
-                                               itPassedL1 != passedL1.end();
-                                               ++itPassedL1) LogTrace("Analysis") << "Passed L1 trigger " << *itPassedL1;
+  l1GtUtils_.retrieveL1EventSetup(setup);
+  /*edm::ESHandle<L1GtTriggerMenu> l1GtMenuRcd;
+  setup.get<L1GtTriggerMenuRcd>().get(l1GtMenuRcd);
+  const L1GtTriggerMenu* l1GtMenu = l1GtMenuRcd.product();
+  // Get L1 menu from event setup
+  for(CItAlgo algo = l1GtMenu->gtAlgorithmMap().begin(); algo != l1GtMenu->gtAlgorithmMap().end(); ++algo) {
+     //if (_Debug) std::cout << "Name: " << (algo->second).algoName() << " Alias: " << (algo->second).algoAlias() << std::endl;
+     int itrig = (algo->second).algoBitNumber();
+     algoBitToName[itrig] = (algo->second).algoName();
+  }*/
+  std::vector<std::string> passedL1;
+  std::vector<int> prescalesL1;
+  for(size_t k = 0; k < l1TriggerNames_.size(); ++k){
+     int ierror = -1;
+     bool decision = l1GtUtils_.decisionBeforeMask(event,l1TriggerNames_[k],ierror);
+     if(ierror == 0 && decision){
+        passedL1.push_back( l1TriggerNames_[k] );
+        int prescale = l1GtUtils_.prescaleFactor(event,l1TriggerNames_[k],ierror);
+        prescalesL1.push_back(prescale);
+     }
+  }
 
-  
+  for(size_t k = 0; k < passedL1.size(); ++k)
+     LogTrace("Analysis") << "Passed L1 trigger " << passedL1[k] << " prescale " << prescalesL1[k];
+
   // Check if event satisfied pre-defined triggers and get correlations
   for(size_t i = 0; i < l1TriggerNames_.size(); ++i){
      for(size_t j = 0; j < l1TriggerNames_.size(); ++j){
