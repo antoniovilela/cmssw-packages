@@ -204,7 +204,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doDeltaEtaGenSelection = false;
    double deltaEtaGenMin = 3.0;
 
-   bool doLogXiGenPlusSelection  = false;
+   bool doLogXiGenPlusSelection  = true;
    bool doLogXiGenMinusSelection = false;
    double logXiGenPlusMax  = -5.5;
    //double logXiGenPlusMax  = -6.5;
@@ -415,9 +415,13 @@ void minimumBiasTTreeAnalysis(TTree* data,
       histosTH1F["MxFromPFCands"]->Fill(MxFromPFCands,eventWeight);
       if(accessMCInfo){
          double MxGen = eventData.MxGen_;
+         double MxGenDiss = eventData.MxGenDiss_;
+         double MyGenDiss = eventData.MyGenDiss_;
          double MxGenRange = eventData.MxGenRange_; 
          //histosTH1F["MxGen"]->Fill(MxGen,eventWeight);
          histosTH1F["MxGen"]->Fill(MxGenRange,eventWeight); 
+         histosTH1F["MxGenDiss"]->Fill(MxGenDiss,eventWeight); 
+         histosTH1F["MyGenDiss"]->Fill(MyGenDiss,eventWeight); 
          histosTH1F["ResMxFromTowers"]->Fill((MxFromTowers - MxGenRange)/MxGenRange,eventWeight);
          histosTH1F["ResMxFromPFCands"]->Fill((MxFromPFCands - MxGenRange)/MxGenRange,eventWeight);
       }

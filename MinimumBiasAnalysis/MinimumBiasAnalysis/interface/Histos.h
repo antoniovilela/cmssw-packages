@@ -108,6 +108,8 @@ namespace minimumBiasAnalysis {
      histos["EMinusPzFromTowersVarBin"] = adaptor.template make<TH1F>("EMinusPzFromTowersVarBin","EMinusPzFromTowersVarBin",24,binningEPlusPz);
 
      histos["MxGen"] = adaptor.template make<TH1F>("MxGen","MxGen",200,-10.,400.);
+     histos["MxGenDiss"] = adaptor.template make<TH1F>("MxGenDiss","MxGenDiss",200,-10.,400.);
+     histos["MyGenDiss"] = adaptor.template make<TH1F>("MyGenDiss","MyGenDiss",200,-10.,400.);
      histos["xiGenPlus"] = adaptor.template make<TH1F>("xiGenPlus","xiGenPlus",500,0.,1.);
      histos["xiGenMinus"] = adaptor.template make<TH1F>("xiGenMinus","xiGenMinus",500,0.,1.);
      histos["etaMaxGen"] = adaptor.template make<TH1F>("etaMaxGen","etaMaxGen",200,-10.,10.);

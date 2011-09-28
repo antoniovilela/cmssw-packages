@@ -152,6 +152,9 @@ def plot(fileName, selection="pFlowAnalysisNoCollNoVtx", runFit=True, rebin=1, o
     
     file = ROOT.TFile(fileName,'READ')
 
+    h_NEvents = file.Get( "%s/%s" % (selection,"NEvents") )
+    nEvents = h_NEvents.GetBinContent(1)
+
     particleTypes = ("all","gamma","hadronNeutral","hadronHF","emHF")
     histoNames = {}
     histoNames["all"] = "energyVsEtaAllTypes" 
@@ -225,12 +228,12 @@ def plot(fileName, selection="pFlowAnalysisNoCollNoVtx", runFit=True, rebin=1, o
             lines.append(ROOT.TLine(xrange[0],ythreshold,xrange[1],ythreshold))
             lines[-1].SetLineColor(2)
             lines[-1].SetLineStyle(2)
-            lines[-1].SetLineWidth(5)
+            lines[-1].SetLineWidth(6)
             lines[-1].Draw("SAME")
             lines.append(ROOT.TLine(-xrange[1],ythreshold,-xrange[0],ythreshold))
             lines[-1].SetLineColor(2) 
             lines[-1].SetLineStyle(2)
-            lines[-1].SetLineWidth(4)
+            lines[-1].SetLineWidth(6)
             lines[-1].Draw("SAME")
 
             # Projections
@@ -248,7 +251,8 @@ def plot(fileName, selection="pFlowAnalysisNoCollNoVtx", runFit=True, rebin=1, o
             projections[-1].SetMarkerStyle(20)
             projections[-1].SetMarkerSize(1.2) 
             projections[-1].Rebin(rebin)
-            projections[-1].Scale( 1./projections[-1].GetSumOfWeights() )
+            #projections[-1].Scale( 1./projections[-1].GetSumOfWeights() )
+            projections[-1].Scale( 1./nEvents )    
             ###
             if runFit:
 		fitMean,fitSigma = fitHistoDoubleGaus(projections[-1])
@@ -262,7 +266,7 @@ def plot(fileName, selection="pFlowAnalysisNoCollNoVtx", runFit=True, rebin=1, o
             projections[-1].Draw()
    
             linesProj.append(ROOT.TLine(ythresholdNew,0.,
-                                        ythresholdNew,0.15))
+                                        ythresholdNew,0.40*projections[-1].GetMaximum()))
             linesProj[-1].SetLineColor(2)
             linesProj[-1].SetLineStyle(2)
             linesProj[-1].SetLineWidth(4)
@@ -282,7 +286,8 @@ def plot(fileName, selection="pFlowAnalysisNoCollNoVtx", runFit=True, rebin=1, o
             projections[-1].SetMarkerStyle(20)
             projections[-1].SetMarkerSize(1.2)
             projections[-1].Rebin(rebin)
-            projections[-1].Scale( 1./projections[-1].GetSumOfWeights() )
+            #projections[-1].Scale( 1./projections[-1].GetSumOfWeights() )
+            projections[-1].Scale( 1./nEvents )
             ###
             if runFit:
 		fitMean,fitSigma = fitHistoDoubleGaus(projections[-1])
@@ -295,7 +300,7 @@ def plot(fileName, selection="pFlowAnalysisNoCollNoVtx", runFit=True, rebin=1, o
             projections[-1].Draw()
 
             linesProj.append(ROOT.TLine(ythresholdNew,0.,
-                                        ythresholdNew,0.15))
+                                        ythresholdNew,0.40*projections[-1].GetMaximum()))
             linesProj[-1].SetLineColor(2)
             linesProj[-1].SetLineStyle(2)
             linesProj[-1].SetLineWidth(4)

@@ -8,7 +8,8 @@ from ForwardAnalysis.Utilities.pfCandidateSelector_cfi import pfCandidateSelecto
 from ForwardAnalysis.Utilities.ExcludeHFEdgesStringCut import ExcludeHFEdgesStringCut
 from ForwardAnalysis.Utilities.PFCandidateNoiseStringCut import PFCandidateNoiseStringCut
 #from ForwardAnalysis.Utilities.pfThresholds_cfi import pfThresholds
-from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_cfi import pfThresholds
+#from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_cfi import pfThresholds
+from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_new_cfi import pfThresholds
 
 #pfCandidateNoiseThresholds.cut = PFCandidateNoiseStringCut(pfThresholds).cut()
 pfStrCut1 = ExcludeHFEdgesStringCut().cut()

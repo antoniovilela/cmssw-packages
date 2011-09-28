@@ -219,6 +219,8 @@ process.trackHistoAnalyzer.TrackTag = config.trackTagName
 process.load('Utilities.AnalysisTools.pfHistos_cfi')
 process.pFlowHistos = process.pfHistos.clone( src = 'particleFlow' )
 process.pFlowWithThresholdsHistos = process.pfHistos.clone( src = 'pfCandidateNoiseThresholds' )
+process.load('Utilities.AnalysisTools.pFlowNoiseAnalyzer_cfi')
+process.pFlowNoiseAnalyzer.particleFlowTag = 'particleFlow'
 
 attributesEnergyScale = [{'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.90,'HCALTowerSummaryTag':'hcalActivitySummaryScale090'},
                          {'ApplyEnergyScaleHCAL':True,'EnergyScaleFactorHCAL':0.92,'HCALTowerSummaryTag':'hcalActivitySummaryScale092'},
@@ -252,6 +254,7 @@ makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR')
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR')
 makeAnalysis(process,'pFlowHistos','eventSelectionBscMinBiasOR')
 makeAnalysis(process,'pFlowWithThresholdsHistos','eventSelectionBscMinBiasOR')
+makeAnalysis(process,'pFlowNoiseAnalyzer','eventSelectionBscMinBiasOR')
 
 if config.varyAttributes:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR',attributes)
@@ -270,6 +273,8 @@ if config.runBPTX:
 if config.runNoColl:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORNoColl')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORBPTXOR')
+    makeAnalysis(process,'pFlowNoiseAnalyzer','eventSelectionBscMinBiasORNoColl')
+    makeAnalysis(process,'pFlowNoiseAnalyzer','eventSelectionBscMinBiasORBPTXOR')
 
 if config.runEtaMaxFilter:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMaxFilter')

@@ -29,7 +29,7 @@ void setFileNamesPythia6Z1(std::vector<std::string>& fileNames){
 }
 
 void setFileNamesMinBias(std::vector<std::string>& fileNames){
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/minimumBiasTTreeAnalysis-v2/analysisMinBias_TTree_MinBias_Pythia8MBR-reco423patch3.root");
+   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/minimumBiasTTreeAnalysis-v4/analysisMinBias_TTree_MinBias_Pythia8MBR-reco423patch3.root");
 }
 
 void runMinimumBiasTTreeAnalysisMC(){
@@ -50,7 +50,7 @@ void runMinimumBiasTTreeAnalysisMC(){
    //std::string outDir = "root/7TeV/Pythia6CW/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/7TeV/Pythia6P0/SumEnergyMaxHFPlus_8_0";
    //std::string outDir = "root/7TeV/Pythia6Z1";
-   std::string outDir = "root/7TeV/Pythia8MBR/minimumBiasTTreeAnalysis-v2";
+   std::string outDir = "root/7TeV/Pythia8MBR/minimumBiasTTreeAnalysis-v4/LogXiGenPlusMax-5.5";
 
    std::vector<std::string> fileNames(0);
    setFileNamesMinBias(fileNames);
