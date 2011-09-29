@@ -29,6 +29,12 @@ from Utilities.AnalysisTools.hcalNoiseFilter_cfi import *
 
 from Utilities.AnalysisTools.analysisTracks_cfi import *
 
+from Utilities.AnalysisSequences.analysisVertices_cfi import *
+
+from Utilities.AnalysisTools.multipleVertexFilter_cfi import *
+multipleVertexFilter.src = 'analysisVertices'
+multipleVertexVeto = cms.Sequence(~multipleVertexFilter)
+
 """
 #from PhysicsTools.RecoAlgos.recoTrackSelector_cfi import *
 #recoTrackSelector.src = "generalTracks"
@@ -91,12 +97,14 @@ hcalActivitySummaryScale108 = hcalActivitySummary.clone(ApplyEnergyScale = True,
 hcalActivitySummaryScale110 = hcalActivitySummary.clone(ApplyEnergyScale = True,EnergyScaleFactorHB = 1.10,EnergyScaleFactorHE = 1.10,EnergyScaleFactorHF = 1.10,EnergyScaleFactorEB = 1.10,EnergyScaleFactorEE = 1.10)
 
 ############
+############
 hltBscMinBiasOR = cms.Sequence(l1CollBscOr + hltBscMinBiasORBptxPlusORMinusFilter)
 hltBscMinBiasORNoColl = cms.Sequence(l1NoCollBscOr + hltBscMinBiasORBptxPlusORMinusFilter)
 hltBscMinBiasORBPTXOR = cms.Sequence(l1NoBPTXBscOr + hltBscMinBiasORBptxPlusORMinusFilter)
 
-#preSelection = cms.Sequence()
-offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping+HBHENoiseFilter+hcalNoiseFilter)
+offlineSelection = cms.Sequence(primaryVertexFilter+filterScraping+
+                                HBHENoiseFilter+hcalNoiseFilter+
+                                multipleVertexVeto)
 eventSelection = cms.Sequence(offlineSelection)
 eventSelectionBeamHaloVeto = cms.Sequence(beamHaloVeto+offlineSelection)
 
@@ -186,6 +194,7 @@ edmDump = cms.Sequence(trackMultiplicity+
                        hcalActivitySummaryScale108+hcalActivitySummaryScale110+
                        xiTower+xiFromCaloTowers+xiFromJets)
 """
+vertices = cms.Sequence(analysisVertices)
 tracks = cms.Sequence(analysisTracks)
 edmDump = cms.Sequence(hcalActivitySummary+hcalActivitySummaryScale090+hcalActivitySummaryScale092+
                        hcalActivitySummaryScale095+hcalActivitySummaryScale098+
