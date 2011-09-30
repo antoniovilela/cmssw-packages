@@ -5,7 +5,7 @@ inputFields = ('runOnMC','generator','hltProcessNameMC')
 requiredFields = ('runOnMC',)
 inputOptions = parseInput(inputFields,requiredFields)
 if not hasattr(inputOptions,'generator'): inputOptions.generator = 'Pythia8'
-if not hasattr(inputOptions,'hltProcessNameMC'): inputOptions.hltProcessNameMC = 'REDIGI38X'
+if not hasattr(inputOptions,'hltProcessNameMC'): inputOptions.hltProcessNameMC = 'HLT'
 
 # Settings
 class config: pass
@@ -15,7 +15,7 @@ config.generator = inputOptions.generator
 config.verbose = True
 config.globalTagNameData = 'GR_R_42_V19::All'
 config.globalTagNameMC = 'START42_V13::All'
-config.outputTTreeFile = '/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/eventSelection-v1/eventSelectionAnalysis_TTree_MinimumBias_Pythia8MBR-reco423patch3.root'
+config.outputTTreeFile = 'eventSelectionAnalysis_TTree_MinBias.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
@@ -24,8 +24,9 @@ config.triggerResultsProcessNameMC = inputOptions.hltProcessNameMC
 
 if config.runOnMC:
     if config.generator == 'Pythia8':
-        from fileNames_Pythia8MBR_reco423patch3 import fileNames
-        config.fileNames = fileNames
+        #from fileNames_Pythia8MBR_reco423patch3 import fileNames
+        #config.fileNames = fileNames
+        config.fileNames = ['file:/storage2/antoniov/data1/MinBias_Tune4C_7TeV-pythia8-Summer11-NoPU_START42_V11-v1-GEN-SIM-RECO/MinBias_Tune4C_7TeV-pythia8-Summer11-NoPU_START42_V11-v1-GEN-SIM-RECO-A8EAFE3C-D7C2-E011-9207-00266CF2E2C8.root'] 
 
 process = cms.Process("Analysis")
 
@@ -44,7 +45,7 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring()
 )
 process.source.fileNames = config.fileNames
-if config.runOnMC: process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
+#if config.runOnMC: process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 # Import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -93,7 +94,7 @@ if config.verbose:
 #process.xiTower.comEnergy = config.comEnergy
 #process.xiFromCaloTowers.comEnergy = config.comEnergy
 #process.xiFromJets.comEnergy = config.comEnergy
-process.recoSequence = cms.Sequence(process.tracks*process.pfCandidates*process.edmDump)
+process.recoSequence = cms.Sequence(process.vertices*process.tracks*process.pfCandidates*process.edmDump)
 if not config.runOnMC: process.eventWeightSequence = cms.Sequence(process.lumiWeight)
 # Reflagging and re-reco
 """
@@ -125,6 +126,7 @@ process.minimumBiasTTreeAnalysisVertexFilter = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisBeamHaloVeto = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisFilterScraping = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisHcalNoiseFilter = minimumBiasTTreeAnalysis.clone()
+process.minimumBiasTTreeAnalysisMultipleVertexVeto = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisEtaMinFilter = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisCastorVeto = minimumBiasTTreeAnalysis.clone()
 
@@ -153,6 +155,7 @@ process.countsVertexFilter = countsAnalyzer.clone()
 process.countsBeamHaloVeto = countsAnalyzer.clone()
 process.countsFilterScraping = countsAnalyzer.clone()
 process.countsHcalNoiseFilter = countsAnalyzer.clone()
+process.countsMultipleVertexVeto = countsAnalyzer.clone()
 process.countsEtaMinFilter = countsAnalyzer.clone()
 process.countsCastorVeto = countsAnalyzer.clone()
 
@@ -179,6 +182,8 @@ process.countEvents_step = cms.Path(    process.countsAll +
                                     process.HBHENoiseFilter+process.hcalNoiseFilter +
                                         process.countsHcalNoiseFilter +
                                         process.minimumBiasTTreeAnalysisHcalNoiseFilter +
+                                    process.multipleVertexVeto + 
+                                        process.countsMultipleVertexVeto +  
                                     process.etaMinFilter +
                                         process.countsEtaMinFilter +
                                         process.minimumBiasTTreeAnalysisEtaMinFilter +
@@ -202,6 +207,6 @@ if config.runOnMC:
     from Utilities.PyConfigTools.setAnalyzerAttributes import setAnalyzerAttributes
     setAnalyzerAttributes(process,'minimumBiasTTreeAnalysis',
                                   AccessMCInfo = True, 
-                                  HLTPath = "HLT_Jet30_v*",
+                                  HLTPath = "HLT_Physics_v*",
                                   CastorRecHitTag = 'castorreco', 
                                   TriggerResultsTag = cms.InputTag("TriggerResults","",config.triggerResultsProcessNameMC)) 

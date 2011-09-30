@@ -21,6 +21,7 @@ config.vertexTagName = 'analysisVertices'
 #---
 config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
 config.varyAttributes = False
+config.runPFlowThresholdAnalysis = True
 config.runOfflineOnly = True
 config.runNoColl = False
 config.runBPTX = False
@@ -154,7 +155,6 @@ process.rereco_step = cms.Path(process.caloTowersRec
                                ) # re-reco jets and met
 """
 if not config.runOnMC: process.castor_step = cms.Path(process.castorSequence)
-process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
 if not config.runOnMC: process.eventWeight_step = cms.Path(process.eventWeightSequence)
 process.reco_step = cms.Path(process.recoSequence)
 if config.runOnMC:
@@ -163,6 +163,8 @@ if config.runOnMC:
                                 process.genStableParticles*
                                 process.etaMaxGen+process.etaMinGen*
                                 process.edmNtupleEtaMaxGen+process.edmNtupleEtaMinGen)
+
+process.selection_step = cms.Path(process.eventSelectionBscMinBiasOR)
 
 # Path for event counting
 process.countsAll = countsAnalyzer.clone()
@@ -173,6 +175,7 @@ process.countsVertexFilter = countsAnalyzer.clone()
 process.countsBeamHaloVeto = countsAnalyzer.clone()
 process.countsFilterScraping = countsAnalyzer.clone()
 process.countsHcalNoiseFilter = countsAnalyzer.clone()
+process.countsMultipleVertexVeto = countsAnalyzer.clone()
 process.countsEtaMinFilter = countsAnalyzer.clone()
 process.countsCastorVeto = countsAnalyzer.clone()  
 process.countEvents_step = cms.Path(process.countsAll +
@@ -190,6 +193,8 @@ process.countEvents_step = cms.Path(process.countsAll +
                                     process.countsFilterScraping +
                                     process.HBHENoiseFilter+process.hcalNoiseFilter +
                                     process.countsHcalNoiseFilter +
+                                    process.multipleVertexVeto + 
+                                    process.countsMultipleVertexVeto +  
                                     process.etaMinFilter +
                                     process.countsEtaMinFilter +
                                     process.castorVeto +
@@ -254,10 +259,18 @@ makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR')
 makeAnalysis(process,config.trackAnalyzerName,'eventSelectionBscMinBiasOR')
 makeAnalysis(process,'pFlowHistos','eventSelectionBscMinBiasOR')
 makeAnalysis(process,'pFlowWithThresholdsHistos','eventSelectionBscMinBiasOR')
-makeAnalysis(process,'pFlowNoiseAnalyzer','eventSelectionBscMinBiasOR')
 
 if config.varyAttributes:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOR',attributes)
+
+if config.runPFlowThresholdAnalysis:
+    process.pfCandidateCollNew = cms.Sequence(process.pfCandidateHFEdges+process.pfCandidateNoiseThresholds)
+    process.recoSequence.replace(process.pfCandidateNoiseThresholds,process.pfCandidateCollNew)
+    makeAnalysis(process,'pFlowNoiseAnalyzer','eventSelectionBscMinBiasOR')
+
+    process.pFlowNoiseAnalyzerHFEdges = process.pFlowNoiseAnalyzer.clone( particleFlowTag = 'pfCandidateHFEdges' )
+    makeAnalysis(process,'pFlowNoiseAnalyzerHFEdges','eventSelectionBscMinBiasOR')
+
 
 if config.runOfflineOnly:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelection')
@@ -273,8 +286,8 @@ if config.runBPTX:
 if config.runNoColl:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORNoColl')
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasORBPTXOR')
-    makeAnalysis(process,'pFlowNoiseAnalyzer','eventSelectionBscMinBiasORNoColl')
-    makeAnalysis(process,'pFlowNoiseAnalyzer','eventSelectionBscMinBiasORBPTXOR')
+    #makeAnalysis(process,'pFlowNoiseAnalyzer','eventSelectionBscMinBiasORNoColl')
+    #makeAnalysis(process,'pFlowNoiseAnalyzer','eventSelectionBscMinBiasORBPTXOR')
 
 if config.runEtaMaxFilter:
     makeAnalysis(process,'minimumBiasTTreeAnalysis','eventSelectionBscMinBiasOREtaMaxFilter')

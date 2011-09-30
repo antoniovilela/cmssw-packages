@@ -12,11 +12,12 @@ from ForwardAnalysis.Utilities.PFCandidateNoiseStringCut import PFCandidateNoise
 from MinimumBiasAnalysis.MinimumBiasAnalysis.pfThresholds_new_cfi import pfThresholds
 
 #pfCandidateNoiseThresholds.cut = PFCandidateNoiseStringCut(pfThresholds).cut()
-pfStrCut1 = ExcludeHFEdgesStringCut().cut()
-pfStrCut2 = PFCandidateNoiseStringCut(pfThresholds).cut()
-pfStrCut = '%s & %s' % (pfStrCut1,pfStrCut2)
+pfStrCutHFEdges = ExcludeHFEdgesStringCut().cut()
+pfStrCutNoise = PFCandidateNoiseStringCut(pfThresholds).cut()
+pfStrCut = '%s & %s' % (pfStrCutHFEdges,pfStrCutNoise)
 pfCandidateNoiseThresholds.cut = pfStrCut
- 
+pfCandidateHFEdges = pfCandidateNoiseThresholds.clone( cut = pfStrCutHFEdges )
+
 from ForwardAnalysis.Utilities.etaMaxCandViewSelector_cfi import etaMaxCandViewSelector as etaMaxPFCands
 from ForwardAnalysis.Utilities.etaMinCandViewSelector_cfi import etaMinCandViewSelector as etaMinPFCands
 etaMaxPFCands.src = "pfCandidateNoiseThresholds"
@@ -51,12 +52,6 @@ etaMinFilter.src = "etaMinPFCands"
 etaMaxGenFilter = etaMaxFilter.clone(src = "etaMaxGen")
 etaMinGenFilter = etaMinFilter.clone(src = "etaMinGen")
 
-############
-analysisVertices = cms.EDFilter("VertexSelector",
-   src = cms.InputTag("offlinePrimaryVertices"),
-   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"),
-   filter = cms.bool(False),
-)
 ############
 from ForwardAnalysis.Utilities.castorActivityFilter_cfi import castorActivityFilter
 castorActivityFilter.CastorRecHitTag = "castorRecHitCorrector"
