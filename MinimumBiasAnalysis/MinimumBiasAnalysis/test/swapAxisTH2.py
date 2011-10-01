@@ -12,10 +12,10 @@ def swapAxisTH2(histo,hname=''):
     nBinsY = histo_new.GetNbinsY()
     if nBinsX != nBinsY: raise RuntimeError,'Only valid for same number of bins in X,Y'
 
-    for ibinX in range(nBinsX+2):
-        for ibinY in range(nBinsY+2):
+    for ibinX in range(1,nBinsX+1):
+        for ibinY in range(1,nBinsY+1):
             histo_new.SetBinContent(ibinX, ibinY, histo.GetBinContent(ibinY,ibinX))  
-
+            histo_new.SetBinError(ibinX, ibinY, histo.GetBinError(ibinY,ibinX))  
 
     ROOT.TH1.AddDirectory(AddDirectoryStatus_)
     return histo_new

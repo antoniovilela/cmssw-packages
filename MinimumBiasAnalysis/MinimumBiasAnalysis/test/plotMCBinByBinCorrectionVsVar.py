@@ -3,21 +3,36 @@ from scaleByWidth import scaleByWidth
 
 def unfoldData(h_VarData,h_VarRecoMC,h_VarGenMC,h_VarRecoVsGenMC,iterations=4):
 
+    nBinsReco = 15
+    nBinsGen = 15
+    from truncateHisto import truncateTH1F,truncateTH2F
+    h_VarReco_range = truncateTH1F(h_VarRecoMC,nBinsReco)
+    h_VarGen_range = truncateTH1F(h_VarGenMC,nBinsGen)
+ 
     from swapAxisTH2 import swapAxisTH2
-    h_VarGenVsReco = swapAxisTH2(h_VarRecoVsGenMC)
+    h_VarGenVsReco_swap = swapAxisTH2(h_VarRecoVsGenMC)
+    h_VarGenVsReco_range = truncateTH2F(h_VarGenVsReco_swap,nBinsReco,nBinsGen)
 
-    response = ROOT.RooUnfoldResponse(h_VarRecoMC,h_VarGenMC,h_VarRecoVsGenMC)
+    response = ROOT.RooUnfoldResponse(h_VarReco_range,h_VarGen_range,h_VarGenVsReco_range)
     unfold = ROOT.RooUnfoldBayes(response, h_VarData, iterations)
 
     h_VarData_unfold = unfold.Hreco()
     return h_VarData_unfold
 
-def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = "plus"):
+def multiplyHistos(histo,histoCorr):
+    for ibin in range(1,histo.GetNbinsX()+1):
+        scale = histoCorr.GetBinContent(ibin)
+        histo.SetBinContent(ibin, histo.GetBinContent(ibin)*scale)
+        histo.SetBinError(ibin, histo.GetBinError(ibin)*scale)
+
+def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNameUnfold = "", side = "plus"):
+    if not fileNameUnfold: fileNameUnfold = fileNameMCEff
+
     ROOT.TH1.AddDirectory(False)
 
     #intLumi = 20.322 # /mub
-    intLumi = 49.156 # /mub
-    #intLumi = 500000./71260.;
+    #intLumi = 49.156 # /mub
+    intLumi = 500000./71260.;
     sigmaMC = 71.26 # mb
     nLogXiBins = 2
     ###############################
@@ -44,10 +59,11 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = 
     #files_mc_eff = [] 
     file_mc_ref = ROOT.TFile(fileNameMCRef,'read')
     file_mc_eff = ROOT.TFile(fileNameMCEff,'read')
+    file_unfold = ROOT.TFile(fileNameUnfold,'read')
     h_EventSelection_mc_ref = file_mc_ref.Get("EventSelection")
-    h_VarReco_mc_eff        = file_mc_eff.Get( histoNames["VarReco"] )
-    h_VarGen_mc_eff         = file_mc_eff.Get( histoNames["VarGen"] )
-    h_VarRecoVsGen_mc_eff   = file_mc_eff.Get( histoNames["VarRecoVsGen"] )
+    h_VarReco_unfold        = file_unfold.Get( histoNames["VarReco"] )
+    h_VarGen_unfold         = file_unfold.Get( histoNames["VarGen"] )
+    h_VarRecoVsGen_unfold   = file_unfold.Get( histoNames["VarRecoVsGen"] )
 
     histos_VarLogXi_data = []
     histos_VarLogXi_data_unfold = []
@@ -69,9 +85,9 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = 
         ###############################
         # Unfolding
         histos_VarLogXi_data_unfold.append( unfoldData(histos_VarLogXi_data[-1],
-                                                       h_VarReco_mc_eff,
-                                                       h_VarGen_mc_eff,
-                                                       h_VarRecoVsGen_mc_eff, 8) )  
+                                                       h_VarReco_unfold,
+                                                       h_VarGen_unfold,
+                                                       h_VarRecoVsGen_unfold, 5) )  
         ###############################
         # Correction factor
         histos_corrVarLogXi.append( histos_VarLogXiGen[-1].Clone('corrVarLogXi_%d' % idx) )
@@ -89,7 +105,8 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, side = 
         # Correct data
         #histos_VarLogXi_data_corr.append( histos_VarLogXi_data[idx].Clone('VarLogXi_data_%d' % idx) )
         histos_VarLogXi_data_corr.append( histos_VarLogXi_data_unfold[idx].Clone('VarLogXi_data_%d' % idx) ) 
-        histos_VarLogXi_data_corr[-1].Multiply( histos_corrFullVarLogXi[-1] ) 
+        #histos_VarLogXi_data_corr[-1].Multiply( histos_corrFullVarLogXi[-1] ) 
+        multiplyHistos(histos_VarLogXi_data_corr[-1],histos_corrFullVarLogXi[-1])
         histos_VarLogXi_data_corr[-1].Scale(0.001/intLumi) # mb
 
         # MC before selection

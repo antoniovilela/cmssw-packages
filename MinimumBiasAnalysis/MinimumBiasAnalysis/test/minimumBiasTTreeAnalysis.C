@@ -74,6 +74,54 @@ void minimumBiasTTreeAnalysis(TTree* data,
                               int genType,
                               int processCategory,
                               int maxEvents, bool verbose) {
+   // Extra options
+   // FIXME
+   //=================================================================
+   // Xi correction factor
+   double EBeam = 3500.;
+   double xiCorrectionFactor = 2.0;
+   // Event selection
+   //=================================================================
+   bool doEtaMaxGenSelection = false;
+   bool doEtaMinGenSelection = false;
+   double etaMaxGenMax = 0.;
+   double etaMinGenMin = 0.; 
+   
+   bool doDeltaEtaGenSelection = false;
+   double deltaEtaGenMin = 3.0;
+
+   bool doLogXiGenPlusSelection  = false;
+   bool doLogXiGenMinusSelection = false;
+   double logXiGenPlusMax  = -5.5;
+   //double logXiGenPlusMax  = -6.5;
+   double logXiGenMinusMax = -5.0;
+   //=================================================================
+   bool doTriggerSelection = false;
+   bool doHcalNoiseSelection = false;
+   // Prim. vertices
+   bool doVertexSelection = false;
+   double primVtxZMax = 10.0;
+   // HF
+   bool doHFSelection = false;
+   double sumEnergyHFPlusMax = 99999.;
+   double sumEnergyHFMinusMax = 99999.;
+   // MET-SumET
+   bool doSumETSelection = false;
+   double sumETMin = 40.;
+   // Mx
+   bool doMxSelection = false;
+   double MxMin = 100.;
+   double MxMax = 999.;
+   // Xi
+   bool doXiPlusSelection = false;
+   bool doXiMinusSelection = false;
+   double xiMax = 0.01;
+   // EtaMax
+   bool doEtaMaxSelection = false;
+   bool doEtaMinSelection = false;
+   double etaMaxMax = 1.0;
+   double etaMinMin = -1.0;
+   //=================================================================
 
    std::cout << ">>> Reading TTree: " << data->GetName() << std::endl;
 
@@ -104,6 +152,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
       }
    }
 
+   // Reweighing 
+   //==========================
    TH1F h_reweightPosZVertex;
    if(accessMCInfo){
       TFile reweightVtxFile("reweightPosZVertex.root","read"); 
@@ -113,6 +163,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    }
 
    // Access event data
+   //==========================
    //EventData eventData;
    //setTTreeBranches(*data,eventData);
    MinimumBiasEventData* eventData_ptr = new MinimumBiasEventData;
@@ -120,12 +171,12 @@ void minimumBiasTTreeAnalysis(TTree* data,
    eventsBranch->SetAddress(&eventData_ptr);
    MinimumBiasEventData const& eventData = *eventData_ptr;
  
-   // Create output file
+   // Create output file and book histograms
+   //==========================
    TFile* hfile = new TFile(outFileName.c_str(),"recreate","data histograms");
 
    // Book Histograms
    //TH1::SetDefaultSumw2(true);
-
    HistoMapTH1F histosTH1F;
    bookHistos(histosTH1F,StdAllocatorAdaptor());
    HistoMapTH2F histosTH2F;
@@ -195,63 +246,10 @@ void minimumBiasTTreeAnalysis(TTree* data,
       for(size_t iprocess = 0; iprocess < processIDs.size(); ++iprocess) histosTH1F["ProcessId"] ->GetXaxis()->SetBinLabel(iprocess + 1,processNames[iprocess].c_str());
    }
 
+   // Event loop
    //==========================
-   bool doEtaMaxGenSelection = false;
-   bool doEtaMinGenSelection = false;
-   double etaMaxGenMax = 0.;
-   double etaMinGenMin = 0.; 
-   
-   bool doDeltaEtaGenSelection = false;
-   double deltaEtaGenMin = 3.0;
-
-   bool doLogXiGenPlusSelection  = true;
-   bool doLogXiGenMinusSelection = false;
-   double logXiGenPlusMax  = -5.5;
-   //double logXiGenPlusMax  = -6.5;
-   double logXiGenMinusMax = -5.0;
-
-   //==========================
-   // Event selection
-   bool doTriggerSelection = false;
-   bool doHcalNoiseSelection = false;
-   /*// Pre-selection
-   bool doGoodVertexSelection = false;
-   bool doHighQualityTracksSelection = true;*/
-   // Event selection
-   // Prim. vertices
-   bool doVertexSelection = false;
-   double primVtxZMax = 10.0;
-   // HF
-   bool doHFSelection = false;
-   double sumEnergyHFPlusMax = 99999.;
-   double sumEnergyHFMinusMax = 99999.;
-   // MET-SumET
-   bool doSumETSelection = false;
-   double sumETMin = 40.;
-   // Tracks
-   //bool doTrackSelection = false;
-   // Mx
-   bool doMxSelection = false;
-   double MxMin = 100.;
-   double MxMax = 999.;
-   // Xi
-   bool doXiPlusSelection = false;
-   bool doXiMinusSelection = false;
-   double xiMax = 0.01;
-   // EtaMax
-   bool doEtaMaxSelection = false;
-   bool doEtaMinSelection = false;
-   double etaMaxMax = 1.0;
-   double etaMinMin = -1.0;
-   //==========================
-
-   // Xi correction factor
-   double EBeam = 3500.;
-   double xiCorrectionFactor = 2.0;
-
    double eventWeight = 1.0;
    //std::vector<std::pair<int,int> > selectedEvents;
-   // Loop over the events
    int nEntries = data->GetEntries();
    for(int ientry = 0; ientry < nEntries; ++ientry){
       if((maxEvents > 0)&&(ientry == maxEvents)) break;
