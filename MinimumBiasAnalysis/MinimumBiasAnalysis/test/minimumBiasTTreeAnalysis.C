@@ -90,10 +90,10 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doDeltaEtaGenSelection = false;
    double deltaEtaGenMin = 3.0;
 
-   bool doLogXiGenPlusSelection  = false;
+   bool doLogXiGenPlusSelection  = true;
    bool doLogXiGenMinusSelection = false;
-   double logXiGenPlusMax  = -5.5;
-   //double logXiGenPlusMax  = -6.5;
+   //double logXiGenPlusMax  = -5.5;
+   double logXiGenPlusMax  = -6.5;
    double logXiGenMinusMax = -5.0;
    //=================================================================
    bool doTriggerSelection = false;
@@ -155,11 +155,17 @@ void minimumBiasTTreeAnalysis(TTree* data,
    // Reweighing 
    //==========================
    TH1F h_reweightPosZVertex;
+   TH1F h_reweightEffBscOr;
    if(accessMCInfo){
-      TFile reweightVtxFile("reweightPosZVertex.root","read"); 
-      TH1F* h_reweightPosZVertex_tmp = static_cast<TH1F*>( reweightVtxFile.Get("posZPrimVtx_ratio") );
+      TFile reweightVtxFile("reweight_posZPrimVtx_Pythia8Tune4C_eventSelectionAnalysis-v1.root","read"); 
+      TH1F* h_reweightPosZVertex_tmp = static_cast<TH1F*>( reweightVtxFile.Get("posZPrimVtx_reweight_range") );
       h_reweightPosZVertex = *h_reweightPosZVertex_tmp;
       reweightVtxFile.Close();
+
+      TFile reweightEffBscOrFile("reweight_eventSelectionBscMinBiasORVsBeamHaloVeto_Pythia8Tune4C_minimumBiasTTreeAnalysis-v5.root");
+      TH1F* h_reweightEffBscOr_tmp = static_cast<TH1F*>( reweightEffBscOrFile.Get("multiplicityTracks_reweight") );
+      h_reweightEffBscOr = *h_reweightEffBscOr_tmp;
+      reweightEffBscOrFile.Close();
    }
 
    // Access event data
@@ -269,16 +275,31 @@ void minimumBiasTTreeAnalysis(TTree* data,
       }
       if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with event...skipping" << std::endl;continue;}
 
-      // Re-weight
+      // Reweighing
       if(accessMCInfo){
          double weight_vtx = 1.;
          int ibin_vtx = h_reweightPosZVertex.FindBin( eventData.posZPrimVtx_ );
+         if(ibin_vtx == 0) ibin_vtx = 1;
+         if(ibin_vtx > h_reweightPosZVertex.GetNbinsX()) ibin_vtx = h_reweightPosZVertex.GetNbinsX();
          if( ibin_vtx >= 1 && ibin_vtx <= h_reweightPosZVertex.GetNbinsX() ){
             weight_vtx = h_reweightPosZVertex.GetBinContent(ibin_vtx);
          }else{
             weight_vtx = 0.;
          }
+    
+         double weight_eff = 1.;
+         double eff_variable = eventData.multiplicityTracks_;
+         int ibin_eff = h_reweightEffBscOr.FindBin( eff_variable );
+         if( ibin_eff >= 1 && ibin_eff <= h_reweightEffBscOr.GetNbinsX() ){
+            weight_eff = h_reweightEffBscOr.GetBinContent(ibin_eff);
+         }else{
+            weight_eff = 0.;
+         }
          // Apply weight
+         double weight_all = weight_vtx*weight_eff;
+         if(ientry%2000 == 0) std::cout << ">>> Event weight " << weight_all << std::endl
+                                        << "     BSC OR eff. " << weight_eff << std::endl
+                                        << "   Vertex Z pos. " << weight_vtx << std::endl;
          //eventWeight *= weight_vtx;   
       }      
 

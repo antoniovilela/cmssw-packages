@@ -19,6 +19,7 @@ config.outputTTreeFile = 'eventSelectionAnalysis_TTree_MinBias.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
+config.vertexTagName = 'analysisVertices'
 config.triggerResultsProcessNameMC = inputOptions.hltProcessNameMC
 #config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collisions10_JSON_v2_sub_132440.root'
 
@@ -39,7 +40,7 @@ process.MessageLogger.cerr.Analysis = cms.untracked.PSet(limit = cms.untracked.i
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring()
@@ -118,6 +119,7 @@ if config.runOnMC:
 from MinimumBiasAnalysis.MinimumBiasAnalysis.minimumBiasTTreeAnalysis_cfi import minimumBiasTTreeAnalysis
 minimumBiasTTreeAnalysis.EBeam = config.comEnergy/2.
 minimumBiasTTreeAnalysis.TrackTag = config.trackTagName
+minimumBiasTTreeAnalysis.VertexTag = config.vertexTagName
 process.minimumBiasTTreeAnalysisAll = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus = minimumBiasTTreeAnalysis.clone()
 process.minimumBiasTTreeAnalysisBPTX = minimumBiasTTreeAnalysis.clone()
@@ -184,6 +186,7 @@ process.countEvents_step = cms.Path(    process.countsAll +
                                         process.minimumBiasTTreeAnalysisHcalNoiseFilter +
                                     process.multipleVertexVeto + 
                                         process.countsMultipleVertexVeto +  
+                                        process.minimumBiasTTreeAnalysisMultipleVertexVeto +
                                     process.etaMinFilter +
                                         process.countsEtaMinFilter +
                                         process.minimumBiasTTreeAnalysisEtaMinFilter +

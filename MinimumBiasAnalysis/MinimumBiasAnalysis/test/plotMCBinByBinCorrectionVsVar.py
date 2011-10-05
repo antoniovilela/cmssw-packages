@@ -1,10 +1,11 @@
 import ROOT
+import math
 from scaleByWidth import scaleByWidth
 
 def unfoldData(h_VarData,h_VarRecoMC,h_VarGenMC,h_VarRecoVsGenMC,iterations=4):
 
-    nBinsReco = 15
-    nBinsGen = 15
+    nBinsReco = 10
+    nBinsGen = 10
     from truncateHisto import truncateTH1F,truncateTH2F
     h_VarReco_range = truncateTH1F(h_VarRecoMC,nBinsReco)
     h_VarGen_range = truncateTH1F(h_VarGenMC,nBinsGen)
@@ -17,13 +18,37 @@ def unfoldData(h_VarData,h_VarRecoMC,h_VarGenMC,h_VarRecoVsGenMC,iterations=4):
     unfold = ROOT.RooUnfoldBayes(response, h_VarData, iterations)
 
     h_VarData_unfold = unfold.Hreco()
-    return h_VarData_unfold
+    h_VarData_unfold_errors = h_VarData_unfold.Clone(h_VarData_unfold.GetName() + "_errors")
+    varData_unfold_errors = unfold.ErecoV()
+    for ibin in range(0,h_VarData_unfold_errors.GetNbinsX()):
+        print "Bin",ibin+1,"error",varData_unfold_errors[ibin]
+        h_VarData_unfold_errors.SetBinError(ibin+1,varData_unfold_errors[ibin])
 
-def multiplyHistos(histo,histoCorr):
+    return (h_VarData_unfold,h_VarData_unfold_errors)
+
+def scaleFromHisto(histo,histoCorr):
     for ibin in range(1,histo.GetNbinsX()+1):
         scale = histoCorr.GetBinContent(ibin)
         histo.SetBinContent(ibin, histo.GetBinContent(ibin)*scale)
         histo.SetBinError(ibin, histo.GetBinError(ibin)*scale)
+
+def addHistoErrors(histo,histoErr):
+    for ibin in range(1,histo.GetNbinsX()+1):
+        error = histo.GetBinError(ibin)
+        errorAdd = histoErr.GetBinError(ibin)
+        errorNew = math.sqrt(error*error + errorAdd*errorAdd)
+        print "Bin",ibin,"error orig.",error,"add error",errorAdd,"total",errorNew
+        histo.SetBinError(ibin, errorNew)
+
+def setErrorsFromHisto(histo,histoErr):
+    for ibin in range(1,histo.GetNbinsX()+1):
+	binContent = histo.GetBinContent(ibin)
+	corrValue = histoErr.GetBinContent(ibin)
+	corrError = histoErr.GetBinError(ibin)
+        errorNew = 0.
+        if corrValue > 0.: errorNew = binContent*(corrError/corrValue)
+        print "Bin",ibin,"value",binContent,"set error",errorNew
+	histo.SetBinError(ibin,errorNew)
 
 def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNameUnfold = "", side = "plus"):
     if not fileNameUnfold: fileNameUnfold = fileNameMCEff
@@ -32,7 +57,8 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
 
     #intLumi = 20.322 # /mub
     #intLumi = 49.156 # /mub
-    intLumi = 500000./71260.;
+    #intLumi = 500000./71260.
+    intLumi = 1816992./71260.
     sigmaMC = 71.26 # mb
     nLogXiBins = 2
     ###############################
@@ -67,13 +93,16 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
 
     histos_VarLogXi_data = []
     histos_VarLogXi_data_unfold = []
+    histos_VarLogXi_data_unfold_errors = []
+    histos_VarLogXi_data_corr_errors = []
+    histos_VarLogXi_data_corr = []
+    histos_VarLogXi_data_errors = []
     histos_VarLogXiGen_ref = []
     histos_VarLogXiGen = []
     histos_VarLogXi = []
     histos_corrVarLogXi = []
     histos_effVarLogXi = []
     histos_corrFullVarLogXi = []
-    histos_VarLogXi_data_corr = []
     histos_VarLogXiGen_ref_scaled = []
     for idx in range(nLogXiBins):
         histos_VarLogXi_data.append( file_data.Get("%s_%d" % (histoNames["VarRecoLogXi"],idx)) )  
@@ -84,10 +113,12 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
 
         ###############################
         # Unfolding
-        histos_VarLogXi_data_unfold.append( unfoldData(histos_VarLogXi_data[-1],
+        unfoldResult = unfoldData(histos_VarLogXi_data[-1],
                                                        h_VarReco_unfold,
                                                        h_VarGen_unfold,
-                                                       h_VarRecoVsGen_unfold, 5) )  
+                                                       h_VarRecoVsGen_unfold, 8)  
+        histos_VarLogXi_data_unfold.append( unfoldResult[0] )
+        histos_VarLogXi_data_unfold_errors.append( unfoldResult[1] )
         ###############################
         # Correction factor
         histos_corrVarLogXi.append( histos_VarLogXiGen[-1].Clone('corrVarLogXi_%d' % idx) )
@@ -106,8 +137,18 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
         #histos_VarLogXi_data_corr.append( histos_VarLogXi_data[idx].Clone('VarLogXi_data_%d' % idx) )
         histos_VarLogXi_data_corr.append( histos_VarLogXi_data_unfold[idx].Clone('VarLogXi_data_%d' % idx) ) 
         #histos_VarLogXi_data_corr[-1].Multiply( histos_corrFullVarLogXi[-1] ) 
-        multiplyHistos(histos_VarLogXi_data_corr[-1],histos_corrFullVarLogXi[-1])
+        scaleFromHisto(histos_VarLogXi_data_corr[-1],histos_corrFullVarLogXi[-1])
         histos_VarLogXi_data_corr[-1].Scale(0.001/intLumi) # mb
+        # Errors
+        # Errors from correction factors
+        histos_VarLogXi_data_corr_errors.append( histos_VarLogXi_data_corr[-1].Clone('VarLogXi_data_corr_errors_%d' % idx) )
+        setErrorsFromHisto(histos_VarLogXi_data_corr_errors[-1],histos_corrFullVarLogXi[-1])
+        # Unfolding errors
+        scaleFromHisto(histos_VarLogXi_data_unfold_errors[-1],histos_corrFullVarLogXi[-1])
+        histos_VarLogXi_data_unfold_errors[-1].Scale(0.001/intLumi) # mb
+        # Sum all errors 
+        histos_VarLogXi_data_errors.append( histos_VarLogXi_data_corr_errors[-1].Clone('VarLogXi_data_errors_%d' % idx) )
+        addHistoErrors(histos_VarLogXi_data_errors[-1],histos_VarLogXi_data_unfold_errors[-1])
 
         # MC before selection
         histos_VarLogXiGen_ref_scaled.append( histos_VarLogXiGen_ref[-1].Clone('VarLogXiGen_ref_scaled_%d' % idx) )
@@ -119,10 +160,11 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
     histos = []
     lineStyles = (1,2,3)
     markerStylesData = (21,24,25)
+    fillColorsData = (5,38,9)
     canvases.append(ROOT.TCanvas("c_effVarLogXi","effVarLogXi"))
     for idx in range(len(histos_effVarLogXi)):
-        histos_effVarLogXi[idx].GetXaxis().SetTitle("N_{trk}")
-        histos_effVarLogXi[idx].GetYaxis().SetTitle("#varepsilon^{MC}(N_{trk};#xi)")
+        histos_effVarLogXi[idx].GetXaxis().SetTitle("N_{chg}")
+        histos_effVarLogXi[idx].GetYaxis().SetTitle("#varepsilon^{MC}(N_{chg};#xi)")
         histos_effVarLogXi[idx].SetLineStyle( lineStyles[idx] )
         histos_effVarLogXi[idx].SetStats(0)
         if idx == 0: histos_effVarLogXi[idx].Draw()
@@ -131,7 +173,7 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
 
     canvases.append(ROOT.TCanvas("c_corrVarLogXi","corrVarLogXi"))
     for idx in range(len(histos_corrVarLogXi)):
-        histos_corrVarLogXi[idx].GetXaxis().SetTitle("N_{trk}")
+        histos_corrVarLogXi[idx].GetXaxis().SetTitle("N_{chg}")
         histos_corrVarLogXi[idx].GetYaxis().SetTitle("N(#xi^{Gen} #epsilon bin i)/N(#xi^{PF} #epsilon bin i)")
         histos_corrVarLogXi[idx].SetLineStyle( lineStyles[idx] )
         histos_corrVarLogXi[idx].SetStats(0)
@@ -141,8 +183,8 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
   
     canvases.append(ROOT.TCanvas("c_corrFullVarLogXi","corrFullVarLogXi"))
     for idx in range(len(histos_corrFullVarLogXi)):
-        histos_corrFullVarLogXi[idx].GetXaxis().SetTitle("N_{trk}")
-        histos_corrFullVarLogXi[idx].GetYaxis().SetTitle("#frac{1}{#varepsilon(N_{trk};#xi)}#frac{N(#xi^{Gen} #epsilon bin i)}{N(#xi^{PF} #epsilon bin i)}")
+        histos_corrFullVarLogXi[idx].GetXaxis().SetTitle("N_{chg}")
+        histos_corrFullVarLogXi[idx].GetYaxis().SetTitle("#frac{1}{#varepsilon(N_{chg};#xi)}#frac{N(#xi^{Gen} #epsilon bin i)}{N(#xi^{PF} #epsilon bin i)}")
         histos_corrFullVarLogXi[idx].SetLineStyle( lineStyles[idx] )
         histos_corrFullVarLogXi[idx].SetStats(0)
         if idx == 0: histos_corrFullVarLogXi[idx].Draw()
@@ -151,15 +193,25 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
 
     canvases.append(ROOT.TCanvas("c_VarLogXi_data_corr","VarLogXi_data_corr"))
     for idx in range(len(histos_VarLogXi_data_corr)):
-        histos_VarLogXi_data_corr[idx].GetXaxis().SetTitle("N_{trk}")
-        histos_VarLogXi_data_corr[idx].GetYaxis().SetTitle("d#sigma/dN_{trk} (#xi) (mb)")
+        histos_VarLogXi_data_errors[idx].GetXaxis().SetTitle("N_{chg}")
+        histos_VarLogXi_data_errors[idx].GetYaxis().SetTitle("d#sigma/dN_{chg} (#xi) (mb)")
+        histos_VarLogXi_data_errors[idx].SetMarkerSize(0.)
+        histos_VarLogXi_data_errors[idx].SetFillColor( fillColorsData[idx] )
+        histos_VarLogXi_data_errors[idx].SetStats(0)
+
+        histos_VarLogXi_data_corr[idx].GetXaxis().SetTitle("N_{chg}")
+        histos_VarLogXi_data_corr[idx].GetYaxis().SetTitle("d#sigma/dN_{chg} (#xi) (mb)")
         histos_VarLogXi_data_corr[idx].SetMarkerStyle( markerStylesData[idx] )
         histos_VarLogXi_data_corr[idx].SetMarkerSize(1.6)
         histos_VarLogXi_data_corr[idx].SetStats(0)
 
         scaleByWidth(histos_VarLogXi_data_corr[idx])
-        if idx == 0: histos_VarLogXi_data_corr[idx].Draw()
-        else:        histos_VarLogXi_data_corr[idx].Draw("SAME")
+        scaleByWidth(histos_VarLogXi_data_errors[idx])
+        #if idx == 0: histos_VarLogXi_data_corr[idx].Draw()
+        #else:        histos_VarLogXi_data_corr[idx].Draw("SAME")
+        if idx == 0: histos_VarLogXi_data_errors[idx].Draw("E2")
+        else:        histos_VarLogXi_data_errors[idx].Draw("E2SAME")
+        histos_VarLogXi_data_corr[idx].Draw("SAME")
 
         histos_VarLogXiGen_ref_scaled[idx].SetLineStyle( lineStyles[idx] )
         histos_VarLogXiGen_ref_scaled[idx].SetLineColor(2)
@@ -167,6 +219,7 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
         scaleByWidth(histos_VarLogXiGen_ref_scaled[idx])
         histos_VarLogXiGen_ref_scaled[idx].Draw("HISTOSAME")
     histos.append(histos_VarLogXi_data_corr)
+    histos.append(histos_VarLogXi_data_errors)
     histos.append(histos_VarLogXiGen_ref_scaled)
 
     return (canvases,histos)
