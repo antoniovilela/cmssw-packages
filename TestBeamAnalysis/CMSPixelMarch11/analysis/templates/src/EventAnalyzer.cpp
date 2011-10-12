@@ -47,26 +47,30 @@ void EventAnalyzer::analyze(int maxEvents)
   // Book Histos
   rootFile_->cd();
   TH1::SetDefaultSumw2(true);
-  histosTH1F_["clusterChargeOnDUT"] = new TH1F("clusterChargeOnDUT","clusterChargeOnDUT",100,-50.,200.);
-  histosTH1F_["clusterSizeOnDUT"] = new TH1F("clusterSizeOnDUT","clusterSizeOnDUT",10,0,10);
-  histosTH1F_["clusterMatchChargeOnDUT"] = new TH1F("clusterMatchChargeOnDUT","clusterMatchChargeOnDUT",100,-50.,200.);
-  histosTH1F_["clusterMatchSizeOnDUT"] = new TH1F("clusterMatchSizeOnDUT","clusterMatchSizeOnDUT",10,0,10);
-  histosTH1F_["clusterMatchResidualX"] = new TH1F("clusterMatchResidualX","clusterMatchResidualX",100,-2.,2.);  
-  histosTH1F_["clusterMatchResidualY"] = new TH1F("clusterMatchResidualY","clusterMatchResidualY",100,-2.,2.);  
-  histosTH1F_["clusterMatchAcceptResidualX"] = new TH1F("clusterMatchAcceptResidualX","clusterMatchAcceptResidualX",100,-2.,2.);  
-  histosTH1F_["clusterMatchAcceptResidualY"] = new TH1F("clusterMatchAcceptResidualY","clusterMatchAcceptResidualY",100,-2.,2.);  
-  // From tracks
-  histosTH1F_["clusterCharge"] = new TH1F("clusterCharge","clusterCharge",100,-50.,200.);
-  histosTH1F_["trackResidualX"] = new TH1F("trackResidualX","trackResidualX",100,-2.,2.);
-  histosTH1F_["trackResidualY"] = new TH1F("trackResidualY","trackResidualY",100,-2.,2.);
 
   int nBinsX = 40;
   int nBinsY = 60;
   double widthDUT = 8.10;
+  int nBinsRes = 800;
+  // Tracks
+  histosTH1F_["ndofTrack"] = new TH1F("ndofTrack","ndofTrack",15,0,15);
+  histosTH1F_["chi2Track"] = new TH1F("chi2Track","chi2Track",100,0.,100.);
   histosTH2F_["posTrackOnDUT"] = new TH2F("posTrackOnDUT","posTrackOnDUT",nBinsX,0.,widthDUT,nBinsY,0.,widthDUT);
+  
+  // DUT clusters 
+  histosTH1F_["clusterChargeOnDUT"] = new TH1F("clusterChargeOnDUT","clusterChargeOnDUT",300,-100.,500.);
+  histosTH1F_["clusterSizeOnDUT"] = new TH1F("clusterSizeOnDUT","clusterSizeOnDUT",10,0,10);
+  histosTH2F_["posClusterOnDUT"] = new TH2F("posClusterOnDUT","posClusterOnDUT",nBinsX,0.,widthDUT,nBinsY,0.,widthDUT);
+
+  // Cluster/track match on DUT 
+  histosTH1F_["clusterMatchChargeOnDUT"] = new TH1F("clusterMatchChargeOnDUT","clusterMatchChargeOnDUT",100,-50.,200.);
+  histosTH1F_["clusterMatchSizeOnDUT"] = new TH1F("clusterMatchSizeOnDUT","clusterMatchSizeOnDUT",10,0,10);
+  histosTH1F_["clusterMatchResidualX"] = new TH1F("clusterMatchResidualX","clusterMatchResidualX",nBinsRes,-2.,2.);  
+  histosTH1F_["clusterMatchResidualY"] = new TH1F("clusterMatchResidualY","clusterMatchResidualY",nBinsRes,-2.,2.);  
+  histosTH1F_["clusterMatchAcceptResidualX"] = new TH1F("clusterMatchAcceptResidualX","clusterMatchAcceptResidualX",nBinsRes,-2.,2.);  
+  histosTH1F_["clusterMatchAcceptResidualY"] = new TH1F("clusterMatchAcceptResidualY","clusterMatchAcceptResidualY",nBinsRes,-2.,2.);  
   histosTH2F_["posTrackMatchOnDUT"] = new TH2F("posTrackMatchOnDUT","posTrackMatchOnDUT",nBinsX,0.,widthDUT,nBinsY,0.,widthDUT);
   histosTH2F_["posTrackMatchAcceptOnDUT"] = new TH2F("posTrackMatchAcceptOnDUT","posTrackMatchAcceptOnDUT",nBinsX,0.,widthDUT,nBinsY,0.,widthDUT);
-  histosTH2F_["posClusterOnDUT"] = new TH2F("posClusterOnDUT","posClusterOnDUT",nBinsX,0.,widthDUT,nBinsY,0.,widthDUT);
   histosTH2F_["posClusterMatchOnDUT"] = new TH2F("posClusterMatchOnDUT","posClusterMatchOnDUT",nBinsX,0.,widthDUT,nBinsY,0.,widthDUT);
   histosTH2F_["posClusterMatchAcceptOnDUT"] = new TH2F("posClusterMatchAcceptOnDUT","posClusterMatchAcceptOnDUT",nBinsX,0.,widthDUT,nBinsY,0.,widthDUT);
   histosTH2F_["hitsClusterMatchOnDUT"] = new TH2F("hitsClusterMatchOnDUT","hitsClusterMatchOnDUT",52,0,52,80,0,80);
@@ -76,10 +80,14 @@ void EventAnalyzer::analyze(int maxEvents)
   histosTH2F_["hitMaxADCClusterMatchAcceptOnDUT"] = new TH2F("hitMaxADCClusterMatchAcceptOnDUT","hitMaxADCClusterMatchAcceptOnDUT",52,0,52,80,0,80);
   histosTH2F_["adcMaxADCClusterMatchAcceptOnDUT"] = new TH2F("adcMaxADCClusterMatchAcceptOnDUT","adcMaxADCClusterMatchAcceptOnDUT",52,0,52,80,0,80);
 
-  // From tracks
-  histosTH2F_["clustersXY"] = new TH2F("clustersXY","clustersXY",nBinsX,0.,widthDUT,nBinsY,0.,widthDUT);
-  histosTH2F_["hitsDUT"] = new TH2F("hitsDUT","hitsDUT",52,0,52,80,0,80);
-  histosTH2F_["adcDUT"] = new TH2F("adcDUT","adcDUT",52,0,52,80,0,80);
+  // DUT hits from tracks
+  histosTH1F_["clusterChargeFromTrack"] = new TH1F("clusterChargeFromTrack","clusterChargeFromTrack",300,-100.,500.);
+  histosTH1F_["clusterResidualXFromTrack"] = new TH1F("clusterResidualXFromTrack","clusterResidualXFromTrack",nBinsRes,-2.,2.);
+  histosTH1F_["clusterResidualYFromTrack"] = new TH1F("clusterResidualYFromTrack","clusterResidualYFromTrack",nBinsRes,-2.,2.);
+  histosTH2F_["clustersXYFromTrack"] = new TH2F("clustersXYFromTrack","clustersXYFromTrack",nBinsX,0.,widthDUT,nBinsY,0.,widthDUT);
+  histosTH2F_["hitsDUTFromTrack"] = new TH2F("hitsDUTFromTrack","hitsDUTFromTrack",52,0,52,80,0,80);
+  histosTH2F_["adcDUTFromTrack"] = new TH2F("adcDUTFromTrack","adcDUTFromTrack",52,0,52,80,0,80);
+
 
   // Retrieve from file the number of stored events  
   unsigned int numberOfEvents = reader_->getNumberOfEvents() ;
@@ -171,13 +179,17 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
     
     // Track selection
     double ndof = trackPoints[tr].size() - 4;
-    //if( chi2[tr] > 5 ) continue;
-    if(ndof < 2) continue;
+    double chi2_trk = chi2[tr];
+    histosTH1F_["ndofTrack"]->Fill(ndof);
+    histosTH1F_["chi2Track"]->Fill(chi2_trk);
+
+    if( ndof < 2 ) continue;
+    if( chi2_trk > 10. ) continue;
 
     // Get the track impact point on DUT in the local detector frame
     double xp, yp, tmp;
     dut->getPredicted( tParameters, xp, yp );
-    Detector::xyPair predPair = dut->getTrackErrorsOnPlane( fittedTracks[tr], fittedTrackCovariance[tr] );
+    Detector::xyPair trackErrorOnDUT = dut->getTrackErrorsOnPlane( fittedTracks[tr], fittedTrackCovariance[tr] );
 
     // Check if the impact point is on the dut surface
     if( xp < 0 || xp > dut->getDetectorLengthX(true) || 
@@ -209,8 +221,8 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
 
        /*// Get the track error and sum to the cluster error
        double nSigma = 5;
-       double xWindow = predPair.first  + xErr_cl*xErr_cl; xWindow = sqrt(xWindow);
-       double yWindow = predPair.second + yErr_cl*yErr_cl; yWindow = sqrt(yWindow);
+       double xWindow = trackErrorOnDUT.first  + xErr_cl*xErr_cl; xWindow = sqrt(xWindow);
+       double yWindow = trackErrorOnDUT.second + yErr_cl*yErr_cl; yWindow = sqrt(yWindow);
        if( fabs(distX_cl) > nSigma*xWindow ) continue;
        if( fabs(distY_cl) > nSigma*yWindow ) continue;*/
 
@@ -267,8 +279,8 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
 
        // Get the track error and sum to the cluster error
        double nSigma = 3;
-       double xWindow = predPair.first  + xErr_cl*xErr_cl; xWindow = sqrt(xWindow);
-       double yWindow = predPair.second + yErr_cl*yErr_cl; yWindow = sqrt(yWindow);
+       double xWindow = trackErrorOnDUT.first  + xErr_cl*xErr_cl; xWindow = sqrt(xWindow);
+       double yWindow = trackErrorOnDUT.second + yErr_cl*yErr_cl; yWindow = sqrt(yWindow);
        ss_.str(""); ss_ << "  dist(X),dist(Y),X,Y window = "
                         << std::setprecision(4) << " " 
                         << std::setw(10) << distX_cl
@@ -300,8 +312,8 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
        xcl_trk = clusters[detectorName][ clusterNumber ]["x"];
        ycl_trk = clusters[detectorName][ clusterNumber ]["y"];
        charge = clusters[detectorName][ clusterNumber ]["charge"];
-       histosTH1F_["clusterCharge"]->Fill(charge);
-       histosTH2F_["clustersXY"]->Fill(xcl_trk/100,ycl_trk/100);
+       histosTH1F_["clusterChargeFromTrack"]->Fill(charge);
+       histosTH2F_["clustersXYFromTrack"]->Fill(xcl_trk/100,ycl_trk/100);
 
        unsigned int nHitsClusters = (unsigned int)clustersHits[detectorName][ clusterNumber ].size();
        for(int h = 0; h < nHitsClusters; ++h){
@@ -309,8 +321,8 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
           row = clustersHits[detectorName][ clusterNumber ][h]["row"];
           col = clustersHits[detectorName][ clusterNumber ][h]["col"];
           adc = clustersHits[detectorName][ clusterNumber ][h]["adc"];
-          histosTH2F_["hitsDUT"]->Fill(col,row);
-          histosTH2F_["adcDUT"]->Fill(col,row,adc);
+          histosTH2F_["hitsDUTFromTrack"]->Fill(col,row);
+          histosTH2F_["adcDUTFromTrack"]->Fill(col,row,adc);
        }
 
        // Compute the local coordinate from the global ones
@@ -325,15 +337,15 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
        // Compute the x and y distances between mesured and predicted point
        double distX = ( xcl_trk - xp );
        double distY = ( ycl_trk - yp );
-       histosTH1F_["trackResidualX"]->Fill(distX/100);
-       histosTH1F_["trackResidualY"]->Fill(distY/100);
+       histosTH1F_["clusterResidualXFromTrack"]->Fill(distX/100);
+       histosTH1F_["clusterResidualYFromTrack"]->Fill(distY/100);
 
        // Get the track error and sum to the cluster error
-       //Detector::xyPair predPair = dut->getTrackErrorsOnPlane( fittedTracks[tr], fittedTrackCovariance[tr] );
+       //Detector::xyPair trackErrorOnDUT = dut->getTrackErrorsOnPlane( fittedTracks[tr], fittedTrackCovariance[tr] );
        double xErr = clusters[detectorName][ clusterNumber ]["xErr"];
        double yErr = clusters[detectorName][ clusterNumber ]["yErr"];
-       double xWindow = predPair.first  + xErr*xErr;
-       double yWindow = predPair.second + yErr*yErr;
+       double xWindow = trackErrorOnDUT.first  + xErr*xErr;
+       double yWindow = trackErrorOnDUT.second + yErr*yErr;
        // If the point is within n sigma got a hit
        double nSigma = 2;
        if( fabs(distX) > nSigma*sqrt(xWindow) ) continue;

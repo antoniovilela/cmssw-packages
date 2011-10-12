@@ -10,6 +10,8 @@
 #include "ReaderTemplate.h"
 #include "EventAnalyzer.h"
 
+#include <cstdlib>
+
 //====================================================================
 int main(int argv, char **args)
 {
@@ -30,14 +32,19 @@ int main(int argv, char **args)
   // associated quantities (tracks have a provenance with pointers to the used
   // hits in the telescope planes). The associated geometry file contains the
   // telescope description and the correctly aligned telescope planes.
-  std::string pathName,fileName,geomFileName; 
+  std::string pathName,fileName,geomFileName,inputNumEventsStr; 
   std::cout << "Path name = ";
   std::cin >> pathName;
   std::cout << "ROOT file name = ";
   std::cin >> fileName;
   std::cout << "Geometry file name = ";
   std::cin >> geomFileName;
- 
+  std::cout << "Number of events to analyze = ";
+  std::cin >> inputNumEventsStr;
+
+  int maxEvents = atoi( inputNumEventsStr.c_str() );
+  std::cout << "...Will analyze " << maxEvents << " events." << std::endl;
+  
   reader->setPath(pathName) ;
   reader->openFile(fileName);
   reader->openFile(geomFileName);
@@ -52,7 +59,7 @@ int main(int argv, char **args)
   // allow user manipulation of the event components (hits, clusters and 
   // reconstructed tracks)
   EventAnalyzer * analyzer = new EventAnalyzer(reader) ;
-  int maxEvents = -1;
+  //int maxEvents = 400000;
   analyzer->analyze(maxEvents); 
   
   //app.Run() ;
