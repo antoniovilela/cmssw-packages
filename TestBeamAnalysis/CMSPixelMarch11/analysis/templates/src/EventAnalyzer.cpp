@@ -79,6 +79,10 @@ void EventAnalyzer::analyze(int maxEvents)
   histosTH2F_["adcMaxADCClusterMatchOnDUT"] = new TH2F("adcMaxADCClusterMatchOnDUT","adcMaxADCClusterMatchOnDUT",52,0,52,80,0,80);
   histosTH2F_["hitMaxADCClusterMatchAcceptOnDUT"] = new TH2F("hitMaxADCClusterMatchAcceptOnDUT","hitMaxADCClusterMatchAcceptOnDUT",52,0,52,80,0,80);
   histosTH2F_["adcMaxADCClusterMatchAcceptOnDUT"] = new TH2F("adcMaxADCClusterMatchAcceptOnDUT","adcMaxADCClusterMatchAcceptOnDUT",52,0,52,80,0,80);
+  histosTH2F_["clusterMatchAcceptResidualXVsPosX"] = new TH2F("clusterMatchAcceptResidualXVsPosX","clusterMatchAcceptResidualXVsPosX",nBinsX,0.,widthDUT,nBinsRes,-2.,2.);  
+  histosTH2F_["clusterMatchAcceptResidualXVsPosY"] = new TH2F("clusterMatchAcceptResidualXVsPosY","clusterMatchAcceptResidualXVsPosY",nBinsY,0.,widthDUT,nBinsRes,-2.,2.);  
+  histosTH2F_["clusterMatchAcceptResidualYVsPosX"] = new TH2F("clusterMatchAcceptResidualYVsPosX","clusterMatchAcceptResidualYVsPosX",nBinsX,0.,widthDUT,nBinsRes,-2.,2.);  
+  histosTH2F_["clusterMatchAcceptResidualYVsPosY"] = new TH2F("clusterMatchAcceptResidualYVsPosY","clusterMatchAcceptResidualYVsPosY",nBinsY,0.,widthDUT,nBinsRes,-2.,2.);  
 
   // DUT hits from tracks
   histosTH1F_["clusterChargeFromTrack"] = new TH1F("clusterChargeFromTrack","clusterChargeFromTrack",300,-100.,500.);
@@ -304,6 +308,10 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
        histosTH2F_["posTrackMatchAcceptOnDUT"]->Fill(xp/100,yp/100);
        histosTH1F_["clusterMatchAcceptResidualX"]->Fill(distX_cl/100);
        histosTH1F_["clusterMatchAcceptResidualY"]->Fill(distY_cl/100);
+       histosTH2F_["clusterMatchAcceptResidualXVsPosX"]->Fill(xp/100,distX_cl/100);
+       histosTH2F_["clusterMatchAcceptResidualXVsPosY"]->Fill(yp/100,distX_cl/100);
+       histosTH2F_["clusterMatchAcceptResidualYVsPosX"]->Fill(xp/100,distY_cl/100);
+       histosTH2F_["clusterMatchAcceptResidualYVsPosY"]->Fill(yp/100,distY_cl/100);
        histosTH2F_["hitMaxADCClusterMatchAcceptOnDUT"]->Fill(colMaxADC,rowMaxADC);
        histosTH2F_["adcMaxADCClusterMatchAcceptOnDUT"]->Fill(colMaxADC,rowMaxADC,adcMax);
     }
