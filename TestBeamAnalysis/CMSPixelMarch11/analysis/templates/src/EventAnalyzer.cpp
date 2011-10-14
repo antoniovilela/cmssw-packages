@@ -23,8 +23,8 @@ EventAnalyzer::EventAnalyzer(EventReader * reader):
    theHeader_( reader->getEventHeaderPointer() ),
    theEvent_( reader->getEventPointer() ),
    theGeometry_( reader->getGeometryPointer() ),
-   hit_(0),hitcl_(0),
-   total_(0),totalcl_(0){
+   hittrk_(0),hitcl_(0),
+   totaltrk_(0),totalcl_(0){
 
   std::string outFileName = reader_->getFileName();
   outFileName.replace(outFileName.find(".root"),5,"_analysis.root");
@@ -95,8 +95,8 @@ void EventAnalyzer::analyze(int maxEvents)
   STDLINE(ss_.str(),ACYellow) ;
   STDLINE("       ",ACYellow) ;
 
-  hit_=0  ;
-  total_=0;
+  hitcl_=0;hittrk_=0;
+  totalcl_=0;totaltrk_=0;
   for(unsigned int event = 0; event < numberOfEvents; ++event)
   {
     if(maxEvents >= 0 && event > maxEvents) break;
@@ -104,6 +104,7 @@ void EventAnalyzer::analyze(int maxEvents)
     reader_->readEvent(event) ;
     this->analyzeEvent(event) ;   
   }
+
   rootFile_->cd();
   histosTH2F_["efficiencyVsPosClusterOnDUT"] = static_cast<TH2F*>(histosTH2F_["posClusterMatchAcceptOnDUT"]->Clone("efficiencyVsPosClusterOnDUT"));
   histosTH2F_["efficiencyVsPosClusterOnDUT"]->Divide(histosTH2F_["posClusterMatchOnDUT"]);
@@ -111,19 +112,23 @@ void EventAnalyzer::analyze(int maxEvents)
   histosTH2F_["efficiencyVsPixelOnDUT"]->Divide(histosTH2F_["hitMaxADCClusterMatchOnDUT"]);
   histosTH2F_["efficiencyVsPosTrackOnDUT"] = static_cast<TH2F*>(histosTH2F_["posTrackMatchAcceptOnDUT"]->Clone("efficiencyVsPosTrackOnDUT"));
   histosTH2F_["efficiencyVsPosTrackOnDUT"]->Divide(histosTH2F_["posTrackOnDUT"]);
-  rootFile_->Write();
-  rootFile_->Close();
   
   double efficencycl = -1.;
   if(totalcl_) efficencycl = (1.*hitcl_)/(1.*totalcl_) * 100.;
   std::cout << "efficency (cluster) = " << efficencycl << std::endl;
   std::cout << "       total tracks = " << totalcl_    << std::endl;
   std::cout << "       hits         = " << hitcl_      << std::endl;
-  double efficency = -1.;
-  if(total_) efficency = (1.*hit_)/(1.*total_) * 100.;
-  std::cout << "efficency (tracks) = " << efficency << std::endl;
-  std::cout << "      total tracks = " << total_    << std::endl;
-  std::cout << "      hits         = " << hit_      << std::endl;
+  double efficencytrk = -1.;
+  if(totaltrk_) efficencytrk = (1.*hittrk_)/(1.*totaltrk_) * 100.;
+  std::cout << "efficency (tracks) = " << efficencytrk << std::endl;
+  std::cout << "      total tracks = " << totaltrk_    << std::endl;
+  std::cout << "      hits         = " << hittrk_      << std::endl;
+  histosTH1F_["efficiency"] = new TH1F("efficiency","efficiency",2,0,2);
+  histosTH1F_["efficiency"]->SetBinContent(1,efficencycl);
+  histosTH1F_["efficiency"]->SetBinContent(2,efficencytrk);
+    
+  rootFile_->Write();
+  rootFile_->Close();
 }
 
 //====================================================================
@@ -184,7 +189,7 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
     histosTH1F_["chi2Track"]->Fill(chi2_trk);
 
     if( ndof < 2 ) continue;
-    if( chi2_trk > 10. ) continue;
+    if( chi2_trk > 5. ) continue;
 
     // Get the track impact point on DUT in the local detector frame
     double xp, yp, tmp;
@@ -195,7 +200,7 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
     if( xp < 0 || xp > dut->getDetectorLengthX(true) || 
         yp < 0 || yp > dut->getDetectorLengthY(true)   ) continue;
 
-    ++total_;
+    ++totaltrk_;
     ++totalcl_;
     histosTH2F_["posTrackOnDUT"]->Fill(xp/100,yp/100);
     // Loop on clusters directly and find best match
@@ -350,7 +355,7 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
        double nSigma = 2;
        if( fabs(distX) > nSigma*sqrt(xWindow) ) continue;
        if( fabs(distY) > nSigma*sqrt(yWindow) ) continue;
-       ++hit_;
+       ++hittrk_;
     }
   } // track candidates
 }

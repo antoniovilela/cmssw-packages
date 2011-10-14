@@ -33,7 +33,7 @@ class EventAnalyzer
    EventHeader * theHeader_   ;
    Geometry    * theGeometry_ ;
    
-   int hit_,hitcl_,total_,totalcl_;
+   int hittrk_,hitcl_,totaltrk_,totalcl_;
    TFile* rootFile_;
    std::map<std::string,TH1F*> histosTH1F_;
    std::map<std::string,TH2F*> histosTH2F_;
