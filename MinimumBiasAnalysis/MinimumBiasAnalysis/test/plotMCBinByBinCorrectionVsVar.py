@@ -4,8 +4,8 @@ from scaleByWidth import scaleByWidth
 
 def unfoldData(h_VarData,h_VarRecoMC,h_VarGenMC,h_VarRecoVsGenMC,iterations=4):
 
-    nBinsReco = 10
-    nBinsGen = 10
+    nBinsReco = 7
+    nBinsGen = 7
     from truncateHisto import truncateTH1F,truncateTH2F
     h_VarReco_range = truncateTH1F(h_VarRecoMC,nBinsReco)
     h_VarGen_range = truncateTH1F(h_VarGenMC,nBinsGen)
@@ -14,8 +14,10 @@ def unfoldData(h_VarData,h_VarRecoMC,h_VarGenMC,h_VarRecoVsGenMC,iterations=4):
     h_VarGenVsReco_swap = swapAxisTH2(h_VarRecoVsGenMC)
     h_VarGenVsReco_range = truncateTH2F(h_VarGenVsReco_swap,nBinsReco,nBinsGen)
 
-    response = ROOT.RooUnfoldResponse(h_VarReco_range,h_VarGen_range,h_VarGenVsReco_range)
+    #response = ROOT.RooUnfoldResponse(h_VarReco_range,h_VarGen_range,h_VarGenVsReco_range)
+    response = ROOT.RooUnfoldResponse(0,0,h_VarGenVsReco_range)
     unfold = ROOT.RooUnfoldBayes(response, h_VarData, iterations)
+    #unfold = ROOT.RooUnfoldBinByBin(response, h_VarData)
 
     h_VarData_unfold = unfold.Hreco()
     h_VarData_unfold_errors = h_VarData_unfold.Clone(h_VarData_unfold.GetName() + "_errors")
@@ -56,9 +58,9 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
     ROOT.TH1.AddDirectory(False)
 
     #intLumi = 20.322 # /mub
-    #intLumi = 49.156 # /mub
+    intLumi = 49.156 # /mub
     #intLumi = 500000./71260.
-    intLumi = 1816992./71260.
+    #intLumi = 1816992./71260.
     sigmaMC = 71.26 # mb
     nLogXiBins = 2
     ###############################
@@ -75,6 +77,9 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
     histoNames["VarReco"]      = "multiplicityTracks"
     histoNames["VarGen"]       = "multiplicityTracksGen"        
     histoNames["VarRecoVsGen"] = "multiplicityTracksVsGen"
+    #histoNames["VarReco"]      = "multiplicityTracks_LogXiMinus_0"
+    #histoNames["VarGen"]       = "multiplicityTracksGen_LogXiMinus_0"        
+    #histoNames["VarRecoVsGen"] = "multiplicityTracksVsGen_LogXiGenMinus_0"
     ###############################
     file_data = ROOT.TFile(fileNameData,'read')
     #histos_VarLogXi_data = []
@@ -116,7 +121,7 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
         unfoldResult = unfoldData(histos_VarLogXi_data[-1],
                                                        h_VarReco_unfold,
                                                        h_VarGen_unfold,
-                                                       h_VarRecoVsGen_unfold, 8)  
+                                                       h_VarRecoVsGen_unfold, 5)  
         histos_VarLogXi_data_unfold.append( unfoldResult[0] )
         histos_VarLogXi_data_unfold_errors.append( unfoldResult[1] )
         ###############################

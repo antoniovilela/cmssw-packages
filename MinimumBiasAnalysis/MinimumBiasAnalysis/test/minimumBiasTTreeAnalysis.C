@@ -297,9 +297,9 @@ void minimumBiasTTreeAnalysis(TTree* data,
          }
          // Apply weight
          double weight_all = weight_vtx*weight_eff;
-         if(ientry%2000 == 0) std::cout << ">>> Event weight " << weight_all << std::endl
-                                        << "     BSC OR eff. " << weight_eff << std::endl
-                                        << "   Vertex Z pos. " << weight_vtx << std::endl;
+         if(verbose && ientry%2000 == 0) std::cout << ">>> Event weight " << weight_all << std::endl
+                                                   << "     BSC OR eff. " << weight_eff << std::endl
+                                                   << "   Vertex Z pos. " << weight_vtx << std::endl;
          //eventWeight *= weight_vtx;   
       }      
 

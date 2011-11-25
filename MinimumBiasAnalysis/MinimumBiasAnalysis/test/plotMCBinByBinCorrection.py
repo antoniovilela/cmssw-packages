@@ -9,6 +9,7 @@ def plotMCBinByBinCorrection(fileNameData, fileNamesMCRef, fileNamesMCEff, side 
     #intLumi = 20.322 # /mub
     intLumi = 49.156 # /mub
     #intLumi = 500000./71260.;
+    #intLumi = 1816992./71260.
     sigmaMC = 71.26 # mb
     ###############################
     histoNames = {}

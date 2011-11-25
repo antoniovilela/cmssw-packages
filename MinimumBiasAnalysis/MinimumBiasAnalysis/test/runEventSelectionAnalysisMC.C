@@ -8,14 +8,7 @@
 #include <map>
 
 void setFileNamesPythia8Tune4C(std::vector<std::string>& fileNames){
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinBias_Tune4C_7TeV-pythia8_Summer11-NoPU_START42_V11-v1/eventSelectionAnalysis-v1/mergedTTree/eventSelectionAnalysis_TTree_MinBias_merged_0.root");
-   /*fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinBias_Tune4C_7TeV-pythia8_Summer11-NoPU_START42_V11-v1/eventSelectionAnalysis-v1/mergedTTree/eventSelectionAnalysis_TTree_MinBias_merged_1.root");
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinBias_Tune4C_7TeV-pythia8_Summer11-NoPU_START42_V11-v1/eventSelectionAnalysis-v1/mergedTTree/eventSelectionAnalysis_TTree_MinBias_merged_2.root");
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinBias_Tune4C_7TeV-pythia8_Summer11-NoPU_START42_V11-v1/eventSelectionAnalysis-v1/mergedTTree/eventSelectionAnalysis_TTree_MinBias_merged_3.root");
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinBias_Tune4C_7TeV-pythia8_Summer11-NoPU_START42_V11-v1/eventSelectionAnalysis-v1/mergedTTree/eventSelectionAnalysis_TTree_MinBias_merged_4.root");
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinBias_Tune4C_7TeV-pythia8_Summer11-NoPU_START42_V11-v1/eventSelectionAnalysis-v1/mergedTTree/eventSelectionAnalysis_TTree_MinBias_merged_5.root");
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinBias_Tune4C_7TeV-pythia8_Summer11-NoPU_START42_V11-v1/eventSelectionAnalysis-v1/mergedTTree/eventSelectionAnalysis_TTree_MinBias_merged_6.root");
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinBias_Tune4C_7TeV-pythia8_Summer11-NoPU_START42_V11-v1/eventSelectionAnalysis-v1/mergedTTree/eventSelectionAnalysis_TTree_MinBias_merged_7.root");*/   
+   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinBias_Tune4C_7TeV-pythia8_Summer11-NoPU_START42_V11-v1/eventSelectionAnalysis-v2/mergedTTree/eventSelectionAnalysis_TTree_MinBias_0.root");
 }
 
 void setFileNamesPythia8MBR(std::vector<std::string>& fileNames){
@@ -37,11 +30,10 @@ void runEventSelectionAnalysisMC(){
    //generator_t genTune = PHOJET;
 
    std::string outDir;
-   //outDir = "root/7TeV/Pythia8MBR/eventSelection-v1";
-   //outDir = "root/7TeV/Pythia8MBR/eventSelection-v1/LogXiGenPlusMax-5.5"; 
-   //std::string outDir = "root/7TeV/Pythia8Tune4C/eventSelection-v1";
-   //std::string outDir = "root/7TeV/Pythia8Tune4C/eventSelection-v1/LogXiGenPlusMax-5.5";
-   std::string outDir = "root/7TeV/Pythia8Tune4C/eventSelection-v1/LogXiGenPlusMax-6.5";
+   //outDir = "root/7TeV/Pythia8Tune4C/eventSelection-v1";
+   //outDir = "root/7TeV/Pythia8Tune4C/eventSelection-v1/LogXiGenPlusMax-5.5";
+   //outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-5.5";
+   outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-6.5";
 
    std::vector<std::string> fileNames;
    setFileNamesPythia8Tune4C(fileNames);

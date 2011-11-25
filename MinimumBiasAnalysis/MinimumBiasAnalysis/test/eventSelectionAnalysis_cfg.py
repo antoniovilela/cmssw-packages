@@ -168,22 +168,22 @@ process.countEvents_step = cms.Path(    process.countsAll +
                                         process.minimumBiasTTreeAnalysishltBscMinBiasORBptxPlusORMinus +
                                     process.bptx +
                                         process.countsBPTX +
-                                        process.minimumBiasTTreeAnalysisBPTX + 
+                                        #process.minimumBiasTTreeAnalysisBPTX + 
                                     process.bscOr + 
                                         process.countsBscOr +
                                         process.minimumBiasTTreeAnalysisBscOr +
                                     process.primaryVertexFilter +
                                         process.countsVertexFilter + 
-                                        process.minimumBiasTTreeAnalysisVertexFilter +
+                                        #process.minimumBiasTTreeAnalysisVertexFilter +
                                     process.beamHaloVeto + 
                                         process.countsBeamHaloVeto +
-                                        process.minimumBiasTTreeAnalysisBeamHaloVeto +
+                                        #process.minimumBiasTTreeAnalysisBeamHaloVeto +
                                     process.filterScraping +
                                         process.countsFilterScraping + 
-                                        process.minimumBiasTTreeAnalysisFilterScraping +
+                                        #process.minimumBiasTTreeAnalysisFilterScraping +
                                     process.HBHENoiseFilter+process.hcalNoiseFilter +
                                         process.countsHcalNoiseFilter +
-                                        process.minimumBiasTTreeAnalysisHcalNoiseFilter +
+                                        #process.minimumBiasTTreeAnalysisHcalNoiseFilter +
                                     process.multipleVertexVeto + 
                                         process.countsMultipleVertexVeto +  
                                         process.minimumBiasTTreeAnalysisMultipleVertexVeto +
