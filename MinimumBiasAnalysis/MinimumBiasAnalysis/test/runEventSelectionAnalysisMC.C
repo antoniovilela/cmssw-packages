@@ -12,7 +12,8 @@ void setFileNamesPythia8Tune4C(std::vector<std::string>& fileNames){
 }
 
 void setFileNamesPythia8MBR(std::vector<std::string>& fileNames){
-   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/eventSelection-v1/eventSelectionAnalysis_TTree_MinimumBias_Pythia8MBR-reco423patch3.root");
+   //fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/eventSelection-v1/eventSelectionAnalysis_TTree_MinimumBias_Pythia8MBR-reco423patch3.root");
+   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/eventSelectionAnalysis-v2/eventSelectionAnalysis_TTree_MinBias_Pythia8MBR-reco423patch3.root"); 
 }
 
 void setFileNamesMinBias(std::vector<std::string>& fileNames){
@@ -30,14 +31,17 @@ void runEventSelectionAnalysisMC(){
    //generator_t genTune = PHOJET;
 
    std::string outDir;
-   //outDir = "root/7TeV/Pythia8Tune4C/eventSelection-v1";
-   //outDir = "root/7TeV/Pythia8Tune4C/eventSelection-v1/LogXiGenPlusMax-5.5";
    //outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-5.5";
-   outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-6.5";
+   //outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-5.5_SingleLogXiBin";
+   //outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-6.5";
+   outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-6.5_SingleLogXiBin";
+   //outDir = "root/7TeV/Pythia8MBR/eventSelectionAnalysis-v2/LogXiGenPlusMax-5.5_SingleLogXiBin";
+   //outDir = "root/7TeV/Pythia8MBR/eventSelectionAnalysis-v2/LogXiGenPlusMax-6.5_SingleLogXiBin";
 
    std::vector<std::string> fileNames;
    setFileNamesPythia8Tune4C(fileNames);
- 
+   //setFileNamesPythia8MBR(fileNames);
+
    bool verbose = false;
 
    std::vector<std::string> selections;
@@ -56,9 +60,9 @@ void runEventSelectionAnalysisMC(){
    std::vector<int> processTypes;
    processTypes.push_back(All);
    //processTypes.push_back(SD);
-   processTypes.push_back(DD);
+   //processTypes.push_back(DD);
    //processTypes.push_back(Diff);
-   processTypes.push_back(Inelastic);
+   //processTypes.push_back(Inelastic);
    processTypes.push_back(SDPlus);
    processTypes.push_back(SDMinus);
 

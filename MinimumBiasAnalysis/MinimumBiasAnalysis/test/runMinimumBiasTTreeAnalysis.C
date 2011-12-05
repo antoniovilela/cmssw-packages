@@ -40,7 +40,8 @@ void runMinimumBiasTTreeAnalysis(){
    //setFileNamesZeroBiasRun135528(fileNames);
  
    //std::string outDir = "root";
-   std::string outDir = "root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v8";
+   //std::string outDir = "root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v8";
+   std::string outDir = "root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v8/SingleLogXiBin";
    //std::string outDir = "root/7TeV/ZeroBias/Run135528/minimumBiasTTreeAnalysis-v4";
    bool verbose = false;
 

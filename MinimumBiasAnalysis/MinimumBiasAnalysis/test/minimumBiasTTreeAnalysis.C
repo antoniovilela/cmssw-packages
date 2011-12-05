@@ -90,10 +90,11 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doDeltaEtaGenSelection = false;
    double deltaEtaGenMin = 3.0;
 
-   bool doLogXiGenPlusSelection  = true;
+   bool doLogXiGenPlusSelection = true;
+   //double logXiGenPlusMax = -5.5;
+   double logXiGenPlusMax = -6.5;
+
    bool doLogXiGenMinusSelection = false;
-   //double logXiGenPlusMax  = -5.5;
-   double logXiGenPlusMax  = -6.5;
    double logXiGenMinusMax = -5.0;
    //=================================================================
    bool doTriggerSelection = false;
@@ -121,6 +122,12 @@ void minimumBiasTTreeAnalysis(TTree* data,
    bool doEtaMinSelection = false;
    double etaMaxMax = 1.0;
    double etaMinMin = -1.0;
+   // Log(xi) binning 
+   // Multiplicity histograms produced for these ranges 
+   //=================================================================
+   //float binningLogXi[] = {-5.,-4.5,-4.,-3.5,-3.,-2.5,-2.0,0.};
+   //float binningLogXi[] = {-4.,-3.5,-3.};
+   float binningLogXi[] = {-4.,-3.};
    //=================================================================
 
    std::cout << ">>> Reading TTree: " << data->GetName() << std::endl;
@@ -195,7 +202,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
    histosTH1F["sumEnergyHFPlusGen_Ntrk16_25"] = new TH1F("sumEnergyHFPlusGen_Ntrk16_25","sumEnergyHFPlusGen_Ntrk16_25",100,0.,100.);
    histosTH1F["sumEnergyHFPlusGen_Ntrk26_100"] = new TH1F("sumEnergyHFPlusGen_Ntrk26_100","sumEnergyHFPlusGen_Ntrk26_100",100,0.,100.);
    //float binningLogXi[] = {-5.,-4.5,-4.,-3.5,-3.,-2.5,-2.0,0.};
-   float binningLogXi[] = {-4.,-3.5,-3.};
+   //float binningLogXi[] = {-4.,-3.5,-3.};
    std::vector<float> vec_binningLogXi(binningLogXi,binningLogXi + sizeof(binningLogXi)/sizeof(float));
    for(size_t ibinLogXi = 0; ibinLogXi < (vec_binningLogXi.size()-1); ++ibinLogXi){
       std::stringstream histoNameXiPlus,histoNameGenXiPlus,
@@ -297,9 +304,9 @@ void minimumBiasTTreeAnalysis(TTree* data,
          }
          // Apply weight
          double weight_all = weight_vtx*weight_eff;
-         if(verbose && ientry%2000 == 0) std::cout << ">>> Event weight " << weight_all << std::endl
-                                                   << "     BSC OR eff. " << weight_eff << std::endl
-                                                   << "   Vertex Z pos. " << weight_vtx << std::endl;
+         if(ientry%10000 == 0 || verbose) std::cout << ">>> Event weight " << weight_all << std::endl
+                                                    << "     BSC OR eff. " << weight_eff << std::endl
+                                                    << "   Vertex Z pos. " << weight_vtx << std::endl;
          //eventWeight *= weight_vtx;   
       }      
 

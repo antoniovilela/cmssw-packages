@@ -15,7 +15,7 @@ config.generator = inputOptions.generator
 config.verbose = True
 config.globalTagNameData = 'GR_R_42_V19::All'
 config.globalTagNameMC = 'START42_V13::All'
-config.outputTTreeFile = 'eventSelectionAnalysis_TTree_MinBias.root'
+config.outputTTreeFile = '/storage2/antoniov/data1/AnalysisResults/Pythia8MBR_reco423patch3/eventSelectionAnalysis-v2/eventSelectionAnalysis_TTree_MinBias_Pythia8MBR-reco423patch3.root'
 config.comEnergy = 7000.0
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
@@ -25,9 +25,9 @@ config.triggerResultsProcessNameMC = inputOptions.hltProcessNameMC
 
 if config.runOnMC:
     if config.generator == 'Pythia8':
-        #from fileNames_Pythia8MBR_reco423patch3 import fileNames
-        #config.fileNames = fileNames
-        config.fileNames = ['file:/storage2/antoniov/data1/MinBias_Tune4C_7TeV-pythia8-Summer11-NoPU_START42_V11-v1-GEN-SIM-RECO/MinBias_Tune4C_7TeV-pythia8-Summer11-NoPU_START42_V11-v1-GEN-SIM-RECO-A8EAFE3C-D7C2-E011-9207-00266CF2E2C8.root'] 
+        from fileNames_Pythia8MBR_reco423patch3 import fileNames
+        config.fileNames = fileNames
+        #config.fileNames = ['file:/storage2/antoniov/data1/MinBias_Tune4C_7TeV-pythia8-Summer11-NoPU_START42_V11-v1-GEN-SIM-RECO/MinBias_Tune4C_7TeV-pythia8-Summer11-NoPU_START42_V11-v1-GEN-SIM-RECO-A8EAFE3C-D7C2-E011-9207-00266CF2E2C8.root'] 
 
 process = cms.Process("Analysis")
 
@@ -40,13 +40,13 @@ process.MessageLogger.cerr.Analysis = cms.untracked.PSet(limit = cms.untracked.i
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring()
 )
 process.source.fileNames = config.fileNames
-#if config.runOnMC: process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
+if config.runOnMC: process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 # Import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
