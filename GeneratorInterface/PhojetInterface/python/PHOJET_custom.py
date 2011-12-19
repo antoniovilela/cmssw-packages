@@ -1,5 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 
+def customiseCASTOR(process):
+    process.g4SimHits.Generator.MinEtaCut =-7.0
+    process.g4SimHits.Generator.MaxEtaCut = 5.5
+
+    return(process)
+
 def customiseEventContent(process):
 
         AddToEventContent = cms.PSet(
@@ -31,5 +37,6 @@ def customise(process):
         process.mix.mixObjects.mixHepMC.input = cms.VInputTag(cms.InputTag("source"))
 
         process = customiseEventContent(process)
+        process = customiseCASTOR(process) 
 
 	return(process)
