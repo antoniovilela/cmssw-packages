@@ -6,10 +6,13 @@ from divideByTGraph import divide as divideHistoByTGraph
 def plotMCBinByBinCorrection(fileNameData, fileNamesMCRef, fileNamesMCEff, side = "plus"):
     ROOT.TH1.AddDirectory(False)
 
-    #intLumi = 20.322 # /mub
-    intLumi = 49.156 # /mub
-    #intLumi = 500000./71260.;
+    useWeights = True
+
+    intLumi = 20.322 # /mub
+    #intLumi = 49.156 # /mub
+    #intLumi = 500000./71260.
     #intLumi = 1816992./71260.
+    #intLumi = 9975000./71260.
     sigmaMC = 71.26 # mb
     ###############################
     histoNames = {}
@@ -63,18 +66,18 @@ def plotMCBinByBinCorrection(fileNameData, fileNamesMCRef, fileNamesMCEff, side 
         histos_logXiCorrVarBin[-1].Divide( histos_logXiFromPFCandsVarBin[-1] )
 
         # Efficiency
-        # FIXME: use graph and compute proper errors 
-        #histos_effLogXiGenVarBin.append( histos_logXiGenVarBin[-1].Clone('effLogXiGenVarBin_%d' % idx) )
-        #histos_effLogXiGenVarBin[-1].Divide( histos_logXiGenVarBin_ref[-1] )
-
-        graphs_effLogXiGenVarBin.append( ROOT.TGraphAsymmErrors(histos_logXiGenVarBin[-1],histos_logXiGenVarBin_ref[-1]) )
-        graphs_effLogXiGenVarBin[-1].SetName('effLogXiGenVarBin_graph_%d' % idx)
-        histos_effLogXiGenVarBin.append( convertTGraphToTH1F(graphs_effLogXiGenVarBin[-1],'effLogXiGenVarBin_%d' % idx) )
+        if useWeights:
+	    histos_effLogXiGenVarBin.append( histos_logXiGenVarBin[-1].Clone('effLogXiGenVarBin_%d' % idx) )
+	    histos_effLogXiGenVarBin[-1].Divide( histos_logXiGenVarBin_ref[-1] )
+        else:
+	    graphs_effLogXiGenVarBin.append( ROOT.TGraphAsymmErrors(histos_logXiGenVarBin[-1],histos_logXiGenVarBin_ref[-1]) )
+	    graphs_effLogXiGenVarBin[-1].SetName('effLogXiGenVarBin_graph_%d' % idx)
+	    histos_effLogXiGenVarBin.append( convertTGraphToTH1F(graphs_effLogXiGenVarBin[-1],'effLogXiGenVarBin_%d' % idx) )
         
         # Full bin by bin correction
         histos_logXiCorrFullVarBin.append( histos_logXiCorrVarBin[-1].Clone('logXiCorrFullVarBin_%d' % idx) )
-        #histos_logXiCorrFullVarBin[-1].Divide( histos_effLogXiGenVarBin[-1] )
-        divideHistoByTGraph(histos_logXiCorrFullVarBin[-1],graphs_effLogXiGenVarBin[-1])
+        if useWeights: histos_logXiCorrFullVarBin[-1].Divide( histos_effLogXiGenVarBin[-1] )
+        else:          divideHistoByTGraph(histos_logXiCorrFullVarBin[-1],graphs_effLogXiGenVarBin[-1])
 
         # Correct data
         histos_logXiFromPFCandsVarBin_data_corr.append( h_logXiFromPFCandsVarBin_data.Clone('logXiFromPFCandsVarBin_data_corr_%d' % idx) )

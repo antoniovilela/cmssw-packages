@@ -31,10 +31,12 @@ void runEventSelectionAnalysisMC(){
    //generator_t genTune = PHOJET;
 
    std::string outDir;
+   //outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2";
    //outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-5.5";
+   outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/TriggerEff-LogXiGenPlusMax-5.5";
    //outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-5.5_SingleLogXiBin";
    //outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-6.5";
-   outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-6.5_SingleLogXiBin";
+   //outDir = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-6.5_SingleLogXiBin";
    //outDir = "root/7TeV/Pythia8MBR/eventSelectionAnalysis-v2/LogXiGenPlusMax-5.5_SingleLogXiBin";
    //outDir = "root/7TeV/Pythia8MBR/eventSelectionAnalysis-v2/LogXiGenPlusMax-6.5_SingleLogXiBin";
 
@@ -60,9 +62,9 @@ void runEventSelectionAnalysisMC(){
    std::vector<int> processTypes;
    processTypes.push_back(All);
    //processTypes.push_back(SD);
-   //processTypes.push_back(DD);
+   processTypes.push_back(DD);
    //processTypes.push_back(Diff);
-   //processTypes.push_back(Inelastic);
+   processTypes.push_back(Inelastic);
    processTypes.push_back(SDPlus);
    processTypes.push_back(SDMinus);
 

@@ -91,8 +91,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
    double deltaEtaGenMin = 3.0;
 
    bool doLogXiGenPlusSelection = true;
-   //double logXiGenPlusMax = -5.5;
-   double logXiGenPlusMax = -6.5;
+   double logXiGenPlusMax = -5.5;
+   //double logXiGenPlusMax = -6.5;
 
    bool doLogXiGenMinusSelection = false;
    double logXiGenMinusMax = -5.0;
@@ -126,8 +126,8 @@ void minimumBiasTTreeAnalysis(TTree* data,
    // Multiplicity histograms produced for these ranges 
    //=================================================================
    //float binningLogXi[] = {-5.,-4.5,-4.,-3.5,-3.,-2.5,-2.0,0.};
-   //float binningLogXi[] = {-4.,-3.5,-3.};
-   float binningLogXi[] = {-4.,-3.};
+   float binningLogXi[] = {-4.,-3.5,-3.};
+   //float binningLogXi[] = {-4.,-3.};
    //=================================================================
 
    std::cout << ">>> Reading TTree: " << data->GetName() << std::endl;
@@ -169,7 +169,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
       h_reweightPosZVertex = *h_reweightPosZVertex_tmp;
       reweightVtxFile.Close();
 
-      TFile reweightEffBscOrFile("reweight_eventSelectionBscMinBiasORVsBeamHaloVeto_Pythia8Tune4C_minimumBiasTTreeAnalysis-v5.root");
+      TFile reweightEffBscOrFile("reweight_eventSelectionBscMinBiasORVsBeamHaloVeto_Pythia8Tune4C_minimumBiasTTreeAnalysis-v5_v2.root");
       TH1F* h_reweightEffBscOr_tmp = static_cast<TH1F*>( reweightEffBscOrFile.Get("multiplicityTracks_reweight") );
       h_reweightEffBscOr = *h_reweightEffBscOr_tmp;
       reweightEffBscOrFile.Close();
@@ -261,7 +261,6 @@ void minimumBiasTTreeAnalysis(TTree* data,
 
    // Event loop
    //==========================
-   double eventWeight = 1.0;
    //std::vector<std::pair<int,int> > selectedEvents;
    int nEntries = data->GetEntries();
    for(int ientry = 0; ientry < nEntries; ++ientry){
@@ -282,6 +281,7 @@ void minimumBiasTTreeAnalysis(TTree* data,
       }
       if((runNumber == 0)&&(eventNumber == 0)) {std::cout << ">>> ERROR: Problem with event...skipping" << std::endl;continue;}
 
+      double eventWeight = 1.0;
       // Reweighing
       if(accessMCInfo){
          double weight_vtx = 1.;
@@ -299,15 +299,21 @@ void minimumBiasTTreeAnalysis(TTree* data,
          int ibin_eff = h_reweightEffBscOr.FindBin( eff_variable );
          if( ibin_eff >= 1 && ibin_eff <= h_reweightEffBscOr.GetNbinsX() ){
             weight_eff = h_reweightEffBscOr.GetBinContent(ibin_eff);
-         }else{
+         } else if( ibin_eff > h_reweightEffBscOr.GetNbinsX() ){
+            weight_eff = h_reweightEffBscOr.GetBinContent( h_reweightEffBscOr.GetNbinsX() );
+         } else{
             weight_eff = 0.;
          }
          // Apply weight
          double weight_all = weight_vtx*weight_eff;
-         if(ientry%10000 == 0 || verbose) std::cout << ">>> Event weight " << weight_all << std::endl
-                                                    << "     BSC OR eff. " << weight_eff << std::endl
-                                                    << "   Vertex Z pos. " << weight_vtx << std::endl;
+
          //eventWeight *= weight_vtx;   
+         eventWeight *= weight_eff;   
+
+         if(ientry%10000 == 0 || verbose) std::cout << ">>> Event weight: " << eventWeight << std::endl
+                                                    << "     BSC OR eff.: " << weight_eff << std::endl
+                                                    << "   Vertex Z pos.: " << weight_vtx << std::endl
+                                                    << "     All weights: " << weight_all << std::endl;
       }      
 
       histosTH1F["EventsPerBunchCrossing"]->Fill(bunchCrossing,eventWeight);

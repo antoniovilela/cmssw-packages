@@ -21,6 +21,10 @@ void setFileNamesMinimumBiasRun135528(std::vector<std::string>& fileNames){
    fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinimumBias_Commissioning10-May19ReReco-v1/Run135528/minimumBiasAnalysisTTree-v8/mergedTTree/analysisMinBias_TTree_MinimumBias_2.root");*/
 }
 
+void setFileNamesMinimumBiasRun132605(std::vector<std::string>& fileNames){
+   fileNames.push_back("/storage2/antoniov/data1/AnalysisResults/MinimumBias_Commissioning10-May19ReReco-v1/Run132605/minimumBiasAnalysisTTree-v2/mergedTTree/analysisMinBias_TTree_MinimumBias_merged_0.root");
+}
+
 void setFileNamesMinimumBias(std::vector<std::string>& fileNames){
    fileNames.push_back("analysisMinBias_TTree_MinimumBias.root");
 }
@@ -36,12 +40,14 @@ void runMinimumBiasTTreeAnalysis(){
    //std::string rootDir = "/tmp/antoniov/root/7TeV";
    std::vector<std::string> fileNames(0);
    //setFileNamesMinimumBias(fileNames);
-   setFileNamesMinimumBiasRun135528(fileNames);
+   setFileNamesMinimumBiasRun132605(fileNames);
+   //setFileNamesMinimumBiasRun135528(fileNames);
    //setFileNamesZeroBiasRun135528(fileNames);
  
    //std::string outDir = "root";
+   std::string outDir = "root/7TeV/Data/Run132605/minimumBiasTTreeAnalysis-v2";
    //std::string outDir = "root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v8";
-   std::string outDir = "root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v8/SingleLogXiBin";
+   //std::string outDir = "root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v8/SingleLogXiBin";
    //std::string outDir = "root/7TeV/ZeroBias/Run135528/minimumBiasTTreeAnalysis-v4";
    bool verbose = false;
 

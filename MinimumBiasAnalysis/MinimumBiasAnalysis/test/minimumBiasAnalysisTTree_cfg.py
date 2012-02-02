@@ -1,9 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 
+from Utilities.PyConfigTools.parseInput import parseInput
+inputFields = ('runOnMC','generator','hltProcessNameMC')
+requiredFields = ('runOnMC',)
+inputOptions = parseInput(inputFields,requiredFields)
+if not hasattr(inputOptions,'generator'): inputOptions.generator = 'Pythia8'
+if not hasattr(inputOptions,'hltProcessNameMC'): inputOptions.hltProcessNameMC = 'HLT'
+
 # Settings
 class config: pass
-config.runOnMC = True
-config.generator = 'Pythia8'
+config.runOnMC = inputOptions.runOnMC
+config.generator = inputOptions.generator
 config.comEnergy = 7000.0
 config.maxEvents = 3000
 config.verbose = True
@@ -18,12 +25,13 @@ config.instLumiROOTFile = 'lumibylsXing_132440-144114_7TeV_Sep17ReReco_Collision
 config.trackAnalyzerName = 'trackHistoAnalyzer'
 config.trackTagName = 'analysisTracks'
 config.vertexTagName = 'analysisVertices'
+config.triggerResultsProcessNameMC = inputOptions.hltProcessNameMC
 #---
 config.switchPVFilter = True #primaryVertexFilterLooseNDOF0
 config.varyAttributes = False
 config.runPFlowThresholdAnalysis = True
 config.runOfflineOnly = True
-config.runNoColl = False
+config.runNoColl = True
 config.runBPTX = False
 config.runHCALFilter = False
 config.runEtaMaxFilter = True
@@ -351,5 +359,5 @@ if config.runOnMC:
     setAnalyzerAttributes(process,'minimumBiasTTreeAnalysis',
                                   AccessMCInfo = True,
                                   HLTPath = 'HLT_Physics_v*',
-                                  CastorRecHitTag = 'castorreco') 
-    #TriggerResultsTag = cms.InputTag("TriggerResults::HLT") 
+                                  CastorRecHitTag = 'castorreco', 
+                                  TriggerResultsTag = cms.InputTag("TriggerResults","",config.triggerResultsProcessNameMC)) 

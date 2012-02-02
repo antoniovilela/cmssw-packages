@@ -4,8 +4,8 @@ from scaleByWidth import scaleByWidth
 
 def unfoldData(h_VarData,h_VarRecoMC,h_VarGenMC,h_VarRecoVsGenMC,iterations=4):
 
-    nBinsReco = 7
-    nBinsGen = 7
+    nBinsReco = 10
+    nBinsGen = 10
     from truncateHisto import truncateTH1F,truncateTH2F
     h_VarReco_range = truncateTH1F(h_VarRecoMC,nBinsReco)
     h_VarGen_range = truncateTH1F(h_VarGenMC,nBinsGen)
@@ -52,7 +52,8 @@ def setErrorsFromHisto(histo,histoErr):
         print "Bin",ibin,"value",binContent,"set error",errorNew
 	histo.SetBinError(ibin,errorNew)
 
-def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNameUnfold = "", side = "plus"):
+def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, 
+                             fileNameUnfold = "", fileNameMCComp = "", side = "plus"):
     if not fileNameUnfold: fileNameUnfold = fileNameMCEff
 
     ROOT.TH1.AddDirectory(False)
@@ -61,8 +62,9 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
     intLumi = 49.156 # /mub
     #intLumi = 500000./71260.
     #intLumi = 1816992./71260.
+    #intLumi = 9975000./71260.
     sigmaMC = 71.26 # mb
-    nLogXiBins = 2
+    nLogXiBins = 1
     ###############################
     histoNames = {}
     if side == "plus":
@@ -91,7 +93,13 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
     file_mc_ref = ROOT.TFile(fileNameMCRef,'read')
     file_mc_eff = ROOT.TFile(fileNameMCEff,'read')
     file_unfold = ROOT.TFile(fileNameUnfold,'read')
+    file_mc_ref_comp = None
+    if fileNameMCComp: file_mc_ref_comp = ROOT.TFile(fileNameMCComp,'read')
+
     h_EventSelection_mc_ref = file_mc_ref.Get("EventSelection")
+    h_EventSelection_mc_ref_comp = None
+    if file_mc_ref_comp: h_EventSelection_mc_ref_comp = file_mc_ref_comp.Get("EventSelection")
+
     h_VarReco_unfold        = file_unfold.Get( histoNames["VarReco"] )
     h_VarGen_unfold         = file_unfold.Get( histoNames["VarGen"] )
     h_VarRecoVsGen_unfold   = file_unfold.Get( histoNames["VarRecoVsGen"] )
@@ -103,16 +111,21 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
     histos_VarLogXi_data_corr = []
     histos_VarLogXi_data_errors = []
     histos_VarLogXiGen_ref = []
+    histos_VarLogXiGen_ref_comp = []
     histos_VarLogXiGen = []
     histos_VarLogXi = []
     histos_corrVarLogXi = []
     histos_effVarLogXi = []
     histos_corrFullVarLogXi = []
     histos_VarLogXiGen_ref_scaled = []
+    histos_VarLogXiGen_ref_comp_scaled = []
     for idx in range(nLogXiBins):
         histos_VarLogXi_data.append( file_data.Get("%s_%d" % (histoNames["VarRecoLogXi"],idx)) )  
 
         histos_VarLogXiGen_ref.append( file_mc_ref.Get("%s_%d" % (histoNames["VarGenLogXiGen"],idx)) )
+        if file_mc_ref_comp:
+	    histos_VarLogXiGen_ref_comp.append( file_mc_ref_comp.Get("%s_%d" % (histoNames["VarGenLogXiGen"],idx)) )
+            
         histos_VarLogXiGen.append( file_mc_eff.Get("%s_%d" % (histoNames["VarGenLogXiGen"],idx)) )
         histos_VarLogXi.append( file_mc_eff.Get("%s_%d" % (histoNames["VarGenLogXi"],idx)) )
 
@@ -159,6 +172,13 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
         histos_VarLogXiGen_ref_scaled.append( histos_VarLogXiGen_ref[-1].Clone('VarLogXiGen_ref_scaled_%d' % idx) )
         nEventsAll_ref = h_EventSelection_mc_ref.GetBinContent(1)
         histos_VarLogXiGen_ref_scaled[-1].Scale(sigmaMC/nEventsAll_ref)    
+
+        if len(histos_VarLogXiGen_ref_comp) > 0:
+            print "Adding",'VarLogXiGen_ref_comp_scaled_%d' % idx
+	    histos_VarLogXiGen_ref_comp_scaled.append( histos_VarLogXiGen_ref_comp[-1].Clone('VarLogXiGen_ref_comp_scaled_%d' % idx) )
+	    nEventsAll_ref_comp = h_EventSelection_mc_ref_comp.GetBinContent(1)
+	    histos_VarLogXiGen_ref_comp_scaled[-1].Scale(sigmaMC/nEventsAll_ref_comp)    
+            
     
     # Plotting
     canvases = []
@@ -219,12 +239,22 @@ def plotMCBinByBinCorrection(fileNameData, fileNameMCRef, fileNameMCEff, fileNam
         histos_VarLogXi_data_corr[idx].Draw("SAME")
 
         histos_VarLogXiGen_ref_scaled[idx].SetLineStyle( lineStyles[idx] )
-        histos_VarLogXiGen_ref_scaled[idx].SetLineColor(2)
+        #histos_VarLogXiGen_ref_scaled[idx].SetLineColor(2)
+        histos_VarLogXiGen_ref_scaled[idx].SetLineColor(46)
         histos_VarLogXiGen_ref_scaled[idx].SetStats(0)
         scaleByWidth(histos_VarLogXiGen_ref_scaled[idx])
         histos_VarLogXiGen_ref_scaled[idx].Draw("HISTOSAME")
+        if len(histos_VarLogXiGen_ref_comp_scaled) > 0:
+	    histos_VarLogXiGen_ref_comp_scaled[idx].SetLineStyle( lineStyles[idx] )
+	    #histos_VarLogXiGen_ref_comp_scaled[idx].SetLineColor(4)
+	    histos_VarLogXiGen_ref_comp_scaled[idx].SetLineColor(42)
+	    histos_VarLogXiGen_ref_comp_scaled[idx].SetStats(0)
+	    scaleByWidth(histos_VarLogXiGen_ref_comp_scaled[idx])
+	    histos_VarLogXiGen_ref_comp_scaled[idx].Draw("HISTOSAME")
+
     histos.append(histos_VarLogXi_data_corr)
     histos.append(histos_VarLogXi_data_errors)
     histos.append(histos_VarLogXiGen_ref_scaled)
+    histos.append(histos_VarLogXiGen_ref_comp_scaled)
 
     return (canvases,histos)

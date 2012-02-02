@@ -12,10 +12,24 @@
 #include "MinimumBiasAnalysis/MinimumBiasAnalysis/interface/RootTools.h"
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 //std::string getDataFile(int runRange);
 //std::string getMCFile(int genType,int runRange);
+void printOptions(){
+   std::vector<std::string> options;
+   options.push_back("setDirsPYTHIAPHOJET");
+   options.push_back("setDirsMCComponents");
+   options.push_back("setDirsDataMC");
+   options.push_back("setDirsDataMCGenSel");
+   options.push_back("setDirsDataMCComponents");
+   options.push_back("setDirsCompareData");
+   std::ostringstream oss;
+   oss << "--- Options:" << std::endl;
+   for(size_t k = 0; k < options.size(); ++k) oss << "  " << options[k] << std::endl;
+   std::cout << oss.str(); 
+}
 
 void setDirsMCComponents(std::string const& selection, std::string const& rootDir, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
 void setDirsPYTHIAPHOJET(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors);
@@ -26,16 +40,15 @@ void setDirsDataMCGenSel(std::string const& selection,std::vector<std::pair<std:
 
 void plot(std::string const& selection, std::string const& mode = "setDirsDataMC", std::string const& rootDir = "", const char* drawOption = "", int rebin = 1){
    std::vector<std::string> variables;
-   /*variables.push_back("nVertex");
-   variables.push_back("posXPrimVtx");
+   variables.push_back("nVertex");
+   /*variables.push_back("posXPrimVtx");
    variables.push_back("posYPrimVtx");
    variables.push_back("posZPrimVtx");*/
-   /*variables.push_back("multiplicityTracks");
    variables.push_back("multiplicityHFPlus");
    variables.push_back("multiplicityHFMinus");
    variables.push_back("sumEnergyHFPlus");
    variables.push_back("sumEnergyHFMinus");
-   variables.push_back("xiPlusFromPFCands");
+   /*variables.push_back("xiPlusFromPFCands");
    variables.push_back("xiMinusFromPFCands");
    variables.push_back("EPlusPzFromPFCands");
    variables.push_back("EMinusPzFromPFCands");
@@ -59,9 +72,9 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    variables.push_back("etaMaxFromPFCandsVarBin_dist");
    variables.push_back("etaMinFromPFCandsVarBin_dist");*/
    variables.push_back("multiplicityTracks");
-   //variables.push_back("sumEnergyHFPlusVarBin");
-   //variables.push_back("sumEnergyHFMinusVarBin");
-   //variables.push_back("sumEnergyCASTOR"); 
+   variables.push_back("sumEnergyHFPlusVarBin");
+   variables.push_back("sumEnergyHFMinusVarBin");
+   variables.push_back("sumEnergyCASTOR"); 
    variables.push_back("logXiPlusFromPFCands");
    variables.push_back("logXiMinusFromPFCands");
    variables.push_back("logXiPlusFromPFCandsVarBin");
@@ -69,8 +82,8 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    //variables.push_back("MxFromPFCands");
    variables.push_back("etaMaxFromPFCandsVarBin");
    variables.push_back("etaMinFromPFCandsVarBin");
-   variables.push_back("logXiGenPlus");
-   variables.push_back("logXiGenMinus");
+   /*variables.push_back("logXiGenPlus");
+   variables.push_back("logXiGenMinus");*/
    /*variables.push_back("xiGenPlus");
    variables.push_back("xiGenMinus");
    variables.push_back("etaMaxGen");
@@ -80,10 +93,11 @@ void plot(std::string const& selection, std::string const& mode = "setDirsDataMC
    Plotter<DefaultNorm> plotter;
    plotter.SetVerbose(true);
    //plotter.SetRefHisto(true);
-   plotter.SetStats(false);
+   plotter.SetStats(true);
    plotter.SetRebin(rebin);
    plotter.SetMarkerSizes(std::vector<float>(1,1.4));
-   plotter.SetHeader("#eta_{min} > -1 (BSC OR and Vertex and CASTOR tag)");
+   plotter.SetHeader("#eta_{min} > -1 (BSC OR and Vertex)");
+   //plotter.SetHeader("#eta_{min} > -1 (BSC OR and Vertex and CASTOR tag)");
 
    plotter.SetTitleX("multiplicityTracks","N_{trk}");
    plotter.SetTitleX("sumEnergyHFPlusVarBin_dist","#sum E (HF+) (GeV)");
@@ -323,10 +337,13 @@ void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair
    //generator_t genType = PYTHIAZ1;
    //generator_t genType = PHOJET;
    std::string eventSelection = selection;
-   std::string dirData = "root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v2";
-   std::string dirMC = "root/7TeV/Pythia8MBR/minimumBiasTTreeAnalysis-v1";
+   std::string dirData = "root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v8";
+   //std::string dirMC = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2/LogXiGenPlusMax-5.5";
+   std::string dirMC = "root/7TeV/Pythia8Tune4C/eventSelectionAnalysis-v2";
 
-   double normMC = 71260.*49.156/499596;
+   //double normMC = 71260.*49.156/499596;
+   //double normMC = 71260.*49.156/1816992.;
+   double normMC = 71260.*49.156/9975000.;
 
    TFile* file_Data = TFile::Open((dirData + "/" + getHistosFileName(runRange,eventSelection)).c_str());
    TH1F* h_EventSelection_Data = static_cast<TH1F*>(file_Data->Get("EventSelection"));
@@ -389,21 +406,27 @@ void setDirsDataMCComponents(std::string const& selection, std::vector<std::pair
 }
 
 void setDirsCompareData(std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
-   //TFile* file_Ref = TFile::Open("analysisMinBiasFWLite_histos_MinimumBias_Dec14thReReco-Run124120_new_highQualityTracks.root");
-   TFile* file_Ref = TFile::Open("analysisMinBiasFWLite_histos_MinimumBias_Dec19thReReco-Runs124020-124030_new_highQualityTracks.root");
+   //TFile* file_Ref = TFile::Open("root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v8/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root");
+   TFile* file_Ref = TFile::Open("root/7TeV/Data/Run135528/minimumBiasTTreeAnalysis-v8/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOREtaMinFilter_histos.root");
    TH1F* h_EventSelection_Ref = static_cast<TH1F*>(file_Ref->Get("EventSelection"));
-   double nEventsPreSel_Ref = h_EventSelection_Ref->GetBinContent(7);
+   double nEventsPreSel_Ref = h_EventSelection_Ref->GetBinContent(11);
 
-   TFile* file_Comp = TFile::Open("analysisMinBiasFWLite_histos_MinimumBias_Dec19thReReco-Run124120_new_highQualityTracks.root");
+   //TFile* file_Comp = TFile::Open("root/7TeV/Data/Run132605/minimumBiasTTreeAnalysis-v2/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOR_histos.root");
+   TFile* file_Comp = TFile::Open("root/7TeV/Data/Run132605/minimumBiasTTreeAnalysis-v2/analysisMinBiasTTree_MinimumBias_7TeV_eventSelectionBscMinBiasOREtaMinFilter_histos.root");
    TH1F* h_EventSelection_Comp = static_cast<TH1F*>(file_Comp->Get("EventSelection"));
-   double nEventsPreSel_Comp = h_EventSelection_Comp->GetBinContent(7);
+   double nEventsPreSel_Comp = h_EventSelection_Comp->GetBinContent(11);
 
+   double intLumi_Comp = 20.322;
+   double intLumi_Ref = 49.156;
+ 
    /*dirs.push_back(std::make_pair("Dec. 14th Re-reco",file_Ref));
    dirs.push_back(std::make_pair("Dec. 19th Re-reco",file_Comp));*/
-   dirs.push_back(std::make_pair("Runs 124020-124030 - 900 GeV",file_Ref));
-   dirs.push_back(std::make_pair("Run 124120 - 2360 GeV",file_Comp));
-   normFactors.push_back(1./nEventsPreSel_Ref);
-   normFactors.push_back(1./nEventsPreSel_Comp);
+   dirs.push_back(std::make_pair("Run 135528",file_Ref));
+   dirs.push_back(std::make_pair("Run 132605",file_Comp));
+   /*normFactors.push_back(1./nEventsPreSel_Ref);
+   normFactors.push_back(1./nEventsPreSel_Comp);*/
+   normFactors.push_back(1.);
+   normFactors.push_back( intLumi_Ref/intLumi_Comp );
 }
 
 void setDirsDataMCGenSel(std::string const& selection, std::vector<std::pair<std::string,TDirectory*> >& dirs, std::vector<double>& normFactors){
