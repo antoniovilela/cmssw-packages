@@ -604,8 +604,10 @@ void MinimumBiasAnalysis::fillEventVariables(MinimumBiasEventData& eventData, co
   // Castor RecHit collection
   edm::Handle<CastorRecHitCollection> castorRecHitCollectionH;
   event.getByLabel(castorRecHitTag_,castorRecHitCollectionH);
-  double sumETotCastor = castorEnergy(*castorRecHitCollectionH, event.isRealData());
- 
+  double sumETotCastor = -1.; 
+  if( castorRecHitCollectionH.isValid() ){
+     sumETotCastor = castorEnergy(*castorRecHitCollectionH, event.isRealData());
+  } 
   eventData.sumETotCastor_ = sumETotCastor;
 
   fillMultiplicities(eventData,event,setup);
