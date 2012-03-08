@@ -1,6 +1,0 @@
-#!/bin/csh
-set files = `nsls $1 | grep root | grep -v err`
-
-foreach file ( $files )
-	 echo rfio:$1/$file
-end
