@@ -62,6 +62,8 @@ void PFlowNoiseAnalyzer::beginJob(){
   histosTH2F_["energyVsEtaGamma"] = fs->make<TH2F>("energyVsEtaGamma","energyVsEtaGamma",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
   histosTH2F_["energyVsEtaNeutralHadron"] = fs->make<TH2F>("energyVsEtaNeutralHadron","energyVsEtaNeutralHadron",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
   histosTH2F_["energyVsEtaHadronHF"] = fs->make<TH2F>("energyVsEtaHadronHF","energyVsEtaHadronHF",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
+  histosTH2F_["energyVsEtaHadronHFEcalEnergy"] = fs->make<TH2F>("energyVsEtaHadronHFEcalEnergy","energyVsEtaHadronHFEcalEnergy",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
+  histosTH2F_["energyVsEtaHadronHFNoEcalEnergy"] = fs->make<TH2F>("energyVsEtaHadronHFNoEcalEnergy","energyVsEtaHadronHFNoEcalEnergy",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
   histosTH2F_["energyVsEtaEGammaHF"] = fs->make<TH2F>("energyVsEtaEGammaHF","energyVsEtaEGammaHF",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
    
 }     
@@ -94,9 +96,11 @@ void PFlowNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
         histosTH2F_["energyVsEtaGamma"]->Fill(eta,energy);
      else if(partType == reco::PFCandidate::h0) 
         histosTH2F_["energyVsEtaNeutralHadron"]->Fill(eta,energy);
-     else if(partType == reco::PFCandidate::h_HF) 
+     else if(partType == reco::PFCandidate::h_HF){ 
         histosTH2F_["energyVsEtaHadronHF"]->Fill(eta,energy);
-     else if(partType == reco::PFCandidate::egamma_HF) 
+        if( part->ecalEnergy() > 0. ) histosTH2F_["energyVsEtaHadronHFEcalEnergy"]->Fill(eta,energy);
+        else                          histosTH2F_["energyVsEtaHadronHFNoEcalEnergy"]->Fill(eta,energy);
+     } else if(partType == reco::PFCandidate::egamma_HF) 
         histosTH2F_["energyVsEtaEGammaHF"]->Fill(eta,energy); 
 
   }
