@@ -52,8 +52,8 @@ void PFlowNoiseAnalyzer::beginJob(){
                                     4.730, 4.903, 5.205}; // 41 + 41 bins
 
   double energyMin = -1.0;
-  double energyMax = 10.0;
-  int nBinsEnergy = 200;
+  double energyMax = 20.0;
+  int nBinsEnergy = 400;
   histosTH2F_["energyVsEtaAllTypes"] = fs->make<TH2F>("energyVsEtaAllTypes","energyVsEtaAllTypes",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
   histosTH2F_["energyVsEtaUndefined"] = fs->make<TH2F>("energyVsEtaUndefined","energyVsEtaUndefined",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
   histosTH2F_["energyVsEtaChargedHadron"] = fs->make<TH2F>("energyVsEtaChargedHadron","energyVsEtaChargedHadron",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
