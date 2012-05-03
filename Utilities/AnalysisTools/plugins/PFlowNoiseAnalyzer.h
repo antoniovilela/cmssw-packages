@@ -19,7 +19,10 @@ class PFlowNoiseAnalyzer : public edm::EDAnalyzer
   virtual void beginJob();
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
  private:
+  double corrEnergyHF(double, double); 
+ 
   edm::InputTag particleFlowTag_;
+  bool applyHFEnergyCorrection_;
 
   std::map<std::string,TH1F*> histosTH1F_;
   std::map<std::string,TH2F*> histosTH2F_;

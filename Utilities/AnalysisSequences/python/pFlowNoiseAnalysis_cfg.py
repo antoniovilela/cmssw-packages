@@ -22,6 +22,9 @@ process.trackVeto = cms.Sequence(~process.generalTracksFilter + ~process.pixelTr
 #############
 
 process.load('Utilities.AnalysisTools.pFlowNoiseAnalyzer_cfi')
+process.pFlowNoiseAnalyzer.particleFlowTag = "particleFlow"
+process.pFlowNoiseAnalyzer.applyHFEnergyCorrection = False
+
 process.pFlowAnalysisNoSel = process.pFlowNoiseAnalyzer.clone()
 process.pFlowAnalysisColl = process.pFlowNoiseAnalyzer.clone()
 process.pFlowAnalysisNoColl = process.pFlowNoiseAnalyzer.clone()

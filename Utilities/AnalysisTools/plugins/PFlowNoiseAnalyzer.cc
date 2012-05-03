@@ -13,15 +13,16 @@
 
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
-
 #include "TFile.h"
+#include "TMath.h"
 #include "TH1F.h"
 #include "TH2F.h" 
 
 using namespace reco;
  
 PFlowNoiseAnalyzer::PFlowNoiseAnalyzer(const edm::ParameterSet& pset):
-  particleFlowTag_(pset.getParameter<edm::InputTag>("particleFlowTag")){
+  particleFlowTag_(pset.getParameter<edm::InputTag>("particleFlowTag")),
+  applyHFEnergyCorrection_(pset.getParameter<bool>("applyHFEnergyCorrection")){
 
 }  
   
@@ -82,6 +83,9 @@ void PFlowNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
      int partType = part->particleId();
      double eta = part->eta();
      double energy = part->energy();
+     if(applyHFEnergyCorrection_ && 
+        (partType == reco::PFCandidate::h_HF || partType == reco::PFCandidate::egamma_HF) ) { energy = corrEnergyHF(energy,eta); }
+
      histosTH2F_["energyVsEtaAllTypes"]->Fill(eta,energy);
 
      if(partType == reco::PFCandidate::X)
@@ -105,6 +109,10 @@ void PFlowNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
 
   }
 
+}
+
+double PFlowNoiseAnalyzer::corrEnergyHF(double energy, double eta) {
+  return 1.5*energy*( 1.0 - 0.0017*TMath::Exp( fabs(eta) ) );
 }
 
 DEFINE_FWK_MODULE(PFlowNoiseAnalyzer);
