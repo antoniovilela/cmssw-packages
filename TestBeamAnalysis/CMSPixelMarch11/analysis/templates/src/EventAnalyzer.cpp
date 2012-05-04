@@ -197,7 +197,8 @@ void EventAnalyzer::analyzeEvent(unsigned int event)
 
     // Get the track impact point on DUT in the local detector frame
     double xp, yp, tmp;
-    dut->getPredicted( tParameters, xp, yp );
+    //dut->getPredicted( tParameters, xp, yp );
+    dut->getPredictedLocal( tParameters, xp, yp );
     Detector::xyPair trackErrorOnDUT = dut->getTrackErrorsOnPlane( fittedTracks[tr], fittedTrackCovariance[tr] );
 
     // Check if the impact point is on the dut surface
