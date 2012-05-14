@@ -22,6 +22,9 @@ class PFlowNoiseAnalyzer : public edm::EDAnalyzer
   double corrEnergyHF(double, double); 
  
   edm::InputTag particleFlowTag_;
+  double energyMin_;
+  double energyMax_;
+  int nBins_;
   bool applyHFEnergyCorrection_;
 
   std::map<std::string,TH1F*> histosTH1F_;

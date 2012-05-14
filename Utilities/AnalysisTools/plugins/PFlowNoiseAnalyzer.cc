@@ -21,7 +21,10 @@
 using namespace reco;
  
 PFlowNoiseAnalyzer::PFlowNoiseAnalyzer(const edm::ParameterSet& pset):
-  particleFlowTag_(pset.getParameter<edm::InputTag>("particleFlowTag")),
+  particleFlowTag_( pset.getParameter<edm::InputTag>("particleFlowTag") ),
+  energyMin_( pset.getParameter<double>("energyMin") ),
+  energyMax_( pset.getParameter<double>("energyMax") ),
+  nBins_( pset.getParameter<int>("nBins") ), 
   applyHFEnergyCorrection_(pset.getParameter<bool>("applyHFEnergyCorrection")){
 
 }  
@@ -52,9 +55,12 @@ void PFlowNoiseAnalyzer::beginJob(){
                                     3.152, 3.327, 3.503, 3.677, 3.853, 4.027, 4.204, 4.377, 4.552,
                                     4.730, 4.903, 5.205}; // 41 + 41 bins
 
-  double energyMin = -1.0;
+  /*double energyMin = -1.0;
   double energyMax = 20.0;
-  int nBinsEnergy = 400;
+  int nBinsEnergy = 400;*/
+  double energyMin = energyMin_;
+  double energyMax = energyMax_;
+  int nBinsEnergy = nBins_;
   histosTH2F_["energyVsEtaAllTypes"] = fs->make<TH2F>("energyVsEtaAllTypes","energyVsEtaAllTypes",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
   histosTH2F_["energyVsEtaUndefined"] = fs->make<TH2F>("energyVsEtaUndefined","energyVsEtaUndefined",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
   histosTH2F_["energyVsEtaChargedHadron"] = fs->make<TH2F>("energyVsEtaChargedHadron","energyVsEtaChargedHadron",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
