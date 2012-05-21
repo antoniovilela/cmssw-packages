@@ -22,6 +22,7 @@ class PFlowNoiseAnalyzer : public edm::EDAnalyzer
   double corrEnergyHF(double, double); 
  
   edm::InputTag particleFlowTag_;
+  edm::InputTag eventWeightTag_;
   double energyMin_;
   double energyMax_;
   int nBins_;

@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-leadingJets = cms.EDProducer("LargestPtCandViewSelector",
+leadingJets = cms.EDFilter("LargestPtCandViewSelector",
       src = cms.InputTag(""),
       maxNumber = cms.uint32(2)
 )

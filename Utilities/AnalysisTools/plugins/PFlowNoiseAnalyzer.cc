@@ -22,6 +22,7 @@ using namespace reco;
  
 PFlowNoiseAnalyzer::PFlowNoiseAnalyzer(const edm::ParameterSet& pset):
   particleFlowTag_( pset.getParameter<edm::InputTag>("particleFlowTag") ),
+  eventWeightTag_( pset.getParameter<edm::InputTag>("weight") ),
   energyMin_( pset.getParameter<double>("energyMin") ),
   energyMax_( pset.getParameter<double>("energyMax") ),
   nBins_( pset.getParameter<int>("nBins") ), 
@@ -41,6 +42,8 @@ void PFlowNoiseAnalyzer::beginJob(){
   TH1::SetDefaultSumw2(true);
 
   histosTH1F_["NEvents"] = fs->make<TH1F>("NEvents","NEvents",1,0,1);
+  histosTH1F_["NEventsUnweighted"] = fs->make<TH1F>("NEventsUnweighted","NEventsUnweighted",1,0,1);
+  histosTH1F_["weight"] = fs->make<TH1F>("weight","weight",1000,0.,100.);
 
   double etaBinsHCALBoundaries[] = {-5.205, -4.903, -4.730,
                                     -4.552, -4.377, -4.204, -4.027, -3.853, -3.677, -3.503, -3.327, -3.152,
@@ -77,7 +80,15 @@ void PFlowNoiseAnalyzer::beginJob(){
 
 void PFlowNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup) {
 
-  histosTH1F_["NEvents"]->Fill(0.);
+  double weight = 1.;
+
+  edm::Handle<double> eventWeight;
+  event.getByLabel(eventWeightTag_,eventWeight);
+  if( eventWeight.isValid() ) weight = *eventWeight;
+
+  histosTH1F_["NEvents"]->Fill(0.,weight);
+  histosTH1F_["NEventsUnweighted"]->Fill(0.);
+  histosTH1F_["weight"]->Fill(weight);
 
   edm::Handle<reco::PFCandidateCollection> particleFlowCollectionH;
   event.getByLabel(particleFlowTag_,particleFlowCollectionH);
@@ -92,26 +103,26 @@ void PFlowNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
      if(applyHFEnergyCorrection_ && 
         (partType == reco::PFCandidate::h_HF || partType == reco::PFCandidate::egamma_HF) ) { energy = corrEnergyHF(energy,eta); }
 
-     histosTH2F_["energyVsEtaAllTypes"]->Fill(eta,energy);
+     histosTH2F_["energyVsEtaAllTypes"]->Fill(eta,energy,weight);
 
      if(partType == reco::PFCandidate::X)
-        histosTH2F_["energyVsEtaUndefined"]->Fill(eta,energy);
+        histosTH2F_["energyVsEtaUndefined"]->Fill(eta,energy,weight);
      else if(partType == reco::PFCandidate::h)
-        histosTH2F_["energyVsEtaChargedHadron"]->Fill(eta,energy); 
+        histosTH2F_["energyVsEtaChargedHadron"]->Fill(eta,energy,weight); 
      else if(partType == reco::PFCandidate::e) 
-        histosTH2F_["energyVsEtaElectron"]->Fill(eta,energy);
+        histosTH2F_["energyVsEtaElectron"]->Fill(eta,energy,weight);
      else if(partType == reco::PFCandidate::mu) 
-        histosTH2F_["energyVsEtaMuon"]->Fill(eta,energy);
+        histosTH2F_["energyVsEtaMuon"]->Fill(eta,energy,weight);
      else if(partType == reco::PFCandidate::gamma) 
-        histosTH2F_["energyVsEtaGamma"]->Fill(eta,energy);
+        histosTH2F_["energyVsEtaGamma"]->Fill(eta,energy,weight);
      else if(partType == reco::PFCandidate::h0) 
-        histosTH2F_["energyVsEtaNeutralHadron"]->Fill(eta,energy);
+        histosTH2F_["energyVsEtaNeutralHadron"]->Fill(eta,energy,weight);
      else if(partType == reco::PFCandidate::h_HF){ 
-        histosTH2F_["energyVsEtaHadronHF"]->Fill(eta,energy);
-        if( part->ecalEnergy() > 0. ) histosTH2F_["energyVsEtaHadronHFEcalEnergy"]->Fill(eta,energy);
-        else                          histosTH2F_["energyVsEtaHadronHFNoEcalEnergy"]->Fill(eta,energy);
+        histosTH2F_["energyVsEtaHadronHF"]->Fill(eta,energy,weight);
+        if( part->ecalEnergy() > 0. ) histosTH2F_["energyVsEtaHadronHFEcalEnergy"]->Fill(eta,energy,weight);
+        else                          histosTH2F_["energyVsEtaHadronHFNoEcalEnergy"]->Fill(eta,energy,weight);
      } else if(partType == reco::PFCandidate::egamma_HF) 
-        histosTH2F_["energyVsEtaEGammaHF"]->Fill(eta,energy); 
+        histosTH2F_["energyVsEtaEGammaHF"]->Fill(eta,energy,weight); 
 
   }
 
