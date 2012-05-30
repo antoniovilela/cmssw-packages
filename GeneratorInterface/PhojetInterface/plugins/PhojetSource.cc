@@ -1,11 +1,11 @@
 /*
- *  $Date: 2009/12/30 14:06:18 $
- *  $Revision: 1.4 $
+ *  $Date: 2010/01/04 20:25:56 $
+ *  $Revision: 1.5 $
  *  
  */
 
 
-#include "GeneratorInterface/PhojetInterface/interface/PhojetSource.h"
+#include "PhojetSource.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenRunInfoProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include "time.h"
-#include "fostream.h"
+#include "GeneratorInterface/PhojetInterface/interface/fostream.h"
 
 using namespace edm;
 using namespace std;

@@ -1,7 +1,7 @@
 #include "FWCore/Framework/interface/InputSourceMacros.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "GeneratorInterface/PhojetInterface/interface/PhojetSource.h"
-#include "GeneratorInterface/PhojetInterface/interface/EmptyEventFilter.h"
+#include "PhojetSource.h"
+#include "EmptyEventFilter.h"
 
   using edm::PhojetSource;
 

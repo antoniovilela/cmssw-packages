@@ -1,4 +1,4 @@
-#include "GeneratorInterface/PhojetInterface/interface/EmptyEventFilter.h"
+#include "EmptyEventFilter.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
