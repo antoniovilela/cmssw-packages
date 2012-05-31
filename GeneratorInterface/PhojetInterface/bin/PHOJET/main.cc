@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "HepMC/IO_GenEvent.h"
+
 int main(int argc, char **argv)
 {
    /*std::string line_;
@@ -17,7 +19,8 @@ int main(int argc, char **argv)
    std::vector<std::string> params_;
    params_.push_back(line_);
 
-   std::ofstream output("phojet.hepmc");
+   //std::ofstream output("phojet.hepmc");
+   HepMC::IO_GenEvent* output = new HepMC::IO_GenEvent("phojet.hepmc",std::ios::out);
 
    phojet::Phojet* generator = new phojet::Phojet(comEnergy_,seed_,params_);
    generator->begin();
@@ -28,11 +31,11 @@ int main(int argc, char **argv)
          std::cout << "WARNING: Event " << (evt + 1) << " failed." << std::endl;
          continue;
       }
-      generator->write(output);
-      
+      //generator->write(output);
+      output->write_event( generator->event() );
    }    
    generator->end();
-   output.close();
+   //output.close();
 
    return 0;
 }

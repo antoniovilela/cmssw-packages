@@ -29,6 +29,8 @@ namespace phojet
     void end();
     void write(std::ostream&);
 
+    const HepMC::GenEvent* event() const { return hepMCEvt_; } 
+
   private:
     void getProtonKinematics(double* p1, double* p2);
     
