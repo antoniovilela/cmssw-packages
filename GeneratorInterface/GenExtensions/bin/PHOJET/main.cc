@@ -12,7 +12,7 @@ int main(int argc, char **argv)
    if (argc > 1 && strcmp(s1,argv[1]) != 0)  line_ = argv[1];*/
 
    std::string line_ = "PROCESS     1  0  1  1  1  1  1  1  1  1  1";
-   unsigned int maxEvents_ = 100;
+   unsigned int maxEvents_ = 1000;
 
    double comEnergy_ = 7000;
    long seed_ = 123456789;
