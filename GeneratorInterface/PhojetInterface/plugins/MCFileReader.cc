@@ -80,4 +80,5 @@ void MCFileReader::endRun(Run& run, EventSetup const& setup) {
 
    run.put(genRunInfoProd);
 }
-DEFINE_FWK_MODULE(MCFileReader);
+// Move plugin to different package
+//DEFINE_FWK_MODULE(MCFileReader);
