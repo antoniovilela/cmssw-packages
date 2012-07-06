@@ -20,7 +20,7 @@ process.pfCandidateNoiseThresholds = pfCandidateSelector.clone()
 from ForwardAnalysis.Utilities.ExcludeHFEdgesStringCut import ExcludeHFEdgesStringCut
 from ForwardAnalysis.Utilities.PFCandidateNoiseStringCut import PFCandidateNoiseStringCut
 # Change thresholds here if needed
-from ForwardAnalysis.ForwardTTreeAnalysis.pfThresholds_cfi import pfThresholds
+from ForwardAnalysis.AnalysisSequences.pfThresholds_cfi import pfThresholds
 pfStrCut1 = ExcludeHFEdgesStringCut().cut()
 pfStrCut2 = PFCandidateNoiseStringCut(pfThresholds).cut()
 # Only noise thresholds
