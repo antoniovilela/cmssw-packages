@@ -122,6 +122,10 @@ void SimpleTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
      //int l1decision = -1;
      //if(ierror == 0) l1decision = decision ? 1 : 0;
 
+     std::stringstream ss_acc;
+     ss_acc << "l1Accept_" << l1TriggerNames_[k];
+     histosTH1F_[ ss_acc.str() ]->Fill( decision ? 1 : 0 );
+
      int prescale = -1;
      if(ierror == 0){
 	if(gtDigisTag_.label() != "")
@@ -130,6 +134,10 @@ void SimpleTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
 	   prescale = l1GtUtils_.prescaleFactor(event,l1TriggerNames_[k],ierr_pr);
      }
     
+     std::stringstream ss_pcl;
+     ss_pcl << "l1Prescale_" << l1TriggerNames_[k];
+     histosTH1F_[ ss_pcl.str() ]->Fill( prescale );
+
      if(ierror == 0 && decision){
         passedL1.push_back( l1TriggerNames_[k] );
         prescalesL1.push_back(prescale);
@@ -217,6 +225,17 @@ void SimpleTriggerAnalyzer::analyze(const edm::Event& event, const edm::EventSet
 }
 
 void SimpleTriggerAnalyzer::bookHistos(HistoMapTH1F& histos, edm::Service<TFileService> const& fs){
+  for(size_t k = 0; k < l1TriggerNames_.size(); ++k){
+     std::stringstream ss_acc;
+     ss_acc << "l1Accept_" << l1TriggerNames_[k];
+     histos[ ss_acc.str() ] = fs->make<TH1F>(ss_acc.str().c_str(),"accept",2,0,2);
+
+     std::stringstream ss_pcl;
+     ss_pcl << "l1Prescale_" << l1TriggerNames_[k];
+     histos[ ss_pcl.str() ] = fs->make<TH1F>(ss_pcl.str().c_str(),"prescale",1000,0,1000);
+  }
+
+  histos["l1JetCentralEta"] = fs->make<TH1F>("l1JetCentralEta","eta",50,-5.2,5.2);
   histos["l1JetCentralPt"] = fs->make<TH1F>("l1JetCentralPt","pt",50,0.,100.);
   histos["l1JetCentralEta"] = fs->make<TH1F>("l1JetCentralEta","eta",50,-5.2,5.2);
   histos["l1JetCentralPhi"] = fs->make<TH1F>("l1JetCentralPhi","phi",50,-M_PI,M_PI);

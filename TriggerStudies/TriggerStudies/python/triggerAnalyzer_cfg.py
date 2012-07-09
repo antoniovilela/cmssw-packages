@@ -36,7 +36,8 @@ process.source = cms.Source("PoolSource",
 )
 
 process.triggerAnalyzer = cms.EDAnalyzer('SimpleTriggerAnalyzer',
-    gtDigisTag = cms.InputTag('simGtDigis'),
+    #gtDigisTag = cms.InputTag('simGtDigis'),
+    gtDigisTag = cms.InputTag('hltGtDigis'),
     l1ExtraParticlesTag = cms.InputTag('hltL1extraParticles'),
     hltJetTag = cms.InputTag('hltCaloJetL1FastJetCorrected'),
     l1TriggerNames = cms.vstring(),
@@ -55,14 +56,17 @@ process.triggerAnalyzer = cms.EDAnalyzer('SimpleTriggerAnalyzer',
 
 process.triggerAnalyzerL1SingleJet16 = process.triggerAnalyzer.clone( l1TriggerNames = ['L1_SingleJet16'] ) 
 process.triggerAnalyzerL1SingleJet36 = process.triggerAnalyzer.clone( l1TriggerNames = ['L1_SingleJet36'] ) 
-process.triggerAnalyzerL1DoubleJet36Central = process.triggerAnalyzer.clone( l1TriggerNames = ['L1_DoubleJet36_Central'] ) 
+process.triggerAnalyzerL1DoubleJet20 = process.triggerAnalyzer.clone( l1TriggerNames = ['L1_DoubleJet20'] ) 
+process.triggerAnalyzerL1DoubleJet24 = process.triggerAnalyzer.clone( l1TriggerNames = ['L1_DoubleJet24'] ) 
+#process.triggerAnalyzerL1DoubleJet36Central = process.triggerAnalyzer.clone( l1TriggerNames = ['L1_DoubleJet36_Central'] ) 
 
 import copy
 from HLTrigger.HLTfilters.hltHighLevel_cfi import *
 hltFilter = copy.deepcopy(hltHighLevel)
 process.hltZeroBias = hltFilter.clone( HLTPaths = ['HLT_ZeroBias_v*'] )
 
-process.analysis_step = cms.Path( process.hltZeroBias +
+process.analysis_step = cms.Path( #process.hltZeroBias +
                                   process.triggerAnalyzerL1SingleJet16 + 
                                   process.triggerAnalyzerL1SingleJet36 +
-                                  process.triggerAnalyzerL1DoubleJet36Central )
+                                  process.triggerAnalyzerL1DoubleJet20 +
+                                  process.triggerAnalyzerL1DoubleJet24 )
