@@ -13,12 +13,15 @@
 
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
+#include "ForwardAnalysis/Utilities/interface/DeadMaterialEnergyCorrection.h"
+
 #include "TFile.h"
 #include "TMath.h"
 #include "TH1F.h"
 #include "TH2F.h" 
 
 using namespace reco;
+using namespace forwardAnalysis;
  
 PFlowNoiseAnalyzer::PFlowNoiseAnalyzer(const edm::ParameterSet& pset):
   particleFlowTag_( pset.getParameter<edm::InputTag>("particleFlowTag") ),
@@ -26,7 +29,8 @@ PFlowNoiseAnalyzer::PFlowNoiseAnalyzer(const edm::ParameterSet& pset):
   energyMin_( pset.getParameter<double>("energyMin") ),
   energyMax_( pset.getParameter<double>("energyMax") ),
   nBins_( pset.getParameter<int>("nBins") ), 
-  applyHFEnergyCorrection_(pset.getParameter<bool>("applyHFEnergyCorrection")){
+  applyHFEnergyCorrection_(pset.getParameter<bool>("applyHFEnergyCorrection")),
+  applyHFDeadMaterialCorrection_(pset.getParameter<bool>("applyHFDeadMaterialCorrection")){
 
 }  
   
@@ -45,7 +49,7 @@ void PFlowNoiseAnalyzer::beginJob(){
   histosTH1F_["NEventsUnweighted"] = fs->make<TH1F>("NEventsUnweighted","NEventsUnweighted",1,0,1);
   histosTH1F_["weight"] = fs->make<TH1F>("weight","weight",1000,0.,100.);
 
-  double etaBinsHCALBoundaries[] = {-5.205, -4.903, -4.730,
+  /*double etaBinsHCALBoundaries[] = {-5.205, -4.903, -4.730,
                                     -4.552, -4.377, -4.204, -4.027, -3.853, -3.677, -3.503, -3.327, -3.152,
                                     -3.000, -2.868, -2.650, -2.500,
                                     -2.322, -2.172, -2.043, -1.930, -1.830, -1.740, -1.653, -1.566, -1.479,
@@ -55,6 +59,18 @@ void PFlowNoiseAnalyzer::beginJob(){
                                     0.783, 0.870, 0.957, 1.044, 1.131, 1.218, 1.305, 1.392,
                                     1.479, 1.566, 1.653, 1.740, 1.830, 1.930, 2.043, 2.172, 2.322,
                                     2.500, 2.650, 2.868, 3.000,
+                                    3.152, 3.327, 3.503, 3.677, 3.853, 4.027, 4.204, 4.377, 4.552,
+                                    4.730, 4.903, 5.205}; // 41 + 41 bins*/
+  double etaBinsHCALBoundaries[] = {-5.205, -4.903, -4.730,
+                                    -4.552, -4.377, -4.204, -4.027, -3.853, -3.677, -3.503, -3.327, -3.152,
+                                    -2.976, -2.866, -2.650, -2.500,
+                                    -2.322, -2.172, -2.043, -1.930, -1.830, -1.740, -1.653, -1.566, -1.479,
+                                    -1.392, -1.305, -1.218, -1.131, -1.044, -0.957, -0.870, -0.783,
+                                    -0.696, -0.609, -0.522, -0.435, -0.348, -0.261, -0.174, -0.087,
+                                    0.000, 0.087, 0.174, 0.261, 0.348, 0.435, 0.522, 0.609, 0.696,
+                                    0.783, 0.870, 0.957, 1.044, 1.131, 1.218, 1.305, 1.392,
+                                    1.479, 1.566, 1.653, 1.740, 1.830, 1.930, 2.043, 2.172, 2.322,
+                                    2.500, 2.650, 2.866, 2.976,
                                     3.152, 3.327, 3.503, 3.677, 3.853, 4.027, 4.204, 4.377, 4.552,
                                     4.730, 4.903, 5.205}; // 41 + 41 bins
 
@@ -100,8 +116,18 @@ void PFlowNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
      int partType = part->particleId();
      double eta = part->eta();
      double energy = part->energy();
+
      if(applyHFEnergyCorrection_ && 
-        (partType == reco::PFCandidate::h_HF || partType == reco::PFCandidate::egamma_HF) ) { energy = corrEnergyHF(energy,eta); }
+        (partType == reco::PFCandidate::h_HF || partType == reco::PFCandidate::egamma_HF) ){
+        energy = corrEnergyHF(energy,eta);
+     }
+
+     if(applyHFDeadMaterialCorrection_ && 
+        (partType == reco::PFCandidate::h_HF || partType == reco::PFCandidate::egamma_HF) ){ 
+        DeadMaterialEnergyCorrection correction;
+        double correctionValue = correction(*part);
+        energy = energy*correctionValue;
+     }
 
      histosTH2F_["energyVsEtaAllTypes"]->Fill(eta,energy,weight);
 

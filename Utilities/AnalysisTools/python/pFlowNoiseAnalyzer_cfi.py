@@ -9,5 +9,6 @@ pFlowNoiseAnalyzer = cms.EDAnalyzer("PFlowNoiseAnalyzer",
     energyMin = cms.double(-10.),
     energyMax = cms.double(190.),
     nBins = cms.int32(4000),
-    applyHFEnergyCorrection = cms.bool(False)
+    applyHFEnergyCorrection = cms.bool(False),
+    applyHFDeadMaterialCorrection = cms.bool(False)
 )

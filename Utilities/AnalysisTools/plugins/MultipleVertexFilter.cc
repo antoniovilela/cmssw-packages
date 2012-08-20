@@ -75,4 +75,4 @@ bool MultipleVertexFilter::filter(edm::Event& event, const edm::EventSetup& setu
    return accept;
 }
 
-DEFINE_FWK_MODULE(MultipleVertexFilter);
+//DEFINE_FWK_MODULE(MultipleVertexFilter);

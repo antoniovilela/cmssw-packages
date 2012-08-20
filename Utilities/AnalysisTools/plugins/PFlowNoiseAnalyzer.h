@@ -27,6 +27,7 @@ class PFlowNoiseAnalyzer : public edm::EDAnalyzer
   double energyMax_;
   int nBins_;
   bool applyHFEnergyCorrection_;
+  bool applyHFDeadMaterialCorrection_;
 
   std::map<std::string,TH1F*> histosTH1F_;
   std::map<std::string,TH2F*> histosTH2F_;

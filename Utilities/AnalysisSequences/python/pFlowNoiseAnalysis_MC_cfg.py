@@ -39,6 +39,8 @@ process.trackVeto = cms.Sequence(~process.generalTracksFilter + ~process.pixelTr
 process.load('Utilities.AnalysisTools.pFlowNoiseAnalyzer_cfi')
 process.pFlowNoiseAnalyzer.particleFlowTag = "particleFlow"
 process.pFlowNoiseAnalyzer.applyHFEnergyCorrection = False
+#process.pFlowNoiseAnalyzer.applyHFDeadMaterialCorrection = False
+process.pFlowNoiseAnalyzer.applyHFDeadMaterialCorrection = True
 
 process.load('ForwardAnalysis.Utilities.pileUpInfoFilter_cfi')
 process.pileUpInfoFilter.pileUpSummaryInfoTag = "addPileupInfo"
@@ -57,9 +59,9 @@ process.pFlowAnalysisCollPU0 = process.pFlowNoiseAnalyzer.clone()
 process.analysis_reco_step = cms.Path(process.analysisSequences)
 process.analysisNoSel = cms.Path(process.pFlowAnalysisNoSel)
 process.analysisColl = cms.Path(process.offlineSelection + process.pFlowAnalysisColl)
-process.analysisNoiseThresholdsColl = cms.Path(process.offlineSelection+
+process.analysisNoiseThresholdsColl = cms.Path(process.offlineSelection +
                                                process.pFlowAnalysisNoiseThresholdsColl)
-process.analysisCollPU0 = cms.Path(process.offlineSelection+
+process.analysisCollPU0 = cms.Path(process.pileUpInfoFilter + process.offlineSelection +
                                    process.pFlowAnalysisCollPU0)
 
 #######

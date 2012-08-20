@@ -1,13 +1,13 @@
-#ifndef Utilities_AnalysisTools_PileUpInfoFilter_h
-#define Utilities_AnalysisTools_PileUpInfoFilter_h
+#ifndef Utilities_AnalysisTools_PileUpInfoFilterOld_h
+#define Utilities_AnalysisTools_PileUpInfoFilterOld_h
 
 #include "FWCore/Framework/interface/EDFilter.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-class PileUpInfoFilter : public edm::EDFilter {
+class PileUpInfoFilterOld : public edm::EDFilter {
     public:
-       explicit PileUpInfoFilter(const edm::ParameterSet&);
-       ~PileUpInfoFilter();
+       explicit PileUpInfoFilterOld(const edm::ParameterSet&);
+       ~PileUpInfoFilterOld();
 
        virtual bool filter(edm::Event&, const edm::EventSetup&);
    private:
@@ -25,14 +25,14 @@ class PileUpInfoFilter : public edm::EDFilter {
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
-PileUpInfoFilter::PileUpInfoFilter(const edm::ParameterSet& pset){
+PileUpInfoFilterOld::PileUpInfoFilterOld(const edm::ParameterSet& pset){
   pileUpInfoTag_ = pset.getParameter<edm::InputTag>("pileUpInfoTag"); 
   numberPU_ = pset.getParameter<unsigned int>("numberOfPileUpEvents");
 }
 
-PileUpInfoFilter::~PileUpInfoFilter() {}
+PileUpInfoFilterOld::~PileUpInfoFilterOld() {}
 
-bool PileUpInfoFilter::filter(edm::Event& event, const edm::EventSetup& setup){
+bool PileUpInfoFilterOld::filter(edm::Event& event, const edm::EventSetup& setup){
   edm::Handle<PileupSummaryInfo> pileUpInfo;
   event.getByLabel( pileUpInfoTag_, pileUpInfo );
   int n_PU = pileUpInfo->getPU_NumInteractions();
@@ -43,4 +43,4 @@ bool PileUpInfoFilter::filter(edm::Event& event, const edm::EventSetup& setup){
   return accept;
 }
 
-//DEFINE_FWK_MODULE(PileUpInfoFilter);
+//DEFINE_FWK_MODULE(PileUpInfoFilterOld);
