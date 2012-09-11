@@ -55,15 +55,20 @@ process.pFlowAnalysisNoiseThresholdsColl = process.pFlowNoiseAnalyzer.clone()
 process.pFlowAnalysisNoiseThresholdsColl.particleFlowTag = "pfCandidateNoiseThresholds"
 
 process.pFlowAnalysisCollPU0 = process.pFlowNoiseAnalyzer.clone()
+process.pFlowAnalysisNoiseThresholdsCollPU0 = process.pFlowNoiseAnalyzer.clone()
+process.pFlowAnalysisNoiseThresholdsCollPU0.particleFlowTag = "pfCandidateNoiseThresholds"
 #######
 process.analysis_reco_step = cms.Path(process.analysisSequences)
+
 process.analysisNoSel = cms.Path(process.pFlowAnalysisNoSel)
 process.analysisColl = cms.Path(process.offlineSelection + process.pFlowAnalysisColl)
 process.analysisNoiseThresholdsColl = cms.Path(process.offlineSelection +
                                                process.pFlowAnalysisNoiseThresholdsColl)
+
 process.analysisCollPU0 = cms.Path(process.pileUpInfoFilter + process.offlineSelection +
                                    process.pFlowAnalysisCollPU0)
-
+process.analysisNoiseThresholdsCollPU0 = cms.Path(process.pileUpInfoFilter + process.offlineSelection +
+                                                  process.pFlowAnalysisNoiseThresholdsCollPU0)
 #######
 process.analysisNoVtx = cms.Path(process.vertexVeto + process.pFlowAnalysisNoVtx)
 process.analysisNoTrk = cms.Path(process.trackVeto + process.pFlowAnalysisNoTrk)
