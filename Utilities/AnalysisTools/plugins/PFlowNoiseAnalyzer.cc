@@ -92,6 +92,17 @@ void PFlowNoiseAnalyzer::beginJob(){
   histosTH2F_["energyVsEtaHadronHFNoEcalEnergy"] = fs->make<TH2F>("energyVsEtaHadronHFNoEcalEnergy","energyVsEtaHadronHFNoEcalEnergy",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
   histosTH2F_["energyVsEtaEGammaHF"] = fs->make<TH2F>("energyVsEtaEGammaHF","energyVsEtaEGammaHF",82,etaBinsHCALBoundaries,nBinsEnergy,energyMin,energyMax);
    
+  histosTH1F_["sumEnergyVsEtaAllTypes"] = fs->make<TH1F>("sumEnergyVsEtaAllTypes","sumEnergyVsEtaAllTypes",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaUndefined"] = fs->make<TH1F>("sumEnergyVsEtaUndefined","sumEnergyVsEtaUndefined",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaChargedHadron"] = fs->make<TH1F>("sumEnergyVsEtaChargedHadron","sumEnergyVsEtaChargedHadron",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaElectron"] = fs->make<TH1F>("sumEnergyVsEtaElectron","sumEnergyVsEtaElectron",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaMuon"] = fs->make<TH1F>("sumEnergyVsEtaMuon","sumEnergyVsEtaMuon",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaGamma"] = fs->make<TH1F>("sumEnergyVsEtaGamma","sumEnergyVsEtaGamma",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaNeutralHadron"] = fs->make<TH1F>("sumEnergyVsEtaNeutralHadron","sumEnergyVsEtaNeutralHadron",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaHadronHF"] = fs->make<TH1F>("sumEnergyVsEtaHadronHF","sumEnergyVsEtaHadronHF",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaHadronHFEcalEnergy"] = fs->make<TH1F>("sumEnergyVsEtaHadronHFEcalEnergy","sumEnergyVsEtaHadronHFEcalEnergy",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaHadronHFNoEcalEnergy"] = fs->make<TH1F>("sumEnergyVsEtaHadronHFNoEcalEnergy","sumEnergyVsEtaHadronHFNoEcalEnergy",82,etaBinsHCALBoundaries);
+  histosTH1F_["sumEnergyVsEtaEGammaHF"] = fs->make<TH1F>("sumEnergyVsEtaEGammaHF","sumEnergyVsEtaEGammaHF",82,etaBinsHCALBoundaries);
 }     
 
 void PFlowNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup) {
@@ -130,25 +141,40 @@ void PFlowNoiseAnalyzer::analyze(const edm::Event& event, const edm::EventSetup&
      }
 
      histosTH2F_["energyVsEtaAllTypes"]->Fill(eta,energy,weight);
+     histosTH1F_["sumEnergyVsEtaAllTypes"]->Fill(eta,energy*weight);
 
-     if(partType == reco::PFCandidate::X)
+     if(partType == reco::PFCandidate::X){
         histosTH2F_["energyVsEtaUndefined"]->Fill(eta,energy,weight);
-     else if(partType == reco::PFCandidate::h)
+        histosTH1F_["sumEnergyVsEtaUndefined"]->Fill(eta,energy*weight);
+     } else if(partType == reco::PFCandidate::h){
         histosTH2F_["energyVsEtaChargedHadron"]->Fill(eta,energy,weight); 
-     else if(partType == reco::PFCandidate::e) 
+        histosTH1F_["sumEnergyVsEtaChargedHadron"]->Fill(eta,energy*weight); 
+     } else if(partType == reco::PFCandidate::e){ 
         histosTH2F_["energyVsEtaElectron"]->Fill(eta,energy,weight);
-     else if(partType == reco::PFCandidate::mu) 
+        histosTH1F_["sumEnergyVsEtaElectron"]->Fill(eta,energy*weight);
+     } else if(partType == reco::PFCandidate::mu){ 
         histosTH2F_["energyVsEtaMuon"]->Fill(eta,energy,weight);
-     else if(partType == reco::PFCandidate::gamma) 
+        histosTH1F_["sumEnergyVsEtaMuon"]->Fill(eta,energy*weight);
+     } else if(partType == reco::PFCandidate::gamma){ 
         histosTH2F_["energyVsEtaGamma"]->Fill(eta,energy,weight);
-     else if(partType == reco::PFCandidate::h0) 
+        histosTH1F_["sumEnergyVsEtaGamma"]->Fill(eta,energy*weight);
+     } else if(partType == reco::PFCandidate::h0){ 
         histosTH2F_["energyVsEtaNeutralHadron"]->Fill(eta,energy,weight);
-     else if(partType == reco::PFCandidate::h_HF){ 
+        histosTH1F_["sumEnergyVsEtaNeutralHadron"]->Fill(eta,energy*weight);
+     } else if(partType == reco::PFCandidate::h_HF){ 
         histosTH2F_["energyVsEtaHadronHF"]->Fill(eta,energy,weight);
-        if( part->ecalEnergy() > 0. ) histosTH2F_["energyVsEtaHadronHFEcalEnergy"]->Fill(eta,energy,weight);
-        else                          histosTH2F_["energyVsEtaHadronHFNoEcalEnergy"]->Fill(eta,energy,weight);
-     } else if(partType == reco::PFCandidate::egamma_HF) 
+        histosTH1F_["sumEnergyVsEtaHadronHF"]->Fill(eta,energy*weight);
+        if( part->ecalEnergy() > 0. ){
+           histosTH2F_["energyVsEtaHadronHFEcalEnergy"]->Fill(eta,energy,weight);
+           histosTH1F_["sumEnergyVsEtaHadronHFEcalEnergy"]->Fill(eta,energy*weight);
+        } else{
+           histosTH2F_["energyVsEtaHadronHFNoEcalEnergy"]->Fill(eta,energy,weight);
+           histosTH1F_["sumEnergyVsEtaHadronHFNoEcalEnergy"]->Fill(eta,energy*weight);
+        }
+     } else if(partType == reco::PFCandidate::egamma_HF){ 
         histosTH2F_["energyVsEtaEGammaHF"]->Fill(eta,energy,weight); 
+        histosTH1F_["sumEnergyVsEtaEGammaHF"]->Fill(eta,energy*weight); 
+     }
 
   }
 

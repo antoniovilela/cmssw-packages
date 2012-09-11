@@ -13,7 +13,7 @@
 
 class VarDesc{
    public:
-      VarDesc(const std::string& name, TDirectory* dir, const std::string& label, double norm): name_(name),dir_(dir),label_(label),norm_(norm) {}
+      VarDesc(const std::string& fname, TDirectory* fdir, const std::string& flabel, double fnorm): name_(fname),dir_(fdir),label_(flabel),norm_(fnorm) {}
       const std::string& name() const {return name_;}
       TDirectory* dir() const {return dir_;}
       const std::string& label() const {return label_;}
@@ -39,6 +39,7 @@ class Plotter{
       void SetVerbose(bool set = true) { verbose_ = set; }
       void SetRebin(int rebin) { rebin_ = rebin; }
       void SetStats(bool stats) { histStats_ = stats; }
+      void SetRatio(bool set) { useRatio_ = set; }
       void SetTitleSize(float size) { titleSize_ = size; }
       void SetAxisLabelSize(float size) { axisLabelSize_ = size; }
       void SetHeader(std::string const& header) { legendHeader_ = header; }
@@ -80,7 +81,7 @@ class Plotter{
       VarMap makeVarMap(std::vector<std::string>&, std::vector<std::pair<std::string,TDirectory*> >&, const std::vector<double>&);
       void plotHistos(std::vector<HistDesc> const&, std::string const&);
 
-      bool verbose_, firstAsRefHist_, histStats_;
+      bool verbose_, firstAsRefHist_, histStats_, useRatio_;
       int rebin_;
       float titleSize_, axisLabelSize_; 
       std::string legendHeader_;

@@ -14,7 +14,7 @@
 #include <sstream>
 
 template <class NormPolicy>
-Plotter<NormPolicy>::Plotter(): verbose_(false), firstAsRefHist_(false), histStats_(true),
+Plotter<NormPolicy>::Plotter(): verbose_(false), firstAsRefHist_(false), histStats_(true), useRatio_(false),
                                 rebin_(1),
                                 titleSize_(0.05), axisLabelSize_(0.05),
                                 legendHeader_("") {
@@ -150,10 +150,12 @@ typename Plotter<NormPolicy>::HistMap Plotter<NormPolicy>::loadHistos(VarMap con
 
    // HistDesc --> std::pair<TH1F*,std::string>
    std::map<std::string,std::vector<HistDesc> > histos;
+   std::map<std::string,std::vector<HistDesc> > histosRatio;
    for(VarMap::const_iterator cat = variablesMap.begin(); cat != variablesMap.end(); ++cat){
       const std::string& catName = cat->first;
 
       histos[catName] = std::vector<HistDesc>();
+      histosRatio[catName] = std::vector<HistDesc>();
 
       std::vector<VarDesc> const& vars = cat->second;
       size_t index = 0;
@@ -162,10 +164,18 @@ typename Plotter<NormPolicy>::HistMap Plotter<NormPolicy>::loadHistos(VarMap con
          std::string const& desc = var->label();
    
          histos[catName].push_back(std::make_pair(histo_new,desc));
+
+         if(useRatio_){
+            std::stringstream label;
+            label << histo_new->GetName() << "_ratio"; 
+            TH1F* histo_ratio = static_cast<TH1F*>( histo_new->Clone( label.str().c_str() ) );
+            histo_ratio->Divide( histos[catName].front().first );
+            histosRatio[catName].push_back(std::make_pair(histo_ratio,desc));
+         }
       }
    }
 
-   return histos;
+   return (useRatio_) ? histosRatio : histos;
 }
 
 template <class NormPolicy>
