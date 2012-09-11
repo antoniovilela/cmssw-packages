@@ -1,5 +1,0 @@
-<use   name="GeneratorInterface/PhojetInterface"/>
-<flags   FFLAGS="-O"/>
-<library   file="*.cc" name="GeneratorInterfacePhojetProducer">
-  <flags   EDM_PLUGIN="1"/>
-</library>
